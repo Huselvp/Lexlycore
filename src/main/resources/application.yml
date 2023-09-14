@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lexly_database
+    username: postgres
+    password: password
+  driverClassName: org.postgresql.Driver
+  sql:
+    init:
+      platform: postgres
+
