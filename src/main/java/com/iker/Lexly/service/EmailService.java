@@ -44,13 +44,10 @@ public class EmailService {
         javaMailSender.send(mimeMessage);
     }
     public void sendResetPasswordEmail(User user, String resetToken) {
-        // Create a SimpleMailMessage for the email
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail()); // Set the recipient's email address
-        message.setSubject("Password Reset Request"); // Set the email subject
-        message.setText("Click the following link to reset your password: " + generateResetLink(resetToken)); // Set the email content
-
-        // Send the email
+        message.setTo(user.getEmail());
+        message.setSubject("Password Reset Request");
+        message.setText("Click the following link to reset your password: " + generateResetLink(resetToken));
         javaMailSender.send(message);
     }
     private String generateResetLink(String resetToken) {

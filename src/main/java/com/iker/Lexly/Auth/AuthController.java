@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-   @Autowired
+
    userService userService;
    EmailService emailService;
    ResetTokenService resetTokenService;
@@ -58,11 +58,11 @@ public class AuthController {
         User user = resetTokenService.getUserFromToken(token);
 
         if (user == null) {
-
+            // User not found, return an error response
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-
         userService.resetPassword(user, newPassword);
+        resetTokenService.deleteToken(token);
         resetTokenService.invalidateToken(token);
         return ResponseEntity.ok("Password reset successful");
     }
