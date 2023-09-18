@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private  static final String SECRET_KEY= "3C2E395FCAB91DEF9A5425CF228B8";
+    private  static final String SECRET_KEY= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
     public String extractUsername(String token) {
         return extractClaim(token,Claims::getSubject);
     }
@@ -29,13 +29,13 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
     public String generateToken(Map<String,Object> extraClaims, UserDetails userDetails){
-       return Jwts
-               .builder()
-               .setClaims(extraClaims).
-               setSubject(userDetails.getUsername())
-               .setIssuedAt(new Date(System.currentTimeMillis()))
-               .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
-               .signWith(SignatureAlgorithm.HS256, getSignKey()).compact();
+        return Jwts
+                .builder()
+                .setClaims(extraClaims).
+                setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
     public boolean isTokenValid(String token ,UserDetails userDetails){
         final String username = extractUsername(token);
@@ -51,13 +51,10 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token){
-        return Jwts.parser().setSigningKey(getSignKey())
+        return Jwts.parser().setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
 }
+
