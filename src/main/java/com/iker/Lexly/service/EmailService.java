@@ -22,7 +22,7 @@ import java.util.Map;
 public class EmailService {
 
        JavaMailSender javaMailSender;
-     
+
 
     public void sendResetPasswordEmail(User user, String resetToken) {
         SimpleMailMessage message = new SimpleMailMessage();
