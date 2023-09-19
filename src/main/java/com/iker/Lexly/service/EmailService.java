@@ -21,11 +21,8 @@ import java.util.Map;
 @Service
 public class EmailService {
 
-      Configuration configuration;
        JavaMailSender javaMailSender;
-       JwtService jwtService;
-    @Value("${frontend}")
-    private String frontendUrl;
+     
 
     public void sendResetPasswordEmail(User user, String resetToken) {
         SimpleMailMessage message = new SimpleMailMessage();
