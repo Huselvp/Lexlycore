@@ -79,13 +79,10 @@ public class User implements UserDetails {
         this.picture = picture;
         this.role = role;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
      return List.of(new SimpleGrantedAuthority(role.getName().name()));
-
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -106,6 +103,9 @@ public class User implements UserDetails {
         return true;
     }
 
+    public void setEmailVerified(boolean verificationemail){
+        this .verificationemail=verificationemail;
+    }
 
 }
 

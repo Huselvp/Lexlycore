@@ -3,6 +3,7 @@ package com.iker.Lexly.service;
 import ch.qos.logback.core.boolex.Matcher;
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +18,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Configuration
 @Service
 @RequiredArgsConstructor
 public class userService {
-
+    private final ResetTokenService resetTokenService;
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
@@ -52,5 +56,42 @@ public class userService {
     public void resetPassword(User user, String newPassword) {
         user.setPassword(newPassword);
     }
+    public void markEmailAsVerified(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        optionalUser.ifPresent(user -> {
+            user.setEmailVerified(true);
+            userRepository.save(user);
+        });
+    }
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+    public void initiatePasswordReset(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            User user1 = user.get();
+            String resetToken = generatePasswordResetToken(user1);
+          resetTokenService.generateToken(user1);
+            emailService.sendResetPasswordEmail(user1, resetToken);
+        }
+    }
+
+    private String generatePasswordResetToken(User user) {
+        // Generate a unique token (you can use UUID or any other secure method)
+        // For example:
+        String token = UUID.randomUUID().toString();
+
+        // You may want to set an expiration time for the token and store it in your database
+
+        return token;
+    }
 }
+
+
+
+
+
+
 

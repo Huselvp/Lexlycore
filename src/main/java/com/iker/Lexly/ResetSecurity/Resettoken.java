@@ -2,11 +2,15 @@ package com.iker.Lexly.ResetSecurity;
 
 import com.iker.Lexly.Entity.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-
+@NoArgsConstructor
+@Setter@Getter
 public class Resettoken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +38,4 @@ public class Resettoken {
     public LocalDateTime getExpirationTime() {
         return expirationTime;
     }
-
-
-    // Constructors, getters, and setters...
 }

@@ -26,23 +26,7 @@ public class EmailService {
        JwtService jwtService;
     @Value("${frontend}")
     private String frontendUrl;
-    public void sendEmail(User user) throws MessagingException, IOException, TemplateException, jakarta.mail.MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-        helper.setSubject("Reset your password - LEXLY");
-        helper.setTo(user.getEmail());
 
-        String token = jwtService.generateToken(user);
-        StringWriter stringWriter = new StringWriter();
-        Map<String, Object> model = new HashMap<>();
-        model.put("fullname", user.getFirstname() + " " + user.getLastname());
-        model.put("email", user.getEmail());
-        model.put("url", frontendUrl + "reset-password/" +  token);
-       configuration.getTemplate("reset-password.ftl").process(model, stringWriter);
-        String emailContent = stringWriter.getBuffer().toString();
-        helper.setText(emailContent, true);
-        javaMailSender.send(mimeMessage);
-    }
     public void sendResetPasswordEmail(User user, String resetToken) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());

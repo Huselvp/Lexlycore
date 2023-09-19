@@ -17,12 +17,8 @@ public class ResetTokenService {
     private ResettokenRepository resetTokenRepository;
     private Map<String, User> resetTokens = new HashMap<>();
 
-
-    public String generateToken(User user) {
-        // Generate a unique token
+    public  String generateToken(User user) {
         String resetToken = UUID.randomUUID().toString();
-
-        // Store the token in the database
         Resettoken tokenEntity = new Resettoken();
         tokenEntity.setToken(resetToken);
         tokenEntity.setUser(user);
@@ -50,13 +46,16 @@ public class ResetTokenService {
     }
 
     public User getUserFromToken(String token) {
-        // Retrieve the associated user from the token
         return resetTokens.get(token);
     }
 
     public void invalidateToken(String token) {
-        // Remove the token from storage after it's used
         resetTokens.remove(token);
     }
+    public Optional<User> findUserByPasswordToken(String passwordResetToken) {
+        return Optional.ofNullable(resetTokenRepository.findByToken(passwordResetToken).get().getUser());
+    }
+
+
 
 }
