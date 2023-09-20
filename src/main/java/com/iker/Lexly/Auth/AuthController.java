@@ -4,18 +4,30 @@ import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.service.EmailService;
 import com.iker.Lexly.service.userService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-  EmailService emailService;
-   userService userService;
-   ResetTokenService resetTokenService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
- private  final AuthenticationService service;
+    @Autowired
+    private final  EmailService emailService;
+     @Autowired
+    private final userService userService;
+    @Autowired
+    private  final  ResetTokenService resetTokenService;
+    @Autowired
+    private  final AuthenticationService service;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register (
@@ -42,17 +54,19 @@ public class AuthController {
         }
     }
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> requestPasswordReset(@RequestBody String email) {
-        boolean emailExists = userService.emailExists(email);
+    public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {
+            String email = request.get("email");
+            logger.info("Received email: " + email);
+            boolean emailExists = userService.emailExists(email);
+            logger.info("Email exists in the database: " + emailExists);
 
-        if (emailExists) {
-            userService.initiatePasswordReset(email);
-            return ResponseEntity.ok("Password reset instructions sent to your email.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
+            if (emailExists) {
+                userService.initiatePasswordReset(email);
+                return ResponseEntity.ok("Password reset instructions sent to your email.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
+            }
         }
-    }
-
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPasswordRequest(@RequestBody String email) {
         User user = userService.findByEmail(email);

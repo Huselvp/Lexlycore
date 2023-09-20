@@ -22,7 +22,6 @@ public class ResetTokenService {
         Resettoken tokenEntity = new Resettoken();
         tokenEntity.setToken(resetToken);
         tokenEntity.setUser(user);
-        // Set an expiration time for the token, e.g., 1 hour from now
         tokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
 
         resetTokenRepository.save(tokenEntity);
@@ -54,6 +53,13 @@ public class ResetTokenService {
     }
     public Optional<User> findUserByPasswordToken(String passwordResetToken) {
         return Optional.ofNullable(resetTokenRepository.findByToken(passwordResetToken).get().getUser());
+    }
+    public void createPasswordResetToken(User user, String token, LocalDateTime expirationTime) {
+        Resettoken resetToken = new Resettoken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpirationTime(expirationTime);
+        resetTokenRepository.save(resetToken);
     }
 
 

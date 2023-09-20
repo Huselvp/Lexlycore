@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +66,7 @@ public class userService {
         });
     }
     public boolean emailExists(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsUserByEmail(email);
     }
     public void initiatePasswordReset(String email) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -78,13 +79,10 @@ public class userService {
         }
     }
 
-    private String generatePasswordResetToken(User user) {
-        // Generate a unique token (you can use UUID or any other secure method)
-        // For example:
+    public String generatePasswordResetToken(User user) {
         String token = UUID.randomUUID().toString();
-
-        // You may want to set an expiration time for the token and store it in your database
-
+        LocalDateTime expirationTime = LocalDateTime.now().plusHours(1);
+        resetTokenService.createPasswordResetToken(user, token, expirationTime);
         return token;
     }
 }

@@ -59,11 +59,9 @@ public class ApplicationConfig {
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587); // Typically, the SMTP port is 587
+        mailSender.setPort(587);
         mailSender.setUsername("Iker");
         mailSender.setPassword("itkplmxjcobyfrvo");
-
-        // Configure additional properties (e.g., TLS/SSL settings)
 
         return mailSender;
     }

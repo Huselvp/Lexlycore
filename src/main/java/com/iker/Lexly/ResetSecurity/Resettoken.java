@@ -2,14 +2,15 @@ package com.iker.Lexly.ResetSecurity;
 
 import com.iker.Lexly.Entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Setter@Getter
 public class Resettoken {
     @Id
@@ -18,7 +19,7 @@ public class Resettoken {
     @Column(nullable = false)
     private String token;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
     @Column(nullable = false)
