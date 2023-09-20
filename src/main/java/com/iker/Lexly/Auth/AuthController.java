@@ -82,7 +82,6 @@ public class AuthController {
     @PostMapping("/set-new-password")
     public ResponseEntity<String> setNewPassword(@RequestParam("token") String token, @RequestBody String newPassword) {
         boolean isTokenValid = resetTokenService.validateToken(token);
-
         if (!isTokenValid) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");

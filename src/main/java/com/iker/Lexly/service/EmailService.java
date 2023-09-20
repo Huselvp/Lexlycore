@@ -20,10 +20,11 @@ import java.util.Map;
 
 @Service
 public class EmailService {
-
-       JavaMailSender javaMailSender;
-
-
+   private final  JavaMailSender javaMailSender;
+   @Autowired
+    public EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
     public void sendResetPasswordEmail(User user, String resetToken) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());

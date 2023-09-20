@@ -13,3 +13,14 @@ spring:
     init:
       platform: postgres
 
+  mail:
+    host: smtp.gmail.com          # Your SMTP server host
+    port: 587                       # Port for SMTP (587 for TLS, 465 for SSL)
+    username: Iker         # Your SMTP username
+    password: itkplmxjcobyfrvo         # Your SMTP password
+    properties:
+      mail:
+        smtp:
+          auth: true                # Enable SMTP authentication
+          starttls:
+            enable: true            # Enable STARTTLS for secure connection (if supported)
