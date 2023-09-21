@@ -69,21 +69,15 @@ public class userService {
         return userRepository.existsUserByEmail(email);
     }
     public void initiatePasswordReset(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (user.isPresent()) {
-            User user1 = user.get();
-            String resetToken = generatePasswordResetToken(user1);
-          resetTokenService.generateToken(user1);
-            emailService.sendResetPasswordEmail(user1, resetToken);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            resetTokenService.deleteTokensByUser(user);
+
+            String resetToken= resetTokenService.generateAndSavePasswordResetToken(user);
+            emailService.sendResetPasswordEmail(user, resetToken);
         }
-    }
-
-    public String generatePasswordResetToken(User user) {
-        String token = UUID.randomUUID().toString();
-        LocalDateTime expirationTime = LocalDateTime.now().plusHours(1);
-        resetTokenService.createPasswordResetToken(user, token, expirationTime);
-        return token;
     }
 }
 

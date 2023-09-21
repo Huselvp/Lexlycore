@@ -20,19 +20,24 @@ public class  AuthenticationService {
     private  final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
     public AuthenticationResponse register(RegisterRequest request) {
+        ERole roleName = ERole.valueOf(request.getRole());
+        var role = roleRepository.findByName(roleName).orElse(null);
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(roleRepository.findByName(ERole.SUSER).get())
+                .role(role)
                 .build();
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
+
 
     public AuthenticationResponse authenticate(com.iker.Lexly.Auth.AuthenticationRequest request) {
         authenticationManager.authenticate(

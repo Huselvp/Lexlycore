@@ -17,7 +17,4 @@ public class RegisterRequest {
     private String password;
     private String role;
 
-    public Role getRole() {
-        return this.getRole();
-    }
 }

@@ -1,6 +1,7 @@
 package com.iker.Lexly.ResetSecurity;
 
 import com.iker.Lexly.Entity.User;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +18,7 @@ public class ResetTokenService {
     private ResettokenRepository resetTokenRepository;
     private Map<String, User> resetTokens = new HashMap<>();
 
-    public  String generateToken(User user) {
-        String resetToken = UUID.randomUUID().toString();
-        Resettoken tokenEntity = new Resettoken();
-        tokenEntity.setToken(resetToken);
-        tokenEntity.setUser(user);
-        tokenEntity.setExpirationTime(LocalDateTime.now().plusHours(1));
 
-        resetTokenRepository.save(tokenEntity);
-
-        return resetToken;
-    }
 
     public boolean validateToken(String token) {
         Optional<Resettoken> optionalToken = resetTokenRepository.findByToken(token);
@@ -40,6 +31,7 @@ public class ResetTokenService {
         }
         return false;
     }
+    @Transactional
     public void deleteToken(String token) {
         resetTokenRepository.deleteByToken(token);
     }
@@ -54,12 +46,23 @@ public class ResetTokenService {
     public Optional<User> findUserByPasswordToken(String passwordResetToken) {
         return Optional.ofNullable(resetTokenRepository.findByToken(passwordResetToken).get().getUser());
     }
-    public void createPasswordResetToken(User user, String token, LocalDateTime expirationTime) {
-        Resettoken resetToken = new Resettoken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setExpirationTime(expirationTime);
-        resetTokenRepository.save(resetToken);
+    @Transactional
+    public void deleteTokensByUser(User user) {
+        resetTokenRepository.deleteByUser(user);
+    }
+
+    public String generateAndSavePasswordResetToken(User user) {
+        String resetToken = UUID.randomUUID().toString();
+        LocalDateTime expirationTime = LocalDateTime.now().plusHours(1);
+
+        Resettoken resetTokenEntity = new Resettoken();
+        resetTokenEntity.setToken(resetToken);
+        resetTokenEntity.setUser(user);
+        resetTokenEntity.setExpirationTime(expirationTime);
+
+        resetTokenRepository.save(resetTokenEntity);
+
+        return resetToken;
     }
 
 
