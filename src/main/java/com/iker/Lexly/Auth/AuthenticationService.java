@@ -20,10 +20,10 @@ public class  AuthenticationService {
     private  final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
     public AuthenticationResponse register(RegisterRequest request) {
-        ERole roleName = ERole.valueOf(request.getRole());
-        var role = roleRepository.findByName(roleName).orElse(null);
+        ERole roleName = ERole.valueOf(String.valueOf(request.getRole()));
+        var role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
 
         var user = User.builder()
                 .firstname(request.getFirstname())
@@ -32,18 +32,21 @@ public class  AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
                 .build();
+
         userRepository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
 
+
     public AuthenticationResponse authenticate(com.iker.Lexly.Auth.AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
-                        request.getPasssword()
+                        request.getPassword()
                 )
         );
         var user =userRepository.findByEmail(request.getEmail())

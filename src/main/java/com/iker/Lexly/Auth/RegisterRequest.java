@@ -1,6 +1,7 @@
 package com.iker.Lexly.Auth;
 
 import com.iker.Lexly.Entity.Role;
+import com.iker.Lexly.Entity.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,6 @@ public class RegisterRequest {
     private String lastname;
     private  String email;
     private String password;
-    private String role;
+    private ERole role;
 
 }
