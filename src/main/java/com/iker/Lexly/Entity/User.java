@@ -46,6 +46,7 @@ public class User implements UserDetails {
     @Column(length = 50)
     private String email;
     @Column(length = 250)
+    @JsonIgnore
     private String password;
     @Column(length = 50)
     private String country;

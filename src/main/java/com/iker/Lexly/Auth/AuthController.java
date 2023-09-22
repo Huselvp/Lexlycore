@@ -33,9 +33,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate (
             @RequestBody AuthenticationRequest request
-    ) {
+    ) throws Exception {
         return  ResponseEntity.ok(service.authenticate(request));
-
     }
     @PostMapping("/forgot-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {
