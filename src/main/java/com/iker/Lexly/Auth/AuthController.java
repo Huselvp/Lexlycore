@@ -39,10 +39,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {
             String email = request.get("email");
-            logger.info("Received email: " + email);
             boolean emailExists = userService.emailExists(email);
-            logger.info("Email exists in the database: " + emailExists);
-
             if (emailExists) {
                 userService.initiatePasswordReset(email);
                 return ResponseEntity.ok("Password reset instructions sent to your email.");
@@ -50,21 +47,11 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
             }
         }
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPasswordRequest(@RequestBody String email) {
-        User user = userService.findByEmail(email);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
 
-        String resetToken = resetTokenService.generateAndSavePasswordResetToken(user);
-        emailService.sendResetPasswordEmail(user, resetToken);
-        return ResponseEntity.ok("Reset link sent successfully");
-    }
-
+     //need a token
     @PostMapping("/reset-password/{token}")
     public ResponseEntity<String> handlePasswordReset(@PathVariable String token,
-            @RequestBody String newPassword) {
+                                                      @RequestBody String newPassword) {
         boolean isTokenValid = resetTokenService.validateToken(token);
         if (!isTokenValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
@@ -78,18 +65,7 @@ public class AuthController {
         resetTokenService.invalidateToken(token);
         return ResponseEntity.ok("Password reset successful");
     }
-    @PostMapping("/set-new-password")
-    public ResponseEntity<String> setNewPassword(@RequestParam("token") String token, @RequestBody String newPassword) {
-        boolean isTokenValid = resetTokenService.validateToken(token);
-        if (!isTokenValid) {
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-        }
-        User user = resetTokenService.getUserFromToken(token);
-        userService.resetPassword(user, newPassword);
-        resetTokenService.invalidateToken(token);
-        return ResponseEntity.ok("Password reset successful");
-    }
 }
 
 

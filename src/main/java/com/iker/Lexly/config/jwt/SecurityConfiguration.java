@@ -42,7 +42,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
                                 .requestMatchers("/api/admin").hasAnyRole(ERole.ADMIN.name())
                                 .requestMatchers("/api/superadmin").hasAnyRole(ERole.SUPERADMIN.name())
-                                .requestMatchers("/api/suser").hasAnyRole((ERole.SUSER.name()))
+                                .requestMatchers("/api/user").hasAnyRole((ERole.SUSER.name()))
                                 .requestMatchers("/api/advisor").hasAnyRole(ERole.ADVISOR.name())
                                 .anyRequest().permitAll()
                 );

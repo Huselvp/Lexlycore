@@ -28,16 +28,18 @@ import java.util.UUID;
 public class userService {
     private final ResetTokenService resetTokenService;
     private final EmailService emailService;
+    @Autowired
     private final UserRepository userRepository;
     private final JwtService jwtService;
-
-
-
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-    }
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+    }
     public String loginUser(String email, String password) throws Exception {
         User user = findByEmail(email);
         if (!userServicepasswordEncoder().matches(password, user.getPassword())) {
@@ -48,12 +50,10 @@ public class userService {
         String token = jwtService.generateToken(userDetails);
         return token;
     }
-
     @Bean
     public PasswordEncoder userServicepasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     public void resetPassword(User user, String newPassword) {
         user.setPassword(newPassword);
     }
@@ -62,19 +62,16 @@ public class userService {
 
         optionalUser.ifPresent(user -> {
             user.setEmailVerified(true);
-            userRepository.save(user);
-        });
+            userRepository.save(user);});
     }
     public boolean emailExists(String email) {
         return userRepository.existsUserByEmail(email);
     }
     public void initiatePasswordReset(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
-
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             resetTokenService.deleteTokensByUser(user);
-
             String resetToken= resetTokenService.generateAndSavePasswordResetToken(user);
             emailService.sendResetPasswordEmail(user, resetToken);
         }

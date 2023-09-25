@@ -18,10 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
 @Service
 public class EmailService {
-   private final  JavaMailSender javaMailSender;
-   @Autowired
+    private final  JavaMailSender javaMailSender;
+    @Autowired
     public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
@@ -33,9 +34,17 @@ public class EmailService {
         javaMailSender.send(message);
     }
     private String generateResetLink(String resetToken) {
-        // Generate and return the reset link URL based on your frontend and token
-        // Example: "https://your-frontend-domain.com/reset-password?token=" + resetToken
-        return "https://your-frontend-domain.com/reset-password?token=" + resetToken;
+        return "localhost:3000/change-password?token=" + resetToken;
+    }
+    private String buildEmailBody(String fullName, String resetLink) {
+        // Customize the email body
+        return "Hello " + fullName + ",\n\n"
+                + "We received a request to reset your password. "
+                + "Click the following link to reset your password:\n"
+                + resetLink + "\n\n"
+                + "If you did not request this, please ignore this email."
+                + "\n\n"
+                + "Best regards,\n"
+                + "Your App Team";
     }
 }
-

@@ -63,13 +63,13 @@ public class ApplicationConfig {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("Iker");
-        mailSender.setPassword("itkplmxjcobyfrvo");
+        mailSender.setUsername("lexly3279@gmail.com");
+        mailSender.setPassword("dambkhwiaptusvip");
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-
+//itkplmxjcobyfrvo
         return mailSender;
     }
 

@@ -10,16 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 @Service
 public class ResetTokenService {
 
     @Autowired
     private ResettokenRepository resetTokenRepository;
     private Map<String, User> resetTokens = new HashMap<>();
-
-
-
     public boolean validateToken(String token) {
         Optional<Resettoken> optionalToken = resetTokenRepository.findByToken(token);
         if (optionalToken.isPresent()) {
@@ -50,18 +46,14 @@ public class ResetTokenService {
     public void deleteTokensByUser(User user) {
         resetTokenRepository.deleteByUser(user);
     }
-
     public String generateAndSavePasswordResetToken(User user) {
         String resetToken = UUID.randomUUID().toString();
         LocalDateTime expirationTime = LocalDateTime.now().plusHours(1);
-
         Resettoken resetTokenEntity = new Resettoken();
         resetTokenEntity.setToken(resetToken);
         resetTokenEntity.setUser(user);
         resetTokenEntity.setExpirationTime(expirationTime);
-
         resetTokenRepository.save(resetTokenEntity);
-
         return resetToken;
     }
 
