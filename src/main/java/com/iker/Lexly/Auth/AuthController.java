@@ -53,12 +53,18 @@ public class AuthController {
     public ResponseEntity<String> handlePasswordReset(@RequestBody Map<String, String> request) {
         String token = request.get("token");
         String newPassword = request.get("newPassword");
+
+        // Use findUserByPasswordToken to retrieve the user associated with the token
         Optional<User> optionalUser = resetTokenService.findUserByPasswordToken(token);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            user.setPassword(newPassword); // Replace this line with your actual password update logic
 
+            // Update the user's password with the new password
+            user.setPassword(newPassword); // Make sure this line correctly updates the password
+
+            // Save the updated user in your database
+            // Ensure that this method effectively updates the user's information in the database
             userService.saveUser(user); // Replace this line with your actual save operation
 
             resetTokenService.deleteToken(token);
@@ -69,6 +75,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
+
 
 }
 
