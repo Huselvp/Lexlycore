@@ -50,6 +50,9 @@ public class userService {
         String token = jwtService.generateToken(userDetails);
         return token;
     }
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
     @Bean
     public PasswordEncoder userServicepasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -61,7 +64,6 @@ public class userService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         optionalUser.ifPresent(user -> {
-            user.setEmailVerified(true);
             userRepository.save(user);});
     }
     public boolean emailExists(String email) {

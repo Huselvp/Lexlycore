@@ -14,11 +14,11 @@ import jakarta.persistence.Entity;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Advisor extends User{
-    private int NUmberofexperience;
+    private int Numberofexperience;
     private String specialite;
 
     public void setNumberOfExperience(int numberOfExperience) {
-        this.NUmberofexperience = numberOfExperience;
+        this.Numberofexperience = numberOfExperience;
     }
 
     public void setSpecialite(String specialite) {

@@ -24,11 +24,9 @@ import java.util.List;
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
-
         @Enumerated(EnumType.STRING)
         @Column(length = 20)
         private ERole name;
-
         @JsonIgnore
         @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
         private List<User> users = new ArrayList<>();

@@ -54,8 +54,6 @@ public class User implements UserDetails {
     private int zipcode;
     @Column(length = 50)
     private String town;
-    @Column(length = 50)
-    private boolean verificationemail;
     private String picture;
     @ManyToOne
     @JsonIgnore
@@ -103,10 +101,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    public void setEmailVerified(boolean verificationemail){
-        this .verificationemail=verificationemail;
-    }
-
 }
 
