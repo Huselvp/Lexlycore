@@ -20,7 +20,6 @@ public class ResetTokenService {
         Optional<Resettoken> optionalToken = resetTokenRepository.findByToken(token);
         if (optionalToken.isPresent()) {
             Resettoken resetToken = optionalToken.get();
-
             LocalDateTime expirationTime = resetToken.getExpirationTime();
             LocalDateTime currentTime = LocalDateTime.now();
             return !currentTime.isAfter(expirationTime);
@@ -39,10 +38,18 @@ public class ResetTokenService {
     public void invalidateToken(String token) {
         resetTokens.remove(token);
     }
-    public Optional<User> findUserByPasswordToken(String passwordResetToken) {
-        return Optional.ofNullable(resetTokenRepository.findByToken(passwordResetToken).get().getUser());
-    }
+
+
     @Transactional
+    public Optional<User> findUserByPasswordToken(String passwordResetToken) {
+        Resettoken resetToken = resetTokenRepository.findByToken(passwordResetToken).orElse(null);
+
+        if (resetToken != null) {
+            return Optional.ofNullable(resetToken.getUser());
+        } else {
+            return Optional.empty();
+        }
+    }
     public void deleteTokensByUser(User user) {
         resetTokenRepository.deleteByUser(user);
     }
