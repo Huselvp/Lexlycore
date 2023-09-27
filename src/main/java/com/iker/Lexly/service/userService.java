@@ -33,6 +33,9 @@ public class userService {
     @Autowired
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 

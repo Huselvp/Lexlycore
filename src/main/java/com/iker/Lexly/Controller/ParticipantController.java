@@ -19,7 +19,7 @@ public class ParticipantController {
         this.participantService = participantService;
     }
 
-    @PostMapping("create-participant")
+    @PostMapping("/create")
     public Participant createParticipant(@RequestBody Participant participant) {
         return participantService.createParticipant(participant);
     }

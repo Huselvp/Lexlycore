@@ -1,18 +1,26 @@
 package com.iker.Lexly.Controller;
 
+import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.repository.RoleRepository;
+import com.iker.Lexly.repository.UserRepository;
+import com.iker.Lexly.service.userService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/user")
 public class userController {
     @Autowired
     RoleRepository roleRepository;
-    @GetMapping
-    public String get(){
-        return "GET :: suser controller";
+    @Autowired
+    userService userService;
+
+    @GetMapping("/email/{email}")
+    public Optional<User> getUserByEmail(@PathVariable String email) {
+        return userService.getUserByEmail(email);
     }
     @PostMapping
     public String post(){

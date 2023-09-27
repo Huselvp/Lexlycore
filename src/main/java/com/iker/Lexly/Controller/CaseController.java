@@ -21,22 +21,22 @@ public class CaseController {
         this.caseService = caseService;
     }
 
-    @PostMapping("/api/cases/create-case")
+    @PostMapping("create")
     public Case createCase(@RequestBody Case aCase) {
         return caseService.createCase(aCase);
     }
 
-    @GetMapping("/api/cases/getAllCases")
+    @GetMapping("/All")
     public List<Case> getAllCases() {
         return caseService.getAllCases();
     }
 
-    @GetMapping("api/cases/{id}")
+    @GetMapping("/{id}")
     public Optional<Case> getCaseById(@PathVariable Long id) {
         return caseService.getCaseById(id);
     }
 
-    @GetMapping("api/cases/type/{type}")
+    @GetMapping("/type/{type}")
     public List<Case> getCasesByType(@PathVariable CaseType type) {
         return caseService.getCasesByType(type);
     }
