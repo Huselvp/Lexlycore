@@ -10,11 +10,8 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "_user" , uniqueConstraints = {
@@ -55,10 +52,17 @@ public class User implements UserDetails {
     @Column(length = 50)
     private String town;
     private String picture;
+
     @ManyToOne
     @JsonIgnore
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role = new Role();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Case> cases = new HashSet<>();
+    @ManyToMany(mappedBy = "users")
+    private Set<Participant> participants = new HashSet<>();
+
+
 
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;

@@ -1,18 +1,16 @@
 package com.iker.Lexly.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iker.Lexly.Entity.enums.CaseType;
 import com.iker.Lexly.Entity.enums.Casestatus;
-import com.iker.Lexly.Entity.enums.ERole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "_case" )
@@ -29,7 +27,9 @@ public class Case {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Casestatus casestatus;
-
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private CaseType type;
     @Column(length =20)
     private float cost;
 
@@ -41,9 +41,13 @@ public class Case {
 
     @Column(length=20)
     private Date ModifiedDate;
-
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    @ManyToMany(mappedBy = "cases")
+    private Set<Participant> participants = new HashSet<>();
 
 
 
 }
+
