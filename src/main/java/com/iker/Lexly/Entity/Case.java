@@ -46,8 +46,9 @@ public class Case {
     private User user;
     @ManyToMany(mappedBy = "cases")
     private Set<Participant> participants = new HashSet<>();
-    public Case(Casestatus casestatus, float cost, Date createdDate, Date deletedDate, Date modifiedDate) {
+    public Case(Casestatus casestatus,CaseType type, float cost, Date createdDate, Date deletedDate, Date modifiedDate) {
         this.casestatus = casestatus;
+        this.type= type;
         this.cost = cost;
         this.CreatedDate = createdDate;
         this.DeletedDate = deletedDate;
