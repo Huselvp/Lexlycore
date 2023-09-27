@@ -20,11 +20,11 @@ public class CaseController {
     public CaseController(CaseService caseService) {
         this.caseService = caseService;
     }
-
-    @PostMapping("create")
+    @PostMapping("/create")
     public Case createCase(@RequestBody Case aCase) {
         return caseService.createCase(aCase);
     }
+
 
     @GetMapping("/All")
     public List<Case> getAllCases() {

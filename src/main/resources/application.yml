@@ -24,3 +24,5 @@ spring:
           auth: true                # Enable SMTP authentication
           starttls:
             enable: true            # Enable STARTTLS for secure connection (if supported)
+server:
+  port: 8081

@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Service
 public class CaseService {
+    @Autowired
     private final CaseRepository caseRepository;
 
     @Autowired
