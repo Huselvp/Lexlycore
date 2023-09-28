@@ -1,6 +1,7 @@
 package com.iker.Lexly.Controller;
 
 import com.iker.Lexly.Entity.Case;
+import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Entity.enums.CaseType;
 import com.iker.Lexly.service.CaseService;
 import com.iker.Lexly.service.ParticipantService;
@@ -23,8 +24,8 @@ public class CaseController {
         this.caseService = caseService1;
     }
     @PostMapping("/create")
-    public Case createCase(@RequestBody Case aCase) {
-        return caseService.createCase(aCase);
+    public Case createCase(@RequestBody Case aCase, User user) {
+        return caseService.createCase(aCase,user);
     }
     @GetMapping("/All")
     public List<Case> getAllCases() {

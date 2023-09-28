@@ -25,7 +25,6 @@ public class Case {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "case_id")
     private long case_id;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Casestatus casestatus;
@@ -47,8 +46,9 @@ public class Case {
     @Column(length=20)
     private LocalDateTime ModifiedDate;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     @ManyToMany(mappedBy = "cases")
     private Set<Participant> participants = new HashSet<>();
     public Case(Long caseId,Casestatus casestatus,CaseType type,Subtype subtype, float cost, LocalDateTime createdDate, LocalDateTime deletedDate, LocalDateTime modifiedDate) {

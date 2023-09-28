@@ -28,8 +28,11 @@ public class CaseService {
 
         this.caseRepository = caseRepository;
             }
-    public Case createCase(Case aCase) {
-        return caseRepository.save(aCase);
+    public Case createCase(Case aCase,User user) {
+        Case newCase = new Case();
+        newCase.setUser(user);
+
+        return caseRepository.save(newCase);
     }
 
     public List<Case> getAllCases() {
