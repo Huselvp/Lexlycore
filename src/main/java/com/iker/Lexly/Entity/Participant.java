@@ -4,6 +4,7 @@ import com.iker.Lexly.Entity.enums.Casestatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,6 +40,16 @@ public class Participant {
     private Set<Case> cases = new HashSet<>();
 
 
+    public Set<User> getUsers() {
+        return users;
+    }
+    public void setStatus(Casestatus status) {
+        this.status = status;
+    }
+
+    public void setJoinedAt(LocalDateTime joinedAt) {
+        this.joinedAt = joinedAt;
+    }
 }
 
 

@@ -3,6 +3,7 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.Entity.Case;
 import com.iker.Lexly.Entity.enums.CaseType;
 import com.iker.Lexly.service.CaseService;
+import com.iker.Lexly.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,14 @@ public class CaseController {
     private final CaseService caseService;
 
     @Autowired
-    public CaseController(CaseService caseService) {
-        this.caseService = caseService;
+    public CaseController(CaseService caseService, ParticipantService participantService, CaseService caseService1) {
+
+        this.caseService = caseService1;
     }
     @PostMapping("/create")
     public Case createCase(@RequestBody Case aCase) {
         return caseService.createCase(aCase);
     }
-
-
     @GetMapping("/All")
     public List<Case> getAllCases() {
         return caseService.getAllCases();
