@@ -39,7 +39,6 @@ private  final JwtService jwtService;
     @PostMapping("/createCase")
     public ResponseEntity<String> createCase(@RequestBody CaseRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication != null && authentication.isAuthenticated()) {
             User authenticatedUser = (User) authentication.getPrincipal();
             Case newCase = new Case();
@@ -48,7 +47,6 @@ private  final JwtService jwtService;
             newCase.setSubtype(request.getSubtype());
             newCase.setCreatedDate(LocalDateTime.now());
             newCase.setUser(authenticatedUser);
-
             caseRepository.save(newCase);
 
             return ResponseEntity.ok("Case created successfully");
