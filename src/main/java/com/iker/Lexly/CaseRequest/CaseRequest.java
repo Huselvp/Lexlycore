@@ -1,5 +1,6 @@
 package com.iker.Lexly.CaseRequest;
 
+import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Entity.enums.CaseType;
 import com.iker.Lexly.Entity.enums.Casestatus;
 import com.iker.Lexly.Entity.enums.Subtype;
@@ -12,11 +13,11 @@ public class CaseRequest {
     private Casestatus casestatus;
     private CaseType type;
     private Subtype subtype;
-    private float cost;
+    private String description;
+    private User user;
     private LocalDateTime createdDate;
     private LocalDateTime deletedDate;
     private LocalDateTime modifiedDate;
     private String participantEmails;
-
 }
 

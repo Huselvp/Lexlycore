@@ -23,7 +23,6 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -52,7 +51,6 @@ public class User implements UserDetails {
     @Column(length = 50)
     private String town;
     private String picture;
-
     @ManyToOne
     @JsonIgnore
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -61,9 +59,6 @@ public class User implements UserDetails {
     private Set<Case> cases = new HashSet<>();
     @ManyToMany(mappedBy = "users")
     private Set<Participant> participants = new HashSet<>();
-
-
-
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
@@ -72,7 +67,6 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
     }
-
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
         this.email = email;
         this.firstname = firstName;

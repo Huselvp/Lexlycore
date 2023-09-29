@@ -69,7 +69,7 @@ public class ApplicationConfig {
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-//itkplmxjcobyfrvo
+
         return mailSender;
     }
 

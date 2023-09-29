@@ -1,25 +1,26 @@
 package com.iker.Lexly.config.jwt;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 @Service
 public class JwtService {
     private  static final String SECRET_KEY= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
-    public String extractUsername(String token) {
-        return extractClaim(token,Claims::getSubject);
+   public String extractUsername(String token) {
+       return extractClaim(token,Claims::getSubject);
+    }
+
+    public String extractUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("userId", String.class);
     }
     public  String generateToken(UserDetails userDetails){
         return generateToken(new HashMap<>(),userDetails);
@@ -55,6 +56,4 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
 }
-

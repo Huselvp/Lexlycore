@@ -46,16 +46,16 @@ public class Case {
     @Column(length=20)
     private LocalDateTime ModifiedDate;
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToMany(mappedBy = "cases")
     private Set<Participant> participants = new HashSet<>();
-    public Case(Long caseId,Casestatus casestatus,CaseType type,Subtype subtype, float cost, LocalDateTime createdDate, LocalDateTime deletedDate, LocalDateTime modifiedDate) {
+    public Case(Long caseId,Casestatus casestatus,CaseType type,Subtype subtype, float cost, LocalDateTime createdDate, LocalDateTime deletedDate, LocalDateTime modifiedDate,User user) {
        this.case_id= caseId;
         this.casestatus = casestatus;
         this.type= type;
         this.cost = cost;
+        this.user=user;
         this.CreatedDate = createdDate;
         this.DeletedDate = deletedDate;
         this.ModifiedDate = modifiedDate;
