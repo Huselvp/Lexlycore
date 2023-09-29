@@ -6,7 +6,6 @@ import com.iker.Lexly.Entity.enums.CaseType;
 import com.iker.Lexly.Entity.enums.Casestatus;
 import com.iker.Lexly.Entity.enums.Subtype;
 import com.iker.Lexly.repository.CaseRepository;
-import com.iker.Lexly.repository.ParticipantRepository;
 import com.iker.Lexly.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +22,7 @@ public class CaseService {
 
 
     @Autowired
-    public CaseService(UserRepository userRepository, CaseRepository caseRepository, ParticipantRepository participantRepository, EmailService emailService) {
+    public CaseService(UserRepository userRepository, CaseRepository caseRepository, EmailService emailService) {
 
         this.caseRepository = caseRepository;
             }

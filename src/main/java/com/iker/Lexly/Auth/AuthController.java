@@ -30,7 +30,6 @@ public class AuthController {
     private  final  ResetTokenService resetTokenService;
     @Autowired
     private  final AuthenticationService service;
-
      @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.register(request));

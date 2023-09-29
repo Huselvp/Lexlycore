@@ -57,8 +57,6 @@ public class User implements UserDetails {
     private Role role = new Role();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Case> cases = new HashSet<>();
-    @ManyToMany(mappedBy = "users")
-    private Set<Participant> participants = new HashSet<>();
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;

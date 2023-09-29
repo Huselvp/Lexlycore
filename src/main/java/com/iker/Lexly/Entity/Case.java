@@ -48,8 +48,6 @@ public class Case {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToMany(mappedBy = "cases")
-    private Set<Participant> participants = new HashSet<>();
     public Case(Long caseId,Casestatus casestatus,CaseType type,Subtype subtype, float cost, LocalDateTime createdDate, LocalDateTime deletedDate, LocalDateTime modifiedDate,User user) {
        this.case_id= caseId;
         this.casestatus = casestatus;
