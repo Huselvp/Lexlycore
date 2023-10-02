@@ -1,7 +1,6 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iker.Lexly.Entity.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Set;
+
 import java.util.*;
 
 @Entity
@@ -56,7 +55,8 @@ public class User implements UserDetails {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role = new Role();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Case> cases = new HashSet<>();
+    private List<Docs> documents;
+
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
@@ -65,7 +65,7 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
     }
-    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
+    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role,List<Docs> documents) {
         this.email = email;
         this.firstname = firstName;
         this.lastname = lastName;
@@ -73,7 +73,10 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
         this.role = role;
+        this.documents=documents;
     }
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
      return List.of(new SimpleGrantedAuthority(role.getName().name()));
@@ -96,6 +99,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Set<Role> getRoles() {
+    return (Set<Role>) this.role;
     }
 }
 

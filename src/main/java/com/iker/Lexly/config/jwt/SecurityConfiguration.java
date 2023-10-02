@@ -2,6 +2,7 @@ package com.iker.Lexly.config.jwt;
 
 import com.iker.Lexly.Entity.Role;
 import com.iker.Lexly.Entity.enums.ERole;
+import com.iker.Lexly.Entity.enums.Permissions;
 import com.iker.Lexly.repository.RoleRepository;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,6 @@ import java.util.Arrays;
 public class SecurityConfiguration {
     private final  AuthenticationProvider authenticationProvider;
     private final AuthFilterJwt jwtAuthFilter;
-    private final RoleRepository roleRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,7 +43,9 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/admin").hasAnyRole(ERole.ADMIN.name())
                                 .requestMatchers("/api/superadmin").hasAnyRole(ERole.SUPERADMIN.name())
                                 .requestMatchers("/api/user").hasAnyRole((ERole.SUSER.name()))
-                                .requestMatchers("/api/advisor").hasAnyRole(ERole.ADVISOR.name())
+                                .requestMatchers(HttpMethod.GET, "/api/documents/**").hasAuthority(String.valueOf(Permissions.READ_DOCUMENT))
+                                .requestMatchers(HttpMethod.POST, "/api/documents/**").hasAuthority(String.valueOf(Permissions.WRITE_DOCUMENT))
+                                .requestMatchers(HttpMethod.DELETE, "/api/documents/**").hasAuthority(String.valueOf(Permissions.DELETE_DOCUMENT))
                                 .anyRequest().permitAll()
                 );
                http.authenticationProvider(authenticationProvider)
