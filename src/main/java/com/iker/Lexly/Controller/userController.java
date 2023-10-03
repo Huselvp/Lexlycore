@@ -7,6 +7,7 @@ import com.iker.Lexly.service.userService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.DeleteExchange;
 
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ public class userController {
         return "GET :: suser controller";
     }
     @DeleteMapping
+
     public String Delete(){
         return "GET :: suser controller";
     }

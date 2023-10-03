@@ -22,20 +22,15 @@ private final UserRepository userRepository;
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
     }
-
     public List<Docs> getUserDocuments(Long userId) {
         return documentRepository.findByUserUserId(userId);
     }
     public Optional<Docs> getDocumentById(Long id) {
         return documentRepository.findById(id);
     }
-
     public List<Docs> getAllDocuments() {
         return documentRepository.findAll();
     }
-
-
-
     public void deleteDocument(Long id) {
         documentRepository.deleteById(id);
     }
@@ -43,12 +38,9 @@ private final UserRepository userRepository;
     public List<Docs> getDocumentsByUserEmail(String userEmail) {
         return documentRepository.findByUserEmail(userEmail);
     }
-
     public Docs getDocumentByUserIdAndId(Long userId, Long documentId) {
         return documentRepository.findByUserUserIdAndId(userId, documentId);
     }
-
-
     public void updateDocument(Docs document) {
         Docs existingDocument = documentRepository.findById(document.getId())
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found."));
@@ -70,7 +62,6 @@ private final UserRepository userRepository;
         }
         documentRepository.delete(documentToDelete);
     }
-
     public void saveDocumentProgress(Long userId, Long documentId, DocsDTO docsDTO) {
         Docs document = documentRepository.findByUserUserIdAndId(userId, documentId);
         if (document == null) {
@@ -80,6 +71,7 @@ private final UserRepository userRepository;
         document.setLastName(docsDTO.getLastName());
         documentRepository.save(document);
     }
+
 
     public Docs createUserDocument(Long userId, DocsDTO docsDTO) {
         Docs newDocument = new Docs();

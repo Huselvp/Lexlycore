@@ -9,9 +9,10 @@ import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/documents")
@@ -24,13 +25,22 @@ public class DocsController {
         this.docsService = docsService;
         this.templateService=templateService;
     }
+    @GetMapping("/generate-document")
+    public String generateDocument(Model model) {
+        Docs docs = new Docs();
+        model.addAttribute("user", docs);
+        return "document";
+    }
+    @GetMapping("/")
+    public List<Docs> getAllDocs() {
+        return docsService.getAllDocuments();
+    }
     @GetMapping("/template/{templateName}")
     public ResponseEntity<String> getTemplate(@PathVariable String templateName) {
         try {
             String templateContent = templateService.fetchTemplateContent(templateName);
             return ResponseEntity.ok(templateContent);
         } catch (IOException | TemplateException e) {
-            // Handle exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error loading template");
         }
     }

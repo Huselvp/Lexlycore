@@ -17,7 +17,6 @@ public class Template {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-
     public Template(String name,String content) {
         this.name=name;
         this.content=content;

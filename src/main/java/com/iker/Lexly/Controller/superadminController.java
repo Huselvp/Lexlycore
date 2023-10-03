@@ -21,7 +21,6 @@ public class superadminController {
     @PostMapping("/templates")
     public ResponseEntity<String> createTemplate(
             @RequestBody TemplateDTO templateDTO) {
-
         return ResponseEntity.ok("Template created successfully.");
     }
 
