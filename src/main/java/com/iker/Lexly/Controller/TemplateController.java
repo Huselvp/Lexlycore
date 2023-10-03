@@ -1,5 +1,6 @@
 package com.iker.Lexly.Controller;
 
+import com.iker.Lexly.Entity.DocsTemplate;
 import com.iker.Lexly.service.TemplateService;
 import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,22 +17,22 @@ public class TemplateController {
     }
 
     @GetMapping("/All")
-    public List<Template> getAllTemplates() {
+    public List<DocsTemplate> getAllTemplates() {
         return templateService.getAllTemplates();
     }
 
     @GetMapping("/{id}")
-    public Optional<Template> getTemplateById(@PathVariable Long id) {
+    public Optional<DocsTemplate> getTemplateById(@PathVariable Long id) {
         return templateService.getTemplateById(id);
     }
 
     @GetMapping("/name/{name}")
-    public Optional<Template> getTemplateByName(@PathVariable String name) {
+    public Optional<DocsTemplate> getTemplateByName(@PathVariable String name) {
         return templateService.getTemplateByName(name);
     }
 
     @PostMapping("/create")
-    public Template createTemplate(@RequestBody Template template) {
+    public DocsTemplate createTemplate(@RequestBody DocsTemplate template) {
         return templateService.createTemplate(template);
     }
 }

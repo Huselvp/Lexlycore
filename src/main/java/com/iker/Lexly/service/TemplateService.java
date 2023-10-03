@@ -1,5 +1,6 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.Entity.DocsTemplate;
 import com.iker.Lexly.repository.TemplateRepository;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
@@ -25,16 +26,16 @@ public class TemplateService {
         this.freemarkerConfig = freemarkerConfig;
         this.templateRepository=templateRepository;
     }
-    public List<Template> getAllTemplates() {
+    public List<DocsTemplate> getAllTemplates() {
         return templateRepository.findAll();
     }
-    public Optional<Template> getTemplateById(Long id) {
+    public Optional<DocsTemplate> getTemplateById(Long id) {
         return templateRepository.findById(id);
     }
-    public Optional<Template> getTemplateByName(String name) {
+    public Optional<DocsTemplate> getTemplateByName(String name) {
         return templateRepository.findByName(name);
     }
-    public Template createTemplate(Template template) {
+    public DocsTemplate createTemplate(DocsTemplate template) {
         return templateRepository.save(template);
     }
 
