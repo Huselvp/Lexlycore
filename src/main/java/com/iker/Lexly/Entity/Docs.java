@@ -18,7 +18,6 @@ public class Docs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "docs_id")
     private Long id;
-
     private String firstName;
     private String lastName;
     private String phoneNumber;

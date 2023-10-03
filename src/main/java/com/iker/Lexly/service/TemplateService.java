@@ -25,20 +25,15 @@ public class TemplateService {
         this.freemarkerConfig = freemarkerConfig;
         this.templateRepository=templateRepository;
     }
-
-
     public List<Template> getAllTemplates() {
         return templateRepository.findAll();
     }
-
     public Optional<Template> getTemplateById(Long id) {
         return templateRepository.findById(id);
     }
-
     public Optional<Template> getTemplateByName(String name) {
         return templateRepository.findByName(name);
     }
-
     public Template createTemplate(Template template) {
         return templateRepository.save(template);
     }

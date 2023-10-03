@@ -83,6 +83,10 @@ public class userService {
             emailService.sendResetPasswordEmail(user, resetToken);
         }
     }
+
+    public User findByUsername(String username) {
+
+    }
 }
 
 
