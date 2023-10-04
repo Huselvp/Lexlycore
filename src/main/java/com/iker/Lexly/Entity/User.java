@@ -56,7 +56,6 @@ public class User implements UserDetails {
     private Role role = new Role();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Docs> documents;
-
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
@@ -74,9 +73,8 @@ public class User implements UserDetails {
         this.picture = picture;
         this.role = role;
         this.documents=documents;
+
     }
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
      return List.of(new SimpleGrantedAuthority(role.getName().name()));

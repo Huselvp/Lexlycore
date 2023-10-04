@@ -20,7 +20,6 @@ import java.util.List;
     @NoArgsConstructor
     @Builder
     public class Role  {
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
@@ -33,7 +32,6 @@ import java.util.List;
         public Role(ERole name) {
             this.name = name;
         }
-
     }
 
 

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Entity
 @Data
 @AllArgsConstructor
@@ -25,14 +24,10 @@ public class Docs {
     private String zipCode;
     private String country;
     private Long templateId;
-
-
+    private float cost;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @Enumerated(EnumType.STRING)
     private DocsStatus status;
-
-
 }
-

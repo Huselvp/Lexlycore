@@ -1,11 +1,7 @@
 package com.iker.Lexly.Controller;
 
 import com.iker.Lexly.DTO.DocsDTO;
-import com.iker.Lexly.Entity.Docs;
-import com.iker.Lexly.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +10,9 @@ import java.util.List;
 @RequestMapping("/user/docs")
 public class suserController {
     @GetMapping("/{userId}/documents")
-    public List<Docs> getUserDocuments(@PathVariable Long userId) {
-    return null;
-    }
+  //  public List<Docs> getUserDocuments(@PathVariable Long userId) {
+  //  return null;
+  //  }
     @PostMapping("/{userId}/documents")
     public ResponseEntity<String> createUserDocument(
             @PathVariable Long userId,
