@@ -6,7 +6,6 @@ public enum Permissions {
     UPLOAD_DOCUMENT("UPLOAD_DOCUMENT"),
     DELETE_DOCUMENT("DELETE_DOCUMENT");
 
-
     private final String permission;
 
     Permissions(String permission) {
@@ -16,5 +15,6 @@ public enum Permissions {
     public String getPermission() {
         return permission;
     }
+
     }
 

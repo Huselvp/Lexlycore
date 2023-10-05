@@ -1,10 +1,7 @@
 package com.iker.Lexly.Controller;
 
-import com.iker.Lexly.DTO.DocsDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user/docs")
