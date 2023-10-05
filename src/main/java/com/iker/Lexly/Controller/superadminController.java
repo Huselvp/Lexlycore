@@ -14,22 +14,5 @@ public class superadminController {
       return null;
     }
 
-    @PostMapping("/templates")
-    public ResponseEntity<String> createTemplate(
-            @RequestBody TemplateDTO templateDTO) {
-        return ResponseEntity.ok("Template created successfully.");
-    }
 
-    @PutMapping("/templates/{templateId}")
-    public ResponseEntity<String> updateTemplate(
-            @PathVariable Long templateId,
-            @RequestBody TemplateDTO templateDTO) {
-        return ResponseEntity.ok("Template updated successfully.");
-    }
-
-    @DeleteMapping("/templates/{templateId}")
-    public ResponseEntity<String> deleteTemplate(
-            @PathVariable Long templateId) {
-        return ResponseEntity.ok("Template deleted successfully.");
-    }
 }
