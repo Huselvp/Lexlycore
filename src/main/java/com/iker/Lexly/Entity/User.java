@@ -54,8 +54,6 @@ public class User implements UserDetails {
     @JsonIgnore
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role = new Role();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Docs> documents;
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
@@ -64,7 +62,7 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
     }
-    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role,List<Docs> documents) {
+    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
         this.email = email;
         this.firstname = firstName;
         this.lastname = lastName;
@@ -72,7 +70,7 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
         this.role = role;
-        this.documents=documents;
+
 
     }
     @Override
