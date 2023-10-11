@@ -11,14 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/admin/templates")
+@RequestMapping("/api/admin")
 public class adminController {
     private  final QuestionRepository questionRepository;
     private final TemplateService templateService;
@@ -60,7 +56,13 @@ public class adminController {
             Long templateId = templateQuestionValue.getTemplate().getId();
             Template fetchedTemplate = templateRepository.findById(templateId).orElse(null);
             Long questionId = templateQuestionValue.getQuestion().getId();
-            Question fetchedQuestion = questionRepository.findById(questionId).orElse(null);
+            Question fetchedQuestion = questionRepository.findById(questionId).orElseGet(() -> {
+                String questionText = templateQuestionValue.getQuestion().getQuestionText();
+                Question newQuestion = new Question();
+                newQuestion.setQuestionText(questionText);
+
+                return questionRepository.save(newQuestion);
+            });
             if (fetchedTemplate != null && fetchedQuestion != null) {
                 templateQuestionValue.setTemplate(fetchedTemplate);
                 templateQuestionValue.setQuestion(fetchedQuestion);
@@ -70,8 +72,6 @@ public class adminController {
         createdValues = templateQuestionValueService.createTemplateQuestionValues(createdValues);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdValues);
     }
-
-    // Endpoint for updating a template question value by ID
     @PutMapping("/update_template_question_value/{id}")
     public ResponseEntity<TemplateQuestionValue> updateTemplateQuestionValue(
             @PathVariable Long id,
@@ -100,6 +100,7 @@ public class adminController {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();
     }
+
 }
 
 
