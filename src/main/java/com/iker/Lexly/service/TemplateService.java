@@ -18,7 +18,7 @@ public class TemplateService {
         this.templateRepository = templateRepository;
     }
 
-    public List<com.iker.Lexly.Entity.Template> getAllTemplates() {
+    public List<Template> getAllTemplates() {
         return templateRepository.findAll();
     }
 
@@ -37,6 +37,7 @@ public class TemplateService {
             Template updatedTemplate = existingTemplate.get();
             updatedTemplate.setTemplateName(template.getTemplateName());
             updatedTemplate.setTemplateDescription(template.getTemplateDescription());
+            updatedTemplate.setCategory(template.getCategory());
             updatedTemplate.setCost(template.getCost());
               return templateRepository.save(updatedTemplate);
         } else {

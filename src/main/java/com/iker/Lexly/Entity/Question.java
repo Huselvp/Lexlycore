@@ -11,9 +11,9 @@ public class Question {
     @Transient
     @Column(name = "question_text")
     private String questionText;
+    @OneToMany(mappedBy = "question")
+    private List<TemplateQuestionValue> templateQuestionValue;
 
-    @ManyToMany(mappedBy = "questions")
-    private List<Template> templates;
     public Long getId() {
         return id;
     }

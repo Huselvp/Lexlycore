@@ -24,8 +24,7 @@ public class userController {
         return userService.getUserByEmail(email);
     }
     @PostMapping
-    public String post(){
-        return "GET :: suser controller";
+    public String post(){return "GET :: suser controller";
     }
     @PutMapping
     public String put(){
