@@ -13,19 +13,14 @@ public class Template {
 
     @Column(name = "template_name")
     private String templateName;
+    @Column(name="category")
+    private String category;
 
     @Column(name = "template_description")
     private String templateDescription;
     @Column(name = "template_cost")
     private float cost;
 
-    @ManyToMany
-    @JoinTable(
-            name = "template_question",
-            joinColumns = @JoinColumn(name = "template_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
-    private List<Question> questions;
     public Long getId() {
         return id;
     }
@@ -33,30 +28,31 @@ public class Template {
     public void setId(Long id) {
         this.id = id;
     }
+    public String getCategory(){return category;}
+    public void setCategory(String category){this.category=category;}
 
     public String getTemplateName() {
         return templateName;
     }
-    public float getCost(){return cost;}
+
+    public float getCost() {
+        return cost;
+    }
 
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
     }
-    public void setCost(float Cost){this.cost=Cost;}
+
+    public void setCost(float Cost) {
+        this.cost = Cost;
+    }
+
     public String getTemplateDescription() {
         return templateDescription;
     }
 
     public void setTemplateDescription(String templateDescription) {
         this.templateDescription = templateDescription;
-    }
-
-    public List<Question> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
     }
 
 }
