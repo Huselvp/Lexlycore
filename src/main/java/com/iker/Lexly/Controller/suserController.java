@@ -4,8 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/docs")
+@RequestMapping("/user/templates")
 public class suserController {
-
 
 }

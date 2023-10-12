@@ -13,9 +13,6 @@ public class Template {
 
     @Column(name = "template_name")
     private String templateName;
-    @Column(name="category")
-    private String category;
-
     @Column(name = "template_description")
     private String templateDescription;
     @Column(name = "template_cost")
@@ -28,8 +25,7 @@ public class Template {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getCategory(){return category;}
-    public void setCategory(String category){this.category=category;}
+
 
     public String getTemplateName() {
         return templateName;
@@ -38,7 +34,9 @@ public class Template {
     public float getCost() {
         return cost;
     }
-
+    public boolean isNew() {
+        return id == null || id == 0;
+    }
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
     }

@@ -13,7 +13,7 @@ public class TemplateQuestionValue {
     @JoinColumn(name = "template_id")
     private Template template;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "question_id")
     private Question question;
 

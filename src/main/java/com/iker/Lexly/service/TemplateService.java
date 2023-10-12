@@ -37,7 +37,7 @@ public class TemplateService {
             Template updatedTemplate = existingTemplate.get();
             updatedTemplate.setTemplateName(template.getTemplateName());
             updatedTemplate.setTemplateDescription(template.getTemplateDescription());
-            updatedTemplate.setCategory(template.getCategory());
+            //updatedTemplate.setCategory(template.getCategory());
             updatedTemplate.setCost(template.getCost());
               return templateRepository.save(updatedTemplate);
         } else {
