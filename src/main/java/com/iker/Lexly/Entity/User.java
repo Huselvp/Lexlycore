@@ -1,6 +1,7 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iker.Lexly.Entity.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -49,11 +51,19 @@ public class User implements UserDetails {
     private int zipcode;
     @Column(length = 50)
     private String town;
+    @Column(length = 50)
+    private boolean verificationemail;
     private String picture;
     @ManyToOne
     @JsonIgnore
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role = new Role();
+    @ManyToMany
+    @JoinTable(name = "user_template",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "template_id"))
+    private Set<Template> templates = new HashSet<>();
+
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
@@ -62,6 +72,7 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
     }
+
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
         this.email = email;
         this.firstname = firstName;
@@ -70,8 +81,6 @@ public class User implements UserDetails {
         this.phonenumber=phoneNumber;
         this.picture = picture;
         this.role = role;
-
-
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -96,8 +105,10 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public Set<Role> getRoles() {
-    return (Set<Role>) this.role;
+
+    public void setEmailVerified(boolean verificationemail){
+        this .verificationemail=verificationemail;
     }
+
 }
 

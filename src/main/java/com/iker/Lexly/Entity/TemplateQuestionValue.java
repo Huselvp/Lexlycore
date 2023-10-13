@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,11 +11,9 @@ public class TemplateQuestionValue {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "template_id")
     private Template template;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "question_id")
+    @ManyToOne
     private Question question;
 
     @Column(name = "value")
@@ -29,7 +28,6 @@ public class TemplateQuestionValue {
     public void setId(Long id) {
         this.id = id;
     }
-
     public Template getTemplate() {
         return template;
     }
@@ -37,7 +35,6 @@ public class TemplateQuestionValue {
     public void setTemplate(Template template) {
         this.template = template;
     }
-
     public Question getQuestion() {
         return question;
     }
@@ -61,6 +58,7 @@ public class TemplateQuestionValue {
     public void setValueType(String valueType) {
         this.valueType = valueType;
     }
+
 
 
 }

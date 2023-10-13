@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/admin")
 public class adminController {
@@ -73,9 +75,9 @@ public class adminController {
                 questionRepository.save(fetchedQuestion);
             }
             templateQuestionValue.setTemplate(fetchedTemplate);
-            List<TemplateQuestionValue> questionValues = fetchedQuestion.getTemplateQuestionValue();
+            List<TemplateQuestionValue> questionValues = (List<TemplateQuestionValue>) fetchedQuestion.getTemplateQuestionValues();
             questionValues.add(templateQuestionValue);
-            fetchedQuestion.setTemplateQuestionValue(questionValues);
+            fetchedQuestion.setTemplateQuestionValues((Set<TemplateQuestionValue>) questionValues);
 
             createdValues.add(templateQuestionValue);
         }
@@ -138,6 +140,5 @@ public class adminController {
     }
 
 }
-
 
 

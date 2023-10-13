@@ -21,6 +21,7 @@ public class UserDTO {
     private String country;
     private int zipcode;
     private String town;
+    private boolean verificationemail;
     private RoleDTO role = new RoleDTO();
     private String picture;
 
@@ -30,6 +31,7 @@ public class UserDTO {
         this.email = email;
         this.firstname = firstName;
         this.lastname = lastName;
+
         this.phonenumber=phoneNumber;
         this.picture = picture;
         this.role = roleDtos;

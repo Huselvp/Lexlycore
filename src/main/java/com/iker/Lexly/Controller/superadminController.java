@@ -1,18 +1,29 @@
 package com.iker.Lexly.Controller;
 
-import freemarker.template.Template;
-import org.springframework.http.ResponseEntity;
+import com.iker.Lexly.repository.RoleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/superadmin/docs")
+@Controller
+@RequestMapping("/api/superadmin")
 public class superadminController {
-    @GetMapping("/templates")
-    public List<Template> getAllTemplates() {
-      return null;
+    @Autowired
+    RoleRepository roleRepository;
+    @GetMapping
+    public String get(){
+        return "GET :: superadmin controller";
     }
-
-
+    @PostMapping
+    public String post(){
+        return "GET :: superadmin controller";
+    }
+    @PutMapping
+    public String put(){
+        return "GET :: superadmin controller";
+    }
+    @DeleteMapping
+    public String Delete(){
+        return "GET :: superadmin controller";
+    }
 }

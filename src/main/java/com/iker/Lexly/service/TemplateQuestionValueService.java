@@ -2,6 +2,10 @@ package com.iker.Lexly.service;
 
 import com.iker.Lexly.Entity.TemplateQuestionValue;
 import com.iker.Lexly.repository.TemplateQuestionValueRepository;
+
+
+import com.iker.Lexly.Entity.TemplateQuestionValue;
+import com.iker.Lexly.repository.TemplateQuestionValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

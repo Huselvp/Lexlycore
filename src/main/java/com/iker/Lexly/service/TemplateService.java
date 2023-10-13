@@ -2,7 +2,6 @@ package com.iker.Lexly.service;
 
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.TemplateRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,7 @@ public class TemplateService {
             updatedTemplate.setTemplateDescription(template.getTemplateDescription());
             //updatedTemplate.setCategory(template.getCategory());
             updatedTemplate.setCost(template.getCost());
-              return templateRepository.save(updatedTemplate);
+            return templateRepository.save(updatedTemplate);
         } else {
             // Handle the case where the template with the given ID doesn't exist
             return null; // You can return an appropriate response or throw an exception

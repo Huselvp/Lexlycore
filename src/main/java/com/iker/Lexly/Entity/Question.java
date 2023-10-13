@@ -3,7 +3,10 @@ package com.iker.Lexly.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 @Entity
 @Table(name = "question")
 public class Question {
@@ -14,9 +17,10 @@ public class Question {
     @NotNull
     @Column(name = "question_text")
     private String questionText;  // Add this attribute
-
+    @ManyToMany(mappedBy = "questions")
+    private Set<Template> templates = new HashSet<>();
     @OneToMany(mappedBy = "question")
-    private List<TemplateQuestionValue> templateQuestionValue;
+    private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -27,12 +31,13 @@ public class Question {
     public void setId(Long id) {
         this.id = id;
     }
-    public List<TemplateQuestionValue> getTemplateQuestionValue() {
-        return templateQuestionValue;
+
+    public Set<Template> getTemplates() {
+        return templates;
     }
 
-    public void setTemplateQuestionValue(List<TemplateQuestionValue> templateQuestionValue) {
-        this.templateQuestionValue = templateQuestionValue;
+    public void setTemplates(Set<Template> templates) {
+        this.templates = templates;
     }
     public String getQuestionText() {
         return questionText;
@@ -40,5 +45,13 @@ public class Question {
 
     public void setQuestionText(String questionText) {
         this.questionText = questionText;  // Add this setter
+    }
+
+    public Set<TemplateQuestionValue> getTemplateQuestionValues() {
+        return templateQuestionValues;
+    }
+
+    public void setTemplateQuestionValues(Set<TemplateQuestionValue> templateQuestionValues) {
+        this.templateQuestionValues = templateQuestionValues;
     }
 }

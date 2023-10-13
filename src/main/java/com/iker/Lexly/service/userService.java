@@ -6,12 +6,10 @@ import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,9 +31,6 @@ public class userService {
     @Autowired
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
@@ -55,9 +50,6 @@ public class userService {
         String token = jwtService.generateToken(userDetails);
         return token;
     }
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
     @Bean
     public PasswordEncoder userServicepasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -69,6 +61,7 @@ public class userService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         optionalUser.ifPresent(user -> {
+            user.setEmailVerified(true);
             userRepository.save(user);});
     }
     public boolean emailExists(String email) {
@@ -82,10 +75,6 @@ public class userService {
             String resetToken= resetTokenService.generateAndSavePasswordResetToken(user);
             emailService.sendResetPasswordEmail(user, resetToken);
         }
-    }
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
     }
 }
 
