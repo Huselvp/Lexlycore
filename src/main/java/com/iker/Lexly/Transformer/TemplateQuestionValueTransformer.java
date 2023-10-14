@@ -14,7 +14,6 @@ public class TemplateQuestionValueTransformer extends Transformer<TemplateQuesti
         } else {
            TemplateQuestionValue templateQuestionValue = new TemplateQuestionValue();
             templateQuestionValue.setId(dto.getId());
-            templateQuestionValue.setValue(dto.getValue());
             templateQuestionValue.setValueType(dto.getValueType());
 
             return templateQuestionValue;
@@ -26,7 +25,7 @@ public class TemplateQuestionValueTransformer extends Transformer<TemplateQuesti
         if (entity == null) {
             return null;
         } else {
-            return new TemplateQuestionValueDTO(entity.getId(), entity.getValue(),entity.getValueType());
+            return new TemplateQuestionValueDTO(entity.getId(),entity.getValueType());
         }
     }
     }

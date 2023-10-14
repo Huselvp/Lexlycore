@@ -20,9 +20,6 @@ public class TemplateQuestionValue {
     @ManyToOne
     private Question question;
 
-    @Column(name = "value")
-    private String value;
-
     @Column(name = "value_type")
     private String valueType;
     public Long getId() {
@@ -46,14 +43,6 @@ public class TemplateQuestionValue {
 
     public void setQuestion(Question question) {
         this.question = question;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     public String getValueType() {

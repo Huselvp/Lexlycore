@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TemplateQuestionValueDTO {
     private Long id;
-    private String value;
     private String valueType;
 }
