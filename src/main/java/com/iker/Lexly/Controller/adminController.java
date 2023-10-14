@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,7 @@ private final UserService userService;
         this.questionTransformer=questionTransformer1;
         this.userService = userService;
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -58,6 +60,7 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return userDTOs;
     }
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -67,24 +70,25 @@ private final UserService userService;
         return templateDTOs;
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_template/{id}")
     public ResponseEntity<Template> updateTemplate(@PathVariable Long id, @RequestBody Template template) {
         Template updatedTemplate = templateService.updateTemplate(id, template);
         return ResponseEntity.ok(updatedTemplate);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_template/{id}")
     public ResponseEntity<?> deleteTemplate(@PathVariable Long id) {
         templateService.deleteTemplate(id);
         return ResponseEntity.ok().build();
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_template_question_values")
     public ResponseEntity<List<TemplateQuestionValue>> createTemplateQuestionValues(
             @RequestBody List<TemplateQuestionValue> templateQuestionValues
@@ -116,7 +120,7 @@ private final UserService userService;
         createdValues = templateQuestionValueService.createTemplateQuestionValues(createdValues);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdValues);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_template_question_value/{id}")
     public ResponseEntity<TemplateQuestionValue> updateTemplateQuestionValue(
             @PathVariable Long id,
@@ -125,6 +129,7 @@ private final UserService userService;
         TemplateQuestionValue updatedValue = templateQuestionValueService.updateTemplateQuestionValue(id, updatedTemplateQuestionValue);
         return ResponseEntity.ok(updatedValue);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
@@ -133,11 +138,13 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return questionDTOs;
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_question")
     public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
         Question createdQuestion = questionService.createQuestion(question);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(
             @PathVariable Long id,
@@ -146,16 +153,19 @@ private final UserService userService;
         Question updatedQues = questionService.updateQuestion(id, updatedQuestion);
         return ResponseEntity.ok(updatedQues);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete_question/{id}")
     public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add_category")
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_category/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
@@ -167,11 +177,13 @@ private final UserService userService;
         }
         return ResponseEntity.notFound().build();
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
