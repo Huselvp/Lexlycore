@@ -31,7 +31,7 @@ public class UserDTO {
         this.email = email;
         this.firstname = firstName;
         this.lastname = lastName;
-
+         this.userId = userId;
         this.phonenumber=phoneNumber;
         this.picture = picture;
         this.role = roleDtos;
