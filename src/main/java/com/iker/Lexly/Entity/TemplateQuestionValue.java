@@ -1,6 +1,9 @@
 package com.iker.Lexly.Entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,10 +12,11 @@ public class TemplateQuestionValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonManagedReference
 
     @ManyToOne
     private Template template;
-
+    @JsonIgnoreProperties("questions")
     @ManyToOne
     private Question question;
 
@@ -28,6 +32,7 @@ public class TemplateQuestionValue {
     public void setId(Long id) {
         this.id = id;
     }
+    @JsonProperty("template")
     public Template getTemplate() {
         return template;
     }

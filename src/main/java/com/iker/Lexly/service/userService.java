@@ -1,7 +1,5 @@
 package com.iker.Lexly.service;
 
-import ch.qos.logback.core.boolex.Matcher;
-import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.config.jwt.JwtService;
@@ -16,21 +14,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Configuration
 @Service
 @RequiredArgsConstructor
-public class userService {
+public class UserService {
     private final ResetTokenService resetTokenService;
     private final EmailService emailService;
     @Autowired
     private final UserRepository userRepository;
     private final JwtService jwtService;
+
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
@@ -76,7 +72,11 @@ public class userService {
             emailService.sendResetPasswordEmail(user, resetToken);
         }
     }
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 }
+
 
 
 

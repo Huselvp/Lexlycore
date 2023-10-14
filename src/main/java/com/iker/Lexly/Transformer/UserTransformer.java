@@ -6,10 +6,11 @@ import com.iker.Lexly.Entity.Role;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Component
 public class UserTransformer extends Transformer<User, UserDTO> {
 
     private static final Transformer<Role, RoleDTO> roleTransformer = new RoleTransformer();

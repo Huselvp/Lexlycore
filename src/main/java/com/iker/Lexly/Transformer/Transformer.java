@@ -1,5 +1,7 @@
 package com.iker.Lexly.Transformer;
 
+import com.iker.Lexly.DTO.TemplateQuestionValueDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,5 @@ public abstract class Transformer<Entity, DTO> {
         }
         return dtos;
     }
-
 
 }

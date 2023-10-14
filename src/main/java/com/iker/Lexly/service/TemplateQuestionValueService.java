@@ -19,7 +19,6 @@ public class TemplateQuestionValueService {
     public TemplateQuestionValueService(TemplateQuestionValueRepository templateQuestionValueRepository) {
         this.templateQuestionValueRepository = templateQuestionValueRepository;
     }
-
     public List<TemplateQuestionValue> createTemplateQuestionValues(List<TemplateQuestionValue> templateQuestionValues) {
         return templateQuestionValueRepository.saveAll(templateQuestionValues);
     }
@@ -29,15 +28,11 @@ public class TemplateQuestionValueService {
     }
 
     public TemplateQuestionValue updateTemplateQuestionValue(Long id, TemplateQuestionValue updatedTemplateQuestionValue) {
-        // Find the existing TemplateQuestionValue by ID
         TemplateQuestionValue existingTemplateQuestionValue = templateQuestionValueRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("TemplateQuestionValue not found"));
 
-        // Update the existing TemplateQuestionValue with the new values
         existingTemplateQuestionValue.setValue(updatedTemplateQuestionValue.getValue());
         existingTemplateQuestionValue.setValueType(updatedTemplateQuestionValue.getValueType());
-
-        // Save the updated TemplateQuestionValue
         return templateQuestionValueRepository.save(existingTemplateQuestionValue);
     }
 }

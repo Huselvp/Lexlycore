@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,6 +21,7 @@ public class Question {
     @ManyToMany(mappedBy = "questions")
     private Set<Template> templates = new HashSet<>();
     @OneToMany(mappedBy = "question")
+    @JsonIgnoreProperties("question")
     private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
 
     public Long getId() {

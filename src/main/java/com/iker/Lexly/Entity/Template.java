@@ -1,5 +1,8 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -33,6 +36,7 @@ public class Template {
             joinColumns = @JoinColumn(name = "template_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id"))
     private Set<Question> questions = new HashSet<>();
+
     @OneToMany(mappedBy = "template")
     private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
 
@@ -90,7 +94,7 @@ public class Template {
     public Set<TemplateQuestionValue> getTemplateQuestionValues() {
         return templateQuestionValues;
     }
-
+    @JsonProperty("templateQuestionValues")
     public void setTemplateQuestionValues(Set<TemplateQuestionValue> templateQuestionValues) {
         this.templateQuestionValues = templateQuestionValues;
     }

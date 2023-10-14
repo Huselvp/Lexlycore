@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TemplateDTO {
+public class TemplateQuestionValueDTO {
     private Long id;
-    private String templateName;
-    private String templateDescription;
-    private float cost;
+    private String value;
+    private String valueType;
 }

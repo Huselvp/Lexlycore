@@ -1,14 +1,14 @@
 package com.iker.Lexly.Controller;
-import com.iker.Lexly.Entity.Category;
-import com.iker.Lexly.Entity.Question;
-import com.iker.Lexly.Entity.Template;
-import com.iker.Lexly.Entity.TemplateQuestionValue;
+import com.iker.Lexly.DTO.QuestionDTO;
+import com.iker.Lexly.DTO.TemplateDTO;
+import com.iker.Lexly.DTO.UserDTO;
+import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Transformer.QuestionTransformer;
+import com.iker.Lexly.Transformer.TemplateTransformer;
+import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
-import com.iker.Lexly.service.CategoryService;
-import com.iker.Lexly.service.QuestionService;
-import com.iker.Lexly.service.TemplateQuestionValueService;
-import com.iker.Lexly.service.TemplateService;
+import com.iker.Lexly.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,26 +17,57 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
 public class adminController {
+private final UserService userService;
+    private final UserTransformer userTransformer;
+
+    private final QuestionTransformer questionTransformer;
+
     private  final QuestionRepository questionRepository;
     private final CategoryService categoryService;
     private final TemplateService templateService;
     private final TemplateQuestionValueService templateQuestionValueService;
     private final QuestionService questionService;
     private final TemplateRepository templateRepository;
+    private final TemplateTransformer templateTransformer;
+
+
 
     @Autowired
-    public adminController(TemplateService templateService,CategoryService categoryService , TemplateQuestionValueService templateQuestionValueService, QuestionService questionService, QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public adminController(UserService userService,UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService , TemplateQuestionValueService templateQuestionValueService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
+        this.userTransformer=userTransformer;
         this.templateQuestionValueService=templateQuestionValueService;
         this.templateRepository=templateRepository;
         this.categoryService=categoryService;
         this.questionService=questionService;
         this.questionRepository=questionRepository;
+        this.templateTransformer=templateTransformer;
+        this.questionTransformer=questionTransformer1;
+        this.userService = userService;
     }
+    @GetMapping("/all_users")
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        List<UserDTO> userDTOs = users.stream()
+                .map(userTransformer::toDTO)
+                .collect(Collectors.toList());
+        return userDTOs;
+    }
+    @GetMapping("/all_templates")
+    public List<TemplateDTO> getAllTemplates() {
+        List<Template> templates = templateService.getAllTemplates();
+        List<TemplateDTO> templateDTOs = templates.stream()
+                .map(templateTransformer::toDTO)
+                .collect(Collectors.toList());
+        return templateDTOs;
+    }
+
+
     @PostMapping("/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
@@ -94,6 +125,14 @@ public class adminController {
         TemplateQuestionValue updatedValue = templateQuestionValueService.updateTemplateQuestionValue(id, updatedTemplateQuestionValue);
         return ResponseEntity.ok(updatedValue);
     }
+    @GetMapping("/all_questions")
+    public List<QuestionDTO> getAllQuestions() {
+        List<Question> questions = questionService.getAllQuestions();
+        List<QuestionDTO> questionDTOs = questions.stream()
+                .map(questionTransformer::toDTO)
+                .collect(Collectors.toList());
+        return questionDTOs;
+    }
     @PostMapping("/create_question")
     public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
         Question createdQuestion = questionService.createQuestion(question);
@@ -133,7 +172,7 @@ public class adminController {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
-    @GetMapping("All_categories")
+    @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);

@@ -1,6 +1,10 @@
 package com.iker.Lexly.Transformer;
+import com.iker.Lexly.DTO.TemplateQuestionValueDTO;
 import com.iker.Lexly.Entity.Role;
 import com.iker.Lexly.DTO.RoleDTO;
+import org.springframework.stereotype.Component;
+
+@Component
 public class RoleTransformer extends Transformer<Role, RoleDTO>{
 
     @Override
@@ -23,6 +27,7 @@ public class RoleTransformer extends Transformer<Role, RoleDTO>{
             return new RoleDTO(entity.getId(),entity.getName());
         }
     }
+
 
 }
 
