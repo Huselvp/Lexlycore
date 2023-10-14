@@ -3,7 +3,7 @@ import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Entity.enums.ERole;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.service.EmailService;
-import com.iker.Lexly.service.userService;
+import com.iker.Lexly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class AuthController {
     @Autowired
     private final  EmailService emailService;
      @Autowired
-    private final userService userService;
+    private final UserService userService;
     @Autowired
     private  final  ResetTokenService resetTokenService;
     @Autowired
