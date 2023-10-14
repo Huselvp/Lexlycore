@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -40,13 +42,13 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
-                                .requestMatchers("/api/admin").hasAnyRole(ERole.ADMIN.name())
-                                .requestMatchers("/api/superadmin").hasAnyRole(ERole.SUPERADMIN.name())
-                                .requestMatchers("/api/user").hasAnyRole((ERole.SUSER.name()))
-                                .requestMatchers("/api/advisor").hasAnyRole(ERole.ADVISOR.name())
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
+                                .requestMatchers("/api/user/**").hasAnyRole("SUSER", "ADMIN")
+                                .requestMatchers("/api/advisor/**").hasRole("ADVISOR")
                                 .anyRequest().permitAll()
                 );
-               http.authenticationProvider(authenticationProvider)
+        http.authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
