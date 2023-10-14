@@ -1,10 +1,12 @@
 package com.iker.Lexly.Entity;
 
-import jakarta.persistence.Table;
-import lombok.*;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
@@ -14,11 +16,11 @@ import jakarta.persistence.Entity;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Advisor extends User{
-    private int Numberofexperience;
+    private int NUmberofexperience;
     private String specialite;
 
     public void setNumberOfExperience(int numberOfExperience) {
-        this.Numberofexperience = numberOfExperience;
+        this.NUmberofexperience = numberOfExperience;
     }
 
     public void setSpecialite(String specialite) {
