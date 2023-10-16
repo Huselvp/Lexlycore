@@ -16,10 +16,8 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
-    private final  EmailService emailService;
-     @Autowired
     private final UserService userService;
     @Autowired
     private  final  ResetTokenService resetTokenService;
@@ -64,7 +62,6 @@ public class AuthController {
         resetTokenService.invalidateToken(token);
         return ResponseEntity.ok("Password reset successful");
     }
-
 }
 
 
