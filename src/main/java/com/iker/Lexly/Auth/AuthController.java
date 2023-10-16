@@ -55,7 +55,6 @@ public class AuthController {
         if (!isTokenValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
-
         User user = resetTokenService.getUserFromToken(token);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
