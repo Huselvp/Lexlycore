@@ -47,11 +47,10 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
             }
         }
-
-     //need a token
-    @PostMapping("/reset-password/{token}")
-    public ResponseEntity<String> handlePasswordReset(@PathVariable String token,
-                                                      @RequestBody String newPassword) {
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> handlePasswordReset(Map<String,String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
         boolean isTokenValid = resetTokenService.validateToken(token);
         if (!isTokenValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
