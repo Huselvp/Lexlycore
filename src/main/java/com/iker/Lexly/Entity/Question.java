@@ -14,16 +14,14 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotNull
     @Column(name = "question_text")
-    private String questionText;  // Add this attribute
+    private String questionText;
     @ManyToMany(mappedBy = "questions")
     private Set<Template> templates = new HashSet<>();
     @OneToMany(mappedBy = "question")
     @JsonIgnoreProperties("question")
     private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
-
     public Long getId() {
         return id;
     }
@@ -33,26 +31,21 @@ public class Question {
     public void setId(Long id) {
         this.id = id;
     }
-
     public Set<Template> getTemplates() {
         return templates;
     }
-
     public void setTemplates(Set<Template> templates) {
         this.templates = templates;
     }
     public String getQuestionText() {
         return questionText;
     }
-
     public void setQuestionText(String questionText) {
-        this.questionText = questionText;  // Add this setter
+        this.questionText = questionText;
     }
-
     public Set<TemplateQuestionValue> getTemplateQuestionValues() {
         return templateQuestionValues;
     }
-
     public void setTemplateQuestionValues(Set<TemplateQuestionValue> templateQuestionValues) {
         this.templateQuestionValues = templateQuestionValues;
     }

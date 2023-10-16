@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,7 +39,7 @@ public class Template {
     private Set<Question> questions = new HashSet<>();
 
     @OneToMany(mappedBy = "template")
-    private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
+    private List<TemplateQuestionValue> templateQuestionValues;
 
 
     public Template() {
@@ -91,12 +92,13 @@ public class Template {
     public void setCategory(Category category) {
         this.category = category;
     }
-    public Set<TemplateQuestionValue> getTemplateQuestionValues() {
+    public List<TemplateQuestionValue> getTemplateQuestionValues() {
         return templateQuestionValues;
     }
-    @JsonProperty("templateQuestionValues")
-    public void setTemplateQuestionValues(Set<TemplateQuestionValue> templateQuestionValues) {
+
+    public void setTemplateQuestionValues(List<TemplateQuestionValue> templateQuestionValues) {
         this.templateQuestionValues = templateQuestionValues;
     }
+
 
 }

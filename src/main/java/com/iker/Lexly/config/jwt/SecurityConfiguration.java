@@ -33,7 +33,6 @@ import java.util.Arrays;
 public class SecurityConfiguration {
     private final  AuthenticationProvider authenticationProvider;
     private final AuthFilterJwt jwtAuthFilter;
-    private final RoleRepository roleRepository;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())

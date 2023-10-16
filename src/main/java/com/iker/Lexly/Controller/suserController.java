@@ -1,29 +1,36 @@
 package com.iker.Lexly.Controller;
 
-import com.iker.Lexly.repository.RoleRepository;
+import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/api/suser")
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/user/documents")
 public class suserController {
+    private final DocumentsService documentsService;
+    private final UserService userService;
+    private final TemplateService templateService;
+    private final QuestionService questionService;
+    private final TemplateQuestionValueService templateQuestionValueService;
+
     @Autowired
-    RoleRepository roleRepository;
-    @GetMapping
-    public String get(){
-        return "GET :: suser controller";
+    public suserController(DocumentsService documentsService, UserService userService, TemplateService templateService, QuestionService questionService, TemplateQuestionValueService templateQuestionValueService) {
+        this.documentsService = documentsService;
+        this.userService = userService;
+        this.templateQuestionValueService = templateQuestionValueService;
+        this.questionService = questionService;
+        this.templateService = templateService;
     }
-    @PostMapping
-    public String post(){
-        return "GET :: suser controller";
-    }
-    @PutMapping
-    public String put(){
-        return "GET :: suser controller";
-    }
-    @DeleteMapping
-    public String Delete(){
-        return "GET :: suser controller";
-    }
+
+
+
 }
+
+

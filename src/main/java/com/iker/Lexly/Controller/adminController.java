@@ -23,12 +23,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
 public class adminController {
-private final UserService userService;
+    private final UserService userService;
     private final UserTransformer userTransformer;
-
     private final QuestionTransformer questionTransformer;
-
-    private  final QuestionRepository questionRepository;
+    private final QuestionRepository questionRepository;
     private final CategoryService categoryService;
     private final TemplateService templateService;
     private final TemplateQuestionValueService templateQuestionValueService;
@@ -37,20 +35,20 @@ private final UserService userService;
     private final TemplateTransformer templateTransformer;
 
 
-
     @Autowired
-    public adminController(UserService userService,UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService , TemplateQuestionValueService templateQuestionValueService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
+    public adminController(UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, TemplateQuestionValueService templateQuestionValueService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
-        this.userTransformer=userTransformer;
-        this.templateQuestionValueService=templateQuestionValueService;
-        this.templateRepository=templateRepository;
-        this.categoryService=categoryService;
-        this.questionService=questionService;
-        this.questionRepository=questionRepository;
-        this.templateTransformer=templateTransformer;
-        this.questionTransformer=questionTransformer1;
+        this.userTransformer = userTransformer;
+        this.templateQuestionValueService = templateQuestionValueService;
+        this.templateRepository = templateRepository;
+        this.categoryService = categoryService;
+        this.questionService = questionService;
+        this.questionRepository = questionRepository;
+        this.templateTransformer = templateTransformer;
+        this.questionTransformer = questionTransformer1;
         this.userService = userService;
     }
+
     //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers() {
@@ -60,7 +58,8 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return userDTOs;
     }
-   // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
+
+    // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -70,25 +69,28 @@ private final UserService userService;
         return templateDTOs;
     }
 
- //   @PreAuthorize("hasRole('ADMIN')")
+    //   @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-  //  @PreAuthorize("hasRole('ADMIN')")
+
+    //  @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_template/{id}")
     public ResponseEntity<Template> updateTemplate(@PathVariable Long id, @RequestBody Template template) {
         Template updatedTemplate = templateService.updateTemplate(id, template);
         return ResponseEntity.ok(updatedTemplate);
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_template/{id}")
-    public ResponseEntity<?> deleteTemplate(@PathVariable Long id) {
+    public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         templateService.deleteTemplate(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("template with ID " + id + " has been deleted successfully.");
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_template_question_text")
     public ResponseEntity<List<TemplateQuestionValue>> createTemplateQuestionValues(
             @RequestBody List<TemplateQuestionValue> templateQuestionValues
@@ -115,11 +117,10 @@ private final UserService userService;
 
             createdValues.add(templateQuestionValue);
         }
-
         createdValues = templateQuestionValueService.createTemplateQuestionValues(createdValues);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdValues);
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_template_question_value/{id}")
     public ResponseEntity<TemplateQuestionValue> updateTemplateQuestionValue(
             @PathVariable Long id,
@@ -128,7 +129,7 @@ private final UserService userService;
         TemplateQuestionValue updatedValue = templateQuestionValueService.updateTemplateQuestionValue(id, updatedTemplateQuestionValue);
         return ResponseEntity.ok(updatedValue);
     }
-  //  @PreAuthorize("hasRole('ADMIN')")
+    //  @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
@@ -137,13 +138,22 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_question")
     public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
         Question createdQuestion = questionService.createQuestion(question);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/find_questions_by_template/{templateId}")
+    public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
+        List<Question> questions = questionService.findQuestionsByTemplateId(templateId);
+        List<QuestionDTO> questionDTOs = questions.stream()
+                .map(questionTransformer::toDTO)
+                .collect(Collectors.toList());
+        return questionDTOs;
+    }
+    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(
             @PathVariable Long id,
@@ -152,19 +162,23 @@ private final UserService userService;
         Question updatedQues = questionService.updateQuestion(id, updatedQuestion);
         return ResponseEntity.ok(updatedQues);
     }
-  //  @PreAuthorize("hasRole('ADMIN')")
+
+    //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete_question/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
+
     }
-  //  @PreAuthorize("hasRole('ADMIN')")
+
+    //  @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add_category")
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_category/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
@@ -176,19 +190,20 @@ private final UserService userService;
         }
         return ResponseEntity.notFound().build();
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_category/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Category with ID " + categoryId + " has been deleted successfully.");
     }
-   // @PreAuthorize("hasRole('ADMIN')")
+
+    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
-
 }
 
 

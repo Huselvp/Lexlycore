@@ -19,6 +19,10 @@ public class CategoryService {
     public Category addCategory(Category category) {
         return categoryRepository.save(category);
     }
+    public boolean categoryExists(Long categoryId) {
+        // Use the existsById method from the repository to check if the category exists.
+        return categoryRepository.existsById(categoryId);
+    }
 
     // Method to update a category
     public Category updateCategory(Long categoryId, Category updatedCategory) {

@@ -110,5 +110,13 @@ public class User implements UserDetails {
         this .verificationemail=verificationemail;
     }
 
+
+    public Long getId() {
+        return userId;
+    }
+
+    public void setId(Long id) {
+        this.userId = id;
+    }
 }
 

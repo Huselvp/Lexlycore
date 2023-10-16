@@ -47,4 +47,9 @@ public class QuestionService {
     public void deleteQuestion(Long id) {
         questionRepository.deleteById(id);
     }
+
+    public List<Question> findQuestionsByTemplateId(Long templateId) {
+        // Use the findByTemplateId method from the repository to find questions by template ID.
+        return questionRepository.findByTemplateId(templateId);
+    }
 }

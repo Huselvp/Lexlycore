@@ -1,6 +1,7 @@
 package com.iker.Lexly.service;
 
 import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Exceptions.UserNotFoundException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
@@ -75,6 +76,8 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+
 }
 
 

@@ -19,9 +19,19 @@ public class TemplateQuestionValue {
     @JsonIgnoreProperties("questions")
     @ManyToOne
     private Question question;
+    @ManyToOne
+    private Documents document;
 
     @Column(name = "value_type")
     private String valueType;
+    public Documents getDocument() {
+        return document;
+    }
+
+    public void setDocument(Documents document) {
+        this.document = document;
+    }
+
     public Long getId() {
         return id;
     }
@@ -33,26 +43,20 @@ public class TemplateQuestionValue {
     public Template getTemplate() {
         return template;
     }
-
     public void setTemplate(Template template) {
         this.template = template;
     }
     public Question getQuestion() {
         return question;
     }
-
     public void setQuestion(Question question) {
         this.question = question;
     }
-
     public String getValueType() {
         return valueType;
     }
-
     public void setValueType(String valueType) {
         this.valueType = valueType;
     }
-
-
 
 }

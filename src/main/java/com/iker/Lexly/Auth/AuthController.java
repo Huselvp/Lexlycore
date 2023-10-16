@@ -46,8 +46,12 @@ public class AuthController {
             }
         }
     @PostMapping("/reset-password")
-    public ResponseEntity<String> handlePasswordReset(Map<String,String> request) {
+    public ResponseEntity<String> handlePasswordReset(Map<String, String> request) {
         String token = request.get("token");
+        System.out.println("Token from request: " + token);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
+        }
         String newPassword = request.get("newPassword");
         boolean isTokenValid = resetTokenService.validateToken(token);
         if (!isTokenValid) {
@@ -58,10 +62,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         userService.resetPassword(user, newPassword);
+        resetTokenService.validateToken(token);
+        System.out.println("Token validation result: " + isTokenValid);
         resetTokenService.deleteToken(token);
-        resetTokenService.invalidateToken(token);
         return ResponseEntity.ok("Password reset successful");
     }
 }
-
-
