@@ -51,7 +51,7 @@ private final UserService userService;
         this.questionTransformer=questionTransformer1;
         this.userService = userService;
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -60,7 +60,7 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return userDTOs;
     }
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
+   // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -70,26 +70,26 @@ private final UserService userService;
         return templateDTOs;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+ //   @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+  //  @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_template/{id}")
     public ResponseEntity<Template> updateTemplate(@PathVariable Long id, @RequestBody Template template) {
         Template updatedTemplate = templateService.updateTemplate(id, template);
         return ResponseEntity.ok(updatedTemplate);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_template/{id}")
     public ResponseEntity<?> deleteTemplate(@PathVariable Long id) {
         templateService.deleteTemplate(id);
         return ResponseEntity.ok().build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create_template_question_values")
+   // @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create_template_question_text")
     public ResponseEntity<List<TemplateQuestionValue>> createTemplateQuestionValues(
             @RequestBody List<TemplateQuestionValue> templateQuestionValues
     ) {
@@ -103,7 +103,6 @@ private final UserService userService;
             }
             String questionText = templateQuestionValue.getQuestion().getQuestionText();
             Question fetchedQuestion = questionRepository.findByQuestionText(questionText);
-
             if (fetchedQuestion == null) {
                 fetchedQuestion = new Question();
                 fetchedQuestion.setQuestionText(questionText);
@@ -120,7 +119,7 @@ private final UserService userService;
         createdValues = templateQuestionValueService.createTemplateQuestionValues(createdValues);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdValues);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_template_question_value/{id}")
     public ResponseEntity<TemplateQuestionValue> updateTemplateQuestionValue(
             @PathVariable Long id,
@@ -129,7 +128,7 @@ private final UserService userService;
         TemplateQuestionValue updatedValue = templateQuestionValueService.updateTemplateQuestionValue(id, updatedTemplateQuestionValue);
         return ResponseEntity.ok(updatedValue);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+  //  @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
@@ -138,13 +137,13 @@ private final UserService userService;
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create_question")
     public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
         Question createdQuestion = questionService.createQuestion(question);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(
             @PathVariable Long id,
@@ -153,19 +152,19 @@ private final UserService userService;
         Question updatedQues = questionService.updateQuestion(id, updatedQuestion);
         return ResponseEntity.ok(updatedQues);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+  //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete_question/{id}")
     public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+  //  @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add_category")
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_category/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
@@ -177,13 +176,13 @@ private final UserService userService;
         }
         return ResponseEntity.notFound().build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }
-    @PreAuthorize("hasRole('ADMIN')")
+   // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();

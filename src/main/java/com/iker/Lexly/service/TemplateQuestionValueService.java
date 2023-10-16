@@ -30,8 +30,6 @@ public class TemplateQuestionValueService {
     public TemplateQuestionValue updateTemplateQuestionValue(Long id, TemplateQuestionValue updatedTemplateQuestionValue) {
         TemplateQuestionValue existingTemplateQuestionValue = templateQuestionValueRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("TemplateQuestionValue not found"));
-
-        existingTemplateQuestionValue.setValue(updatedTemplateQuestionValue.getValue());
         existingTemplateQuestionValue.setValueType(updatedTemplateQuestionValue.getValueType());
         return templateQuestionValueRepository.save(existingTemplateQuestionValue);
     }

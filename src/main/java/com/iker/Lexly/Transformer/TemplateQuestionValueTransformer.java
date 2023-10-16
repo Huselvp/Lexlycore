@@ -15,7 +15,6 @@ public class TemplateQuestionValueTransformer extends Transformer<TemplateQuesti
            TemplateQuestionValue templateQuestionValue = new TemplateQuestionValue();
             templateQuestionValue.setId(dto.getId());
             templateQuestionValue.setValueType(dto.getValueType());
-
             return templateQuestionValue;
         }
     }

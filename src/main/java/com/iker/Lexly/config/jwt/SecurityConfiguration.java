@@ -35,6 +35,7 @@ public class SecurityConfiguration {
     private final AuthFilterJwt jwtAuthFilter;
     private final RoleRepository roleRepository;
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -42,10 +43,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/api/superadmin/**").hasRole("SUPERADMIN")
-                                .requestMatchers("/api/user/**").hasAnyRole("SUSER", "ADMIN")
-                                .requestMatchers("/api/advisor/**").hasRole("ADVISOR")
+                                .requestMatchers("/api/admin").hasAnyRole(ERole.ADMIN.name())
+                                .requestMatchers("/api/superadmin").hasAnyRole(ERole.SUPERADMIN.name())
+                                .requestMatchers("/api/user").hasAnyRole((ERole.SUSER.name()))
+                                .requestMatchers("/api/advisor").hasAnyRole(ERole.ADVISOR.name())
                                 .anyRequest().permitAll()
                 );
         http.authenticationProvider(authenticationProvider)
@@ -53,6 +54,7 @@ public class SecurityConfiguration {
 
         return http.build();
     }
+
 
 
 }
