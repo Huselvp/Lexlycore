@@ -118,5 +118,9 @@ public class User implements UserDetails {
     public void setId(Long id) {
         this.userId = id;
     }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
 
