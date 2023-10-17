@@ -19,6 +19,8 @@ public class Question {
     private String questionText;
     @ManyToMany(mappedBy = "questions")
     private Set<Template> templates = new HashSet<>();
+    @ManyToOne
+    private Template template;
     @OneToMany(mappedBy = "question")
     @JsonIgnoreProperties("question")
     private Set<TemplateQuestionValue> templateQuestionValues = new HashSet<>();
@@ -48,5 +50,12 @@ public class Question {
     }
     public void setTemplateQuestionValues(Set<TemplateQuestionValue> templateQuestionValues) {
         this.templateQuestionValues = templateQuestionValues;
+    }
+    public Template getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(Template template) {
+        this.template = template;
     }
 }

@@ -11,4 +11,6 @@ public interface QuestionRepository  extends JpaRepository<Question,Long> {
     Question findByQuestionText(String questionText);
 
     List<Question> findByTemplateId(Long templateId);
+
+
 }

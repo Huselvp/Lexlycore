@@ -2,16 +2,20 @@ package com.iker.Lexly.Auth;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Entity.enums.ERole;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
+import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.service.EmailService;
 import com.iker.Lexly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Map;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -22,7 +26,11 @@ public class AuthController {
     @Autowired
     private  final  ResetTokenService resetTokenService;
     @Autowired
+    private final PasswordEncoder passwordEncoder;
+    @Autowired
     private  final AuthenticationService service;
+    @Autowired
+    private final UserRepository userRepository;
 
      @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
@@ -45,26 +53,26 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
             }
         }
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> handlePasswordReset(Map<String, String> request) {
+    @PostMapping("/reset")
+    public ResponseEntity<String> handlePasswordReset(@RequestBody Map<String, String> request) {
         String token = request.get("token");
-        System.out.println("Token from request: " + token);
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
-        }
         String newPassword = request.get("newPassword");
-        boolean isTokenValid = resetTokenService.validateToken(token);
-        if (!isTokenValid) {
+        if (resetTokenService.validateToken(token)) {
+            Optional<User> optionalUser = resetTokenService.findUserByPasswordToken(token);
+
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                passwordEncoder.encode(newPassword);
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+                resetTokenService.deleteToken(token);
+                resetTokenService.invalidateToken(token);
+                return ResponseEntity.ok("Password reset successful");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
-        User user = resetTokenService.getUserFromToken(token);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        userService.resetPassword(user, newPassword);
-        resetTokenService.validateToken(token);
-        System.out.println("Token validation result: " + isTokenValid);
-        resetTokenService.deleteToken(token);
-        return ResponseEntity.ok("Password reset successful");
     }
 }
