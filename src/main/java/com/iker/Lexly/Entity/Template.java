@@ -1,13 +1,7 @@
 package com.iker.Lexly.Entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "template")
@@ -21,9 +15,10 @@ public class Template {
     private String templateDescription;
     @Column(name = "template_cost")
     private float cost;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @ManyToMany(mappedBy = "templates")
-    private Set<User> users = new HashSet<>();
     @ManyToOne
     private Category category;
     public Template(String name, Category category, String templateDescription,float cost) {
@@ -32,17 +27,21 @@ public class Template {
         this.cost=cost;
         this.category = category;
     }
-    @ManyToMany
-    @JoinTable(name = "template_question",
-            joinColumns = @JoinColumn(name = "template_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id"))
-    private Set<Question> questions = new HashSet<>();
+    @OneToMany(mappedBy = "template")
+    private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template")
-    private List<TemplateQuestionValue> templateQuestionValues;
+    private List<Documents> documents = new ArrayList<>();
 
 
     public Template() {
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getId() {
@@ -75,13 +74,7 @@ public class Template {
     public String getTemplateDescription() {
         return templateDescription;
     }
-    public Set<Question> getQuestions() {
-        return questions;
-    }
 
-    public void setQuestions(Set<Question> questions) {
-        this.questions = questions;
-    }
     public void setTemplateDescription(String templateDescription) {
         this.templateDescription = templateDescription;
     }
@@ -92,13 +85,19 @@ public class Template {
     public void setCategory(Category category) {
         this.category = category;
     }
-    public List<TemplateQuestionValue> getTemplateQuestionValues() {
-        return templateQuestionValues;
+    public List<Question> getQuestions() {
+        return questions;
     }
 
-    public void setTemplateQuestionValues(List<TemplateQuestionValue> templateQuestionValues) {
-        this.templateQuestionValues = templateQuestionValues;
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 
+    public List<Documents> getDocuments() {
+        return documents;
+    }
 
+    public void setDocuments(List<Documents> documents) {
+        this.documents = documents;
+    }
 }

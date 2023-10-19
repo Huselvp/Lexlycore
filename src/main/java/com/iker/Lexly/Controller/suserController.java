@@ -18,13 +18,12 @@ public class suserController {
     private final UserService userService;
     private final TemplateService templateService;
     private final QuestionService questionService;
-    private final TemplateQuestionValueService templateQuestionValueService;
+
 
     @Autowired
-    public suserController(DocumentsService documentsService, UserService userService, TemplateService templateService, QuestionService questionService, TemplateQuestionValueService templateQuestionValueService) {
+    public suserController(DocumentsService documentsService, UserService userService, TemplateService templateService, QuestionService questionService) {
         this.documentsService = documentsService;
         this.userService = userService;
-        this.templateQuestionValueService = templateQuestionValueService;
         this.questionService = questionService;
         this.templateService = templateService;
     }

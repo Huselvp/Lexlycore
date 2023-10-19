@@ -20,7 +20,7 @@ public class Documents {
     @ManyToOne
     private Template template;
     @OneToMany(mappedBy = "document")
-    private List<TemplateQuestionValue> documentQuestionValues;
+    private List<DocumentQuestionValue> documentQuestionValues;
     public Long getId() {
         return id;
     }
@@ -45,12 +45,11 @@ public class Documents {
         this.template = template;
     }
 
-    public List<TemplateQuestionValue> getTemplateQuestionValues() {
+    public List<DocumentQuestionValue> getDocumentQuestionValues() {
         return documentQuestionValues;
     }
-
-    public void setTemplateQuestionValues(List<TemplateQuestionValue> templateQuestionValues) {
-        this.documentQuestionValues = templateQuestionValues;
+    public void setDocumentQuestionValues(List<DocumentQuestionValue> documentQuestionValues) {
+        this.documentQuestionValues = documentQuestionValues;
     }
     public LocalDateTime getCreatedAt() {
         return createdAt;

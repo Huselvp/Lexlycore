@@ -29,20 +29,22 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
-    public Question updateQuestion(Long id, Question question) {
+    public Question updateQuestion(Long id, String questionText, String valueType) {
         Optional<Question> existingQuestion = questionRepository.findById(id);
 
         if (existingQuestion.isPresent()) {
-            // Update the existing question with the new values
             Question updatedQuestion = existingQuestion.get();
-            updatedQuestion.setQuestionText(question.getQuestionText());
+            updatedQuestion.setQuestionText(questionText);
+            updatedQuestion.setValueType(valueType); // Set the valueType
 
             return questionRepository.save(updatedQuestion);
         } else {
             // Handle the case where the question with the given ID doesn't exist
-            return null; // You can return an appropriate response or throw an exception
+            // You can return an appropriate response or throw an exception
+            return null;
         }
     }
+
 
     public void deleteQuestion(Long id) {
         questionRepository.deleteById(id);

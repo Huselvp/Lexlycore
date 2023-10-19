@@ -58,11 +58,8 @@ public class User implements UserDetails {
     @JsonIgnore
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Role role = new Role();
-    @ManyToMany
-    @JoinTable(name = "user_template",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "template_id"))
-    private Set<Template> templates = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    private List<Template> templates;
 
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
