@@ -82,9 +82,7 @@ public class adminController {
         return ResponseEntity.ok("template with ID " + id + " has been deleted successfully.");
     }
     // @PreAuthorize("hasRole('ADMIN')")
-
     // @PreAuthorize("hasRole('ADMIN')")
-
     //  @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
@@ -109,7 +107,7 @@ public class adminController {
         return questionDTOs;
     }
     // @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/questions/{id}")
+    @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
         Question updatedQuestion = questionService.updateQuestion(id, question.getQuestionText(), question.getValueType());
         if (updatedQuestion != null) {

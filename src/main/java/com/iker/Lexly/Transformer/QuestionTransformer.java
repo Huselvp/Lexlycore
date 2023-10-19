@@ -14,7 +14,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
             Question question = new Question();
            question.setId(dto.getId());
            question.setQuestionText(dto.getQuestionText());
-
+           question.setValueType(dto.getValueType());
            return question;
         }
     }
@@ -24,7 +24,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
         if (entity == null) {
             return null;
         } else {
-            return new QuestionDTO(entity.getId(), entity.getQuestionText());
+            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType());
         }
     }
 

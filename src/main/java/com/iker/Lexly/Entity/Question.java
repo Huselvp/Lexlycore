@@ -13,7 +13,7 @@ public class Question {
     @Column(name = "question_text")
     private String questionText;
     @Column(name= "value_type")
-    private String ValueType;
+    private String valueType;
     @ManyToOne
     private Template template;
     public Long getId() {
@@ -26,8 +26,8 @@ public class Question {
     public Template getTemplates() {
         return template;
     }
-    public String getValueType(){return ValueType;}
-    public void setValueType(String valueType){this.ValueType=valueType;}
+    public String getValueType(){return valueType;}
+    public void setValueType(String valueType){this.valueType=valueType;}
 
     public String getQuestionText() {
         return questionText;
