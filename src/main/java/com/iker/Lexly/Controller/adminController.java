@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 @RestController
@@ -116,6 +117,36 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    @GetMapping("/questions/{questionId}")
+    public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
+        Question question = questionService.getQuestionById(questionId);
+
+        if (question != null) {
+            return new ResponseEntity<>(question, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping("/templates/{templateId}")
+    public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
+        Template template = templateService.getTemplateById(templateId);
+
+        if (template != null) {
+            return new ResponseEntity<>(template, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
+        Category category = categoryService.getCategoryById(categoryId);
+
+        if (category != null) {
+            return new ResponseEntity<>(category, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
@@ -154,6 +185,8 @@ public class adminController {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
+
+
 }
 
 

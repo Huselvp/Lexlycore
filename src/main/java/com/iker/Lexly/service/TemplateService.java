@@ -21,8 +21,9 @@ public class TemplateService {
         return templateRepository.findAll();
     }
 
-    public Optional<Template> getTemplateById(Long id) {
-        return templateRepository.findById(id);
+    public Template getTemplateById(Long templateId) {
+        return templateRepository.findById(templateId)
+                .orElse(null);
     }
 
     public Template createTemplate(Template template) {
