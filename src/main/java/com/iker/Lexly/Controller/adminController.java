@@ -65,7 +65,6 @@ public class adminController {
         User updatedUserResponse = userService.updateUser(userId, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
-
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
