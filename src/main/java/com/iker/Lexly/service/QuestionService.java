@@ -1,7 +1,10 @@
 package com.iker.Lexly.service;
 
 import com.iker.Lexly.Entity.Question;
+import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.repository.TemplateRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +14,12 @@ import java.util.Optional;
 @Service
 public class QuestionService {
     private final QuestionRepository questionRepository;
+    private final TemplateRepository templateRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository) {
+    public QuestionService(QuestionRepository questionRepository,TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
+        this.templateRepository=templateRepository;
     }
 
     public List<Question> getAllQuestions() {
@@ -46,5 +51,12 @@ public class QuestionService {
 
     public List<Question> findQuestionsByTemplateId(Long templateId) {
         return questionRepository.findByTemplateId(templateId);
+    }
+
+    public Question createQuestionByTemplateId(Long templateId, Question newQuestion) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new EntityNotFoundException("Template not found with ID: " + templateId));
+        newQuestion.setTemplate(template);
+        return questionRepository.save(newQuestion);
     }
 }

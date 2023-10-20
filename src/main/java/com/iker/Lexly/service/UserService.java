@@ -1,14 +1,17 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Exceptions.UserNotFoundException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -78,6 +81,28 @@ public class UserService {
     }
 
 
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +id));
+           userRepository.delete(user);
+
+    }
+    public User updateUser(Long userId, User updatedUser) throws ChangeSetPersister.NotFoundException {
+        // Check if the user with the specified ID exists
+        User existingUser = userRepository.findById(Math.toIntExact(userId))
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+
+        existingUser.setFirstname(updatedUser.getFirstname());
+        existingUser.setLastname(updatedUser.getLastname());
+        existingUser.setPhonenumber(updatedUser.getPhonenumber());
+        existingUser.setDescription(updatedUser.getDescription());
+        existingUser.setAdress(updatedUser.getAdress());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setCountry(updatedUser.getCountry());
+        existingUser.setZipcode(updatedUser.getZipcode());
+        existingUser.setTown(updatedUser.getTown());
+        return userRepository.save(existingUser);
+    }
 }
 
 

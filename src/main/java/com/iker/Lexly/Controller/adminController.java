@@ -6,19 +6,18 @@ import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
+import com.iker.Lexly.repository.CategoryRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
@@ -33,11 +32,12 @@ public class adminController {
     private final QuestionService questionService;
     private final TemplateRepository templateRepository;
     private final TemplateTransformer templateTransformer;
+    private final CategoryRepository categoryRepository;
     @Autowired
-    public adminController(UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
+    public adminController(CategoryRepository categoryRepository,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.userTransformer = userTransformer;
-
+       this.categoryRepository=categoryRepository;
         this.templateRepository = templateRepository;
         this.categoryService = categoryService;
         this.questionService = questionService;
@@ -55,6 +55,17 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
+    @DeleteMapping("/delete_user/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
+    }
+    @PutMapping("update_user/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
+        User updatedUserResponse = userService.updateUser(userId, updatedUser);
+        return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
+    }
+
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
@@ -64,27 +75,40 @@ public class adminController {
                 .collect(Collectors.toList());
         return templateDTOs;
     }
-    //   @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create_template")
+    @PostMapping(value = "/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
     //  @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("update_template/{id}")
-    public ResponseEntity<Template> updateTemplate(@PathVariable Long id, @RequestBody Template template) {
-        Template updatedTemplate = templateService.updateTemplate(id, template);
-        return ResponseEntity.ok(updatedTemplate);
+    @PutMapping("/update/{templateId}")
+    public ResponseEntity<Template> updateTemplate(
+            @PathVariable Long templateId,
+            @RequestBody Template updatedTemplate) {
+        Template updated = templateService.updateTemplate(templateId, updatedTemplate);
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
     // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_template/{id}")
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
-        templateService.deleteTemplate(id);
-        return ResponseEntity.ok("template with ID " + id + " has been deleted successfully.");
+        Template template = templateService.getTemplateById(id);
+        if (template != null) {
+            List<Question> questions = template.getQuestions();
+                if (!questions.isEmpty()) {
+                for (Question question : questions) {
+                    questionService.deleteQuestion(question.getId());
+                }
+            }
+            templateService.deleteTemplate(id);
+            return ResponseEntity.ok("Template with ID " + id + " has been deleted successfully.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-    // @PreAuthorize("hasRole('ADMIN')")
-    // @PreAuthorize("hasRole('ADMIN')")
-    //  @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
@@ -107,6 +131,7 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
+
     // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
@@ -173,11 +198,16 @@ public class adminController {
         }
         return ResponseEntity.notFound().build();
     }
-    // @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("delete_category/{categoryId}")
+  //  @PreAuthorize("hasRole('ADMIN')")
+   @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok("Category with ID " + categoryId + " has been deleted successfully.");
+    }
+    @DeleteMapping("delete_category_and_template/{categoryId}")
+    public ResponseEntity<String> deleteCategoryAndTemplates(@PathVariable Long categoryId) {
+        categoryService.deleteCategoryAndTemplates(categoryId);
+        return ResponseEntity.ok("Category and associated templates deleted successfully.");
     }
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all_categories")
@@ -185,7 +215,6 @@ public class adminController {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
-
 
 }
 
