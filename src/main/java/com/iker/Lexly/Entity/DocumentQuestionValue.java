@@ -16,7 +16,7 @@ public class DocumentQuestionValue {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    private String value; // This can store checkbox state or label text
+    private String value;
 
     public Long getDocumentQuestionValueId() {
         return documentQuestionValueId;

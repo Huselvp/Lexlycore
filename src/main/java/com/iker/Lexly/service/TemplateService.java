@@ -69,7 +69,10 @@ public class TemplateService {
     }
 
 
+    public List<Template> getAllTemplatesByUserId(Long userId) {
+        return templateRepository.findByUserId(userId);
     }
+}
 
 
 
