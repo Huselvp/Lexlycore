@@ -1,5 +1,6 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Entity.User;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentsService {
@@ -44,10 +46,23 @@ public class DocumentsService {
         return documentsRepository.findByUser(user);
     }
 
-    public List<Documents> getDocumentsByUserId(Long userId) {
-        return documentsRepository.findByUserId(userId);
+    public List<DocumentsDTO> getDocumentsByUserId(Long userId) {
+        List<Documents> documents = documentsRepository.findByUserId(userId);
+        List<DocumentsDTO> documentDTOs = documents.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return documentDTOs;
     }
-    public Documents createDocument(DocumentCreateRequest request) {
+
+    private DocumentsDTO convertToDTO(Documents documents) {
+        DocumentsDTO dto = new DocumentsDTO();
+        dto.setId(documents.getId());
+        dto.setCreatedAt(documents.getCreatedAt());
+        // dto.setDraft(documents.isDraft());
+        // Set other fields
+        return dto;
+    }
+    public DocumentsDTO createDocument(DocumentCreateRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
 
@@ -59,6 +74,12 @@ public class DocumentsService {
         document.setTemplate(template);
         document.setCreatedAt(request.getCreatedAt());
         document.setDraft(request.isDraft());
-        return documentsRepository.save(document);
+        document = documentsRepository.save(document);
+        DocumentsDTO documentDTO = new DocumentsDTO();
+        documentDTO.setId(document.getId());
+        documentDTO.setCreatedAt(document.getCreatedAt());
+        documentDTO.setDraft(document.getDraft());
+        return documentDTO;
     }
+
 }

@@ -14,6 +14,8 @@ public class Question {
     private String questionText;
     @Column(name= "value_type")
     private String valueType;
+    @Column(name= "text_erea")
+    private String Texte;
     @ManyToOne
     private Template template;
     public Long getId() {
@@ -28,7 +30,8 @@ public class Question {
     }
     public String getValueType(){return valueType;}
     public void setValueType(String valueType){this.valueType=valueType;}
-
+    public String  getTexte(){ return Texte;}
+    public String setTexte(String texte){return this.Texte=texte;}
     public String getQuestionText() {
         return questionText;
     }

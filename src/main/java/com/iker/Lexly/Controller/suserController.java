@@ -1,5 +1,7 @@
 package com.iker.Lexly.Controller;
 
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
+import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -18,22 +20,23 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/user")
 public class suserController {
+
     private final DocumentsService documentsService;
+    @Autowired
     private final UserService userService;
     private final TemplateService templateService;
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
 
-
-
     @Autowired
-    public suserController(DocumentsService documentsService,TemplateTransformer templateTransformer, UserService userService, TemplateService templateService, QuestionService questionService) {
-        this.templateTransformer=templateTransformer;
+    public suserController(DocumentsService documentsService, TemplateTransformer templateTransformer, UserService userService, TemplateService templateService, QuestionService questionService) {
+        this.templateTransformer = templateTransformer;
         this.userService = userService;
-        this.documentsService=documentsService;
+        this.documentsService = documentsService;
         this.questionService = questionService;
         this.templateService = templateService;
     }
+
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -42,21 +45,25 @@ public class suserController {
                 .collect(Collectors.toList());
         return templateDTOs;
     }
+
     @PostMapping("/create_document")
-    public Documents createDocument(@RequestBody DocumentCreateRequest documentCreateRequest) {
+    public DocumentsDTO createDocument(@RequestBody DocumentCreateRequest documentCreateRequest) {
         return documentsService.createDocument(documentCreateRequest);
     }
+
     @GetMapping("/get_documents/{userId}")
-    public List<Documents> getDocumentsByUserId( @PathVariable String userId) {
+    public List<DocumentsDTO> getDocumentsByUserId(@PathVariable String userId) {
         return documentsService.getDocumentsByUserId(Long.valueOf(userId));
     }
+
     @PostMapping("/addValue")
-    public ResponseEntity<DocumentQuestionValue> addValueToQuestion(
-            @RequestParam Long questionId,
-            @RequestParam Long documentId,
-            @RequestParam String value
-    ) {
-        DocumentQuestionValue documentQuestionValue = questionService.addValueToQuestion(questionId, documentId, value);
+    public ResponseEntity<DocumentQuestionValueDTO> addValueToQuestion(
+            @RequestBody DocumentQuestionValueDTO documentQuestionValueDTO) {
+        DocumentQuestionValueDTO documentQuestionValue = questionService.addValueToQuestion(
+                documentQuestionValueDTO.getQuestionId(),
+                documentQuestionValueDTO.getDocumentId(),
+                documentQuestionValueDTO.getValue()
+        );
         return new ResponseEntity<>(documentQuestionValue, HttpStatus.CREATED);
     }
 
@@ -65,7 +72,6 @@ public class suserController {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-
 }
 
 

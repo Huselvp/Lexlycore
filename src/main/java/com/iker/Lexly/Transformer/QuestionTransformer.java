@@ -18,13 +18,12 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
            return question;
         }
     }
-
     @Override
     public QuestionDTO toDTO(Question entity) {
         if (entity == null) {
             return null;
         } else {
-            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType());
+            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte());
         }
     }
 

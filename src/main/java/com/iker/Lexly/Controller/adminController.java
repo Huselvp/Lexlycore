@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class adminController {
     public adminController(CategoryRepository categoryRepository,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.userTransformer = userTransformer;
-       this.categoryRepository=categoryRepository;
+        this.categoryRepository=categoryRepository;
         this.templateRepository = templateRepository;
         this.categoryService = categoryService;
         this.questionService = questionService;
@@ -97,7 +98,7 @@ public class adminController {
         Template template = templateService.getTemplateById(id);
         if (template != null) {
             List<Question> questions = template.getQuestions();
-                if (!questions.isEmpty()) {
+            if (!questions.isEmpty()) {
                 for (Question question : questions) {
                     questionService.deleteQuestion(question.getId());
                 }
@@ -197,8 +198,8 @@ public class adminController {
         }
         return ResponseEntity.notFound().build();
     }
-  //  @PreAuthorize("hasRole('ADMIN')")
-   @DeleteMapping("delete_category/{categoryId}")
+    //  @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok("Category with ID " + categoryId + " has been deleted successfully.");
@@ -214,7 +215,6 @@ public class adminController {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
-
 }
 
 

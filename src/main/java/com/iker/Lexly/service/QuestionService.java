@@ -1,5 +1,6 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Question;
@@ -68,18 +69,30 @@ public class QuestionService {
         return questionRepository.save(newQuestion);
     }
 
-    public DocumentQuestionValue addValueToQuestion(Long questionId, Long documentId, String value) {
+    public DocumentQuestionValueDTO addValueToQuestion(Long questionId, Long documentId, String value) {
+        // Fetch question and document entities from repositories
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
+
         Documents document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found with ID: " + documentId));
         DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
         documentQuestionValue.setQuestion(question);
         documentQuestionValue.setDocument(document);
-       // documentQuestionValue.setTemplate(template);
         documentQuestionValue.setValue(value);
-        return documentQuestionValueRepository.save(documentQuestionValue);
+        documentQuestionValue = documentQuestionValueRepository.save(documentQuestionValue);
+        DocumentQuestionValueDTO dto = convertToDTO(documentQuestionValue);
+        return dto;
     }
+    private DocumentQuestionValueDTO convertToDTO(DocumentQuestionValue documentQuestionValue) {
+        DocumentQuestionValueDTO dto = new DocumentQuestionValueDTO();
+        dto.setDocumentQuestionValueId(documentQuestionValue.getDocumentQuestionValueId());
+        dto.setDocumentId(documentQuestionValue.getDocument().getId());
+        dto.setQuestionId(documentQuestionValue.getQuestion().getId());
+        dto.setValue(documentQuestionValue.getValue());
+        return dto;
+    }
+
 
     public List<DocumentQuestionValue> getValuesForDocument(Long documentId) {
         return documentQuestionValueRepository.findByDocumentId(documentId);
