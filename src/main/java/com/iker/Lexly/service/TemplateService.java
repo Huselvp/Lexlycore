@@ -17,12 +17,14 @@ import java.util.Optional;
 public class TemplateService {
     private final TemplateRepository templateRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
 
     @Autowired
-    public TemplateService(QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.categoryRepository = categoryRepository;
+        this.categoryService=categoryService;
         this.questionRepository=questionRepository;
     }
 
@@ -72,7 +74,21 @@ public class TemplateService {
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
     }
-}
+
+    public Template assignCategoryToTemplate(Long templateId, Long categoryId) {
+        Template template = templateRepository.findById(templateId).orElse(null);
+        Category category = categoryService.getCategoryById(categoryId);
+
+        if (template != null && category != null) {
+            template.setCategory(category);
+            return templateRepository.save(template);
+        }
+System.out.println("erreur");
+        return null;
+    }
+
+    }
+
 
 
 

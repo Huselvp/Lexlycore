@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,6 +16,7 @@ public class Category {
     @NotNull
     private String category;
     @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnore
     private List<Template> templates;
     public String getCategory(){return category;}
     public void setCategory(String category){this.category=category;}

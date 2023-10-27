@@ -198,6 +198,10 @@ public class adminController {
         }
         return ResponseEntity.notFound().build();
     }
+    @PostMapping("/assignCategory/{templateId}/{categoryId}")
+    public Template assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
+        return templateService.assignCategoryToTemplate(templateId, categoryId);
+    }
     //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
