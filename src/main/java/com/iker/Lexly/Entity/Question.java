@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,11 +13,16 @@ public class Question {
     @NotNull
     @Column(name = "question_text")
     private String questionText;
+    @Column(name="Description")
+    private String Description;
+    @Column(name="Description-Details")
+    private String DescriptionDetails;
     @Column(name= "value_type")
     private String valueType;
     @Column(name= "text_erea")
     private String Texte;
     @ManyToOne
+    @JsonManagedReference
     private Template template;
     public Long getId() {
         return id;
@@ -29,6 +35,10 @@ public class Question {
     }
     public String getValueType(){return valueType;}
     public void setValueType(String valueType){this.valueType=valueType;}
+    public String getDescription(){return  Description;}
+    public String getDescriptionDetails(){return DescriptionDetails;}
+    public void setDescription(String Description){this.Description=Description;}
+    public void setDescriptionDetails(String DescriptionDetails){this.DescriptionDetails=DescriptionDetails;}
     public String  getTexte(){ return Texte;}
     public String setTexte(String texte){return this.Texte=texte;}
     public String getQuestionText() {

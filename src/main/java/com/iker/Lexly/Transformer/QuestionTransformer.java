@@ -15,6 +15,8 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
            question.setId(dto.getId());
            question.setQuestionText(dto.getQuestionText());
            question.setValueType(dto.getValueType());
+           question.setDescription(dto.getDescription());
+           question.setDescriptionDetails(dto.getDescriptionDetails());
            return question;
         }
     }
@@ -23,7 +25,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
         if (entity == null) {
             return null;
         } else {
-            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte());
+            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte(),entity.getDescription(),entity.getDescriptionDetails());
         }
     }
 

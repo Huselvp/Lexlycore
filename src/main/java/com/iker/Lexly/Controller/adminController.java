@@ -1,4 +1,6 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.ApiResponse;
+import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.DTO.UserDTO;
@@ -15,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
@@ -26,11 +28,14 @@ public class adminController {
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
+    @Autowired
     private final QuestionRepository questionRepository;
     private final CategoryService categoryService;
+    @Autowired
     private final TemplateService templateService;
-
+    @Autowired
     private final QuestionService questionService;
+    @Autowired
     private final TemplateRepository templateRepository;
     private final TemplateTransformer templateTransformer;
     @Autowired
@@ -48,7 +53,6 @@ public class adminController {
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
     }
-    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers() {
         List<User> users = userService.getAllUsers();
@@ -81,19 +85,28 @@ public class adminController {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-    //  @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{templateId}")
     public ResponseEntity<Template> updateTemplate(
             @PathVariable Long templateId,
-            @RequestBody Template updatedTemplate) {
-        Template updated = templateService.updateTemplate(templateId, updatedTemplate);
+            @RequestBody Template updatedFields) {
+        Template updated = templateService.updateTemplate(templateId, updatedFields);
         if (updated != null) {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/updateCategory/{templateId}")
+    public ResponseEntity<TemplateDTO> updateCategory(
+            @PathVariable Long templateId,
+            @RequestBody CategoryDTO updatedCategoryDTO) {
+        TemplateDTO updatedTemplate = templateService.updateCategory(templateId, updatedCategoryDTO);
+        if (updatedTemplate != null) {
+            return new ResponseEntity<>(updatedTemplate, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @DeleteMapping("delete_template/{id}")
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         Template template = templateService.getTemplateById(id);
@@ -118,10 +131,21 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create_question")
-    public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
+    @PostMapping("/create_question/{templateId}")
+    public ResponseEntity<Question> createQuestion(
+            @RequestBody QuestionDTO questionDTO,
+            @PathVariable Long templateId
+    ) {
+        Question question = new Question();
+        question.setQuestionText(questionDTO.getQuestionText());
+        question.setDescription(questionDTO.getDescription());
+        question.setDescriptionDetails(questionDTO.getDescriptionDetails());
+        question.setValueType(questionDTO.getValueType());
+        question.setTexte(questionDTO.getTexte());
+        Template template = templateService.getTemplateById(templateId);
+        question.setTemplate(template);
         Question createdQuestion = questionService.createQuestion(question);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
     }
     @GetMapping("/find_questions_by_template/{templateId}")
@@ -132,21 +156,17 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-
-    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update_question/{id}")
     public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
         Question updatedQuestion = questionService.updateQuestion(id, question.getQuestionText(), question.getValueType());
         if (updatedQuestion != null) {
             return new ResponseEntity<>(updatedQuestion, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
     }
     @GetMapping("/questions/{questionId}")
     public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
-
         if (question != null) {
             return new ResponseEntity<>(question, HttpStatus.OK);
         } else {
@@ -173,21 +193,16 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-
-    //  @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add_category")
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-
-    // @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("update_category/{categoryId}")
     public ResponseEntity<Category> updateCategory(
             @PathVariable Long categoryId,
@@ -200,10 +215,9 @@ public class adminController {
         return ResponseEntity.notFound().build();
     }
     @PostMapping("/assignCategory/{templateId}/{categoryId}")
-    public Template assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
+    public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
         return templateService.assignCategoryToTemplate(templateId, categoryId);
     }
-    //  @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("delete_category/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
@@ -214,12 +228,9 @@ public class adminController {
         categoryService.deleteCategoryAndTemplates(categoryId);
         return ResponseEntity.ok("Category and associated templates deleted successfully.");
     }
-    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 }
-
-

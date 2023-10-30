@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface DocumentQuestionValueRepository extends JpaRepository<DocumentQuestionValue,Long> {
+    static void deleteByTemplateId(Long templateId) {
+    }
+
     List<DocumentQuestionValue> findByDocumentId(Long documentId);
 }

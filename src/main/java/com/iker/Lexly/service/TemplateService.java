@@ -1,10 +1,15 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.ApiResponse;
+import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.Template;
+import com.iker.Lexly.Transformer.CategoryTransformer;
+import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.repository.CategoryRepository;
+import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,17 +22,23 @@ import java.util.Optional;
 @Service
 public class TemplateService {
     private final TemplateRepository templateRepository;
+    private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final CategoryRepository categoryRepository;
     @Autowired
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
+    private final TemplateTransformer templateTransformer;
+    private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public TemplateService(CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
+        this.templateTransformer=templateTransformer;
         this.categoryRepository = categoryRepository;
         this.categoryService=categoryService;
+        this.categoryTransformer=categoryTransformer;
         this.questionRepository=questionRepository;
+        this.documentQuestionValueRepository=documentQuestionValueRepository;
     }
 
     public List<Template> getAllTemplates() {
@@ -40,15 +51,20 @@ public class TemplateService {
     }
 
     public Template updateTemplate(Long templateId, Template updatedTemplate) {
-
-        Template existingTemplate = templateRepository.findById(templateId)
-                .orElse(null);
-
+        Template existingTemplate = templateRepository.findById(templateId).orElse(null);
         if (existingTemplate != null) {
-            existingTemplate.setCost(updatedTemplate.getCost());
-            existingTemplate.setTemplateName(updatedTemplate.getTemplateName());
-            existingTemplate.setTemplateDescription(updatedTemplate.getTemplateDescription());
-            existingTemplate.setCategory(updatedTemplate.getCategory());
+            if (updatedTemplate.getCategory() != null && updatedTemplate.getCategory().getId() != null) {
+                existingTemplate.setCategory(updatedTemplate.getCategory());
+            }
+            if (updatedTemplate.getCost() != 0.00) {
+                existingTemplate.setCost(updatedTemplate.getCost());
+            }
+            if (updatedTemplate.getTemplateName() != null) {
+                existingTemplate.setTemplateName(updatedTemplate.getTemplateName());
+            }
+            if (updatedTemplate.getTemplateDescription() != null) {
+                existingTemplate.setTemplateDescription(updatedTemplate.getTemplateDescription());
+            }
             return templateRepository.save(existingTemplate);
         } else {
             return null;
@@ -61,41 +77,51 @@ public class TemplateService {
             deleteTemplate(template.getId());
         }
     }
-
     public void deleteTemplate(Long templateId) {
-        Template template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new EntityNotFoundException("Template not found with ID: " + templateId));
-        templateRepository.delete(template);
+        // Manually delete associated template_question_value records
+        DocumentQuestionValueRepository.deleteByTemplateId(templateId);
+        templateRepository.deleteById(templateId);
     }
     public Template createTemplate(Template template) {
         return templateRepository.save(template);
     }
-
-
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
     }
 
-    public Template assignCategoryToTemplate(Long templateId, Long categoryId) {
+
+    public ApiResponse assignCategoryToTemplate(Long templateId, Long categoryId) {
         Template template = templateRepository.findById(templateId).orElse(null);
         Category category = categoryService.getCategoryById(categoryId);
 
         if (template != null && category != null) {
             if (template.getCategory() != null) {
-                System.out.println("Template already has a category.");
-                return null;
+                return new ApiResponse("Template already has a category.", template.getCategory());
             } else {
                 template.setCategory(category);
-                return templateRepository.save(template);
+                Template updatedTemplate = templateRepository.save(template);
+                return new ApiResponse("Category assigned successfully.", updatedTemplate.getCategory());
             }
         } else {
-            System.out.println("Error");
-            return null;
+            return new ApiResponse("Error", null);
         }
     }
 
 
+    public TemplateDTO updateCategory(Long templateId, CategoryDTO updatedCategoryDTO) {
+        Template template = templateRepository.findById(templateId).orElse(null);
+        if (template != null) {
+            Category updatedCategory = categoryTransformer.toEntity(updatedCategoryDTO);
+            template.setCategory(updatedCategory);
+            template = templateRepository.save(template);
+
+            return templateTransformer.toDTO(template);
+        } else {
+            return null;
+        }
     }
+}
+
 
 
 

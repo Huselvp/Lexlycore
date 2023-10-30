@@ -1,8 +1,8 @@
 package com.iker.Lexly.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.DTO.CategoryDTO;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,6 @@ public class Template {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "category_id")
-    @NotNull
     private Category category;
     public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
         this.templateName = name;
@@ -41,6 +40,7 @@ public class Template {
         this.questions=questions;
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template")
@@ -113,4 +113,7 @@ public class Template {
     public Category getCategory() {
         return category;
     }
+
+
+
 }

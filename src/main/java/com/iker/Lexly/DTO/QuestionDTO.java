@@ -14,5 +14,7 @@ public class QuestionDTO {
     private String questionText;
     private String valueType;
     private String Texte;
+    private String Description;
+    private String DescriptionDetails;
 
 }
