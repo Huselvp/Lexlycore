@@ -1,5 +1,6 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.Template;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class TemplateService {
     private final TemplateRepository templateRepository;
     private final CategoryRepository categoryRepository;
+    @Autowired
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
 
@@ -43,11 +45,10 @@ public class TemplateService {
                 .orElse(null);
 
         if (existingTemplate != null) {
-
             existingTemplate.setCost(updatedTemplate.getCost());
             existingTemplate.setTemplateName(updatedTemplate.getTemplateName());
             existingTemplate.setTemplateDescription(updatedTemplate.getTemplateDescription());
-
+            existingTemplate.setCategory(updatedTemplate.getCategory());
             return templateRepository.save(existingTemplate);
         } else {
             return null;
@@ -80,12 +81,19 @@ public class TemplateService {
         Category category = categoryService.getCategoryById(categoryId);
 
         if (template != null && category != null) {
-            template.setCategory(category);
-            return templateRepository.save(template);
+            if (template.getCategory() != null) {
+                System.out.println("Template already has a category.");
+                return null;
+            } else {
+                template.setCategory(category);
+                return templateRepository.save(template);
+            }
+        } else {
+            System.out.println("Error");
+            return null;
         }
-System.out.println("erreur");
-        return null;
     }
+
 
     }
 

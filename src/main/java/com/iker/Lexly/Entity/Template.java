@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iker.Lexly.DTO.CategoryDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "template")
 public class Template {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +29,7 @@ public class Template {
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "category_id")
     @NotNull
     private Category category;
@@ -88,9 +91,6 @@ public class Template {
     public void setTemplateDescription(String templateDescription) {
         this.templateDescription = templateDescription;
     }
-    public Category getCategory() {
-        return category;
-    }
 
     public void setCategory(Category category) {
         this.category = category;
@@ -109,5 +109,8 @@ public class Template {
 
     public void setDocuments(List<Documents> documents) {
         this.documents = documents;
+    }
+    public Category getCategory() {
+        return category;
     }
 }

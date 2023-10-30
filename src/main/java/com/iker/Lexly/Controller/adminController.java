@@ -33,6 +33,7 @@ public class adminController {
     private final QuestionService questionService;
     private final TemplateRepository templateRepository;
     private final TemplateTransformer templateTransformer;
+    @Autowired
     private final CategoryRepository categoryRepository;
     @Autowired
     public adminController(CategoryRepository categoryRepository,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
