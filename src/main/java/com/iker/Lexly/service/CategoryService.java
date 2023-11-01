@@ -37,21 +37,28 @@ public class CategoryService {
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
-    public void deleteCategory(Long categoryId) {
+    public String deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with ID: " + categoryId));
-        categoryRepository.delete(category);
+
+        if (category.getTemplates() != null && !category.getTemplates().isEmpty()) {
+            // If the category is associated with templates, delete the templates first
+            List<Template> templates = category.getTemplates();
+            templateRepository.deleteAll(templates);
+
+            return "The category and associated templates have been deleted successfully.";
+        } else {
+            categoryRepository.delete(category);
+
+            return "The category has been deleted successfully.";
+        }
     }
+
+
+
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElse(null);
     }
-    public void deleteCategoryAndTemplates(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + categoryId));
-        List<Template> templates = category.getTemplates();
-        templateRepository.deleteAll(templates);
 
-        categoryRepository.delete(category);
-    }
 }

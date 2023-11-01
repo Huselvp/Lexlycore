@@ -40,12 +40,11 @@ public class Template {
         this.questions=questions;
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
+    @JsonIgnore
     private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template")
     private List<Documents> documents = new ArrayList<>();
-
 
     public Template() {
     }
