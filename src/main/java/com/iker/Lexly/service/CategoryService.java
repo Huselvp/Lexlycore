@@ -7,7 +7,10 @@ import com.iker.Lexly.repository.TemplateRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -38,24 +41,20 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
     public String deleteCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found with ID: " + categoryId));
-
-        if (category.getTemplates() != null && !category.getTemplates().isEmpty()) {
-            // If the category is associated with templates, delete the templates first
-            List<Template> templates = category.getTemplates();
-            templateRepository.deleteAll(templates);
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+        if (categoryOptional.isPresent()) {
+            Category category = categoryOptional.get();
+            if (!category.getTemplates().isEmpty()) {
+                List<Template> templates = new ArrayList<>(category.getTemplates());
+                templateRepository.deleteAll(templates);
+            }
+            categoryRepository.delete(category);
 
             return "The category and associated templates have been deleted successfully.";
         } else {
-            categoryRepository.delete(category);
-
-            return "The category has been deleted successfully.";
+            return "Category with ID " + categoryId + " not found.";
         }
     }
-
-
-
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElse(null);

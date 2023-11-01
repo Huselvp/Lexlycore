@@ -221,7 +221,7 @@ public class adminController {
     public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
         return templateService.assignCategoryToTemplate(templateId, categoryId);
     }
-    @DeleteMapping("/delete_category/{categoryId}") // valide
+    @DeleteMapping("/delete_category/{categoryId}") //valide
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         String deletionMessage = categoryService.deleteCategory(categoryId);
 
