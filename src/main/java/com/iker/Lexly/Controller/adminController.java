@@ -85,7 +85,7 @@ public class adminController {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-    @PutMapping("/update/{templateId}")
+    @PutMapping("/update/{templateId}") //not yet
     public ResponseEntity<Template> updateTemplate(
             @PathVariable Long templateId,
             @RequestBody Template updatedFields) {
@@ -96,7 +96,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PutMapping("/updateCategory/{templateId}")
+    @PutMapping("/updateCategory/{templateId}") // not yet
     public ResponseEntity<TemplateDTO> updateCategory(
             @PathVariable Long templateId,
             @RequestBody CategoryDTO updatedCategoryDTO) {
@@ -206,16 +206,17 @@ public class adminController {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-    @PutMapping("update_category/{categoryId}")
-    public ResponseEntity<Category> updateCategory(
+    @PutMapping("update_category/{categoryId}") //not yet
+    public ResponseEntity<String> updateCategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody Category updatedCategory
     ) {
-        Category category = categoryService.updateCategory(categoryId, updatedCategory);
-        if (category != null) {
-            return ResponseEntity.ok(category);
+        String message = categoryService.updateCategory(categoryId, updatedCategory);
+        if (message != null) {
+            return ResponseEntity.ok(message);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
     @PostMapping("/assignCategory/{templateId}/{categoryId}")//valide
     public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {

@@ -29,8 +29,8 @@ public class Template {
     private User user;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category category;
     public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
         this.templateName = name;

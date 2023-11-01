@@ -5,6 +5,7 @@ import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.CategoryRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,20 +24,40 @@ public class CategoryService {
         this.templateRepository=templateRepository;
     }
     public Category addCategory(Category category) {
+        String categoryName = category.getCategory();
+
+        Optional<Category> existingCategory = categoryRepository.findByCategory(categoryName);
+        if (existingCategory.isPresent()) {
+            throw new IllegalArgumentException("Category with name '" + categoryName + "' already exists.");
+        }
         return categoryRepository.save(category);
     }
     public boolean categoryExists(Long categoryId) {
         return categoryRepository.existsById(categoryId);
     }
 
-    // Method to update a category
-    public Category updateCategory(Long categoryId, Category updatedCategory) {
-        if (categoryRepository.existsById(categoryId)) {
+    public String updateCategory(Long categoryId, Category updatedCategory) {
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+
+        if (categoryOptional.isPresent()) {
+            Category category = categoryOptional.get();
             updatedCategory.setId(categoryId);
-            return categoryRepository.save(updatedCategory);
+            categoryRepository.save(updatedCategory);
+            if (!category.getTemplates().isEmpty()) {
+                List<Template> templates = category.getTemplates();
+                for (Template template : templates) {
+                    template.setCategory(updatedCategory);
+                    templateRepository.save(template);
+                }
+            }
+
+
+            return "Category and associated templates have been updated successfully.";
+        } else {
+            return "Category with ID " + categoryId + " not found.";
         }
-        return null;
     }
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
