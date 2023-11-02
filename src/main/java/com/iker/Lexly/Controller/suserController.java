@@ -36,6 +36,14 @@ public class suserController {
         this.questionService = questionService;
         this.templateService = templateService;
     }
+    @GetMapping("/get_templates")
+    public List<TemplateDTO> getAllTemplates() {
+        List<Template> templates = templateService.getAllTemplates();
+        List<TemplateDTO> templateDTOs = templates.stream()
+                .map(templateTransformer::toDTO)
+                .collect(Collectors.toList());
+        return templateDTOs;
+    }
     @PostMapping("/create_document")
     public DocumentsDTO createDocument(@RequestBody DocumentCreateRequest documentCreateRequest) {
         return documentsService.createDocument(documentCreateRequest);
