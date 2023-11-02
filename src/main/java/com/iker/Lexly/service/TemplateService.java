@@ -50,26 +50,6 @@ public class TemplateService {
                 .orElse(null);
     }
 
-    public Template updateTemplate(Long templateId, Template updatedTemplate) {
-        Template existingTemplate = templateRepository.findById(templateId).orElse(null);
-        if (existingTemplate != null) {
-            if (updatedTemplate.getCategory() != null && updatedTemplate.getCategory().getId() != null) {
-                existingTemplate.setCategory(updatedTemplate.getCategory());
-            }
-            if (updatedTemplate.getCost() != 0.00) {
-                existingTemplate.setCost(updatedTemplate.getCost());
-            }
-            if (updatedTemplate.getTemplateName() != null) {
-                existingTemplate.setTemplateName(updatedTemplate.getTemplateName());
-            }
-            if (updatedTemplate.getTemplateDescription() != null) {
-                existingTemplate.setTemplateDescription(updatedTemplate.getTemplateDescription());
-            }
-            return templateRepository.save(existingTemplate);
-        } else {
-            return null;
-        }
-    }
 
     public void deleteTemplatesByCategoryId(Long categoryId) {
         List<Template> templates = templateRepository.findByCategoryId(categoryId);
@@ -120,6 +100,25 @@ public class TemplateService {
             return null;
         }
     }
+    public Template updateTemplate(Long templateId, TemplateDTO templateDTO) {
+        Optional<Template> existingTemplateOptional = templateRepository.findById(templateId);
+        if (existingTemplateOptional.isPresent()) {
+            Template existingTemplate = existingTemplateOptional.get();
+            Template updatedTemplate = existingTemplate;
+            updatedTemplate.setTemplateName(templateDTO.getTemplateName());
+            updatedTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
+            updatedTemplate.setCost(templateDTO.getCost());
+            if (templateDTO.getCategory() != null) {
+                CategoryDTO categoryDTO = templateDTO.getCategory();
+                Category updatedCategory = categoryService.updateCategory(existingTemplate.getCategory().getId(), categoryDTO);
+                updatedTemplate.setCategory(updatedCategory);
+            }
+            return templateRepository.save(updatedTemplate);
+        } else {
+            return null;
+        }
+    }
+
 }
 
 

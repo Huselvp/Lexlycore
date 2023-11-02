@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/suser")
 public class suserController {
 
     private final DocumentsService documentsService;
@@ -36,8 +36,7 @@ public class suserController {
         this.questionService = questionService;
         this.templateService = templateService;
     }
-
-    @GetMapping("/all_templates")
+    @GetMapping("/get_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
         List<TemplateDTO> templateDTOs = templates.stream()
@@ -45,7 +44,6 @@ public class suserController {
                 .collect(Collectors.toList());
         return templateDTOs;
     }
-
     @PostMapping("/create_document")
     public DocumentsDTO createDocument(@RequestBody DocumentCreateRequest documentCreateRequest) {
         return documentsService.createDocument(documentCreateRequest);

@@ -7,7 +7,7 @@ public class DocumentsDTO {
     private LocalDateTime createdAt;
     private boolean isDraft;
 
-    // Add other necessary fields
+
 
     public Long getId() {
         return id;

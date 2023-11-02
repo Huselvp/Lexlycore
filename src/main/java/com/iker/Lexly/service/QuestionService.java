@@ -1,6 +1,7 @@
 package com.iker.Lexly.service;
 
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
+import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Question;
@@ -42,18 +43,22 @@ public class QuestionService {
     public Question createQuestion(Question question) {
         return questionRepository.save(question);
     }
-
-    public Question updateQuestion(Long id, String questionText, String valueType) {
+    public Question updateQuestion(Long id, QuestionDTO questionDTO) {
         Optional<Question> existingQuestion = questionRepository.findById(id);
         if (existingQuestion.isPresent()) {
             Question updatedQuestion = existingQuestion.get();
-            updatedQuestion.setQuestionText(questionText);
-            updatedQuestion.setValueType(valueType);
+            updatedQuestion.setQuestionText(questionDTO.getQuestionText());
+            updatedQuestion.setValueType(questionDTO.getValueType());
+            updatedQuestion.setDescription(questionDTO.getDescription());
+            updatedQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
+            updatedQuestion.setTexte(questionDTO.getTexte());
             return questionRepository.save(updatedQuestion);
         } else {
             return null;
         }
     }
+
+
     public void deleteQuestion(Long id) {
         questionRepository.deleteById(id);
     }
@@ -96,5 +101,9 @@ public class QuestionService {
 
     public List<DocumentQuestionValue> getValuesForDocument(Long documentId) {
         return documentQuestionValueRepository.findByDocumentId(documentId);
+    }
+
+    public boolean doesQuestionExist(Long templateId, String questionText) {
+        return questionRepository.existsByTemplateIdAndQuestionText(templateId, questionText);
     }
 }

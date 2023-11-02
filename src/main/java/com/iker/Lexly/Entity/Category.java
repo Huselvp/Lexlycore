@@ -15,8 +15,7 @@ public class Category {
     @Column
     @NotNull
     private String category;
-    @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Template> templates;
     public String getCategory(){return category;}
     public void setCategory(String category){this.category=category;}

@@ -1,5 +1,7 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +24,7 @@ public class Question {
     @Column(name= "text_erea")
     private String Texte;
     @ManyToOne
-    @JsonManagedReference
+   @JsonIgnore
     private Template template;
     public Long getId() {
         return id;

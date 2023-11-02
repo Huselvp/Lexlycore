@@ -29,8 +29,8 @@ public class Template {
     private User user;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category category;
     public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
         this.templateName = name;
@@ -40,12 +40,11 @@ public class Template {
         this.questions=questions;
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
+    @JsonIgnore
     private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template")
     private List<Documents> documents = new ArrayList<>();
-
 
     public Template() {
     }

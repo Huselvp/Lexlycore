@@ -5,6 +5,7 @@ import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
@@ -28,32 +29,26 @@ public class adminController {
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
-    @Autowired
-    private final QuestionRepository questionRepository;
     private final CategoryService categoryService;
     @Autowired
     private final TemplateService templateService;
     @Autowired
     private final QuestionService questionService;
-    @Autowired
-    private final TemplateRepository templateRepository;
     private final TemplateTransformer templateTransformer;
+    private final CategoryTransformer categoryTransformer;
+
     @Autowired
-    private final CategoryRepository categoryRepository;
-    @Autowired
-    public adminController(CategoryRepository categoryRepository,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
+    public adminController(CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.userTransformer = userTransformer;
-        this.categoryRepository=categoryRepository;
-        this.templateRepository = templateRepository;
         this.categoryService = categoryService;
         this.questionService = questionService;
-        this.questionRepository = questionRepository;
+        this.categoryTransformer=categoryTransformer;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
     }
-    @GetMapping("/all_users")
+    @GetMapping("/all_users") //valide
     public List<UserDTO> getAllUsers() {
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
@@ -61,18 +56,18 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-    @DeleteMapping("/delete_user/{id}")
+    @DeleteMapping("/delete_user/{id}") //valide
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-    @PutMapping("update_user/{userId}")
+    @PutMapping("update_user/{userId}") //valide
     public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
         User updatedUserResponse = userService.updateUser(userId, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
     // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
-    @GetMapping("/all_templates")
+    @GetMapping("/all_templates") // valide
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
         List<TemplateDTO> templateDTOs = templates.stream()
@@ -80,34 +75,40 @@ public class adminController {
                 .collect(Collectors.toList());
         return templateDTOs;
     }
-    @PostMapping(value = "/create_template")
+    @PostMapping(value = "/create_template")//valide
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-    @PutMapping("/update/{templateId}")
-    public ResponseEntity<Template> updateTemplate(
+    @PutMapping("/update_template/{templateId}")//valid
+    public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
-            @RequestBody Template updatedFields) {
-        Template updated = templateService.updateTemplate(templateId, updatedFields);
-        if (updated != null) {
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-    @PutMapping("/updateCategory/{templateId}")
-    public ResponseEntity<TemplateDTO> updateCategory(
-            @PathVariable Long templateId,
-            @RequestBody CategoryDTO updatedCategoryDTO) {
-        TemplateDTO updatedTemplate = templateService.updateCategory(templateId, updatedCategoryDTO);
+            @RequestBody TemplateDTO updateRequest
+    ) {
+        Template updatedTemplate = templateService.updateTemplate(templateId, updateRequest);
         if (updatedTemplate != null) {
-            return new ResponseEntity<>(updatedTemplate, HttpStatus.OK);
+            TemplateDTO updatedTemplateDTO = templateTransformer.toDTO(updatedTemplate);
+            return new ResponseEntity<>(updatedTemplateDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @DeleteMapping("delete_template/{id}")
+
+    @PutMapping("/update_category/{categoryId}")//valid
+    public ResponseEntity<CategoryDTO> updateCategory(
+            @PathVariable Long categoryId,
+            @RequestBody CategoryDTO updateRequest
+    ) {
+        Category updatedCategory = categoryService.updateCategory(categoryId, updateRequest);
+        if (updatedCategory != null) {
+            CategoryDTO updatedCategoryDTO = categoryTransformer.toDTO(updatedCategory);
+            return new ResponseEntity<>(updatedCategoryDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("delete_template/{id}") //valide
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         Template template = templateService.getTemplateById(id);
         if (template != null) {
@@ -123,7 +124,7 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/all_questions")
+    @GetMapping("/all_questions") // valide
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
         List<QuestionDTO> questionDTOs = questions.stream()
@@ -131,24 +132,21 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PostMapping("/create_question/{templateId}")
-    public ResponseEntity<Question> createQuestion(
-            @RequestBody QuestionDTO questionDTO,
-            @PathVariable Long templateId
-    ) {
-        Question question = new Question();
-        question.setQuestionText(questionDTO.getQuestionText());
-        question.setDescription(questionDTO.getDescription());
-        question.setDescriptionDetails(questionDTO.getDescriptionDetails());
-        question.setValueType(questionDTO.getValueType());
-        question.setTexte(questionDTO.getTexte());
+    @PostMapping("/create_question/{templateId}") // valide
+    public ResponseEntity<?> createQuestion(@RequestBody Question question, @PathVariable Long templateId) {
+        if (questionService.doesQuestionExist(templateId, question.getQuestionText())) {
+            return ResponseEntity.badRequest().body("Question with the same text already exists for this template.");
+        }
         Template template = templateService.getTemplateById(templateId);
-        question.setTemplate(template);
-        Question createdQuestion = questionService.createQuestion(question);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
+        if (template != null) {
+            question.setTemplate(template);
+            Question createdQuestion = questionService.createQuestion(question);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
+        } else {
+            return ResponseEntity.notFound().build();}
     }
-    @GetMapping("/find_questions_by_template/{templateId}")
+
+    @GetMapping("/find_questions_by_template/{templateId}") // valide
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<Question> questions = questionService.findQuestionsByTemplateId(templateId);
         List<QuestionDTO> questionDTOs = questions.stream()
@@ -156,15 +154,21 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PutMapping("/update_question/{id}")
-    public ResponseEntity<Question> updateQuestion(@PathVariable Long id, @RequestBody Question question) {
-        Question updatedQuestion = questionService.updateQuestion(id, question.getQuestionText(), question.getValueType());
+    @PutMapping("/update_question/{id}") //valide
+    public ResponseEntity<QuestionDTO> updateQuestion(
+            @PathVariable Long id,
+            @RequestBody QuestionDTO updateRequest
+    ) {
+        Question updatedQuestion = questionService.updateQuestion(id, updateRequest);
         if (updatedQuestion != null) {
-            return new ResponseEntity<>(updatedQuestion, HttpStatus.OK);
+            QuestionDTO updatedQuestionDTO = questionTransformer.toDTO(updatedQuestion);
+            return new ResponseEntity<>(updatedQuestionDTO, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
-    @GetMapping("/questions/{questionId}")
+
+    @GetMapping("/question/{questionId}") //valide
     public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
         if (question != null) {
@@ -173,7 +177,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/templates/{templateId}")
+    @GetMapping("/template/{templateId}")//valide
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
 
@@ -183,7 +187,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/category/{categoryId}")//valide
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
         Category category = categoryService.getCategoryById(categoryId);
 
@@ -193,42 +197,31 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @DeleteMapping("/delete_question/{id}")
+    @DeleteMapping("/delete_question/{id}") //valide
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-    @PostMapping("/add_category")
+    @PostMapping("/add_category") // valide
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }
-    @PutMapping("update_category/{categoryId}")
-    public ResponseEntity<Category> updateCategory(
-            @PathVariable Long categoryId,
-            @Valid @RequestBody Category updatedCategory
-    ) {
-        Category category = categoryService.updateCategory(categoryId, updatedCategory);
-        if (category != null) {
-            return ResponseEntity.ok(category);
-        }
-        return ResponseEntity.notFound().build();
-    }
-    @PostMapping("/assignCategory/{templateId}/{categoryId}")
+    @PostMapping("/assignCategory/{templateId}/{categoryId}")//valide
     public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
         return templateService.assignCategoryToTemplate(templateId, categoryId);
     }
-    @DeleteMapping("delete_category/{categoryId}")
+    @DeleteMapping("/delete_category/{categoryId}") //valide
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-        categoryService.deleteCategory(categoryId);
-        return ResponseEntity.ok("Category with ID " + categoryId + " has been deleted successfully.");
+        String deletionMessage = categoryService.deleteCategory(categoryId);
+
+        if (deletionMessage != null) {
+            return ResponseEntity.ok(deletionMessage);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
-    @DeleteMapping("delete_category_and_template/{categoryId}")
-    public ResponseEntity<String> deleteCategoryAndTemplates(@PathVariable Long categoryId) {
-        categoryService.deleteCategoryAndTemplates(categoryId);
-        return ResponseEntity.ok("Category and associated templates deleted successfully.");
-    }
-    @GetMapping("all_categories")
+    @GetMapping("all_categories") //valide
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);

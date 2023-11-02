@@ -13,4 +13,5 @@ public interface QuestionRepository  extends JpaRepository<Question,Long> {
     List<Question> findByTemplateId(Long templateId);
 
 
+    boolean existsByTemplateIdAndQuestionText(Long templateId, String questionText);
 }
