@@ -88,17 +88,20 @@ public class adminController {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-    @PutMapping("/update/{templateId}") //not yet
-    public ResponseEntity<Template> updateTemplate(
+    @PutMapping("/update_template/{templateId}")//valid
+    public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
-            @RequestBody Template updatedFields) {
-        Template updated = templateService.updateTemplate(templateId, updatedFields);
-        if (updated != null) {
-            return new ResponseEntity<>(updated, HttpStatus.OK);
+            @RequestBody TemplateDTO updateRequest
+    ) {
+        Template updatedTemplate = templateService.updateTemplate(templateId, updateRequest);
+        if (updatedTemplate != null) {
+            TemplateDTO updatedTemplateDTO = templateTransformer.toDTO(updatedTemplate);
+            return new ResponseEntity<>(updatedTemplateDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PutMapping("/update_category/{categoryId}")//valid
     public ResponseEntity<CategoryDTO> updateCategory(
             @PathVariable Long categoryId,
