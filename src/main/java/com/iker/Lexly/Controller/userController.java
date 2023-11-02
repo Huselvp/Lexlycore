@@ -21,7 +21,7 @@ public class userController {
     TemplateService templateService;
     @Autowired
     TemplateTransformer templateTransformer;
-    @GetMapping("/user_all_templates")
+    @GetMapping("/get_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
         List<TemplateDTO> templateDTOs = templates.stream()
