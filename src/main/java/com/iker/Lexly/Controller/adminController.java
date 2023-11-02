@@ -29,29 +29,21 @@ public class adminController {
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
-    @Autowired
-    private final QuestionRepository questionRepository;
     private final CategoryService categoryService;
     @Autowired
     private final TemplateService templateService;
     @Autowired
     private final QuestionService questionService;
-    @Autowired
-    private final TemplateRepository templateRepository;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
+
     @Autowired
-    private final CategoryRepository categoryRepository;
-    @Autowired
-    public adminController(CategoryTransformer categoryTransformer,CategoryRepository categoryRepository,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, QuestionRepository questionRepository, TemplateRepository templateRepository, TemplateTransformer templateTransformer) {
+    public adminController(CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.userTransformer = userTransformer;
-        this.categoryRepository=categoryRepository;
-        this.templateRepository = templateRepository;
         this.categoryService = categoryService;
         this.questionService = questionService;
         this.categoryTransformer=categoryTransformer;
-        this.questionRepository = questionRepository;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
