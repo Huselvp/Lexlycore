@@ -1,5 +1,6 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.CategoryRepository;
@@ -35,26 +36,23 @@ public class CategoryService {
     public boolean categoryExists(Long categoryId) {
         return categoryRepository.existsById(categoryId);
     }
+    public Category updateCategory(Long categoryId, CategoryDTO categoryDTO) {
+        Optional<Category> existingCategoryOptional = categoryRepository.findById(categoryId);
 
-    public String updateCategory(Long categoryId, Category updatedCategory) {
-        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-
-        if (categoryOptional.isPresent()) {
-            Category category = categoryOptional.get();
-            updatedCategory.setId(categoryId);
-            categoryRepository.save(updatedCategory);
-            if (!category.getTemplates().isEmpty()) {
-                List<Template> templates = category.getTemplates();
-                for (Template template : templates) {
+        if (existingCategoryOptional.isPresent()) {
+            Category existingCategory = existingCategoryOptional.get();
+            Category updatedCategory = existingCategory;
+            updatedCategory.setCategory(categoryDTO.getCategory());
+            if (!existingCategory.getTemplates().isEmpty()) {
+                List<Template> associatedTemplates = existingCategory.getTemplates();
+                for (Template template : associatedTemplates) {
                     template.setCategory(updatedCategory);
                     templateRepository.save(template);
                 }
             }
-
-
-            return "Category and associated templates have been updated successfully.";
+            return categoryRepository.save(updatedCategory);
         } else {
-            return "Category with ID " + categoryId + " not found.";
+            return null;
         }
     }
 
