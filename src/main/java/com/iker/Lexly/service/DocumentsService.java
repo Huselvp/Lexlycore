@@ -58,8 +58,7 @@ public class DocumentsService {
         DocumentsDTO dto = new DocumentsDTO();
         dto.setId(documents.getId());
         dto.setCreatedAt(documents.getCreatedAt());
-        // dto.setDraft(documents.isDraft());
-        // Set other fields
+         dto.setDraft(documents.getDraft());
         return dto;
     }
     public DocumentsDTO createDocument(DocumentCreateRequest request) {
@@ -97,7 +96,6 @@ public class DocumentsService {
     }
 
     public ApiResponse saveTemporaryValue(Long documentId, Long questionId, String value) {
-        // Check if the document and question exist
         Documents document = documentsRepository.findById(documentId).orElse(null);
         Question question = questionRepository.findById(questionId).orElse(null);
 
