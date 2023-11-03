@@ -52,6 +52,7 @@ public class QuestionService {
             updatedQuestion.setDescription(questionDTO.getDescription());
             updatedQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
             updatedQuestion.setTexte(questionDTO.getTexte());
+            updatedQuestion.setChoices(questionDTO.getChoices());
             return questionRepository.save(updatedQuestion);
         } else {
             return null;
@@ -78,7 +79,6 @@ public class QuestionService {
         // Fetch question and document entities from repositories
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
-
         Documents document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found with ID: " + documentId));
         DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
@@ -97,8 +97,6 @@ public class QuestionService {
         dto.setValue(documentQuestionValue.getValue());
         return dto;
     }
-
-
     public List<DocumentQuestionValue> getValuesForDocument(Long documentId) {
         return documentQuestionValueRepository.findByDocumentId(documentId);
     }
