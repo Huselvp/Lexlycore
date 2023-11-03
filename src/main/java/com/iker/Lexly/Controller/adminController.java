@@ -1,5 +1,5 @@
 package com.iker.Lexly.Controller;
-import com.iker.Lexly.ApiResponse;
+import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
@@ -9,9 +9,6 @@ import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
-import com.iker.Lexly.repository.CategoryRepository;
-import com.iker.Lexly.repository.QuestionRepository;
-import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")

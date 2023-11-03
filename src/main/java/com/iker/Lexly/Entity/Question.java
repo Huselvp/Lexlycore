@@ -1,10 +1,12 @@
 package com.iker.Lexly.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.iker.Lexly.DTO.ChoiceRelatedTextePairDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "question")
@@ -23,6 +25,8 @@ public class Question {
     private String valueType;
     @Column(name= "text_erea")
     private String Texte;
+    @ElementCollection
+    private List<ChoiceRelatedTextePair> choices;
     @ManyToOne
    @JsonIgnore
     private Template template;
@@ -54,5 +58,12 @@ public class Question {
     }
     public void setTemplate(Template template) {
         this.template = template;
+    }
+    public List<ChoiceRelatedTextePair> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(List<ChoiceRelatedTextePair> choices) {
+        this.choices = choices;
     }
 }

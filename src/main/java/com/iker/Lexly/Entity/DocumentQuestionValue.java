@@ -3,7 +3,7 @@ package com.iker.Lexly.Entity;
 import jakarta.persistence.*;
 
 @Entity
-public class DocumentQuestionValue {
+public class  DocumentQuestionValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long documentQuestionValueId;

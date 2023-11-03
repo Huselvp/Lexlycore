@@ -12,12 +12,13 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
             return null;
         } else {
             Question question = new Question();
-           question.setId(dto.getId());
-           question.setQuestionText(dto.getQuestionText());
-           question.setValueType(dto.getValueType());
-           question.setDescription(dto.getDescription());
-           question.setDescriptionDetails(dto.getDescriptionDetails());
-           return question;
+            question.setId(dto.getId());
+            question.setQuestionText(dto.getQuestionText());
+            question.setValueType(dto.getValueType());
+            question.setDescription(dto.getDescription());
+            question.setDescriptionDetails(dto.getDescriptionDetails());
+            question.setChoices(dto.getChoices());
+            return question;
         }
     }
     @Override
@@ -25,7 +26,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
         if (entity == null) {
             return null;
         } else {
-            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte(),entity.getDescription(),entity.getDescriptionDetails());
+            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte(),entity.getDescription(),entity.getDescriptionDetails(),entity.getChoices());
         }
     }
 
