@@ -32,6 +32,8 @@ public class Template {
     @JoinColumn(name = "category_id")
     @JsonIgnore
     private Category category;
+
+
     public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
         this.templateName = name;
         this.templateDescription=templateDescription;

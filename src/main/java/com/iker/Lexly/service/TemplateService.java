@@ -47,6 +47,13 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
+    public TemplateDTO getTemplateDTOById(Long templateId) {
+        Template template = templateRepository.findById(templateId).orElse(null);
+        if (template != null) {
+            return templateTransformer.toDTO(template); // Use the transformer to convert to TemplateDTO
+        }
+        return null;
+    }
 
 
     public void deleteTemplatesByCategoryId(Long categoryId) {
