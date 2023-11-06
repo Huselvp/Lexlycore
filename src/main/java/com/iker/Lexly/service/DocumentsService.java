@@ -116,4 +116,37 @@ public class DocumentsService {
             return new ApiResponse("Document or question not found.", null);
         }
     }
+
+    public ApiResponse addValueAndSave(Long documentId, Long questionId, String value) {
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+        Question question = questionRepository.findById(questionId).orElse(null);
+        if (document != null && question != null) {
+            DocumentQuestionValue newValue = new DocumentQuestionValue();
+            newValue.setDocument(document);
+            newValue.setQuestion(question);
+            newValue.setValue(value);
+            documentQuestionValueRepository.save(newValue);
+            return new ApiResponse("Value added and saved successfully.", null);
+        } else {
+            return new ApiResponse("Document or question not found.", null);
+        }
+    }
+
+    public ApiResponse completeDocument(Long documentId) {
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+
+        if (document != null) {
+            List<Question> templateQuestions = document.getTemplate().getQuestions();
+            List<DocumentQuestionValue> documentValues = document.getDocumentQuestionValues();
+            if (documentValues.size() == templateQuestions.size()) {
+                document.setDraft(false);
+                documentsRepository.save(document);
+                return new ApiResponse("Document completed successfully.", null);
+            } else {
+                return new ApiResponse("All questions must have values to complete the document.", null);
+            }
+        } else {
+            return new ApiResponse("Document not found.", null);
+        }
+    }
 }

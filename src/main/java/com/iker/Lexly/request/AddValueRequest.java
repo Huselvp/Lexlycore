@@ -1,20 +1,11 @@
-package com.iker.Lexly.DTO;
+package com.iker.Lexly.request;
 
-public class DocumentQuestionValueDTO {
-    private Long documentQuestionValueId;
+public class AddValueRequest {
     private Long documentId;
     private Long questionId;
     private String value;
 
-
-    public Long getDocumentQuestionValueId() {
-        return documentQuestionValueId;
-    }
-
-    public void setDocumentQuestionValueId(Long documentQuestionValueId) {
-        this.documentQuestionValueId = documentQuestionValueId;
-    }
-
+    // Getters and setters for the fields
     public Long getDocumentId() {
         return documentId;
     }
@@ -26,6 +17,7 @@ public class DocumentQuestionValueDTO {
     public Long getQuestionId() {
         return questionId;
     }
+
     public void setQuestionId(Long questionId) {
         this.questionId = questionId;
     }

@@ -2,6 +2,7 @@ package com.iker.Lexly.Controller;
 
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
+import com.iker.Lexly.request.AddValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
@@ -30,12 +31,13 @@ public class suserController {
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final QuestionTransformer questionTransformer;
-
+private final PDFGenerationService pdfGenerationService;
 
     @Autowired
-    public suserController(QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController(PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer;
+        this.pdfGenerationService=pdfGenerationService;
         this.documentsService = documentsService;
         this.questionService = questionService;
         this.templateService = templateService;
@@ -86,21 +88,30 @@ public class suserController {
         return response;
     }
 
-    @PostMapping("/addValue")
-    public ResponseEntity<DocumentQuestionValueDTO> addValueToQuestion(
-            @RequestBody DocumentQuestionValueDTO documentQuestionValueDTO) {
-        DocumentQuestionValueDTO documentQuestionValue = questionService.addValueToQuestion(
-                documentQuestionValueDTO.getQuestionId(),
-                documentQuestionValueDTO.getDocumentId(),
-                documentQuestionValueDTO.getValue()
-        );
-        return new ResponseEntity<>(documentQuestionValue, HttpStatus.CREATED);
+    @PostMapping("/addValueAndSave")
+    public ApiResponse addValueAndSave(@RequestBody AddValueRequest request) {
+        ApiResponse response = documentsService.addValueAndSave(request.getDocumentId(), request.getQuestionId(), request.getValue());
+        return response;
     }
 
+    @PostMapping("/completeDocument/{documentId}")
+    public ApiResponse completeDocument(@PathVariable Long documentId) {
+        ApiResponse response = documentsService.completeDocument(documentId);
+        return response;
+    }
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
+    }
+    @GetMapping("/generate/{userId}")
+    public ResponseEntity<String> generatePDFDocument(@PathVariable Long userId) {
+        try {
+            pdfGenerationService.generatePDFDocument(userId);
+            return ResponseEntity.ok("PDF document generated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed: " + e.getMessage());
+        }
     }
 }
 

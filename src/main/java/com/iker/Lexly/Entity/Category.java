@@ -12,17 +12,36 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column
     @NotNull
     private String category;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Template> templates;
-    public String getCategory(){return category;}
-    public void setCategory(String category){this.category=category;}
-    public Long getId(){return id;}
-    public void setId(Long id){this.id=id;}
+
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public List<Template> getTemplates() {
         return templates;
     }
 
+    public void setTemplates(List<Template> templates) {
+        this.templates = templates;
+    }
 }

@@ -163,7 +163,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @GetMapping("/question/{questionId}") //valide
     public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
@@ -173,12 +172,12 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/template/{templateId}")//valide
-    public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
-        Template template = templateService.getTemplateById(templateId);
+    @GetMapping("/template/{templateId}")
+    public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long templateId) {
+        TemplateDTO templateDTO = templateService.getTemplateDTOById(templateId);
 
-        if (template != null) {
-            return new ResponseEntity<>(template, HttpStatus.OK);
+        if (templateDTO != null) {
+            return new ResponseEntity<>(templateDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
