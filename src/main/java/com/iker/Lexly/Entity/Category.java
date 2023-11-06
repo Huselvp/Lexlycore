@@ -18,6 +18,7 @@ public class Category {
     private String category;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Template> templates;
 
 
