@@ -3,6 +3,7 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.request.AddValueRequest;
+import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
@@ -78,19 +79,34 @@ private final PDFGenerationService pdfGenerationService;
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PostMapping("/saveTemporaryValue")
-    public ApiResponse saveTemporaryValue(
+    @PostMapping("/saveTemporaryValues")
+    public ApiResponse saveTemporaryValues(
             @RequestParam Long documentId,
-            @RequestParam Long questionId,
-            @RequestParam String value
+            @RequestParam List<Long> questionIds,
+            @RequestParam List<String> values
     ) {
-        ApiResponse response = documentsService.saveTemporaryValue(documentId, questionId, value);
-        return response;
-    }
+        if (questionIds.size() != values.size()) {
+            return new ApiResponse("Mismatched question IDs and values.", null);
+        }
 
+        for (int i = 0; i < questionIds.size(); i++) {
+            Long questionId = questionIds.get(i);
+            String value = values.get(i);
+            ApiResponse response = documentsService.saveTemporaryValue(documentId, questionId, value);
+            if (!response.isSuccess()) {
+                return response;
+            }
+        }
+        return new ApiResponse("Temporary values saved successfully.", null);
+    }
     @PostMapping("/addValueAndSave")
     public ApiResponse addValueAndSave(@RequestBody AddValueRequest request) {
         ApiResponse response = documentsService.addValueAndSave(request.getDocumentId(), request.getQuestionId(), request.getValue());
+        return response;
+    }
+    @PutMapping("/updateValue")
+    public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
+        ApiResponse response = documentsService.updateValue(request);
         return response;
     }
 

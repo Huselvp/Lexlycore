@@ -4,6 +4,7 @@ import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.DocumentCreateRequest;
+import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,7 @@ public class DocumentsService {
         }
     }
 
+
     public ApiResponse addValueAndSave(Long documentId, Long questionId, String value) {
         Documents document = documentsRepository.findById(documentId).orElse(null);
         Question question = questionRepository.findById(questionId).orElse(null);
@@ -149,4 +151,23 @@ public class DocumentsService {
             return new ApiResponse("Document not found.", null);
         }
     }
+
+    public ApiResponse updateValue(UpdateValueRequest request) {
+        Documents document = documentsRepository.findById(request.getDocumentId()).orElse(null);
+        Question question = questionRepository.findById(request.getQuestionId()).orElse(null);
+
+        if (document != null && question != null) {
+            DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
+            if (existingValue != null) {
+                existingValue.setValue(request.getNewValue());
+                documentQuestionValueRepository.save(existingValue);
+                return new ApiResponse("Value updated successfully.", null);
+            } else {
+                return new ApiResponse("Document and question combination not found.", null);
+            }
+        } else {
+            return new ApiResponse("Document or question not found.", null);
+        }
+    }
+
 }

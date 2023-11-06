@@ -219,6 +219,7 @@ public class adminController {
     @GetMapping("all_categories") //valide
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
+
         return ResponseEntity.ok(categories);
     }
 }
