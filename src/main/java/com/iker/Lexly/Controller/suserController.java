@@ -4,14 +4,11 @@ import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.request.AddValueRequest;
 import com.iker.Lexly.request.UpdateValueRequest;
-import com.iker.Lexly.responses.ApiResponse;
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.TemplateTransformer;
-import com.iker.Lexly.repository.DocumentsRepository;
-import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,5 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
@@ -11,6 +10,7 @@ import com.iker.Lexly.repository.CategoryRepository;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
