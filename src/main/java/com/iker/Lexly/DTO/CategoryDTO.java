@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class CategoryDTO {
     private Long id;
     private String category;
+
+
     public Long getId() {
         return id;
     }
@@ -24,4 +26,5 @@ public class CategoryDTO {
     public void setCategory(String category) {
         this.category = category;
     }
+
 }

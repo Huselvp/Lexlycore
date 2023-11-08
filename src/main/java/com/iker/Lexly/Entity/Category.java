@@ -1,6 +1,7 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iker.Lexly.DTO.CategoryDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -45,4 +46,6 @@ public class Category {
     public void setTemplates(List<Template> templates) {
         this.templates = templates;
     }
+
+
 }

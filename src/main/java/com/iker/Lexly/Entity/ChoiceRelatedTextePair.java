@@ -8,7 +8,6 @@ public class ChoiceRelatedTextePair {
     private String relatedTexte;
 
     public ChoiceRelatedTextePair() {
-        // Default constructor
     }
 
     public ChoiceRelatedTextePair(String choice, String relatedTexte) {

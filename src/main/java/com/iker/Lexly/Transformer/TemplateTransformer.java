@@ -23,7 +23,6 @@ CategoryTransformer categoryTransformer;
             template.setCost(dto.getCost());
             template.setTemplateName(dto.getTemplateName());
             template.setTemplateDescription(dto.getTemplateDescription());
-           // template.setCategory(dto.getCategory());
             return template;
         }
     }
@@ -38,9 +37,6 @@ CategoryTransformer categoryTransformer;
             dto.setCost(entity.getCost());
             dto.setTemplateName(entity.getTemplateName());
             dto.setTemplateDescription(entity.getTemplateDescription());
-            CategoryDTO categoryDTO = categoryTransformer.toDTO(entity.getCategory());
-            dto.setCategory(categoryDTO);
-
             return dto;
         }
     }

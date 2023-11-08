@@ -65,10 +65,8 @@ public class DocumentsService {
     public DocumentsDTO createDocument(DocumentCreateRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-
         Template template = templateRepository.findById(request.getTemplateId())
                 .orElseThrow(() -> new IllegalArgumentException("Template not found with ID: " + request.getTemplateId()));
-
         Documents document = new Documents();
         document.setUser(user);
         document.setTemplate(template);

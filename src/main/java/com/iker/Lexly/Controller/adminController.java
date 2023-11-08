@@ -77,6 +77,7 @@ public class adminController {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
+
     @PutMapping("/update_template/{templateId}")//valid
     public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
@@ -90,7 +91,18 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    @PutMapping("/update_category/{templateId}/{newCategoryId}")
+    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
+            @PathVariable Long templateId,
+            @PathVariable Long newCategoryId
+    ) {
+        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @PutMapping("/update_category/{categoryId}")//valid
     public ResponseEntity<CategoryDTO> updateCategory(
             @PathVariable Long categoryId,
@@ -104,7 +116,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @DeleteMapping("delete_template/{id}") //valide
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         Template template = templateService.getTemplateById(id);
@@ -129,20 +140,21 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PostMapping("/create_question/{templateId}") // valide
-    public ResponseEntity<?> createQuestion(@RequestBody Question question, @PathVariable Long templateId) {
+    @PostMapping("/create_question/{templateId}")
+    public ResponseEntity<ApiResponse> createQuestion(@RequestBody Question question, @PathVariable Long templateId) {
         if (questionService.doesQuestionExist(templateId, question.getQuestionText())) {
-            return ResponseEntity.badRequest().body("Question with the same text already exists for this template.");
+            return ResponseEntity.badRequest().body(new ApiResponse("Question with the same text already exists for this template.", null));
         }
         Template template = templateService.getTemplateById(templateId);
         if (template != null) {
             question.setTemplate(template);
             Question createdQuestion = questionService.createQuestion(question);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
+            ApiResponse response = new ApiResponse("Question created successfully", null);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.notFound().build();}
+            return ResponseEntity.notFound().build();
+        }
     }
-
     @GetMapping("/find_questions_by_template/{templateId}") // valide
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<Question> questions = questionService.findQuestionsByTemplateId(templateId);
@@ -186,7 +198,6 @@ public class adminController {
     @GetMapping("/category/{categoryId}")//valide
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
         Category category = categoryService.getCategoryById(categoryId);
-
         if (category != null) {
             return new ResponseEntity<>(category, HttpStatus.OK);
         } else {

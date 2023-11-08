@@ -1,6 +1,5 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.DTO.CategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Template;
@@ -54,8 +53,6 @@ public class TemplateService {
         }
         return null;
     }
-
-
     public void deleteTemplatesByCategoryId(Long categoryId) {
         List<Template> templates = templateRepository.findByCategoryId(categoryId);
         for (Template template : templates) {
@@ -72,6 +69,23 @@ public class TemplateService {
     }
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
+    }
+    public ApiResponse updateCategoryForTemplate(Long templateId, Long newCategoryId) {
+        Template template = templateRepository.findById(templateId).orElse(null);
+        Category newCategory = categoryService.getCategoryById(newCategoryId);
+
+        if (template != null && newCategory != null) {
+            Category existingCategory = template.getCategory();
+            if (existingCategory != null) {
+                template.setCategory(newCategory);
+                Template updatedTemplate = templateRepository.save(template);
+                return new ApiResponse("Category updated successfully.", updatedTemplate.getCategory());
+            } else {
+                return new ApiResponse("Template does not have a category.", null);
+            }
+        } else {
+            return new ApiResponse("Error", null);
+        }
     }
 
 
@@ -91,20 +105,6 @@ public class TemplateService {
             return new ApiResponse("Error", null);
         }
     }
-
-
-    public TemplateDTO updateCategory(Long templateId, CategoryDTO updatedCategoryDTO) {
-        Template template = templateRepository.findById(templateId).orElse(null);
-        if (template != null) {
-            Category updatedCategory = categoryTransformer.toEntity(updatedCategoryDTO);
-            template.setCategory(updatedCategory);
-            template = templateRepository.save(template);
-
-            return templateTransformer.toDTO(template);
-        } else {
-            return null;
-        }
-    }
     public Template updateTemplate(Long templateId, TemplateDTO templateDTO) {
         Optional<Template> existingTemplateOptional = templateRepository.findById(templateId);
         if (existingTemplateOptional.isPresent()) {
@@ -113,17 +113,11 @@ public class TemplateService {
             updatedTemplate.setTemplateName(templateDTO.getTemplateName());
             updatedTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
             updatedTemplate.setCost(templateDTO.getCost());
-            if (templateDTO.getCategory() != null) {
-                CategoryDTO categoryDTO = templateDTO.getCategory();
-                Category updatedCategory = categoryService.updateCategory(existingTemplate.getCategory().getId(), categoryDTO);
-                updatedTemplate.setCategory(updatedCategory);
-            }
             return templateRepository.save(updatedTemplate);
         } else {
             return null;
         }
     }
-
 }
 
 

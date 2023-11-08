@@ -1,8 +1,12 @@
 package com.iker.Lexly.responses;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse {
     private String message;
+    @JsonProperty("data")
     private Object data;
 
     public ApiResponse(String message, Object data) {
