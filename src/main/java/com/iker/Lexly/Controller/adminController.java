@@ -176,11 +176,12 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/question/{questionId}") //valide
-    public ResponseEntity<Question> getQuestionById(@PathVariable Long questionId) {
+    @GetMapping("question/{questionId}")
+    public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
         if (question != null) {
-            return new ResponseEntity<>(question, HttpStatus.OK);
+            QuestionDTO questionDTO = questionTransformer.toDTO(question);
+            return new ResponseEntity<>(questionDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

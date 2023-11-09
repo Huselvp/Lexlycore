@@ -43,6 +43,7 @@ public class Template {
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @JsonBackReference
     private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template")

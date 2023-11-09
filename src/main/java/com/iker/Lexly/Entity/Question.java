@@ -1,6 +1,7 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.DTO.ChoiceRelatedTextePairDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class Question {
     private List<ChoiceRelatedTextePair> choices;
     @ManyToOne
    @JsonIgnore
+    @JsonManagedReference
     private Template template;
     public Long getId() {
         return id;
