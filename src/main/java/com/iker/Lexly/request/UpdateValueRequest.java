@@ -3,7 +3,7 @@ package com.iker.Lexly.request;
 public class UpdateValueRequest {
     private Long documentId;
     private Long questionId;
-    private String newValue;
+    private String value;
 
     public Long getDocumentId() {
         return documentId;
@@ -21,11 +21,11 @@ public class UpdateValueRequest {
         this.questionId = questionId;
     }
 
-    public String getNewValue() {
-        return newValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setNewValue(String newValue) {
-        this.newValue = newValue;
+    public void setValue(String newValue) {
+        this.value = newValue;
     }
 }

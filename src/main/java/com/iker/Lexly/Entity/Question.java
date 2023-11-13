@@ -32,6 +32,7 @@ public class Question {
    @JsonIgnore
     @JsonManagedReference
     private Template template;
+
     public Long getId() {
         return id;
     }

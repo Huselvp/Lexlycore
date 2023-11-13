@@ -2,7 +2,9 @@ package com.iker.Lexly.Controller;
 
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
-import com.iker.Lexly.request.AddValueRequest;
+import com.iker.Lexly.repository.DocumentQuestionValueRepository;
+import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.request.RequestData;
 import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,16 @@ public class suserController {
     private final TemplateService templateService;
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
+    private final QuestionRepository questionRepository;
+    private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final QuestionTransformer questionTransformer;
 private final PDFGenerationService pdfGenerationService;
 
     @Autowired
-    public suserController(PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController(DocumentQuestionValueRepository documentQuestionValueRepository,QuestionRepository questionRepository,PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
+        this.documentQuestionValueRepository=documentQuestionValueRepository;
+        this.questionRepository=questionRepository;
         this.questionTransformer = questionTransformer;
         this.pdfGenerationService=pdfGenerationService;
         this.documentsService = documentsService;
@@ -75,11 +80,11 @@ private final PDFGenerationService pdfGenerationService;
                 .collect(Collectors.toList());
         return questionDTOs;
     }
-    @PostMapping("/saveTemporaryValues")
+    @PostMapping("/saveTemporaryValues/{documentId}")
     public ApiResponse saveTemporaryValues(
-            @RequestParam Long documentId,
-            @RequestParam List<Long> questionIds,
-            @RequestParam List<String> values
+            @PathVariable   Long documentId,
+            @RequestBody List<Long> questionIds,
+            @RequestBody List<String> values
     ) {
         if (questionIds.size() != values.size()) {
             return new ApiResponse("Mismatched question IDs and values.", null);
@@ -95,17 +100,11 @@ private final PDFGenerationService pdfGenerationService;
         }
         return new ApiResponse("Temporary values saved successfully.", null);
     }
-    @PostMapping("/addValueAndSave")
-    public ApiResponse addValueAndSave(@RequestBody AddValueRequest request) {
-        ApiResponse response = documentsService.addValueAndSave(request.getDocumentId(), request.getQuestionId(), request.getValue());
-        return response;
-    }
     @PutMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
-        ApiResponse response = documentsService.updateValue(request);
+        ApiResponse response = documentsService.updateValueandSave(request);
         return response;
     }
-
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
@@ -125,6 +124,26 @@ private final PDFGenerationService pdfGenerationService;
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed: " + e.getMessage());
         }
     }
+    @GetMapping("/generate-pdf")
+    public ResponseEntity<String> generatePdf(@RequestParam Long documentId, @RequestParam Long templateId) {
+        List<Question> questions = questionRepository.findByTemplateId(templateId);
+        List<DocumentQuestionValue> documentQuestionValues =documentQuestionValueRepository.findByDocumentId(documentId);
+        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+        String outputFilePath = "document.pdf";
+        documentsService.generatePdfFromText(concatenatedText, outputFilePath);
+        return ResponseEntity.ok("PDF generated successfully");
+    }
+    @GetMapping("/test")
+    public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
+        Long documentId = requestData.getDocumentId();
+        Long templateId = requestData.getTemplateId();
+        List<Question> questions = questionRepository.findByTemplateId(templateId);
+        List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
+        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+        return ResponseEntity.ok(concatenatedText);
+    }
+
+
 }
 
 
