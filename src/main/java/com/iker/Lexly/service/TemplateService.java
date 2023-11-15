@@ -4,13 +4,11 @@ import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.DocumentQuestionValue;
+import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
-import com.iker.Lexly.repository.CategoryRepository;
-import com.iker.Lexly.repository.DocumentQuestionValueRepository;
-import com.iker.Lexly.repository.QuestionRepository;
-import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.repository.*;
 import com.iker.Lexly.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,15 +25,17 @@ public class TemplateService {
     private final CategoryRepository categoryRepository;
     @Autowired
     private final CategoryService categoryService;
+    private  final DocumentsRepository documentsRepository;
     private final QuestionRepository questionRepository;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public TemplateService(DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.categoryRepository = categoryRepository;
+        this.documentsRepository=documentsRepository;
         this.categoryService=categoryService;
         this.categoryTransformer=categoryTransformer;
         this.questionRepository=questionRepository;
@@ -57,17 +57,7 @@ public class TemplateService {
         }
         return null;
     }
-    public void deleteTemplatesByCategoryId(Long categoryId) {
-        List<Template> templates = templateRepository.findByCategoryId(categoryId);
-        for (Template template : templates) {
-            deleteTemplate(template.getId());
-        }
-    }
-    public void deleteTemplate(Long templateId) {
-        // Manually delete associated template_question_value records
-        DocumentQuestionValueRepository.deleteByTemplateId(templateId);
-        templateRepository.deleteById(templateId);
-    }
+
     public Template createTemplate(Template template) {
         return templateRepository.save(template);
     }
@@ -116,10 +106,19 @@ public class TemplateService {
             existingTemplate.setTemplateName(templateDTO.getTemplateName());
             existingTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
             existingTemplate.setCost(templateDTO.getCost());
-
             return templateRepository.save(existingTemplate);
         } else {
             return null;
+        }
+    }
+    public void deleteTemplate(Long id) {
+
+        Optional<Template> templateOptional = templateRepository.findById(id);
+        if (templateOptional.isPresent()) {
+            Template template = templateOptional.get();
+            List<Documents> documents = template.getDocuments();
+            documentsRepository.deleteAll(documents);
+            templateRepository.deleteById(id);
         }
     }
 

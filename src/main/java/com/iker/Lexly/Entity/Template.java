@@ -46,7 +46,7 @@ public class Template {
     @JsonBackReference
     private List<Question> questions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "template")
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<Documents> documents = new ArrayList<>();
 
 

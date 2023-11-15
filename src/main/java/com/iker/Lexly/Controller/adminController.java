@@ -27,6 +27,8 @@ public class adminController {
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
+
+    private final DocumentsService documentsService;
     @Autowired
     private final TemplateService templateService;
     @Autowired
@@ -35,7 +37,7 @@ public class adminController {
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public adminController(CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.userTransformer = userTransformer;
         this.categoryService = categoryService;
@@ -43,6 +45,7 @@ public class adminController {
         this.categoryTransformer=categoryTransformer;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
+        this.documentsService=documentsService;
         this.userService = userService;
     }
     @GetMapping("/all_users") //valide
@@ -115,14 +118,14 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @DeleteMapping("delete_template/{id}") //valide
+    @DeleteMapping("delete_template/{id}")
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         Template template = templateService.getTemplateById(id);
         if (template != null) {
-            List<Question> questions = template.getQuestions();
-            if (!questions.isEmpty()) {
-                for (Question question : questions) {
-                    questionService.deleteQuestion(question.getId());
+            List<Documents> documents = template.getDocuments();
+            if (!documents.isEmpty()) {
+                for (Documents document : documents) {
+                   templateService.deleteTemplate(document.getId());
                 }
             }
             templateService.deleteTemplate(id);
@@ -131,6 +134,7 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/all_questions") // valide
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
