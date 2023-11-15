@@ -14,11 +14,9 @@ public class DocumentQuestionValueDTO {
     public void setDocumentQuestionValueId(Long documentQuestionValueId) {
         this.documentQuestionValueId = documentQuestionValueId;
     }
-
     public Long getDocumentId() {
         return documentId;
     }
-
     public void setDocumentId(Long documentId) {
         this.documentId = documentId;
     }

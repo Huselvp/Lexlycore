@@ -16,6 +16,7 @@ public class  DocumentQuestionValue {
     @JoinColumn(name = "question_id")
     private Question question;
 
+
     private String value;
 
     public Long getDocumentQuestionValueId() {
@@ -49,4 +50,5 @@ public class  DocumentQuestionValue {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

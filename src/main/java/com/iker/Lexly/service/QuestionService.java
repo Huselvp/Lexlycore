@@ -44,20 +44,24 @@ public class QuestionService {
         return questionRepository.save(question);
     }
     public Question updateQuestion(Long id, QuestionDTO questionDTO) {
-        Optional<Question> existingQuestion = questionRepository.findById(id);
-        if (existingQuestion.isPresent()) {
-            Question updatedQuestion = existingQuestion.get();
-            updatedQuestion.setQuestionText(questionDTO.getQuestionText());
-            updatedQuestion.setValueType(questionDTO.getValueType());
-            updatedQuestion.setDescription(questionDTO.getDescription());
-            updatedQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
-            updatedQuestion.setTexte(questionDTO.getTexte());
-            updatedQuestion.setChoices(questionDTO.getChoices());
-            return questionRepository.save(updatedQuestion);
+        Optional<Question> existingQuestionOptional = questionRepository.findById(id);
+        if (existingQuestionOptional.isPresent()) {
+            Question existingQuestion = existingQuestionOptional.get();
+            existingQuestion.getDocumentQuestionValues().clear();
+
+            existingQuestion.setQuestionText(questionDTO.getQuestionText());
+            existingQuestion.setValueType(questionDTO.getValueType());
+            existingQuestion.setDescription(questionDTO.getDescription());
+            existingQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
+            existingQuestion.setTexte(questionDTO.getTexte());
+            existingQuestion.setChoices(questionDTO.getChoices());
+            return questionRepository.save(existingQuestion);
         } else {
             return null;
         }
     }
+
+
 
 
     public void deleteQuestion(Long id) {

@@ -1,7 +1,9 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
+import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -13,8 +15,10 @@ import com.iker.Lexly.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TemplateService {
@@ -109,15 +113,17 @@ public class TemplateService {
         Optional<Template> existingTemplateOptional = templateRepository.findById(templateId);
         if (existingTemplateOptional.isPresent()) {
             Template existingTemplate = existingTemplateOptional.get();
-            Template updatedTemplate = existingTemplate;
-            updatedTemplate.setTemplateName(templateDTO.getTemplateName());
-            updatedTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
-            updatedTemplate.setCost(templateDTO.getCost());
-            return templateRepository.save(updatedTemplate);
+            existingTemplate.setTemplateName(templateDTO.getTemplateName());
+            existingTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
+            existingTemplate.setCost(templateDTO.getCost());
+
+            return templateRepository.save(existingTemplate);
         } else {
             return null;
         }
     }
+
+
 }
 
 

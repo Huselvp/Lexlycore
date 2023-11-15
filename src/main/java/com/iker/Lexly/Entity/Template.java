@@ -49,6 +49,7 @@ public class Template {
     @OneToMany(mappedBy = "template")
     private List<Documents> documents = new ArrayList<>();
 
+
     public Template() {
     }
     public User getUser() {

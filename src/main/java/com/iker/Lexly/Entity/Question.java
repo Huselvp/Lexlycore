@@ -6,6 +6,7 @@ import com.iker.Lexly.DTO.ChoiceRelatedTextePairDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,9 @@ public class Question {
     private String Texte;
     @ElementCollection
     private List<ChoiceRelatedTextePair> choices;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
+
     @ManyToOne
    @JsonIgnore
     @JsonManagedReference
@@ -61,6 +65,13 @@ public class Question {
     }
     public void setTemplate(Template template) {
         this.template = template;
+    }
+    public List<DocumentQuestionValue> getDocumentQuestionValues() {
+        return documentQuestionValues;
+    }
+
+    public void setDocumentQuestionValues(List<DocumentQuestionValue> documentQuestionValues) {
+        this.documentQuestionValues = documentQuestionValues;
     }
     public List<ChoiceRelatedTextePair> getChoices() {
         return choices;

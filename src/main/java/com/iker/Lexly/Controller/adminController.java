@@ -77,7 +77,6 @@ public class adminController {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);
     }
-
     @PutMapping("/update_template/{templateId}")//valid
     public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,

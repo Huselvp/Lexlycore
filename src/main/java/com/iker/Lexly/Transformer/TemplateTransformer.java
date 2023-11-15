@@ -1,7 +1,9 @@
 package com.iker.Lexly.Transformer;
 
 import com.iker.Lexly.DTO.CategoryDTO;
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
+import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Entity.Category; // Import the Category entity
 
@@ -9,10 +11,17 @@ import com.iker.Lexly.Transformer.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
-@Autowired
-CategoryTransformer categoryTransformer;
+
+    @Autowired
+    private CategoryTransformer categoryTransformer;
+
+    @Autowired
+    private DocumentQuestionValueTransformer documentQuestionValueTransformer;
+
     @Override
     public Template toEntity(TemplateDTO dto) {
         if (dto == null) {
@@ -43,3 +52,4 @@ CategoryTransformer categoryTransformer;
         }
     }
 }
+
