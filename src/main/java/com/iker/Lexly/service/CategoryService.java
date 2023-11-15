@@ -69,7 +69,6 @@ public class CategoryService {
             }
             templateRepository.saveAll(templates);
             categoryRepository.delete(category);
-
             return "The category and associated templates have been updated successfully.";
         } else {
             return "Category with ID " + categoryId + " not found.";
