@@ -63,17 +63,20 @@ public class CategoryService {
         Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
         if (categoryOptional.isPresent()) {
             Category category = categoryOptional.get();
-            if (!category.getTemplates().isEmpty()) {
-                List<Template> templates = new ArrayList<>(category.getTemplates());
-                templateRepository.deleteAll(templates);
+            List<Template> templates = category.getTemplates();
+            for (Template template : templates) {
+                template.setCategory(null);
             }
+            templateRepository.saveAll(templates);
             categoryRepository.delete(category);
 
-            return "The category and associated templates have been deleted successfully.";
+            return "The category and associated templates have been updated successfully.";
         } else {
             return "Category with ID " + categoryId + " not found.";
         }
     }
+
+
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElse(null);
