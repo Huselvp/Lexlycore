@@ -1,5 +1,12 @@
 package com.iker.Lexly.DTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
 public class ChoiceRelatedTextePairDTO {
     private String choice;
     private String relatedTexte;

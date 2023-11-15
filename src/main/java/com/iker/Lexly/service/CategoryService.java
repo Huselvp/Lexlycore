@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @Service
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
     private final TemplateRepository templateRepository;
 
@@ -38,7 +39,6 @@ public class CategoryService {
     }
     public Category updateCategory(Long categoryId, CategoryDTO categoryDTO) {
         Optional<Category> existingCategoryOptional = categoryRepository.findById(categoryId);
-
         if (existingCategoryOptional.isPresent()) {
             Category existingCategory = existingCategoryOptional.get();
             Category updatedCategory = existingCategory;

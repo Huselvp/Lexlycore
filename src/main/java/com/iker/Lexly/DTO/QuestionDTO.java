@@ -18,8 +18,6 @@ public class QuestionDTO {
     private String Description;
     private String DescriptionDetails;
     private List<ChoiceRelatedTextePair> choices;
-
-
     public QuestionDTO(Long id, String questionText, String valueType, String texte, String description, String descriptionDetails, List<ChoiceRelatedTextePair> choices) {
         this.id = id;
         this.questionText = questionText;

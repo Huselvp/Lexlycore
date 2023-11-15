@@ -23,7 +23,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final CategoryRepository categoryRepository;
-    @Autowired
+
     private final CategoryService categoryService;
     private  final DocumentsRepository documentsRepository;
     private final QuestionRepository questionRepository;

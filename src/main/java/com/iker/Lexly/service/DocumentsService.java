@@ -180,7 +180,6 @@ public class DocumentsService {
 
     public String DocumentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
         StringBuilder concatenatedText = new StringBuilder();
-
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
@@ -195,17 +194,19 @@ public class DocumentsService {
 
         return concatenatedText.toString();
     }
+
     private String replaceCheckboxValues(String questionText, List<ChoiceRelatedTextePair> choices) {
         for (ChoiceRelatedTextePair pair : choices) {
             questionText = questionText.replace("[" + pair.getChoice() + "]", pair.getRelatedTexte());
         }
         return questionText;
     }
+
     private String replaceValues(String Texte, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
         for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
             if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
                 if (documentQuestionValue.getValue() != null) {
-                   Texte = Texte.replace("[value]", documentQuestionValue.getValue());
+                    Texte = Texte.replace("[value]", documentQuestionValue.getValue());
                 } else {
                     Texte = Texte.replace("[value]", "null");
                 }
@@ -214,6 +215,7 @@ public class DocumentsService {
         }
         return Texte;
     }
+
     public void generatePdfFromText(String text, String outputFilePath) {
         try {
             PDDocument document = new PDDocument();

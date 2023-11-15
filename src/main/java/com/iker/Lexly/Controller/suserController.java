@@ -17,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -105,6 +108,23 @@ private final PDFGenerationService pdfGenerationService;
         ApiResponse response = documentsService.updateValueandSave(request);
         return response;
     }
+    @PostMapping("/add-choices/{questionId}")
+    public ResponseEntity<String> addChoicesToQuestion(
+            @PathVariable Long questionId,
+            @RequestBody List<ChoiceRelatedTextePair> choices) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            if (question.getChoices() == null) {
+                question.setChoices(new ArrayList<>());
+            }
+            question.getChoices().addAll(choices);
+            questionRepository.save(question);
+            return ResponseEntity.ok("Choices added successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
@@ -115,15 +135,7 @@ private final PDFGenerationService pdfGenerationService;
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-    @GetMapping("/generate/{userId}")
-    public ResponseEntity<String> generatePDFDocument(@PathVariable Long userId) {
-        try {
-            pdfGenerationService.generatePDFDocument(userId);
-            return ResponseEntity.ok("PDF document generated successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed: " + e.getMessage());
-        }
-    }
+
     @GetMapping("/generate-pdf")
     public ResponseEntity<String> generatePdf(@RequestParam Long documentId, @RequestParam Long templateId) {
         List<Question> questions = questionRepository.findByTemplateId(templateId);
@@ -137,9 +149,12 @@ private final PDFGenerationService pdfGenerationService;
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
         Long templateId = requestData.getTemplateId();
+        System.out.println("id doc"+requestData.getDocumentId());
+        System.out.println("id template"+requestData.getTemplateId());
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
         String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+        System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
 
