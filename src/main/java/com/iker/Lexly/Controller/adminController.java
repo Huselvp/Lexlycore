@@ -3,6 +3,7 @@ import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.request.QuestionWithChoicesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
@@ -29,7 +30,7 @@ public class adminController {
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
-    private final DocumentsService documentsService;
+    private final TemplateRepository templateRepository;
     @Autowired
     private final TemplateService templateService;
     @Autowired
@@ -38,16 +39,16 @@ public class adminController {
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public adminController(QuestionRepository questionRepository,DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(TemplateRepository templateRepository,QuestionRepository questionRepository,DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.questionRepository=questionRepository;
+        this.templateRepository=templateRepository;
         this.userTransformer = userTransformer;
         this.categoryService = categoryService;
         this.questionService = questionService;
         this.categoryTransformer=categoryTransformer;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
-        this.documentsService=documentsService;
         this.userService = userService;
     }
     @GetMapping("/all_users") //valide
@@ -201,7 +202,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/category/{categoryId}")//valide
+    @GetMapping("/category/{categoryId}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
         Category category = categoryService.getCategoryById(categoryId);
         if (category != null) {
@@ -210,11 +211,12 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @DeleteMapping("/delete_question/{id}") //valide
+    @DeleteMapping("/delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
+
     @PostMapping("/add_category") // valide
     public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
         Category newCategory = categoryService.addCategory(category);
@@ -240,8 +242,12 @@ public class adminController {
 
         return ResponseEntity.ok(categories);
     }
-    @PostMapping("/create-question-with-choices")
-    public ResponseEntity<String> createQuestionWithChoices(@RequestBody QuestionWithChoicesRequest request) {
+    @PostMapping("/create-question-with-choices/{templateId}")
+    public ResponseEntity<String> createQuestionWithChoices(
+            @PathVariable Long templateId,
+            @RequestBody QuestionWithChoicesRequest request) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new RuntimeException("Template not found"));
         Question question = new Question();
         question.setQuestionText(request.getQuestionText());
         question.setValueType(request.getValueType());
@@ -253,11 +259,11 @@ public class adminController {
                 question.addChoice(choice);
             }
         }
+        question.setTemplate(template);
         questionRepository.save(question);
         return ResponseEntity.ok("Question with choices created successfully");
     }
-
-    @PutMapping("/{questionId}/update-question-with-choices")
+    @PutMapping("update-question-with-choices/{questionId}")
     public ResponseEntity<String> updateQuestionWithChoices(
             @PathVariable Long questionId,
             @RequestBody QuestionWithChoicesRequest request) {

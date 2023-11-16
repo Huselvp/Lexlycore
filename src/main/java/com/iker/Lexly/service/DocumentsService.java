@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 
@@ -31,14 +32,14 @@ public class DocumentsService {
     private final UserRepository userRepository;
     private final TemplateRepository templateRepository;
     private final QuestionRepository questionRepository;
-
+private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
 
     @Autowired
-    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository) {
+    public DocumentsService( ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
-
+this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -183,7 +184,8 @@ public class DocumentsService {
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
-                if (question.getValueType().equals("checkbox")) {
+
+                if ("checkbox".equals(question.getValueType())) {
                     Texte = replaceCheckboxValues(Texte, question.getChoices());
                 } else {
                     Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
@@ -191,10 +193,8 @@ public class DocumentsService {
                 concatenatedText.append(Texte).append(" ");
             }
         }
-
-        return concatenatedText.toString();
+        return concatenatedText.toString().trim();
     }
-
     private String replaceCheckboxValues(String questionText, List<ChoiceRelatedTextePair> choices) {
         for (ChoiceRelatedTextePair pair : choices) {
             questionText = questionText.replace("[" + pair.getChoice() + "]", pair.getRelatedTexte());
@@ -216,6 +216,7 @@ public class DocumentsService {
         return Texte;
     }
 
+
     public void generatePdfFromText(String text, String outputFilePath) {
         try {
             PDDocument document = new PDDocument();
@@ -236,7 +237,6 @@ public class DocumentsService {
             e.printStackTrace();
         }
     }
-
 
 }
 

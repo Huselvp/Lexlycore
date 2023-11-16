@@ -48,24 +48,26 @@ public class QuestionService {
         if (existingQuestionOptional.isPresent()) {
             Question existingQuestion = existingQuestionOptional.get();
             existingQuestion.getDocumentQuestionValues().clear();
-
             existingQuestion.setQuestionText(questionDTO.getQuestionText());
             existingQuestion.setValueType(questionDTO.getValueType());
             existingQuestion.setDescription(questionDTO.getDescription());
             existingQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
             existingQuestion.setTexte(questionDTO.getTexte());
-            existingQuestion.setChoices(questionDTO.getChoices());
             return questionRepository.save(existingQuestion);
         } else {
             return null;
         }
     }
+    public void deleteQuestion(Long questionId) {
+        // Get the question
+        Question question = questionRepository.findById(questionId).orElse(null);
 
-
-
-
-    public void deleteQuestion(Long id) {
-        questionRepository.deleteById(id);
+        if (question != null) {
+            if ("checkbox".equals(question.getValueType())) {
+                //choiceService.deleteChoicesByQuestion(question);
+            }
+            questionRepository.delete(question);
+        }
     }
 
     public List<Question> findQuestionsByTemplateId(Long templateId) {

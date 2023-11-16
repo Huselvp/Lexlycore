@@ -7,16 +7,12 @@ public class  DocumentQuestionValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long documentQuestionValueId;
-
     @ManyToOne
     @JoinColumn(name = "document_id")
     private Documents document;
-
-    @ManyToOne
-    @JoinColumn(name = "question_id")
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
-
-
     private String value;
 
     public Long getDocumentQuestionValueId() {

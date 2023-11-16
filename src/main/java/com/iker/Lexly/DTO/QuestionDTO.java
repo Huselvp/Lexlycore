@@ -17,15 +17,15 @@ public class QuestionDTO {
     private String Texte;
     private String Description;
     private String DescriptionDetails;
-    private List<ChoiceRelatedTextePair> choices;
-    public QuestionDTO(Long id, String questionText, String valueType, String texte, String description, String descriptionDetails, List<ChoiceRelatedTextePair> choices) {
+
+    public QuestionDTO(Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
         this.id = id;
         this.questionText = questionText;
         this.valueType = valueType;
         this.Texte = texte;
         this.Description = description;
         this.DescriptionDetails = descriptionDetails;
-        this.choices = choices;
+
     }
 }
  

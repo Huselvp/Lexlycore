@@ -27,14 +27,17 @@ public class Question {
     private String valueType;
     @Column(name= "text_erea")
     private String Texte;
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    private List<ChoiceRelatedTextePair> choices;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ChoiceRelatedTextePair> choices;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
 
     @ManyToOne
-   @JsonIgnore
     @JsonManagedReference
+    @JsonIgnore
     private Template template;
 
     public Long getId() {
