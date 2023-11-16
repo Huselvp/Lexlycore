@@ -1,8 +1,5 @@
 package com.iker.Lexly.Controller;
-import com.iker.Lexly.DTO.CategoryDTO;
-import com.iker.Lexly.DTO.QuestionDTO;
-import com.iker.Lexly.DTO.TemplateDTO;
-import com.iker.Lexly.DTO.UserDTO;
+import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -249,11 +246,17 @@ public class adminController {
         question.setQuestionText(request.getQuestionText());
         question.setValueType(request.getValueType());
         if ("checkbox".equals(request.getValueType())) {
-            question.setChoices(request.getChoices());
+            for (ChoiceRelatedTextePair choice1 : request.getChoices()) {
+                ChoiceRelatedTextePair choice = new ChoiceRelatedTextePair();
+                choice.setChoice(choice1.getChoice());
+                choice.setRelatedTexte(choice1.getRelatedTexte());
+                question.addChoice(choice);
+            }
         }
         questionRepository.save(question);
         return ResponseEntity.ok("Question with choices created successfully");
     }
+
     @PutMapping("/{questionId}/update-question-with-choices")
     public ResponseEntity<String> updateQuestionWithChoices(
             @PathVariable Long questionId,

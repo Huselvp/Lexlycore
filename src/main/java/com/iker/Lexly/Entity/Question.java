@@ -27,7 +27,7 @@ public class Question {
     private String valueType;
     @Column(name= "text_erea")
     private String Texte;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<ChoiceRelatedTextePair> choices;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
@@ -72,6 +72,13 @@ public class Question {
 
     public void setDocumentQuestionValues(List<DocumentQuestionValue> documentQuestionValues) {
         this.documentQuestionValues = documentQuestionValues;
+    }
+    public void addChoice(ChoiceRelatedTextePair choice) {
+        if (choices == null) {
+            choices = new ArrayList<>();
+        }
+        choices.add(choice);
+        choice.setQuestion(this);
     }
     public List<ChoiceRelatedTextePair> getChoices() {
         return choices;
