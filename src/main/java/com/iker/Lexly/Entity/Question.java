@@ -27,7 +27,7 @@ public class Question {
     private String valueType;
     @Column(name= "text_erea")
     private String Texte;
-    @ElementCollection
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question")
     private List<ChoiceRelatedTextePair> choices;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();

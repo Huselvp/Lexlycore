@@ -108,23 +108,8 @@ private final PDFGenerationService pdfGenerationService;
         ApiResponse response = documentsService.updateValueandSave(request);
         return response;
     }
-    @PostMapping("/add-choices/{questionId}")
-    public ResponseEntity<String> addChoicesToQuestion(
-            @PathVariable Long questionId,
-            @RequestBody List<ChoiceRelatedTextePair> choices) {
-        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
-        if (optionalQuestion.isPresent()) {
-            Question question = optionalQuestion.get();
-            if (question.getChoices() == null) {
-                question.setChoices(new ArrayList<>());
-            }
-            question.getChoices().addAll(choices);
-            questionRepository.save(question);
-            return ResponseEntity.ok("Choices added successfully");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
+
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);

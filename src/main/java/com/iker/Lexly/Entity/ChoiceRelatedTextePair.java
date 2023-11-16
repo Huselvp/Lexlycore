@@ -1,11 +1,18 @@
 package com.iker.Lexly.Entity;
 
 import jakarta.persistence.*;
+@Entity
+@Table(name = "choices_related_texte_pairs")
 
-@Embeddable
 public class ChoiceRelatedTextePair {
     private String choice;
     private String relatedTexte;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     public ChoiceRelatedTextePair() {
     }
@@ -29,5 +36,20 @@ public class ChoiceRelatedTextePair {
 
     public void setRelatedTexte(String relatedTexte) {
         this.relatedTexte = relatedTexte;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

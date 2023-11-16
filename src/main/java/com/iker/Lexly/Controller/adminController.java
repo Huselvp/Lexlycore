@@ -5,6 +5,8 @@ import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.CategoryTransformer;
+import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.request.QuestionWithChoicesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -18,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
@@ -27,7 +31,7 @@ public class adminController {
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
-
+    private final QuestionRepository questionRepository;
     private final DocumentsService documentsService;
     @Autowired
     private final TemplateService templateService;
@@ -37,8 +41,9 @@ public class adminController {
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public adminController(DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(QuestionRepository questionRepository,DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
+        this.questionRepository=questionRepository;
         this.userTransformer = userTransformer;
         this.categoryService = categoryService;
         this.questionService = questionService;
@@ -232,10 +237,43 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("all_categories") //valide
+    @GetMapping("all_categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
 
         return ResponseEntity.ok(categories);
     }
+    @PostMapping("/create-question-with-choices")
+    public ResponseEntity<String> createQuestionWithChoices(@RequestBody QuestionWithChoicesRequest request) {
+        Question question = new Question();
+        question.setQuestionText(request.getQuestionText());
+        question.setValueType(request.getValueType());
+        if ("checkbox".equals(request.getValueType())) {
+            question.setChoices(request.getChoices());
+        }
+        questionRepository.save(question);
+        return ResponseEntity.ok("Question with choices created successfully");
+    }
+    @PutMapping("/{questionId}/update-question-with-choices")
+    public ResponseEntity<String> updateQuestionWithChoices(
+            @PathVariable Long questionId,
+            @RequestBody QuestionWithChoicesRequest request) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            question.setQuestionText(request.getQuestionText());
+            question.setValueType(request.getValueType());
+
+            if ("checkbox".equals(request.getValueType())) {
+                question.setChoices(request.getChoices());
+            } else {
+                question.setChoices(null);
+            }
+            questionRepository.save(question);
+            return ResponseEntity.ok("Question with choices updated successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
