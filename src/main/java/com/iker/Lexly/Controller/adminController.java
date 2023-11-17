@@ -214,10 +214,22 @@ public class adminController {
         }
     }
     @DeleteMapping("/delete_question_with_choices/{id}")
-    public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<String> deleteQuestionWithChoices(@PathVariable Long id) {
        choiceRelatedTextePairsService.deleteChoicesByQuestionId(id);
         questionService.deleteQuestion(id);
         return ResponseEntity.ok("Question with ID " + id + " and its choices have been deleted successfully.");
+    }
+    @DeleteMapping("delete_question/{id}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
+        Optional<Question> optionalQuestion = questionRepository.findById(id);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            questionService.deleteQuestion(id);
+            QuestionDTO questionDTO = questionTransformer.toDTO(question);
+            return ResponseEntity.ok("Question with ID " + id + " has been deleted successfully. DTO: " + questionDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/add_category") // valide

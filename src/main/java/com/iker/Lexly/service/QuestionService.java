@@ -57,13 +57,9 @@ public class QuestionService {
     public void deleteQuestion(Long questionId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionId);
         optionalQuestion.ifPresent(question -> {
-            question.getChoices().forEach(choice -> choice.setQuestion(null));
-            question.getChoices().clear();
-            question.getDocumentQuestionValues().clear();
             questionRepository.delete(question);
         });
     }
-
 
     public List<Question> findQuestionsByTemplateId(Long templateId) {
         return questionRepository.findByTemplateId(templateId);
