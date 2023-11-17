@@ -1,6 +1,7 @@
 package com.iker.Lexly.DTO;
 
 import com.iker.Lexly.Entity.ChoiceRelatedTextePair;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class QuestionDTO {
     private Long id;
@@ -17,14 +18,16 @@ public class QuestionDTO {
     private String Texte;
     private String Description;
     private String DescriptionDetails;
+    private List<ChoiceRelatedTextePair> choiceRelatedTextePairs;
 
-    public QuestionDTO(Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
+    public QuestionDTO( List<ChoiceRelatedTextePair> choiceRelatedTextePairs,Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
         this.id = id;
         this.questionText = questionText;
         this.valueType = valueType;
         this.Texte = texte;
         this.Description = description;
         this.DescriptionDetails = descriptionDetails;
+        this.choiceRelatedTextePairs=choiceRelatedTextePairs;
 
     }
 }

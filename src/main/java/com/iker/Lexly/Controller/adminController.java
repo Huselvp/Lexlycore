@@ -29,6 +29,7 @@ public class adminController {
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
+    private final ChoiceRelatedTextePairsService choiceRelatedTextePairsService;
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     @Autowired
@@ -39,8 +40,9 @@ public class adminController {
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public adminController(TemplateRepository templateRepository,QuestionRepository questionRepository,DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(ChoiceRelatedTextePairsService choiceRelatedTextePairsService,TemplateRepository templateRepository,QuestionRepository questionRepository,DocumentsService documentsService,CategoryTransformer categoryTransformer,UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
+        this.choiceRelatedTextePairsService=choiceRelatedTextePairsService;
         this.questionRepository=questionRepository;
         this.templateRepository=templateRepository;
         this.userTransformer = userTransformer;
@@ -211,10 +213,11 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @DeleteMapping("/delete_question/{id}")
+    @DeleteMapping("/delete_question_with_choices/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
+       choiceRelatedTextePairsService.deleteChoicesByQuestionId(id);
         questionService.deleteQuestion(id);
-        return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
+        return ResponseEntity.ok("Question with ID " + id + " and its choices have been deleted successfully.");
     }
 
     @PostMapping("/add_category") // valide

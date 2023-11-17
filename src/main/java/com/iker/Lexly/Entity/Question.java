@@ -15,7 +15,9 @@ import java.util.Map;
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_id")
     private Long id;
+
     @NotNull
     @Column(name = "question_text")
     private String questionText;
@@ -28,9 +30,7 @@ public class Question {
     @Column(name= "text_erea")
     private String Texte;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private List<ChoiceRelatedTextePair> choices;
-
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
@@ -86,7 +86,6 @@ public class Question {
     public List<ChoiceRelatedTextePair> getChoices() {
         return choices;
     }
-
     public void setChoices(List<ChoiceRelatedTextePair> choices) {
         this.choices = choices;
     }

@@ -12,10 +12,10 @@ public class ChoiceRelatedTextePair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
+
     public ChoiceRelatedTextePair() {
     }
     public ChoiceRelatedTextePair(String choice, String relatedTexte) {

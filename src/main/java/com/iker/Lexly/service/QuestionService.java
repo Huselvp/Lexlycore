@@ -2,14 +2,8 @@ package com.iker.Lexly.service;
 
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
-import com.iker.Lexly.Entity.DocumentQuestionValue;
-import com.iker.Lexly.Entity.Documents;
-import com.iker.Lexly.Entity.Question;
-import com.iker.Lexly.Entity.Template;
-import com.iker.Lexly.repository.DocumentQuestionValueRepository;
-import com.iker.Lexly.repository.DocumentsRepository;
-import com.iker.Lexly.repository.QuestionRepository;
-import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,13 +16,15 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
+    private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public QuestionService(DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public QuestionService(ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
         this.templateRepository=templateRepository;
         this.documentsRepository=documentsRepository;
+        this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
     }
 
@@ -59,16 +55,15 @@ public class QuestionService {
         }
     }
     public void deleteQuestion(Long questionId) {
-        // Get the question
-        Question question = questionRepository.findById(questionId).orElse(null);
-
-        if (question != null) {
-            if ("checkbox".equals(question.getValueType())) {
-                //choiceService.deleteChoicesByQuestion(question);
-            }
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        optionalQuestion.ifPresent(question -> {
+            question.getChoices().forEach(choice -> choice.setQuestion(null));
+            question.getChoices().clear();
+            question.getDocumentQuestionValues().clear();
             questionRepository.delete(question);
-        }
+        });
     }
+
 
     public List<Question> findQuestionsByTemplateId(Long templateId) {
         return questionRepository.findByTemplateId(templateId);
