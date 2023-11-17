@@ -180,13 +180,15 @@ this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
     }
 
     public String DocumentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
+        if (!isExist(documentId, documentQuestionValues)) {
+            return "Invalid documentId or document not found.";
+        }
         StringBuilder concatenatedText = new StringBuilder();
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
-
                 if ("checkbox".equals(question.getValueType())) {
-                    Texte = replaceCheckboxValues(Texte, question.getChoices());
+                    Texte = replaceCheckboxValues(Texte, question.getChoices(), documentQuestionValues);
                 } else {
                     Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
                 }
@@ -195,13 +197,25 @@ this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         }
         return concatenatedText.toString().trim();
     }
-    private String replaceCheckboxValues(String questionText, List<ChoiceRelatedTextePair> choices) {
+
+    private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
+        return documentQuestionValues.stream()
+                .anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
+    }
+
+    private String replaceCheckboxValues(String questionText, List<ChoiceRelatedTextePair> choices, List<DocumentQuestionValue> documentQuestionValues) {
         for (ChoiceRelatedTextePair pair : choices) {
-            questionText = questionText.replace("[" + pair.getChoice() + "]", pair.getRelatedTexte());
+            // Check if the choice is selected in the documentQuestionValues list
+            Optional<DocumentQuestionValue> selectedChoice = documentQuestionValues.stream()
+                    .filter(dqv -> dqv.getQuestion().getId().equals(pair.getQuestion().getId()))
+                    .findFirst();
+            // If the choice is selected, replace the checkbox placeholder with the related text
+            if (selectedChoice.isPresent() && selectedChoice.get().getValue() != null && selectedChoice.get().getValue().equals(pair.getChoice())) {
+                questionText = questionText.replace("[" + pair.getChoice() + "]", pair.getRelatedTexte());
+            }
         }
         return questionText;
     }
-
     private String replaceValues(String Texte, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
         for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
             if (documentQuestionValue.getQuestion().getId().equals(questionId)) {

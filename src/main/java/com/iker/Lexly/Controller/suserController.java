@@ -2,6 +2,7 @@ package com.iker.Lexly.Controller;
 
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
+import com.iker.Lexly.repository.ChoicesRelatedTexteRepository;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.request.RequestData;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class suserController {
 
     private final DocumentsService documentsService;
+    private ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final TemplateService templateService;
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
@@ -37,10 +39,11 @@ public class suserController {
 private final PDFGenerationService pdfGenerationService;
 
     @Autowired
-    public suserController(DocumentQuestionValueRepository documentQuestionValueRepository,QuestionRepository questionRepository,PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController(ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,QuestionRepository questionRepository,PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
         this.questionRepository=questionRepository;
+        this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         this.questionTransformer = questionTransformer;
         this.pdfGenerationService=pdfGenerationService;
         this.documentsService = documentsService;
@@ -120,7 +123,17 @@ private final PDFGenerationService pdfGenerationService;
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-
+    @PostMapping("/retrieveRelatedText")
+    public String retrieveRelatedText(@RequestParam Long selectedChoiceId) {
+        Optional<ChoiceRelatedTextePair> selectedChoice =  choicesRelatedTexteRepository.findById(selectedChoiceId);
+        if (selectedChoice.isPresent()) {
+            ChoiceRelatedTextePair choice = selectedChoice.get();
+            String relatedText = choice.getRelatedTexte();
+            return "Related text for choice with ID " + selectedChoiceId + ": " + relatedText;
+        } else {
+            return "Choice with ID " + selectedChoiceId + " not found.";
+        }
+    }
     @GetMapping("/generate-pdf")
     public ResponseEntity<String> generatePdf(@RequestParam Long documentId, @RequestParam Long templateId) {
         List<Question> questions = questionRepository.findByTemplateId(templateId);
