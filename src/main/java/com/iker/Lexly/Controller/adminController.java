@@ -161,7 +161,6 @@ public class adminController {
         question.setDescription(request.getDescription());
         question.setTexte(request.getTexte());
         question.setDescriptionDetails(request.getDescriptionDetails());
-
         if ("checkbox".equals(request.getValueType())) {
             if (request.getChoiceRelatedTextePairs() == null || request.getChoiceRelatedTextePairs().isEmpty()) {
                 return ResponseEntity.badRequest().body("Choices are required for a question with checkbox type");
@@ -170,13 +169,10 @@ public class adminController {
         } else {
             question.setChoices(null);
         }
-
         questionRepository.save(question);
 
         return ResponseEntity.ok("Question created successfully");
     }
-
-
     @GetMapping("/find_questions_by_template/{templateId}")
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);
@@ -278,6 +274,9 @@ public class adminController {
         Question question = new Question();
         question.setQuestionText(request.getQuestionText());
         question.setValueType(request.getValueType());
+        question.setTexte(request.getTexte());
+        question.setDescription(request.getDescription());
+        question.setDescriptionDetails(request.getDescriptionDetails());
         if ("checkbox".equals(request.getValueType())) {
             for (ChoiceRelatedTextePair choice1 : request.getChoices()) {
                 ChoiceRelatedTextePair choice = new ChoiceRelatedTextePair();
@@ -299,6 +298,9 @@ public class adminController {
             Question question = optionalQuestion.get();
             question.setQuestionText(request.getQuestionText());
             question.setValueType(request.getValueType());
+            question.setTexte(request.getTexte());
+            question.setDescription(request.getDescription());
+            request.setDescriptionDetails(request.getDescriptionDetails());
             if ("checkbox".equals(request.getValueType())) {
                 question.setChoices(request.getChoices());
             } else {

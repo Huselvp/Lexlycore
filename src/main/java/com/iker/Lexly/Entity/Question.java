@@ -27,7 +27,7 @@ public class Question {
     private String DescriptionDetails;
     @Column(name= "value_type")
     private String valueType;
-    @Column(name= "text_erea")
+    @Column(name= "text_area")
     private String Texte;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChoiceRelatedTextePair> choices;
