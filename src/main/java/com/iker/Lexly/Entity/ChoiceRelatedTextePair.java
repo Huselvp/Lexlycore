@@ -14,6 +14,7 @@ public class ChoiceRelatedTextePair {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "question_id")
+    @JsonIgnore
     private Question question;
 
     public ChoiceRelatedTextePair() {

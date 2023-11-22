@@ -1,5 +1,8 @@
 package com.iker.Lexly.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.iker.Lexly.Entity.ChoiceRelatedTextePair;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +21,8 @@ public class QuestionDTO {
     private String Texte;
     private String Description;
     private String DescriptionDetails;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties("questionDto")
     private List<ChoiceRelatedTextePair> choiceRelatedTextePairs;
 
     public QuestionDTO( List<ChoiceRelatedTextePair> choiceRelatedTextePairs,Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {

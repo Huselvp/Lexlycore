@@ -78,12 +78,9 @@ private final PDFGenerationService pdfGenerationService;
         ApiResponseDocuments response = documentsService.createNewDocument(templateId);
         return response;
     }
-    @GetMapping("/all_questions_by_template/{templateId}")
+    @GetMapping("/suser_find_questions_by_template/{templateId}")
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
-        List<Question> questions = questionService.findQuestionsByTemplateId(templateId);
-        List<QuestionDTO> questionDTOs = questions.stream()
-                .map(questionTransformer::toDTO)
-                .collect(Collectors.toList());
+        List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);
         return questionDTOs;
     }
     @PostMapping("/saveTemporaryValues/{documentId}")

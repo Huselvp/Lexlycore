@@ -3,6 +3,7 @@ package com.iker.Lexly.service;
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,18 +11,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
+    private final QuestionTransformer questionTransformer;
     private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public QuestionService(ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public QuestionService( QuestionTransformer questionTransformer,ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
+        this.questionTransformer=questionTransformer;
         this.templateRepository=templateRepository;
         this.documentsRepository=documentsRepository;
         this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
@@ -61,9 +65,24 @@ public class QuestionService {
         });
     }
 
-    public List<Question> findQuestionsByTemplateId(Long templateId) {
-        return questionRepository.findByTemplateId(templateId);
+    public List<QuestionDTO> findQuestionsByTemplateId(Long templateId) {
+        List<Question> questions = questionRepository.findByTemplateId(templateId);
+        return questions.stream()
+                .map(this::mapQuestionToDTO)
+                .collect(Collectors.toList());
     }
+
+    private QuestionDTO mapQuestionToDTO(Question question) {
+        QuestionDTO questionDTOs = questionTransformer.toDTO(question);
+        if ("checkbox".equals(question.getValueType())) {
+            questionDTOs.setChoiceRelatedTextePairs(question.getChoices());
+        } else {
+            questionDTOs.setChoiceRelatedTextePairs(null);
+        }
+
+        return questionDTOs;
+    }
+
 
     public Question createQuestionByTemplateId(Long templateId, Question newQuestion) {
         Template template = templateRepository.findById(templateId)

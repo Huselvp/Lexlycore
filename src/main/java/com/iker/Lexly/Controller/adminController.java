@@ -163,14 +163,12 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/find_questions_by_template/{templateId}") // valide
+    @GetMapping("/find_questions_by_template/{templateId}")
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
-        List<Question> questions = questionService.findQuestionsByTemplateId(templateId);
-        List<QuestionDTO> questionDTOs = questions.stream()
-                .map(questionTransformer::toDTO)
-                .collect(Collectors.toList());
+        List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);
         return questionDTOs;
     }
+
     @PutMapping("/update_question/{id}") //valide
     public ResponseEntity<QuestionDTO> updateQuestion(
             @PathVariable Long id,
