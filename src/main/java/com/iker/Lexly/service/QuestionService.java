@@ -16,19 +16,19 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionService {
     private final QuestionRepository questionRepository;
+    private final TemplateService templateService;
     private final TemplateRepository templateRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final QuestionTransformer questionTransformer;
-    private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public QuestionService( QuestionTransformer questionTransformer,ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public QuestionService( TemplateService templateService,QuestionTransformer questionTransformer,ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
+        this.templateService=templateService;
         this.questionTransformer=questionTransformer;
         this.templateRepository=templateRepository;
         this.documentsRepository=documentsRepository;
-        this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
     }
 
@@ -40,7 +40,9 @@ public class QuestionService {
         return questionRepository.findById(questionId)
                 .orElse(null);
     }
-    public Question createQuestion(Question question) {
+    public Question createQuestion(QuestionDTO questionDTO, Long templateId) {
+        Template template = templateService.getTemplateById(templateId);
+        Question question = questionTransformer.toEntity(questionDTO);
         return questionRepository.save(question);
     }
     public Question updateQuestion(Long id, QuestionDTO questionDTO) {

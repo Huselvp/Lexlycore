@@ -15,6 +15,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
             question.setId(dto.getId());
             question.setQuestionText(dto.getQuestionText());
             question.setValueType(dto.getValueType());
+            question.setTexte(dto.getTexte());
             question.setDescription(dto.getDescription());
             question.setDescriptionDetails(dto.getDescriptionDetails());
             question.setChoices(dto.getChoiceRelatedTextePairs());

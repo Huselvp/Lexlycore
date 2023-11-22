@@ -149,20 +149,34 @@ public class adminController {
         return questionDTOs;
     }
     @PostMapping("/create_question/{templateId}")
-    public ResponseEntity<ApiResponse> createQuestion(@RequestBody Question question, @PathVariable Long templateId) {
-        if (questionService.doesQuestionExist(templateId, question.getQuestionText())) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Question with the same text already exists for this template.", null));
-        }
-        Template template = templateService.getTemplateById(templateId);
-        if (template != null) {
-            question.setTemplate(template);
-            Question createdQuestion = questionService.createQuestion(question);
-            ApiResponse response = new ApiResponse("Question created successfully", null);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<String> createQuestion(
+            @PathVariable Long templateId,
+            @RequestBody QuestionDTO request) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new RuntimeException("Template not found"));
+        Question question = questionTransformer.toEntity(request);
+        question.setTemplate(template);
+        question.setQuestionText(request.getQuestionText());
+        question.setValueType(request.getValueType());
+        question.setDescription(request.getDescription());
+        question.setTexte(request.getTexte());
+        question.setDescriptionDetails(request.getDescriptionDetails());
+
+        if ("checkbox".equals(request.getValueType())) {
+            if (request.getChoiceRelatedTextePairs() == null || request.getChoiceRelatedTextePairs().isEmpty()) {
+                return ResponseEntity.badRequest().body("Choices are required for a question with checkbox type");
+            }
+            question.setChoices(request.getChoiceRelatedTextePairs());
         } else {
-            return ResponseEntity.notFound().build();
+            question.setChoices(null);
         }
+
+        questionRepository.save(question);
+
+        return ResponseEntity.ok("Question created successfully");
     }
+
+
     @GetMapping("/find_questions_by_template/{templateId}")
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);
@@ -285,7 +299,6 @@ public class adminController {
             Question question = optionalQuestion.get();
             question.setQuestionText(request.getQuestionText());
             question.setValueType(request.getValueType());
-
             if ("checkbox".equals(request.getValueType())) {
                 question.setChoices(request.getChoices());
             } else {

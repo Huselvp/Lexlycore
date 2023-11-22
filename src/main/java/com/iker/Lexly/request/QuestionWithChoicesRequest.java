@@ -9,5 +9,10 @@ import java.util.List;
 public class QuestionWithChoicesRequest {
     private String questionText;
     private String valueType;
+    private String Description;
+    private String DescriptionDetails;
+    private String Texte;
     private List<ChoiceRelatedTextePair> choices;
+
+
 }

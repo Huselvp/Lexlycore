@@ -55,8 +55,8 @@ public class Question {
     public String getDescriptionDetails(){return DescriptionDetails;}
     public void setDescription(String Description){this.Description=Description;}
     public void setDescriptionDetails(String DescriptionDetails){this.DescriptionDetails=DescriptionDetails;}
-    public String  getTexte(){ return Texte;}
-    public String setTexte(String texte){return this.Texte=texte;}
+    public String getTexte(){ return Texte;}
+    public void setTexte(String texte){ this.Texte=texte;}
     public String getQuestionText() {
         return questionText;
     }

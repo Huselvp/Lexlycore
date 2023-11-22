@@ -13,6 +13,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class QuestionDTO {
     private Long id;
