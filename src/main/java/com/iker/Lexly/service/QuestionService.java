@@ -41,26 +41,38 @@ public class QuestionService {
         return questionRepository.findById(questionId)
                 .orElse(null);
     }
-    public Question createQuestion(QuestionDTO questionDTO, Long templateId) {
-        Template template = templateService.getTemplateById(templateId);
-        Question question = questionTransformer.toEntity(questionDTO);
-        return questionRepository.save(question);
-    }
+    @Transactional
     public Question updateQuestion(Long id, QuestionDTO questionDTO) {
         Optional<Question> existingQuestionOptional = questionRepository.findById(id);
+
         if (existingQuestionOptional.isPresent()) {
             Question existingQuestion = existingQuestionOptional.get();
-            existingQuestion.getDocumentQuestionValues().clear();
-            existingQuestion.setQuestionText(questionDTO.getQuestionText());
-            existingQuestion.setValueType(questionDTO.getValueType());
-            existingQuestion.setDescription(questionDTO.getDescription());
-            existingQuestion.setDescriptionDetails(questionDTO.getDescriptionDetails());
-            existingQuestion.setTexte(questionDTO.getTexte());
+            if (!"checkbox".equalsIgnoreCase(questionDTO.getValueType())) {
+                existingQuestion.getChoices().clear();
+            }
+            existingQuestion.setQuestionText(
+                    questionDTO.getQuestionText() != null ? questionDTO.getQuestionText() : existingQuestion.getQuestionText()
+            );
+            existingQuestion.setValueType(
+                    questionDTO.getValueType() != null ? questionDTO.getValueType() : existingQuestion.getValueType()
+            );
+            existingQuestion.setDescription(
+                    questionDTO.getDescription() != null ? questionDTO.getDescription() : existingQuestion.getDescription()
+            );
+            existingQuestion.setDescriptionDetails(
+                    questionDTO.getDescriptionDetails() != null ? questionDTO.getDescriptionDetails() : existingQuestion.getDescriptionDetails()
+            );
+            existingQuestion.setTexte(
+                    questionDTO.getTexte() != null ? questionDTO.getTexte() : existingQuestion.getTexte()
+            );
             return questionRepository.save(existingQuestion);
         } else {
             return null;
         }
     }
+
+
+
     public void deleteQuestion(Long questionId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionId);
         optionalQuestion.ifPresent(question -> {

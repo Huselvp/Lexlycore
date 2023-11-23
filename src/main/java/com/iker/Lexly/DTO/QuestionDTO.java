@@ -3,6 +3,7 @@ package com.iker.Lexly.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iker.Lexly.Entity.ChoiceRelatedTextePair;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,10 @@ public class QuestionDTO {
         this.descriptionDetails = descriptionDetails;
         this.choiceRelatedTextePairs=choiceRelatedTextePairs;
 
+    }
+    @JsonProperty("choiceRelatedTextePairs")
+    public List<ChoiceRelatedTextePair> getChoiceRelatedTextePairs() {
+        return "checkbox".equalsIgnoreCase(valueType) ? choiceRelatedTextePairs : null;
     }
 }
  
