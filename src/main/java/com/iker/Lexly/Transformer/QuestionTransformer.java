@@ -4,7 +4,7 @@ import com.iker.Lexly.Entity.Question;
 import org.springframework.stereotype.Component;
 
 @Component
-public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
+public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
 
     @Override
     public Question toEntity(QuestionDTO dto) {
@@ -22,20 +22,23 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO>{
             return question;
         }
     }
-    @Override
+
     public QuestionDTO toDTO(Question entity) {
         if (entity == null) {
             return null;
         } else {
-            return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(),entity.getTexte(),entity.getDescription(),entity.getDescriptionDetails(),entity.getChoices());
+            return new QuestionDTO(
+                    entity.getChoices(),
+                    entity.getId(),
+                    entity.getQuestionText(),
+                    entity.getValueType(),
+                    entity.getTexte(),
+                    entity.getDescription(),
+                    entity.getDescriptionDetails()
+            );
         }
     }
-        public QuestionDTO toDTOWithoutTemplate(Question entity) {
-            if (entity == null) {
-                return null;
-            } else {
-                return new QuestionDTO(entity.getId(), entity.getQuestionText(), entity.getValueType(), entity.getTexte(), entity.getDescription(), entity.getDescriptionDetails(), entity.getChoices());
-            }
-        }
-    }
+}
+
+
 

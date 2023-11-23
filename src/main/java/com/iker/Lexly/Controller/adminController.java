@@ -148,31 +148,17 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
+
     @PostMapping("/create_question/{templateId}")
-    public ResponseEntity<String> createQuestion(
+    public ResponseEntity<Question> createQuestion(
             @PathVariable Long templateId,
-            @RequestBody QuestionDTO request) {
+            @RequestBody Question request) {
         Template template = templateRepository.findById(templateId)
                 .orElseThrow(() -> new RuntimeException("Template not found"));
-        Question question = questionTransformer.toEntity(request);
-        question.setTemplate(template);
-        question.setQuestionText(request.getQuestionText());
-        question.setValueType(request.getValueType());
-        question.setDescription(request.getDescription());
-        question.setTexte(request.getTexte());
-        question.setDescriptionDetails(request.getDescriptionDetails());
-        if ("checkbox".equals(request.getValueType())) {
-            if (request.getChoiceRelatedTextePairs() == null || request.getChoiceRelatedTextePairs().isEmpty()) {
-                return ResponseEntity.badRequest().body("Choices are required for a question with checkbox type");
-            }
-            question.setChoices(request.getChoiceRelatedTextePairs());
-        } else {
-            question.setChoices(null);
-        }
-        questionRepository.save(question);
-
-        return ResponseEntity.ok("Question created successfully");
+        Question question = questionService.createQuestion(request, template);
+        return ResponseEntity.ok(question);
     }
+
     @GetMapping("/find_questions_by_template/{templateId}")
     public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);

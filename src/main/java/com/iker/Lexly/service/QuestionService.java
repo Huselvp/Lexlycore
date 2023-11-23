@@ -6,6 +6,7 @@ import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -122,4 +123,15 @@ public class QuestionService {
     public boolean doesQuestionExist(Long templateId, String questionText) {
         return questionRepository.existsByTemplateIdAndQuestionText(templateId, questionText);
     }
+
+    @Transactional
+    public Question createQuestion(Question question, Template template) {
+        if (questionRepository.existsByQuestionText(question.getQuestionText())) {
+            throw new IllegalArgumentException("Question with the same text already exists");
+        }
+        Question savedQuestion = questionRepository.save(question);
+        savedQuestion.setTemplate(template);
+        return questionRepository.save(savedQuestion);
+    }
+
 }

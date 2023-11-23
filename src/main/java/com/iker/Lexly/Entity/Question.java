@@ -1,15 +1,11 @@
 package com.iker.Lexly.Entity;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.iker.Lexly.DTO.ChoiceRelatedTextePairDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 @Entity
 @Table(name = "question")
 public class Question {
@@ -21,15 +17,20 @@ public class Question {
     @NotNull
     @Column(name = "question_text")
     private String questionText;
-    @Column(name="Description")
+    @Column(name="description")
+    @JsonProperty("Description")
     private String Description;
-    @Column(name="Description-Details")
+    @Column(name="description_details")
+    @JsonProperty("description_details")
     private String DescriptionDetails;
     @Column(name= "value_type")
+    @NotNull
     private String valueType;
     @Column(name= "text_area")
+    @JsonProperty("text_area")
     private String Texte;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<ChoiceRelatedTextePair> choices;
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
@@ -46,15 +47,17 @@ public class Question {
     public void setId(Long id) {
         this.id = id;
     }
-    public Template getTemplates() {
-        return template;
-    }
     public String getValueType(){return valueType;}
     public void setValueType(String valueType){this.valueType=valueType;}
     public String getDescription(){return  Description;}
     public String getDescriptionDetails(){return DescriptionDetails;}
     public void setDescription(String Description){this.Description=Description;}
-    public void setDescriptionDetails(String DescriptionDetails){this.DescriptionDetails=DescriptionDetails;}
+    public void setDescriptionDetails(String DescriptionDetails) {
+        System.out.println("Setting DescriptionDetails: " + DescriptionDetails);
+        this.DescriptionDetails = DescriptionDetails;
+        System.out.println("DescriptionDetails after setting: " + this.DescriptionDetails);
+    }
+
     public String getTexte(){ return Texte;}
     public void setTexte(String texte){ this.Texte=texte;}
     public String getQuestionText() {

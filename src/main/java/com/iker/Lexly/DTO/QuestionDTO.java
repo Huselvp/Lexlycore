@@ -12,16 +12,14 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+
 public class QuestionDTO {
     private Long id;
     private String questionText;
     private String valueType;
-    private String Texte;
-    private String Description;
-    private String DescriptionDetails;
+    private String texte;
+    private String description;
+    private String descriptionDetails;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonIgnoreProperties("questionDto")
     private List<ChoiceRelatedTextePair> choiceRelatedTextePairs;
@@ -30,9 +28,9 @@ public class QuestionDTO {
         this.id = id;
         this.questionText = questionText;
         this.valueType = valueType;
-        this.Texte = texte;
-        this.Description = description;
-        this.DescriptionDetails = descriptionDetails;
+        this.texte = texte;
+        this.description = description;
+        this.descriptionDetails = descriptionDetails;
         this.choiceRelatedTextePairs=choiceRelatedTextePairs;
 
     }
