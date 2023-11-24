@@ -13,6 +13,7 @@ import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -266,7 +268,6 @@ public class adminController {
 
         return ResponseEntity.ok(categories);
     }
-
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(
             @PathVariable Long questionId,
@@ -278,67 +279,78 @@ public class adminController {
 
         String[] choices = question.getValueType().split("/");
         int maxChoiceId = 0;
-
-        // Find the maximum choiceId in existing choices
-        for (int i = 1; i < choices.length; i += 2) {
+        for (int i = 1; i < choices.length; i += 4) {
             int currentChoiceId = Integer.parseInt(choices[i]);
             maxChoiceId = Math.max(maxChoiceId, currentChoiceId);
         }
-
-        // Increment the choiceId for the new choice
         int newChoiceId = maxChoiceId + 1;
 
-        String newChoice = newChoiceId + "/" + choiceUpdate.getNewRelatedText();
+        String newChoice = newChoiceId + "/" + choiceUpdate.getNewRelatedText() + "/" + choiceUpdate.getChoice();
         question.setValueType(question.getValueType() + "/" + newChoice);
         questionRepository.save(question);
 
         return ResponseEntity.ok().build();
     }
-
-
-    @PostMapping("update-choice-question/{questionId}")
+    @PutMapping("update-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> updateChoiceInQuestion(
             @PathVariable Long questionId,
-            @RequestBody ChoiceUpdate choiceUpdateDTO) {
-        int choiceId = choiceUpdateDTO.getChoiceId();
-        String newRelatedText = choiceUpdateDTO.getNewRelatedText();
-        Question question = questionService.getQuestionById(questionId);
-        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox/")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String[] choices = question.getValueType().split("/");
-        int index = -1;
-        for (int i = 1; i < choices.length; i += 2) {
-            if (Integer.parseInt(choices[i]) == choiceId) {
-                index = i;
-                break;
-            }
-        }
-        if (index != -1 && index + 1 < choices.length) {
-            choices[index + 1] = newRelatedText;
-            question.setValueType(String.join("/", choices));
-            questionRepository.save(question);
-        }
-        return ResponseEntity.ok().build();
-    }
-    @DeleteMapping("delete-choice-question/{questionId}/{choiceId}")
-    public ResponseEntity<Void> deleteChoiceInQuestion(
-            @PathVariable Long questionId,
-            @PathVariable int choiceId) {
+            @PathVariable Integer choiceId,
+            @RequestBody ChoiceUpdate choiceUpdate) {
         Question question = questionService.getQuestionById(questionId);
         if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
             return ResponseEntity.badRequest().build();
         }
         String[] choices = question.getValueType().split("/");
-        List<String> updatedChoices = new ArrayList<>();
-        for (int i = 1; i < choices.length; i += 2) {
-            String currentChoiceIdStr = choices[i - 1];
-            if (!currentChoiceIdStr.equals("checkbox") && Integer.parseInt(currentChoiceIdStr) != choiceId) {
-                updatedChoices.add(currentChoiceIdStr);
-                updatedChoices.add(choices[i]);
+        System.out.println("this is the valueType" +question.getValueType());
+        boolean choiceFound = false;
+        for (int i = 1; i < choices.length; i += 4) {
+            int currentChoiceId = Integer.parseInt(choices[i]);
+            if (currentChoiceId == choiceId) {
+                choices[i + 1] = choiceUpdate.getNewRelatedText();
+                choices[i + 2] = choiceUpdate.getChoice();
+                choiceFound = true;
+                break;
             }
         }
-        question.setValueType("checkbox/" + String.join("/", updatedChoices));
+        if (!choiceFound) {
+            return ResponseEntity.notFound().build();
+        }
+        String updatedValueType = String.join("/", choices);
+        question.setValueType(updatedValueType);
+        System.out.println("this is the updated valueType" +updatedValueType);
+        questionRepository.save(question);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("delete-choice/{questionId}/{choiceId}")
+    public ResponseEntity<Void> deleteChoiceFromQuestion(
+            @PathVariable Long questionId,
+            @PathVariable Integer choiceId) {
+        Question question = questionService.getQuestionById(questionId);
+        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String[] choices = question.getValueType().split("/");
+        boolean choiceFound = false;
+        for (int i = 1; i < choices.length; i += 4) {
+            int currentChoiceId = Integer.parseInt(choices[i]);
+            if (currentChoiceId == choiceId) {
+                if (i + 4 < choices.length) {
+                    System.arraycopy(choices, i + 4, choices, i, choices.length - (i + 4));
+                } else {
+                    choices = Arrays.copyOf(choices, i);
+                }
+                choiceFound = true;
+                break;
+            }
+        }
+        if (!choiceFound) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String updatedValueType = String.join("/", choices);
+        question.setValueType(updatedValueType);
         questionRepository.save(question);
 
         return ResponseEntity.ok().build();
