@@ -24,7 +24,7 @@ public class QuestionService {
     private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public QuestionService( TemplateService templateService,QuestionTransformer questionTransformer,ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public QuestionService( TemplateService templateService,QuestionTransformer questionTransformer,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
         this.templateService=templateService;
         this.questionTransformer=questionTransformer;
@@ -47,9 +47,7 @@ public class QuestionService {
 
         if (existingQuestionOptional.isPresent()) {
             Question existingQuestion = existingQuestionOptional.get();
-            if (!"checkbox".equalsIgnoreCase(questionDTO.getValueType())) {
-                existingQuestion.getChoices().clear();
-            }
+
             existingQuestion.setQuestionText(
                     questionDTO.getQuestionText() != null ? questionDTO.getQuestionText() : existingQuestion.getQuestionText()
             );
@@ -80,23 +78,9 @@ public class QuestionService {
         });
     }
 
-    public List<QuestionDTO> findQuestionsByTemplateId(Long templateId) {
-        List<Question> questions = questionRepository.findByTemplateId(templateId);
-        return questions.stream()
-                .map(this::mapQuestionToDTO)
-                .collect(Collectors.toList());
-    }
 
-    private QuestionDTO mapQuestionToDTO(Question question) {
-        QuestionDTO questionDTOs = questionTransformer.toDTO(question);
-        if ("checkbox".equals(question.getValueType())) {
-            questionDTOs.setChoiceRelatedTextePairs(question.getChoices());
-        } else {
-            questionDTOs.setChoiceRelatedTextePairs(null);
-        }
 
-        return questionDTOs;
-    }
+
 
 
     public Question createQuestionByTemplateId(Long templateId, Question newQuestion) {

@@ -2,11 +2,9 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.CategoryTransformer;
-import com.iker.Lexly.repository.ChoicesRelatedTexteRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.request.ChoiceUpdate;
-import com.iker.Lexly.request.QuestionWithChoicesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -15,7 +13,6 @@ import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -36,8 +33,6 @@ public class adminController {
     private final UserTransformer userTransformer;
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
-    private final ChoiceRelatedTextePairsService choiceRelatedTextePairsService;
-    private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     @Autowired
@@ -48,10 +43,9 @@ public class adminController {
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public adminController(ChoicesRelatedTexteRepository choicesRelatedTexteRepository, ChoiceRelatedTextePairsService choiceRelatedTextePairsService, TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController( TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
-        this.choicesRelatedTexteRepository = choicesRelatedTexteRepository;
-        this.choiceRelatedTextePairsService = choiceRelatedTextePairsService;
+
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
@@ -178,8 +172,8 @@ public class adminController {
     }
 
     @GetMapping("/find_questions_by_template/{templateId}")
-    public List<QuestionDTO> findQuestionsByTemplateId(@PathVariable Long templateId) {
-        List<QuestionDTO> questionDTOs = questionService.findQuestionsByTemplateId(templateId);
+    public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
+        List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
 
@@ -229,12 +223,7 @@ public class adminController {
         }
     }
 
-    @DeleteMapping("/delete_question_with_choices/{id}")
-    public ResponseEntity<String> deleteQuestionWithChoices(@PathVariable Long id) {
-        choiceRelatedTextePairsService.deleteChoicesByQuestionId(id);
-        questionService.deleteQuestion(id);
-        return ResponseEntity.ok("Question with ID " + id + " and its choices have been deleted successfully.");
-    }
+
 
     @DeleteMapping("delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {

@@ -29,9 +29,6 @@ public class Question {
     @Column(name= "text_area")
     @JsonProperty("text_area")
     private String Texte;
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<ChoiceRelatedTextePair> choices;
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
@@ -79,17 +76,5 @@ public class Question {
     public void setDocumentQuestionValues(List<DocumentQuestionValue> documentQuestionValues) {
         this.documentQuestionValues = documentQuestionValues;
     }
-    public void addChoice(ChoiceRelatedTextePair choice) {
-        if (choices == null) {
-            choices = new ArrayList<>();
-        }
-        choices.add(choice);
-        choice.setQuestion(this);
-    }
-    public List<ChoiceRelatedTextePair> getChoices() {
-        return choices;
-    }
-    public void setChoices(List<ChoiceRelatedTextePair> choices) {
-        this.choices = choices;
-    }
+
 }

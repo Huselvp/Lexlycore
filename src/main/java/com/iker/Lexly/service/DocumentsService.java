@@ -32,14 +32,12 @@ public class DocumentsService {
     private final UserRepository userRepository;
     private final TemplateRepository templateRepository;
     private final QuestionRepository questionRepository;
-private final ChoicesRelatedTexteRepository choicesRelatedTexteRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
 
     @Autowired
-    public DocumentsService( ChoicesRelatedTexteRepository choicesRelatedTexteRepository,DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository) {
+    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
-this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -188,7 +186,7 @@ this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
                 if ("checkbox".equals(question.getValueType())) {
-                    Texte = replaceCheckboxValues(Texte, question.getChoices(), documentQuestionValues);
+                 //   Texte = replaceCheckboxValues(Texte, question.getChoices(), documentQuestionValues);
                 } else {
                     Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
                 }
@@ -203,19 +201,7 @@ this.choicesRelatedTexteRepository=choicesRelatedTexteRepository;
                 .anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
     }
 
-    private String replaceCheckboxValues(String questionText, List<ChoiceRelatedTextePair> choices, List<DocumentQuestionValue> documentQuestionValues) {
-        for (ChoiceRelatedTextePair pair : choices) {
-            // Check if the choice is selected in the documentQuestionValues list
-            Optional<DocumentQuestionValue> selectedChoice = documentQuestionValues.stream()
-                    .filter(dqv -> dqv.getQuestion().getId().equals(pair.getQuestion().getId()))
-                    .findFirst();
-            // If the choice is selected, replace the checkbox placeholder with the related text
-            if (selectedChoice.isPresent() && selectedChoice.get().getValue() != null && selectedChoice.get().getValue().equals(pair.getChoice())) {
-                questionText = questionText.replace("[" + pair.getChoice() + "]", pair.getRelatedTexte());
-            }
-        }
-        return questionText;
-    }
+
     private String replaceValues(String Texte, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
         for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
             if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
