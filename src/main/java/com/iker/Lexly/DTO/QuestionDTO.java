@@ -25,7 +25,7 @@ public class QuestionDTO {
     @JsonIgnoreProperties("questionDto")
     private List<ChoiceRelatedTextePair> choiceRelatedTextePairs;
 
-    public QuestionDTO( List<ChoiceRelatedTextePair> choiceRelatedTextePairs,Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
+    public QuestionDTO( Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
         this.id = id;
         this.questionText = questionText;
         this.valueType = valueType;

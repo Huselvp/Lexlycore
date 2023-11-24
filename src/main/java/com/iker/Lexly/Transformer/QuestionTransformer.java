@@ -28,7 +28,6 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
             return null;
         } else {
             return new QuestionDTO(
-                    entity.getChoices(),
                     entity.getId(),
                     entity.getQuestionText(),
                     entity.getValueType(),

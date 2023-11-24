@@ -12,7 +12,7 @@ public class ChoiceRelatedTextePair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     @JsonIgnore
     private Question question;
@@ -52,5 +52,12 @@ public class ChoiceRelatedTextePair {
 
     public Long getId() {
         return id;
+    }
+
+    public void setQuestionId(Long questionId) {
+        if (this.question == null) {
+            this.question = new Question();
+        }
+        this.question.setId(questionId);
     }
 }
