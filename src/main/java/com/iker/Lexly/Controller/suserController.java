@@ -14,10 +14,13 @@ import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,21 +34,24 @@ public class suserController {
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
+    private final DocumentQuestionValueService documentQuestionValueService;
     private final QuestionTransformer questionTransformer;
-private final PDFGenerationService pdfGenerationService;
+    private final PDFGenerationService pdfGenerationService;
 
     @Autowired
-    public suserController(DocumentQuestionValueRepository documentQuestionValueRepository,QuestionRepository questionRepository,PDFGenerationService pdfGenerationService,QuestionTransformer questionTransformer,DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController(DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
-        this.documentQuestionValueRepository=documentQuestionValueRepository;
-        this.questionRepository=questionRepository;
+        this.documentQuestionValueService = documentQuestionValueService;
+        this.documentQuestionValueRepository = documentQuestionValueRepository;
+        this.questionRepository = questionRepository;
         this.questionTransformer = questionTransformer;
-        this.pdfGenerationService=pdfGenerationService;
+        this.pdfGenerationService = pdfGenerationService;
         this.documentsService = documentsService;
         this.questionService = questionService;
         this.templateService = templateService;
 
     }
+
     @GetMapping("/user_all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -54,10 +60,12 @@ private final PDFGenerationService pdfGenerationService;
                 .collect(Collectors.toList());
         return templateDTOs;
     }
+
     @GetMapping("/get_documents/{userId}")
     public List<DocumentsDTO> getDocumentsByUserId(@PathVariable String userId) {
         return documentsService.getDocumentsByUserId(Long.valueOf(userId));
     }
+
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
@@ -68,19 +76,22 @@ private final PDFGenerationService pdfGenerationService;
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PostMapping("/createDocument/{templateId}")
     public ApiResponseDocuments createNewDocument(@PathVariable Long templateId) {
         ApiResponseDocuments response = documentsService.createNewDocument(templateId);
         return response;
     }
+
     @GetMapping("/suser_find_questions_by_template/{templateId}")
     public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
-        List<Question> questionDTOs =questionRepository.findByTemplateId(templateId);
+        List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
+
     @PostMapping("/saveTemporaryValues/{documentId}")
     public ApiResponse saveTemporaryValues(
-            @PathVariable   Long documentId,
+            @PathVariable Long documentId,
             @RequestBody List<Long> questionIds,
             @RequestBody List<String> values
     ) {
@@ -98,9 +109,10 @@ private final PDFGenerationService pdfGenerationService;
         }
         return new ApiResponse("Temporary values saved successfully.", null);
     }
+
     @PutMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
-        ApiResponse response = documentsService.updateValueandSave(request);
+        ApiResponse response = documentsService.addOrUpdateValue(request);
         return response;
     }
 
@@ -110,27 +122,20 @@ private final PDFGenerationService pdfGenerationService;
         ApiResponse response = documentsService.completeDocument(documentId);
         return response;
     }
+
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
 
-    @GetMapping("/generate-pdf")
-    public ResponseEntity<String> generatePdf(@RequestParam Long documentId, @RequestParam Long templateId) {
-        List<Question> questions = questionRepository.findByTemplateId(templateId);
-        List<DocumentQuestionValue> documentQuestionValues =documentQuestionValueRepository.findByDocumentId(documentId);
-        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
-        String outputFilePath = "document.pdf";
-        documentsService.generatePdfFromText(concatenatedText, outputFilePath);
-        return ResponseEntity.ok("PDF generated successfully");
-    }
+
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
         Long templateId = requestData.getTemplateId();
-        System.out.println("id doc"+requestData.getDocumentId());
-        System.out.println("id template"+requestData.getTemplateId());
+        System.out.println("id doc" + requestData.getDocumentId());
+        System.out.println("id template" + requestData.getTemplateId());
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
         String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
@@ -138,7 +143,31 @@ private final PDFGenerationService pdfGenerationService;
         return ResponseEntity.ok(concatenatedText);
     }
 
+    @GetMapping("/generate-pdf/{documentId}/{templateId}")
+    public ResponseEntity<byte[]> generatePdf(
+            @PathVariable Long documentId,
+            @PathVariable Long templateId) {
+        List<Question> questions = questionRepository.findByTemplateId(templateId);
+        List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
+        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
 
+        String outputFilePath = "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf";
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            byte[] pdfContent = documentsService.generatePdfFromText(concatenatedText, outputStream);
+            if (pdfContent.length > 0) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_PDF);
+                headers.setContentDispositionFormData("attachment", outputFilePath);
+                return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed".getBytes());
+            }
+        } catch (Exception e) {
+            // Handle the exception and return an error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error generating PDF: " + e.getMessage()).getBytes());
+        }
+    }
 }
 
 

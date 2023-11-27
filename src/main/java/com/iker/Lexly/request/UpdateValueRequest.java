@@ -3,6 +3,7 @@ package com.iker.Lexly.request;
 public class UpdateValueRequest {
     private Long documentId;
     private Long questionId;
+    private int selectedChoiceId;
     private String value;
 
     public Long getDocumentId() {
@@ -15,6 +16,13 @@ public class UpdateValueRequest {
 
     public Long getQuestionId() {
         return questionId;
+    }
+    public int getSelectedChoiceId() {
+        return selectedChoiceId;
+    }
+
+    public void setSelectedChoiceId(int selectedChoiceId) {
+        this.selectedChoiceId = selectedChoiceId;
     }
 
     public void setQuestionId(Long questionId) {

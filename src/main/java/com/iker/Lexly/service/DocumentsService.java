@@ -1,8 +1,6 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
-import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.DocumentCreateRequest;
@@ -16,17 +14,17 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class DocumentsService {
     private final DocumentsRepository documentsRepository;
     private final UserRepository userRepository;
@@ -149,28 +147,45 @@ public class DocumentsService {
         }
     }
 
-    public ApiResponse updateValueandSave(UpdateValueRequest request) {
+    public ApiResponse addOrUpdateValue(UpdateValueRequest request) {
         Long documentId = request.getDocumentId();
         Long questionId = request.getQuestionId();
+        int selectedChoiceId = request.getSelectedChoiceId();
         String value = request.getValue();
+
         Documents document = documentsRepository.findById(documentId).orElse(null);
         Question question = questionRepository.findById(questionId).orElse(null);
-
         if (document != null && question != null) {
-            DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
+            if (question.getValueType() != null && question.getValueType().startsWith("checkbox/")) {
+                String[] choices = question.getValueType().split("/");
+                if (selectedChoiceId >= 1 && selectedChoiceId <= choices.length - 3) {
+                    String relatedText = choices[selectedChoiceId * 3 - 1];
+                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
+                    documentQuestionValue.setDocument(document);
+                    documentQuestionValue.setQuestion(question);
+                    documentQuestionValue.setValue(relatedText);
+                    documentQuestionValueRepository.save(documentQuestionValue);
 
-            if (existingValue != null) {
-                existingValue.setValue(value);
-                System.out.println("the value is " + value);
-                documentQuestionValueRepository.save(existingValue);
-                return new ApiResponse("Value updated successfully.", null);
+                    return new ApiResponse("Value added and saved successfully.", null);
+                } else {
+                    return new ApiResponse("Invalid choice ID.", null);
+                }
             } else {
-                DocumentQuestionValue newValue = new DocumentQuestionValue();
-                newValue.setDocument(document);
-                newValue.setQuestion(question);
-                newValue.setValue(value);
-                documentQuestionValueRepository.save(newValue);
-                return new ApiResponse("Value added and saved successfully.", null);
+                // Handle non-checkbox case
+                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
+
+                if (existingValue != null) {
+                    existingValue.setValue(value);
+                    documentQuestionValueRepository.save(existingValue);
+                    return new ApiResponse("Value updated successfully.", null);
+                } else {
+                    DocumentQuestionValue newValue = new DocumentQuestionValue();
+                    newValue.setDocument(document);
+                    newValue.setQuestion(question);
+                    newValue.setValue(value);
+                    documentQuestionValueRepository.save(newValue);
+                    return new ApiResponse("Value added and saved successfully.", null);
+                }
             }
         } else {
             return new ApiResponse("Document or question not found.", null);
@@ -185,11 +200,7 @@ public class DocumentsService {
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
-                if ("checkbox".equals(question.getValueType())) {
-                 //   Texte = replaceCheckboxValues(Texte, question.getChoices(), documentQuestionValues);
-                } else {
                     Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
-                }
                 concatenatedText.append(Texte).append(" ");
             }
         }
@@ -217,24 +228,40 @@ public class DocumentsService {
     }
 
 
-    public void generatePdfFromText(String text, String outputFilePath) {
+    public byte[] generatePdfFromText(String text, ByteArrayOutputStream outputStream) {
         try {
             PDDocument document = new PDDocument();
-            PDPage page = new PDPage(PDRectangle.A4);
-            document.addPage(page);
+            PDPage dummyPage = new PDPage();
+            document.addPage(dummyPage);
 
+            PDPageContentStream dummyContentStream = new PDPageContentStream(document, dummyPage);
+            dummyContentStream.setFont(PDType1Font.HELVETICA, 12);
+            dummyContentStream.beginText();
+            dummyContentStream.newLineAtOffset(50, 700);
+            dummyContentStream.showText(text);
+            dummyContentStream.endText();
+            dummyContentStream.close();
+
+            float textHeight = 12;
+            float textWidth = PDType1Font.HELVETICA.getStringWidth(text) / 1000 * 12;
+            PDPage page = new PDPage(new PDRectangle(textWidth + 100, textHeight + 100));
+            document.addPage(page);
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
             contentStream.setFont(PDType1Font.HELVETICA, 12);
             contentStream.beginText();
-            contentStream.newLineAtOffset(50, 700);
+            contentStream.newLineAtOffset(50, 50);
             contentStream.showText(text);
             contentStream.endText();
             contentStream.close();
 
-            document.save(outputFilePath);
+            document.save(outputStream);
             document.close();
+
+            return outputStream.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
+
+            return new byte[0];
         }
     }
 
