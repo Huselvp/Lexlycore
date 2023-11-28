@@ -13,8 +13,11 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 
 import java.io.ByteArrayOutputStream;
@@ -201,7 +204,9 @@ public class DocumentsService {
             if (question.getTemplate().getId().equals(templateId)) {
                 String Texte = question.getTexte();
                     Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
-                concatenatedText.append(Texte).append(" ");
+                Document document = Jsoup.parse(Texte);
+                String manipulatedText = document.html();
+                concatenatedText.append(manipulatedText).append(" ");
             }
         }
         return concatenatedText.toString().trim();
@@ -264,6 +269,23 @@ public class DocumentsService {
             return new byte[0];
         }
     }
+    public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
+        try {
+            String wellFormedXml = "<div>" + html + "</div>";
+
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(wellFormedXml);
+            renderer.layout();
+            renderer.createPDF(outputStream);
+            renderer.finishPDF();
+
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
 
 }
 

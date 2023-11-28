@@ -146,15 +146,17 @@ public class suserController {
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,
-            @PathVariable Long templateId) {
-        List<Question> questions = questionRepository.findByTemplateId(templateId);
-        List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
-
+            @PathVariable Long templateId,
+            @RequestParam(required = false) String htmlContent) {
+        if (htmlContent == null) {
+            List<Question> questions = questionRepository.findByTemplateId(templateId);
+            List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
+            htmlContent = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+        }
         String outputFilePath = "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf";
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            byte[] pdfContent = documentsService.generatePdfFromText(concatenatedText, outputStream);
+            byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
             if (pdfContent.length > 0) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_PDF);
@@ -164,10 +166,10 @@ public class suserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed".getBytes());
             }
         } catch (Exception e) {
-            // Handle the exception and return an error response
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error generating PDF: " + e.getMessage()).getBytes());
         }
     }
+
 }
 
 
