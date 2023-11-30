@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
@@ -276,15 +278,15 @@ public class adminController {
         if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
             return ResponseEntity.badRequest().build();
         }
+        Pattern pattern = Pattern.compile("(\\d+)/[^/]+/[^/]+");
+        Matcher matcher = pattern.matcher(question.getValueType());
 
-        String[] choices = question.getValueType().split("/");
-        int maxChoiceId = 0;
-        for (int i = 1; i < choices.length; i += 4) {
-            int currentChoiceId = Integer.parseInt(choices[i]);
-            maxChoiceId = Math.max(maxChoiceId, currentChoiceId);
+        List<Integer> choiceIds = new ArrayList<>();
+        while (matcher.find()) {
+            choiceIds.add(Integer.parseInt(matcher.group(1)));
         }
+        int maxChoiceId = choiceIds.stream().max(Integer::compare).orElse(0);
         int newChoiceId = maxChoiceId + 1;
-
         String newChoice = newChoiceId + "/" + choiceUpdate.getNewRelatedText() + "/" + choiceUpdate.getChoice();
         question.setValueType(question.getValueType() + "/" + newChoice);
         questionRepository.save(question);
@@ -300,63 +302,77 @@ public class adminController {
         if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
             return ResponseEntity.badRequest().build();
         }
-        String[] choices = question.getValueType().split("/");
-        System.out.println("this is the valueType" +question.getValueType());
+        Pattern pattern = Pattern.compile("(\\d+)/([^/]+)/([^/]+)");
+        Matcher matcher = pattern.matcher(question.getValueType());
+        StringBuilder updatedValueType = new StringBuilder();
         boolean choiceFound = false;
-        for (int i = 1; i < choices.length; i += 4) {
-            int currentChoiceId = Integer.parseInt(choices[i]);
+        while (matcher.find()) {
+            int currentChoiceId = Integer.parseInt(matcher.group(1));
             if (currentChoiceId == choiceId) {
-                choices[i + 1] = choiceUpdate.getNewRelatedText();
-                choices[i + 2] = choiceUpdate.getChoice();
+                String updatedChoice = String.format("%d/%s/%s",
+                        currentChoiceId,
+                        choiceUpdate.getNewRelatedText(),
+                        choiceUpdate.getChoice());
+
+                updatedValueType.append(updatedChoice);
                 choiceFound = true;
-                break;
+            } else {
+                updatedValueType.append(matcher.group(0));
             }
+
+            updatedValueType.append("/");
         }
+
         if (!choiceFound) {
             return ResponseEntity.notFound().build();
         }
-        String updatedValueType = String.join("/", choices);
-        question.setValueType(updatedValueType);
-        System.out.println("this is the updated valueType" +updatedValueType);
+        String finalUpdatedValueType = updatedValueType.toString().replaceAll("/$", "");
+        question.setValueType(finalUpdatedValueType);
         questionRepository.save(question);
         return ResponseEntity.ok().build();
     }
+
 
     @DeleteMapping("delete-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> deleteChoiceFromQuestion(
             @PathVariable Long questionId,
             @PathVariable Integer choiceId) {
-        Question question = questionService.getQuestionById(questionId);
-        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String[] choices = question.getValueType().split("/");
-        boolean choiceFound = false;
-        for (int i = 1; i < choices.length; i += 4) {
-            int currentChoiceId = Integer.parseInt(choices[i]);
-            if (currentChoiceId == choiceId) {
-                if (i + 4 < choices.length) {
-                    System.arraycopy(choices, i + 4, choices, i, choices.length - (i + 4));
-                } else {
-                    choices = Arrays.copyOf(choices, i);
-                }
-                choiceFound = true;
-                break;
+        try {
+            Question question = questionService.getQuestionById(questionId);
+            if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
+                System.out.println("Bad request: Invalid questionId or valueType");
+                return ResponseEntity.badRequest().build();
             }
-        }
-        if (!choiceFound) {
-            return ResponseEntity.notFound().build();
-        }
+            Pattern pattern = Pattern.compile("(\\d+)/([^/]+)/([^/]+)");
+            Matcher matcher = pattern.matcher(question.getValueType());
 
-        String updatedValueType = String.join("/", choices);
-        question.setValueType(updatedValueType);
-        questionRepository.save(question);
+            StringBuilder updatedValueType = new StringBuilder();
+            boolean choiceFound = false;
 
+            while (matcher.find()) {
+                int currentChoiceId = Integer.parseInt(matcher.group(1));
+
+                if (currentChoiceId == choiceId) {
+                    choiceFound = true;
+                } else {
+                    updatedValueType.append(matcher.group(0));
+                    updatedValueType.append("/");
+                }
+            }
+            if (!choiceFound) {
+                System.out.println("Choice with choiceId=" + choiceId + " not found for questionId=" + questionId);
+                return ResponseEntity.notFound().build();
+            }
+            String finalUpdatedValueType = updatedValueType.toString().replaceAll("/$", "");
+            question.setValueType(finalUpdatedValueType);
+            questionRepository.save(question);
+            System.out.println("Choice deleted successfully for questionId=" + questionId + ", choiceId=" + choiceId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return ResponseEntity.ok().build();
     }
-
-
 
 }
 
