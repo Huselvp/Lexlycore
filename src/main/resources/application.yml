@@ -15,3 +15,9 @@ spring:
 
 server:
   port: 8080
+paypal:
+  mode: sandbox
+  client:
+    id: AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS
+    secret: EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL
+
