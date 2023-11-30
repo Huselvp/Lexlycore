@@ -21,3 +21,5 @@ paypal:
     id: AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS
     secret: EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL
 
+app:
+  firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
