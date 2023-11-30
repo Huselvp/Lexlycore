@@ -45,11 +45,6 @@ public class FCMService {
                 .build();
     }
 
-    private Message getPreconfiguredMessageWithoutData(PushNotificationRequest request) {
-        return getPreconfiguredMessageBuilder(request).setTopic(request.getTopic())
-                .build();
-    }
-
     private Message getPreconfiguredMessageWithData(Map<String, String> data, PushNotificationRequest request) {
         return getPreconfiguredMessageBuilder(request).putAllData(data).setToken(request.getToken())
                 .build();

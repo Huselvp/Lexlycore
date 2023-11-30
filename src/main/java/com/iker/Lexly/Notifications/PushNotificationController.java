@@ -21,5 +21,4 @@ public class PushNotificationController {
         System.out.println("princr");
         return new ResponseEntity<>(new PushNotificationResponse(HttpStatus.OK.value(), "Notification has been sent."), HttpStatus.OK);
     }
-
 }
