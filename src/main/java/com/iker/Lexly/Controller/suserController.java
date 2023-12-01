@@ -129,38 +129,43 @@ public class suserController {
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
 
-
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
         Long templateId = requestData.getTemplateId();
-        System.out.println("id doc" + requestData.getDocumentId());
-        System.out.println("id template" + requestData.getTemplateId());
+
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-        String concatenatedText = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+
+        String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
+
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
-
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,
             @PathVariable Long templateId,
             @RequestParam(required = false) String htmlContent) {
+
         if (htmlContent == null) {
             List<Question> questions = questionRepository.findByTemplateId(templateId);
             List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-            htmlContent = documentsService.DocumentProcess(questions, documentId, templateId, documentQuestionValues);
+            String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
+
+            // Replace self-closing <br> tags with <br></br>
+            concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
+
+            htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
         }
-        String outputFilePath = "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf";
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
+
             if (pdfContent.length > 0) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_PDF);
-                headers.setContentDispositionFormData("attachment", outputFilePath);
+                headers.setContentDispositionFormData("attachment", "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf");
                 return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed".getBytes());

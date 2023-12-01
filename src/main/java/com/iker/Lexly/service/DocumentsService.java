@@ -8,11 +8,6 @@ import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import jakarta.transaction.Transactional;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +16,6 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -194,83 +188,51 @@ public class DocumentsService {
             return new ApiResponse("Document or question not found.", null);
         }
     }
-
-    public String DocumentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
+    public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
         }
-        StringBuilder concatenatedText = new StringBuilder();
+
+        Document mainDocument = Jsoup.parse("<div></div>"); // Initialize an empty document
+
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
-                String Texte = question.getTexte();
-                    Texte = replaceValues(Texte, question.getId(), documentQuestionValues);
-                Document document = Jsoup.parse(Texte);
-                String manipulatedText = document.html();
-                concatenatedText.append(manipulatedText).append(" ");
+                String text = question.getTexte();
+                text = replaceValues(text, question.getId(), documentQuestionValues);
+                Document questionDocument = Jsoup.parseBodyFragment(text);
+
+                // Append each child of questionDocument's body to the mainDocument's body
+                for (org.jsoup.nodes.Node child : questionDocument.body().childNodes()) {
+                    mainDocument.body().appendChild(child.clone()); // Use clone() to avoid DOM node ownership issues
+                }
             }
         }
-        return concatenatedText.toString().trim();
+
+        return mainDocument.html().trim();
     }
+
 
     private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
-        return documentQuestionValues.stream()
-                .anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
+        return documentQuestionValues.stream().anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
     }
 
-
-    private String replaceValues(String Texte, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
+    private String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
         for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
             if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
                 if (documentQuestionValue.getValue() != null) {
-                    Texte = Texte.replace("[value]", documentQuestionValue.getValue());
+                    text = text.replace("[value]", documentQuestionValue.getValue());
                 } else {
-                    Texte = Texte.replace("[value]", "null");
+                    text = text.replace("[value]", "null");
                 }
                 break;
             }
         }
-        return Texte;
+        return text;
     }
 
-
-    public byte[] generatePdfFromText(String text, ByteArrayOutputStream outputStream) {
-        try {
-            PDDocument document = new PDDocument();
-            PDPage dummyPage = new PDPage();
-            document.addPage(dummyPage);
-
-            PDPageContentStream dummyContentStream = new PDPageContentStream(document, dummyPage);
-            dummyContentStream.setFont(PDType1Font.HELVETICA, 12);
-            dummyContentStream.beginText();
-            dummyContentStream.newLineAtOffset(50, 700);
-            dummyContentStream.showText(text);
-            dummyContentStream.endText();
-            dummyContentStream.close();
-
-            float textHeight = 12;
-            float textWidth = PDType1Font.HELVETICA.getStringWidth(text) / 1000 * 12;
-            PDPage page = new PDPage(new PDRectangle(textWidth + 100, textHeight + 100));
-            document.addPage(page);
-            PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.setFont(PDType1Font.HELVETICA, 12);
-            contentStream.beginText();
-            contentStream.newLineAtOffset(50, 50);
-            contentStream.showText(text);
-            contentStream.endText();
-            contentStream.close();
-
-            document.save(outputStream);
-            document.close();
-
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-
-            return new byte[0];
-        }
-    }
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
+            // Ensure HTML is well-formed
             String wellFormedXml = "<div>" + html + "</div>";
 
             ITextRenderer renderer = new ITextRenderer();
@@ -285,7 +247,6 @@ public class DocumentsService {
             return new byte[0];
         }
     }
-
 
 }
 
