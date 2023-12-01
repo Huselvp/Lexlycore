@@ -326,22 +326,13 @@ public class adminController {
                 System.out.println("Bad request: Invalid questionId or valueType");
                 return ResponseEntity.badRequest().build();
             }
-
             String[] choices = question.getValueType().substring("checkbox/".length()).split("/");
-
-            // Ensure the array has enough elements to perform the deletion
             if (choiceId <= 0 || (choiceId - 1) * 3 + 2 >= choices.length) {
                 System.out.println("Choice with choiceId=" + choiceId + " not found for questionId=" + questionId);
                 return ResponseEntity.notFound().build();
             }
-
-            // Identify the starting index of the selected choice
             int startingIndex = (choiceId - 1) * 3;
-
-            // Remove the choice and related text from the array
             choices[startingIndex] = choices[startingIndex + 1] = choices[startingIndex + 2] = "";
-
-            // Reconstruct the value type string, filtering out empty elements
             String finalUpdatedValueType = "checkbox/" + Arrays.stream(choices)
                     .filter(s -> !s.isEmpty())
                     .collect(Collectors.joining("/"));
