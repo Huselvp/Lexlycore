@@ -294,59 +294,81 @@ public class adminController {
         questionRepository.save(question);
         return ResponseEntity.ok().build();
     }
+
     @PutMapping("update-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> updateChoice(
             @PathVariable Long questionId,
             @PathVariable Integer choiceId,
             @RequestBody ChoiceUpdate choiceUpdate) {
-        Question question = questionService.getQuestionById(questionId);
-        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox/")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String[] choices = question.getValueType().substring("checkbox/".length()).split("/");
-        if (choiceId <= 0 || (choiceId - 1) * 3 + 2 >= choices.length) {
-            return ResponseEntity.badRequest().build();
-        }
-        int startingIndex = (choiceId - 1) * 3;
-        choices[startingIndex + 1] = choiceUpdate.getNewRelatedText();
-        choices[startingIndex + 2] = choiceUpdate.getChoice();
-        String updatedValueType = "checkbox/" + String.join("/", choices);
-        question.setValueType(updatedValueType);
-        questionRepository.save(question);
+        try {
+            Question question = questionService.getQuestionById(questionId);
+            if (question.getValueType() == null || !question.getValueType().startsWith("checkbox/")) {
+                return ResponseEntity.badRequest().build();
+            }
+            String checkboxPrefix = "checkbox/";
+            String valueTypeWithoutCheckbox = question.getValueType().substring(checkboxPrefix.length());
+            String[] choices = valueTypeWithoutCheckbox.split("/");
 
-        return ResponseEntity.ok().build();
+            boolean choiceFound = false;
+            for (int i = 0; i < choices.length; i += 3) {
+                int currentChoiceId = Integer.parseInt(choices[i]);
+                if (currentChoiceId == choiceId) {
+                    choices[i + 1] = choiceUpdate.getNewRelatedText();
+                    choices[i + 2] = choiceUpdate.getChoice();
+                    choiceFound = true;
+                    break;
+                }
+            }
+            if (!choiceFound) {
+                return ResponseEntity.notFound().build();
+            }
+            String updatedValueType = checkboxPrefix + String.join("/", choices);
+            question.setValueType(updatedValueType);
+            questionRepository.save(question);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
     @DeleteMapping("delete-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> deleteChoiceFromQuestion(
             @PathVariable Long questionId,
             @PathVariable Integer choiceId) {
         try {
             Question question = questionService.getQuestionById(questionId);
-            if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
-                System.out.println("Bad request: Invalid questionId or valueType");
+            if (question.getValueType() == null || !question.getValueType().startsWith("checkbox/")) {
                 return ResponseEntity.badRequest().build();
             }
-            String[] choices = question.getValueType().substring("checkbox/".length()).split("/");
-            if (choiceId <= 0 || (choiceId - 1) * 3 + 2 >= choices.length) {
-                System.out.println("Choice with choiceId=" + choiceId + " not found for questionId=" + questionId);
+            String checkboxPrefix = "checkbox/";
+            String valueTypeWithoutCheckbox = question.getValueType().substring(checkboxPrefix.length());
+            String[] choices = valueTypeWithoutCheckbox.split("/");
+            boolean choiceFound = false;
+            for (int i = 0; i < choices.length; i += 3) {
+                int currentChoiceId = Integer.parseInt(choices[i]);
+                if (currentChoiceId == choiceId) {
+                    String[] updatedChoices = new String[choices.length - 3];
+                    System.arraycopy(choices, 0, updatedChoices, 0, i);
+                    System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
+                    String updatedValueType = checkboxPrefix + String.join("/", updatedChoices);
+                    question.setValueType(updatedValueType);
+                    questionRepository.save(question);
+                    choiceFound = true;
+                    break;
+                }
+            }
+            if (!choiceFound) {
                 return ResponseEntity.notFound().build();
             }
-            int startingIndex = (choiceId - 1) * 3;
-            choices[startingIndex] = choices[startingIndex + 1] = choices[startingIndex + 2] = "";
-            String finalUpdatedValueType = "checkbox/" + Arrays.stream(choices)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.joining("/"));
-
-            question.setValueType(finalUpdatedValueType);
-            questionRepository.save(question);
-
-            System.out.println("Choice deleted successfully for questionId=" + questionId + ", choiceId=" + choiceId);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok().build();
     }
+
 
 
 }

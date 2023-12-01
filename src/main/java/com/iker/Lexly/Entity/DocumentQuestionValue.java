@@ -8,18 +8,16 @@ public class DocumentQuestionValue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long documentQuestionValueId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    @ManyToOne
     @JoinColumn(name = "document_id")
     private Documents document;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "question_id", nullable = false)
-    private Question question;
 
     private String value;
-
-    // Constructors, other fields...
-
     public Long getDocumentQuestionValueId() {
         return documentQuestionValueId;
     }
@@ -51,4 +49,6 @@ public class DocumentQuestionValue {
     public void setValue(String value) {
         this.value = value;
     }
+
+
 }

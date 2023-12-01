@@ -42,7 +42,6 @@ public class Question {
     @JsonIgnore
     private Template template;
 
-    // Constructors, other methods, getters, setters...
 
     public Long getId() {
         return id;

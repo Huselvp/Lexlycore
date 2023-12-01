@@ -5,7 +5,7 @@ import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
+    private EntityManagerFactory entityManagerFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
+
+
     private final QuestionRepository questionRepository;
     private final TemplateService templateService;
     private final TemplateRepository templateRepository;
@@ -68,19 +73,13 @@ public class QuestionService {
             return null;
         }
     }
-
-
-
+    @Transactional
     public void deleteQuestion(Long questionId) {
-        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
-        optionalQuestion.ifPresent(question -> {
-            questionRepository.delete(question);
-        });
+        Question question = entityManager.find(Question.class, questionId);
+        if (question != null) {
+            entityManager.remove(question);
+        }
     }
-
-
-
-
 
 
     public Question createQuestionByTemplateId(Long templateId, Question newQuestion) {

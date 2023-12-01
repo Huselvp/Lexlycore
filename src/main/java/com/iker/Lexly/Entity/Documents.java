@@ -26,11 +26,9 @@ public class Documents {
     @ManyToOne
     private Template template;
 
-    @OneToMany(mappedBy = "document")
+    @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues;
-
-    // Constructors, other fields...
 
     public Long getId() {
         return id;
