@@ -28,6 +28,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @RestController
 @RequestMapping("/api/admin")
 public class adminController {
@@ -290,48 +292,39 @@ public class adminController {
         String newChoice = newChoiceId + "/" + choiceUpdate.getNewRelatedText() + "/" + choiceUpdate.getChoice();
         question.setValueType(question.getValueType() + "/" + newChoice);
         questionRepository.save(question);
-
         return ResponseEntity.ok().build();
     }
     @PutMapping("update-choice/{questionId}/{choiceId}")
-    public ResponseEntity<Void> updateChoiceInQuestion(
+    public ResponseEntity<Void> updateChoice(
             @PathVariable Long questionId,
             @PathVariable Integer choiceId,
             @RequestBody ChoiceUpdate choiceUpdate) {
         Question question = questionService.getQuestionById(questionId);
-        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox")) {
+        if (question.getValueType() == null || !question.getValueType().startsWith("checkbox/")) {
             return ResponseEntity.badRequest().build();
         }
-        Pattern pattern = Pattern.compile("(\\d+)/([^/]+)/([^/]+)");
-        Matcher matcher = pattern.matcher(question.getValueType());
-        StringBuilder updatedValueType = new StringBuilder();
-        boolean choiceFound = false;
-        while (matcher.find()) {
-            int currentChoiceId = Integer.parseInt(matcher.group(1));
-            if (currentChoiceId == choiceId) {
-                String updatedChoice = String.format("%d/%s/%s",
-                        currentChoiceId,
-                        choiceUpdate.getNewRelatedText(),
-                        choiceUpdate.getChoice());
 
-                updatedValueType.append(updatedChoice);
-                choiceFound = true;
-            } else {
-                updatedValueType.append(matcher.group(0));
-            }
+        String[] choices = question.getValueType().substring("checkbox/".length()).split("/");
 
-            updatedValueType.append("/");
+        // Ensure the array has enough elements to perform the update
+        if (choiceId <= 0 || (choiceId - 1) * 3 + 2 >= choices.length) {
+            return ResponseEntity.badRequest().build();
         }
 
-        if (!choiceFound) {
-            return ResponseEntity.notFound().build();
-        }
-        String finalUpdatedValueType = updatedValueType.toString().replaceAll("/$", "");
-        question.setValueType(finalUpdatedValueType);
+        // Identify the starting index of the selected choice
+        int startingIndex = (choiceId - 1) * 3;
+
+        // Update the related text and choice at the specified index
+        choices[startingIndex + 1] = choiceUpdate.getNewRelatedText();
+        choices[startingIndex + 2] = choiceUpdate.getChoice();
+
+        // Reconstruct the value type string
+        String updatedValueType = "checkbox/" + String.join("/", choices);
+        question.setValueType(updatedValueType);
         questionRepository.save(question);
+
         return ResponseEntity.ok().build();
     }
-
 
     @DeleteMapping("delete-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> deleteChoiceFromQuestion(
