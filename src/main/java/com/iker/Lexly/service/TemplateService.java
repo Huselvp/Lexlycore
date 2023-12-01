@@ -121,6 +121,14 @@ public class TemplateService {
             templateRepository.deleteById(id);
         }
     }
+    public List<Template> getTemplatesByCategoryId(Long categoryId) {
+        return templateRepository.findByCategoryId(categoryId);
+    }
+
+    public int getNumberOfTemplatesByCategoryId(Long categoryId) {
+        List<Template> templates = templateRepository.findByCategoryId(categoryId);
+        return templates.size();
+    }
 
 
 }

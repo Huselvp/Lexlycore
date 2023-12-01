@@ -88,7 +88,7 @@ public class UserService {
 
     }
     public User updateUser(Long userId, User updatedUser) throws ChangeSetPersister.NotFoundException {
-        // Check if the user with the specified ID exists
+
         User existingUser = userRepository.findById(Math.toIntExact(userId))
                 .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
 
