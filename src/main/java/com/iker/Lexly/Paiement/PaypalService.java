@@ -1,5 +1,6 @@
 package com.iker.Lexly.Paiement;
 
+import com.iker.Lexly.service.OrderService;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
@@ -15,6 +16,8 @@ import java.util.List;
 public class PaypalService {
     @Autowired
     private APIContext apiContext;
+    @Autowired
+    OrderService orderService;
     public Payment createPayment(
             Double total,
             String currency,
@@ -55,5 +58,23 @@ public class PaypalService {
         PaymentExecution paymentExecute = new PaymentExecution();
         paymentExecute.setPayerId(payerId);
         return payment.execute(apiContext, paymentExecute);
+    }
+    public String processPayment(Order order) throws PayPalRESTException {
+        Payment payment = createPayment(
+                order.getPrice(), order.getCurrency(), order.getMethod(),
+                order.getIntent(), order.getDescription(),
+                "http://localhost:8080/api/payments/cancel",
+                "http://localhost:8080/api/payments/success"
+        );
+
+        for (Links link : payment.getLinks()) {
+            if (link.getRel().equals("approval_url")) {
+                order.setApprovalUrl(link.getHref());
+                orderService.saveOrder(order);
+                return link.getHref();
+            }
+        }
+
+        throw new PayPalRESTException("Approval URL not found");
     }
 }

@@ -8,6 +8,7 @@ import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +150,6 @@ public class DocumentsService {
         Long questionId = request.getQuestionId();
         int selectedChoiceId = request.getSelectedChoiceId();
         String value = request.getValue();
-
         Documents document = documentsRepository.findById(documentId).orElse(null);
         Question question = questionRepository.findById(questionId).orElse(null);
         if (document != null && question != null) {
@@ -168,7 +168,6 @@ public class DocumentsService {
                     return new ApiResponse("Invalid choice ID.", null);
                 }
             } else {
-                // Handle non-checkbox case
                 DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
 
                 if (existingValue != null) {
@@ -192,18 +191,14 @@ public class DocumentsService {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
         }
-
-        Document mainDocument = Jsoup.parse("<div></div>"); // Initialize an empty document
-
+        Document mainDocument = Jsoup.parse("<div></div>");
         for (Question question : questions) {
             if (question.getTemplate().getId().equals(templateId)) {
                 String text = question.getTexte();
                 text = replaceValues(text, question.getId(), documentQuestionValues);
                 Document questionDocument = Jsoup.parseBodyFragment(text);
-
-                // Append each child of questionDocument's body to the mainDocument's body
                 for (org.jsoup.nodes.Node child : questionDocument.body().childNodes()) {
-                    mainDocument.body().appendChild(child.clone()); // Use clone() to avoid DOM node ownership issues
+                    mainDocument.body().appendChild(child.clone());
                 }
             }
         }
@@ -246,6 +241,13 @@ public class DocumentsService {
             e.printStackTrace();
             return new byte[0];
         }
+    }
+    public Documents updatePaymentStatus(Long documentId) {
+        Documents document = documentsRepository.findById(documentId)
+                .orElseThrow(() -> new NotFoundException("Document not found"));
+
+        document.setPaymentStatus(true);
+        return documentsRepository.save(document);
     }
 
 }

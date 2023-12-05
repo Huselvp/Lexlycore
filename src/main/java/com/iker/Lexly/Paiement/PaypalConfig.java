@@ -24,12 +24,10 @@ public class PaypalConfig {
         configMap.put("mode", mode);
         return configMap;
     }
-
     @Bean
     public OAuthTokenCredential oAuthTokenCredential() {
         return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
     }
-
     @Bean
     public APIContext apiContext() throws PayPalRESTException {
         APIContext context = new APIContext(oAuthTokenCredential().getAccessToken());

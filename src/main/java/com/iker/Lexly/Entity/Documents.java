@@ -19,6 +19,9 @@ public class Documents {
 
     @Column(name = "is_draft")
     private boolean isDraft;
+    @Column(name = "payment_status")
+    private Boolean paymentStatus;
+
 
     @ManyToOne
     private User user;
@@ -77,6 +80,13 @@ public class Documents {
     }
     public void setDraft(boolean draft){
         this.isDraft=draft;
+    }
+    public boolean isPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(boolean paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
 

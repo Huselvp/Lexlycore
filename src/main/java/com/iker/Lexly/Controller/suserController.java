@@ -152,13 +152,10 @@ public class suserController {
             List<Question> questions = questionRepository.findByTemplateId(templateId);
             List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
             String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
-
-            // Replace self-closing <br> tags with <br></br>
             concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
 
             htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
         }
-
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
 
