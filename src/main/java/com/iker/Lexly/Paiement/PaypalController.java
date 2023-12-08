@@ -83,7 +83,6 @@ public class PaypalController {
             } catch (PayPalRESTException e) {
                 e.printStackTrace();
             }
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Payment not approved");
         }
 }
