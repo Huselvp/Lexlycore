@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private Long userId;
     @Column(length = 50)
     private String firstname;
-    @Column(length = 50)
+    @Column(length = 100)
     private String username;
     @Column(length = 50)
     private String lastname;
@@ -57,6 +57,11 @@ public class User implements UserDetails {
     private String picture;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @PrePersist
+    @PreUpdate
+    private void updateUsername() {
+        this.username = firstname + " " + lastname;
+    }
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;

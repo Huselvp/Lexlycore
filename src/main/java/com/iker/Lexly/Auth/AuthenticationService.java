@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,22 +34,47 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .build();
-        var savedUser = repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        //var refreshToken = jwtService.generateRefreshToken(user);
-        saveUserToken(savedUser, jwtToken);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-               // .refreshToken(refreshToken)
-                .build();
+        String username = request.getFirstname() + " " + request.getLastname();
+        try {
+            if (repository.existsByUsername(username)) {
+                return AuthenticationResponse.builder()
+                        .errorMessage("Username already in use")
+                        .build();
+            }
+            if (repository.existsUserByEmail(request.getEmail())) {
+                return AuthenticationResponse.builder()
+                        .errorMessage("Email already in use")
+                        .build();
+            }
+            var user = User.builder()
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .email(request.getEmail())
+                    .username(username)
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(request.getRole())
+                    .build();
+
+            var savedUser = repository.save(user);
+            var jwtToken = jwtService.generateToken(user);
+            saveUserToken(savedUser, jwtToken);
+
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .build();
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getMessage().contains("duplicate key value violates unique constraint \"uknlcolwbx8ujaen5h0u2kr2bn2\"")) {
+                return AuthenticationResponse.builder()
+                        .errorMessage("The username already exists")
+                        .build();
+            } else {
+                return AuthenticationResponse.builder()
+                        .errorMessage("An error occurred during registration")
+                        .build();
+            }
+        }
     }
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
@@ -125,4 +151,6 @@ public class AuthenticationService {
             }
         }
     }
+
+
 }
