@@ -1,18 +1,18 @@
 package com.iker.Lexly.Auth;
 import com.iker.Lexly.Entity.User;
-import com.iker.Lexly.Entity.enums.ERole;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.repository.UserRepository;
-import com.iker.Lexly.service.EmailService;
 import com.iker.Lexly.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,15 +32,26 @@ public class AuthController {
     @Autowired
     private final UserRepository userRepository;
 
-     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> register(
+            @RequestBody RegisterRequest request
+    ) {
         return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate (
+    public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    ) throws Exception {
-        return  ResponseEntity.ok(service.authenticate(request));
+    ) {
+        return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @PostMapping("/refresh-token")
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        service.refreshToken(request, response);
     }
     @PostMapping("/forgot-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {

@@ -1,5 +1,6 @@
 package com.iker.Lexly.Auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iker.Lexly.Entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,9 @@ import lombok.NoArgsConstructor;
 
 public class AuthenticationResponse {
 
-    private String token;
-    private User user;
+    @JsonProperty("access_token")
+    private String accessToken;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 }
+

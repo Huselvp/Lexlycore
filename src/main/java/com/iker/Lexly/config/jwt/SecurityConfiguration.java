@@ -1,8 +1,6 @@
 package com.iker.Lexly.config.jwt;
 
-import com.iker.Lexly.Entity.Role;
-import com.iker.Lexly.Entity.enums.ERole;
-import com.iker.Lexly.repository.RoleRepository;
+import com.iker.Lexly.Entity.enums.Role;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +38,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
-                                .requestMatchers("/api/admin").hasAnyRole(ERole.ADMIN.name())
-                                .requestMatchers("/api/superadmin").hasAnyRole(ERole.SUPERADMIN.name())
-                                .requestMatchers("/api/suser").hasAnyRole((ERole.SUSER.name()))
-                                .requestMatchers("/api/advisor").hasAnyRole(ERole.ADVISOR.name())
+                                .requestMatchers("/api/admin").hasAnyRole(Role.ADMIN.name())
+                                .requestMatchers("/api/superadmin").hasAnyRole(Role.SUPERADMIN.name())
+                                .requestMatchers("/api/suser").hasAnyRole((Role.SUSER.name()))
+                                //.requestMatchers("/api/advisor").hasAnyRole(Role.ADVISOR.name())
                                 .requestMatchers("/get_templates").permitAll()
                             //    .anyRequest().authenticated()
                                 .anyRequest().permitAll()

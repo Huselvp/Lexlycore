@@ -1,15 +1,15 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iker.Lexly.Entity.enums.ERole;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Paiement.Order;
+import com.iker.Lexly.Token.Token;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
@@ -41,7 +41,7 @@ public class User implements UserDetails {
     private String description;
     @Column(length = 50)
     private String adress;
-    @Column(length = 50)
+    @Column(name = "email", unique = true)
     private String email;
     @Column(length = 250)
     @JsonIgnore
@@ -55,23 +55,17 @@ public class User implements UserDetails {
     @Column(length = 50)
     private boolean verificationemail;
     private String picture;
-    @ManyToOne
-    @JsonIgnore
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Role role = new Role();
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
     @OneToMany(mappedBy = "user")
     private List<Template> templates;
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
-    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
-        this.email = email;
-        this.firstname = firstName;
-        this.lastname = lastName;
-        this.password = password;
-        this.phonenumber=phoneNumber;
-        this.picture = picture;
-    }
+
 
     public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
         this.email = email;
@@ -84,7 +78,7 @@ public class User implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-     return List.of(new SimpleGrantedAuthority(role.getName().name()));
+        return role.getAuthorities();
     }
     @Override
     public boolean isAccountNonExpired() {

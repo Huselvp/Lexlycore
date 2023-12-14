@@ -2,6 +2,7 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.CategoryTransformer;
+import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.request.ChoiceUpdate;
@@ -13,12 +14,16 @@ import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,8 +35,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasRole;
+
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+
 public class adminController {
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,11 +56,12 @@ public class adminController {
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
+    private final JwtService jwtService;
 
     @Autowired
-    public adminController( TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
-
+        this.jwtService=jwtService;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
@@ -62,9 +72,8 @@ public class adminController {
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
     }
-
-    @GetMapping("/all_users") //valide
-    public List<UserDTO> getAllUsers() {
+    @GetMapping("/all_users")
+    public List<UserDTO> getAllUsers(HttpServletRequest request) {
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
                 .map(userTransformer::toDTO)
@@ -84,7 +93,7 @@ public class adminController {
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
 
-    // @PreAuthorize("hasRole('ADMIN') or hasRole('SUSER')")
+     //@PreAuthorize("hasRole('ADMIN') ")
     @GetMapping("/all_templates") // valide
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();

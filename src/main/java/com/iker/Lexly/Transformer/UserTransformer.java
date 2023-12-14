@@ -1,19 +1,14 @@
 package com.iker.Lexly.Transformer;
 
-import com.iker.Lexly.DTO.RoleDTO;
 import com.iker.Lexly.DTO.UserDTO;
-import com.iker.Lexly.Entity.Role;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 @Component
 public class UserTransformer extends Transformer<User, UserDTO> {
 
-    private static final Transformer<Role, RoleDTO> roleTransformer = new RoleTransformer();
+
 
     private UserRepository userRepository;
 
@@ -30,7 +25,6 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             user.setPassword(dto.getPassword());
             user.setPhonenumber(dto.getPhonenumber());
             user.setPicture(dto.getPicture());
-            user.setRole(roleTransformer.toEntity(dto.getRole()));
             return user;
         }
     }
@@ -42,7 +36,7 @@ public class UserTransformer extends Transformer<User, UserDTO> {
         } else {
 
             return new UserDTO(entity.getUserId(), entity.getEmail(),
-                    entity.getFirstname(), entity.getLastname(), entity.getPassword(), entity.getPicture(), entity.getPhonenumber(), roleTransformer.toDTO(entity.getRole()));
+                    entity.getFirstname(), entity.getLastname(), entity.getPassword(), entity.getPicture(), entity.getPhonenumber());
         }
 
     }

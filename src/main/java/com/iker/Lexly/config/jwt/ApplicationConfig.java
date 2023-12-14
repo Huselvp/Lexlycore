@@ -27,10 +27,18 @@ import java.util.Properties;
 public class ApplicationConfig {
     private  final UserRepository userRepository;
     @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDetailsService userDetailsService() {
+        return input -> {
+            if (input.contains("@")) {
+                return userRepository.findByEmail(input)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            } else {
+                return userRepository.findByUsername(input)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            }
+        };
     }
+
     @Bean
     public AuthenticationProvider authentificationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -57,6 +65,7 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public JavaMailSender javaMailSender() {

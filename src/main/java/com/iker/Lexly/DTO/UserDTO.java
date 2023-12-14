@@ -1,7 +1,6 @@
 package com.iker.Lexly.DTO;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.iker.Lexly.Entity.enums.Role;
 import lombok.*;
 @Data
 @AllArgsConstructor
@@ -22,18 +21,16 @@ public class UserDTO {
     private int zipcode;
     private String town;
     private boolean verificationemail;
-    private RoleDTO role = new RoleDTO();
     private String picture;
 
 
-
-    public UserDTO(Long userId,String email, String firstName, String lastName, String password, String phoneNumber, String picture,RoleDTO roleDtos) {
+    public UserDTO(Long userId, String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
         this.email = email;
         this.firstname = firstName;
         this.lastname = lastName;
          this.userId = userId;
         this.phonenumber=phoneNumber;
         this.picture = picture;
-        this.role = roleDtos;
+
     }
 }
