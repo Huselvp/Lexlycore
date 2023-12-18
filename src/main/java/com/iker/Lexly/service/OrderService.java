@@ -1,5 +1,5 @@
 package com.iker.Lexly.service;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
 
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Paiement.Order;
@@ -13,12 +13,9 @@ import org.springframework.stereotype.Service;
 public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
-
     public void saveOrder(Order order) {
         orderRepository.save(order);
     }
-
-    // Assuming Order is the correct return type
     public Order findByPaymentId(String paymentId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

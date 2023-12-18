@@ -56,12 +56,10 @@ public class adminController {
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
-    private final JwtService jwtService;
 
     @Autowired
-    public adminController(JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
-        this.jwtService=jwtService;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
@@ -80,13 +78,11 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-
     @DeleteMapping("/delete_user/{id}") //valide
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-
     @PutMapping("update_user/{userId}") //valide
     public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
         User updatedUserResponse = userService.updateUser(userId, updatedUser);

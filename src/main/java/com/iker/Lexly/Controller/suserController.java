@@ -53,7 +53,6 @@ public class suserController {
         this.templateService = templateService;
 
     }
-
     @GetMapping("/user_all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();

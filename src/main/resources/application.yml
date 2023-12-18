@@ -1,4 +1,9 @@
 spring:
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    timeout: 1800
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -12,7 +17,6 @@ spring:
   sql:
     init:
       platform: postgres
-
 server:
   port: 8081
 paypal:
@@ -23,3 +27,6 @@ paypal:
 
 app:
   firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
+  secret-key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
+my-custom-cookie-name: "MyCookie"
+

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,7 +29,6 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     @Autowired
     private final UserService userService;
     @Autowired
@@ -37,21 +41,22 @@ public class AuthController {
     private final UserRepository userRepository;
     @Autowired
     private final TokenRepository tokenRepository;
-
-
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
+            @RequestBody RegisterRequest request,
+            HttpServletResponse response
     ) {
-        return ResponseEntity.ok(service.register(request));
+        AuthenticationResponse authenticationResponse = service.register(request, response);
+        return ResponseEntity.ok(authenticationResponse);
     }
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+        return ResponseEntity.ok(authenticationResponse);
     }
-
     @PostMapping("/refresh-token")
     public void refreshToken(
             HttpServletRequest request,
@@ -76,7 +81,6 @@ public class AuthController {
         String newPassword = request.get("newPassword");
         if (resetTokenService.validateToken(token)) {
             Optional<User> optionalUser = resetTokenService.findUserByPasswordToken(token);
-
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 passwordEncoder.encode(newPassword);
@@ -114,5 +118,7 @@ public class AuthController {
             SecurityContextHolder.clearContext();
         }
     }
+
+
 
 }

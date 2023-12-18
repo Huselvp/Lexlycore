@@ -55,6 +55,7 @@ public class User implements UserDetails {
     @Column(length = 50)
     private boolean verificationemail;
     private String picture;
+    private String sessionId;
     @Enumerated(EnumType.STRING)
     private Role role;
     @PrePersist
@@ -128,5 +129,7 @@ public class User implements UserDetails {
     public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
+
+
 }
 
