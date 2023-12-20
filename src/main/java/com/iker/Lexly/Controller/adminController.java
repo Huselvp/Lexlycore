@@ -5,7 +5,9 @@ import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.ChoiceUpdate;
+import com.iker.Lexly.request.UpdateEmailPassword;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -24,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -49,6 +52,8 @@ public class adminController {
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
+    private  final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
     private final TemplateRepository templateRepository;
     @Autowired
     private final TemplateService templateService;
@@ -56,19 +61,68 @@ public class adminController {
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
+    private final UserRepository userRepository;
 
     @Autowired
-    public adminController(TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController( PasswordEncoder passwordEncoder,UserRepository userRepository,JwtService jwtService,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
         this.categoryService = categoryService;
+        this.jwtService=jwtService;
+        this.passwordEncoder=passwordEncoder;
+        this.userRepository=userRepository;
         this.questionService = questionService;
         this.categoryTransformer = categoryTransformer;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
+    }
+    @GetMapping("getMe")
+    public ResponseEntity<User> getUserByToken(@RequestParam String token) {
+        if (jwtService.isTokenExpired(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String username = jwtService.extractUsername(token);
+        if (username != null) {
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                return ResponseEntity.ok(user);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+    @PatchMapping("updateEMailOrPassword/{token}")
+    public ResponseEntity<String> modifyEmailOrPassword(
+            @PathVariable String token,
+            @RequestBody UpdateEmailPassword updateRequest) {
+        if (jwtService.isTokenExpired(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+        }
+        String username = jwtService.extractUsername(token);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
+                if (updateRequest.getEmail() != null) {
+                    user.setEmail(updateRequest.getEmail());
+                }
+                if (updateRequest.getNewPassword() != null) {
+                    user.setPassword(passwordEncoder.encode(updateRequest.getNewPassword()));
+                }
+                userRepository.save(user);
+                return ResponseEntity.ok("User information updated successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current password.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
     }
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers(HttpServletRequest request) {
