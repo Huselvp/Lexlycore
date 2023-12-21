@@ -5,7 +5,9 @@ import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
+import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.ChoiceUpdate;
+import com.iker.Lexly.request.UpdateEmailPassword;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -24,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -46,6 +49,8 @@ public class adminController {
     private EntityManager entityManager;
     private final UserService userService;
     private final UserTransformer userTransformer;
+    private final UserRepository userRepository;
+    private  final PasswordEncoder passwordEncoder;
     private final QuestionTransformer questionTransformer;
     private final CategoryService categoryService;
     private final QuestionRepository questionRepository;
@@ -59,9 +64,11 @@ public class adminController {
     private final JwtService jwtService;
 
     @Autowired
-    public adminController(JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.jwtService=jwtService;
+        this.passwordEncoder=passwordEncoder;
+        this.userRepository=userRepository;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
@@ -81,6 +88,27 @@ public class adminController {
         return userDTOs;
     }
 
+    @GetMapping("/getMe/{token}")
+    public ResponseEntity<UserDTO> getUserByToken(@PathVariable String token) {
+        if (jwtService.isTokenExpired(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String username = jwtService.extractUsername(token);
+        if (username != null) {
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                UserDTO userDTO = userTransformer.toDTO(user);
+                return ResponseEntity.ok(userDTO);
+            }
+
+        } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+    }
+
     @DeleteMapping("/delete_user/{id}") //valide
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -92,15 +120,38 @@ public class adminController {
         User updatedUserResponse = userService.updateUser(userId, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
-
+    @PatchMapping("updateEMailOrPassword/{token}")
+    public ResponseEntity<String> modifyEmailOrPassword(
+            @PathVariable String token,
+            @RequestBody UpdateEmailPassword updateRequest) {
+        if (jwtService.isTokenExpired(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+        }
+        String username = jwtService.extractUsername(token);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
+                if (updateRequest.getEmail() != null) {
+                    user.setEmail(updateRequest.getEmail());
+                }
+                if (updateRequest.getNewPassword() != null) {
+                    user.setPassword(passwordEncoder.encode(updateRequest.getNewPassword()));
+                }
+                userRepository.save(user);
+                return ResponseEntity.ok("User information updated successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current password.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+    }
      //@PreAuthorize("hasRole('ADMIN') ")
     @GetMapping("/all_templates") // valide
-    public List<TemplateDTO> getAllTemplates() {
+    public List<Template> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
-        List<TemplateDTO> templateDTOs = templates.stream()
-                .map(templateTransformer::toDTO)
-                .collect(Collectors.toList());
-        return templateDTOs;
+        return templates;
     }
 
     @PostMapping(value = "/create_template")//valide
@@ -218,14 +269,9 @@ public class adminController {
     }
 
     @GetMapping("/template/{templateId}")
-    public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long templateId) {
-        TemplateDTO templateDTO = templateService.getTemplateDTOById(templateId);
-
-        if (templateDTO != null) {
-            return new ResponseEntity<>(templateDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
+        Template template = templateService.getTemplateById(templateId);
+            return new ResponseEntity<>(template, HttpStatus.OK);
     }
 
     @GetMapping("/category/{categoryId}")

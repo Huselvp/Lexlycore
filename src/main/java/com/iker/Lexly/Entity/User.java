@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Paiement.Order;
 import com.iker.Lexly.Token.Token;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +21,29 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", firstname='" + firstname + '\'' +
+                ", username='" + username + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", phonenumber='" + phonenumber + '\'' +
+                ", description='" + description + '\'' +
+                ", adress='" + adress + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", country='" + country + '\'' +
+                ", zipcode=" + zipcode +
+                ", town='" + town + '\'' +
+                ", verificationemail=" + verificationemail +
+                ", picture='" + picture + '\'' +
+                ", role=" + role +
+                ", tokens=" + tokens +
+                ", templates=" + templates +
+                ", orders=" + orders +
+                '}';
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -64,6 +83,7 @@ public class User implements UserDetails {
     }
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Token> tokens;
     @OneToMany(mappedBy = "user")
     private List<Template> templates;
@@ -79,6 +99,7 @@ public class User implements UserDetails {
         this.password = password;
         this.phonenumber=phoneNumber;
         this.picture = picture;
+
         this.role = role;
     }
     @Override

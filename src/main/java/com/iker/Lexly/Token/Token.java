@@ -1,5 +1,6 @@
 package com.iker.Lexly.Token;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.Entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Token {
-
+    @Override
+    public String toString() {
+        return "Token{" +
+                "id=" + id +
+                ", token='" + token + '\'' +
+                ", tokenType=" + tokenType +
+                ", revoked=" + revoked +
+                ", expired=" + expired +
+                ", user=" + user +
+                '}';
+    }
     @Id
     @GeneratedValue
     public Integer id;

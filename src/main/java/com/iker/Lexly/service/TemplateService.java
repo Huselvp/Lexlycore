@@ -1,9 +1,7 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
-import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Transformer.CategoryTransformer;
@@ -13,10 +11,8 @@ import com.iker.Lexly.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TemplateService {
@@ -50,14 +46,6 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public TemplateDTO getTemplateDTOById(Long templateId) {
-        Template template = templateRepository.findById(templateId).orElse(null);
-        if (template != null) {
-            return templateTransformer.toDTO(template);
-        }
-        return null;
-    }
-
     public Template createTemplate(Template template) {
         return templateRepository.save(template);
     }

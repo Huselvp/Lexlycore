@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -30,7 +31,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return input -> {
             if (input.contains("@")) {
-                return userRepository.findByEmail(input)
+                return (UserDetails) userRepository.findByEmail(input)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             } else {
                 return userRepository.findByUsername(input)
