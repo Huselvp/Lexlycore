@@ -21,29 +21,7 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", firstname='" + firstname + '\'' +
-                ", username='" + username + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", phonenumber='" + phonenumber + '\'' +
-                ", description='" + description + '\'' +
-                ", adress='" + adress + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", country='" + country + '\'' +
-                ", zipcode=" + zipcode +
-                ", town='" + town + '\'' +
-                ", verificationemail=" + verificationemail +
-                ", picture='" + picture + '\'' +
-                ", role=" + role +
-                ", tokens=" + tokens +
-                ", templates=" + templates +
-                ", orders=" + orders +
-                '}';
-    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

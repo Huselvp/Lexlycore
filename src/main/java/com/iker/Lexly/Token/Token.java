@@ -14,17 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Token {
-    @Override
-    public String toString() {
-        return "Token{" +
-                "id=" + id +
-                ", token='" + token + '\'' +
-                ", tokenType=" + tokenType +
-                ", revoked=" + revoked +
-                ", expired=" + expired +
-                ", user=" + user +
-                '}';
-    }
+
     @Id
     @GeneratedValue
     public Integer id;
@@ -34,9 +24,7 @@ public class Token {
 
     @Enumerated(EnumType.STRING)
     public TokenType tokenType = TokenType.BEARER;
-
     public boolean revoked;
-
     public boolean expired;
 
     @ManyToOne(fetch = FetchType.LAZY)
