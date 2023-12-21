@@ -112,7 +112,7 @@ public class suserController {
         return new ApiResponse("Temporary values saved successfully.", null);
     }
 
-    @PutMapping("/updateValue")
+    @PatchMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
         ApiResponse response = documentsService.addOrUpdateValue(request);
         return response;

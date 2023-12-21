@@ -401,30 +401,37 @@ public class adminController {
             String valueTypeWithoutCheckbox = question.getValueType().substring(checkboxPrefix.length());
             String[] choices = valueTypeWithoutCheckbox.split("/");
             boolean choiceFound = false;
+
             for (int i = 0; i < choices.length; i += 3) {
                 int currentChoiceId = Integer.parseInt(choices[i]);
                 if (currentChoiceId == choiceId) {
-                    String[] updatedChoices = new String[choices.length - 3];
-                    System.arraycopy(choices, 0, updatedChoices, 0, i);
-                    System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
-                    String updatedValueType = checkboxPrefix + String.join("/", updatedChoices);
+                    String[] updatedChoices;
+                    if (choices.length == 3) {
+                        updatedChoices = new String[0];
+                    } else {
+                        updatedChoices = new String[choices.length - 3];
+                        System.arraycopy(choices, 0, updatedChoices, 0, i);
+                        System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
+                    }
+                    String updatedValueType = updatedChoices.length == 0 ?
+                            checkboxPrefix.substring(0, checkboxPrefix.length() - 1) :
+                            checkboxPrefix + String.join("/", updatedChoices);
                     question.setValueType(updatedValueType);
                     questionRepository.save(question);
                     choiceFound = true;
                     break;
                 }
             }
+
             if (!choiceFound) {
                 return ResponseEntity.notFound().build();
             }
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 
 }
 
