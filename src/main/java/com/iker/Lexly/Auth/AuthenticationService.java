@@ -41,11 +41,6 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         String username = request.getFirstname() + " " + request.getLastname();
         try {
-//            if (repository.existsByUsername(username)) {
-//                return AuthenticationResponse.builder()
-//                        .errorMessage("Username already in use")
-//                        .build();
-//            }
             if (repository.existsUserByEmail(request.getEmail())) {
                 return AuthenticationResponse.builder()
                         .errorMessage("Email already in use")

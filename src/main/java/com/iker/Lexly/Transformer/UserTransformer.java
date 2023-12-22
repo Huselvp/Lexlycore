@@ -25,6 +25,7 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             user.setPassword(dto.getPassword());
             user.setPhonenumber(dto.getPhonenumber());
             user.setPicture(dto.getPicture());
+            user.setRole(dto.getRole());
             return user;
         }
     }
@@ -35,7 +36,7 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             return null;
         } else {
 
-            return new UserDTO(entity.getUserId(), entity.getEmail(),
+            return new UserDTO(entity.getRole(),entity.getUserId(), entity.getEmail(),
                     entity.getFirstname(), entity.getLastname(), entity.getPassword(), entity.getPicture(), entity.getPhonenumber());
         }
 

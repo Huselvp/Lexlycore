@@ -133,6 +133,9 @@ public class adminController {
             User user = optionalUser.get();
             if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
                 if (updateRequest.getEmail() != null) {
+                    if (userRepository.existsUserByEmail(updateRequest.getEmail())) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The updated email is already in use.");
+                    }
                     user.setEmail(updateRequest.getEmail());
                 }
                 if (updateRequest.getNewPassword() != null) {
@@ -147,7 +150,8 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
-     //@PreAuthorize("hasRole('ADMIN') ")
+
+    //@PreAuthorize("hasRole('ADMIN') ")
     @GetMapping("/all_templates") // valide
     public List<Template> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
