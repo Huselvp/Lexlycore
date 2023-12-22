@@ -1,6 +1,7 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Exceptions.TokenExpiredException;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -105,9 +106,9 @@ public class adminController {
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
 
-    @PutMapping("update_user/{userId}") //valide
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
-        User updatedUserResponse = userService.updateUser(userId, updatedUser);
+    @PutMapping("update_user_by_token/{token}")
+    public ResponseEntity<User> updateUserByToken(@PathVariable String token, @RequestBody User updatedUser) throws TokenExpiredException, ChangeSetPersister.NotFoundException {
+        User updatedUserResponse = userService.updateUser(token, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
     @PatchMapping("updateEMailOrPassword/{token}")

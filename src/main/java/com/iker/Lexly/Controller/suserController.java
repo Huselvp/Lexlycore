@@ -135,7 +135,6 @@ public class suserController {
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
         Long templateId = requestData.getTemplateId();
-
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
 

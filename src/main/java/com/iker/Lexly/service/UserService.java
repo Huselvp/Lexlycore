@@ -2,12 +2,16 @@ package com.iker.Lexly.service;
 
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Exceptions.TokenExpiredException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +22,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyDescriptor;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Configuration
 @Service
@@ -29,6 +36,8 @@ public class UserService {
     private final EmailService emailService;
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
+    private  final  JwtService jwtService;
 
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -68,20 +77,31 @@ public class UserService {
            userRepository.delete(user);
 
     }
-    public User updateUser(Long userId, User updatedUser) throws ChangeSetPersister.NotFoundException {
+    public User updateUser(String token, User updatedUser) throws TokenExpiredException, ChangeSetPersister.NotFoundException {
+        if (jwtService.isTokenExpired(token)) {
+            throw new TokenExpiredException("Token expired");
+        }
+        String username = jwtService.extractUsername(token);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+            BeanUtils.copyProperties(updatedUser, existingUser, getNullPropertyNames(updatedUser));
 
-        User existingUser = userRepository.findById(Math.toIntExact(userId))
-                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
-
-        existingUser.setFirstname(updatedUser.getFirstname());
-        existingUser.setLastname(updatedUser.getLastname());
-        existingUser.setPhonenumber(updatedUser.getPhonenumber());
-        existingUser.setDescription(updatedUser.getDescription());
-        existingUser.setAdress(updatedUser.getAdress());
-        existingUser.setCountry(updatedUser.getCountry());
-        existingUser.setZipcode(updatedUser.getZipcode());
-        existingUser.setTown(updatedUser.getTown());
-        return userRepository.save(existingUser);
+            return userRepository.save(existingUser);
+        } else {
+            throw new ChangeSetPersister.NotFoundException();
+        }
+    }
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 }
 
