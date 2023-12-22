@@ -29,9 +29,7 @@ public class UserService {
     private final EmailService emailService;
     @Autowired
     private final UserRepository userRepository;
-    private final JwtService jwtService;
-    @Autowired
-private  final UserTransformer userTransformer;
+
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
@@ -46,16 +44,7 @@ private  final UserTransformer userTransformer;
     public PasswordEncoder userServicepasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    public void resetPassword(User user, String newPassword) {
-        user.setPassword(newPassword);
-    }
-//    public void markEmailAsVerified(String email) {
-//        Optional<User> optionalUser = userRepository.findByEmail(email);
-//
-//        optionalUser.ifPresent(user -> {
-//            user.setEmailVerified(true);
-//            userRepository.save(user);});
-//    }
+
     public boolean emailExists(String email) {
         return userRepository.existsUserByEmail(email);
     }
