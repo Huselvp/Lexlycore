@@ -24,29 +24,19 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasRole;
-
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 
 public class adminController {
-    @PersistenceContext
-    private EntityManager entityManager;
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final UserRepository userRepository;
