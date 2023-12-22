@@ -39,23 +39,22 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        String username = request.getFirstname() + " " + request.getLastname();
         try {
             if (repository.existsUserByEmail(request.getEmail())) {
                 return AuthenticationResponse.builder()
                         .errorMessage("Email already in use")
                         .build();
             }
-            var userDTO = UserDTO.builder()
+            var user = User.builder()
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
                     .email(request.getEmail())
-                    .username(username)
+                    .username(request.getUsername())
                     .password(passwordEncoder.encode(request.getPassword()))
+                    .role(request.getRole())
                     .build();
-
-            User savedUser = repository.save(userTransformer.toEntity(userDTO));
-            var jwtToken = jwtService.generateToken((UserDetails) userDTO);
+            User savedUser = repository.save(user);
+            var jwtToken = jwtService.generateToken((UserDetails) user);
             saveUserToken(savedUser, jwtToken);
 
             return AuthenticationResponse.builder()
