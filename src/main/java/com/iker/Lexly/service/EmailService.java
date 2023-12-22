@@ -34,9 +34,8 @@ public class EmailService {
         javaMailSender.send(message);
     }
     private String generateResetLink(String resetToken) {
-        return "<a href=\"http://localhost:3000/change-password=" + resetToken + "\">Click here to reset your password</a>";
+        return "localhost:3000/change-password?token=" + resetToken;
     }
-
     private String buildEmailBody(String fullName, String resetLink) {
         // Customize the email body
         return "Hello " + fullName + ",\n\n"
