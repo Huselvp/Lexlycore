@@ -1,7 +1,6 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
-import com.iker.Lexly.Exceptions.TokenExpiredException;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -25,6 +24,8 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 
 public class adminController {
+    @PersistenceContext
+    private EntityManager entityManager;
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final UserRepository userRepository;
@@ -106,8 +109,8 @@ public class adminController {
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
 
-    @PutMapping("update_user_by_token/{token}")
-    public ResponseEntity<User> updateUserByToken(@PathVariable String token, @RequestBody User updatedUser) throws TokenExpiredException, ChangeSetPersister.NotFoundException {
+    @PutMapping("/update_user/{token}") //valide
+    public ResponseEntity<User> updateUser(@PathVariable String token, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
         User updatedUserResponse = userService.updateUser(token, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }

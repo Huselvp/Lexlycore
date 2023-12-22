@@ -1,6 +1,7 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Paiement.Order;
 import com.iker.Lexly.Token.Token;
@@ -57,6 +58,8 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
+    @JsonIgnore
+    @JsonManagedReference
     private List<Token> tokens;
     @OneToMany(mappedBy = "user")
     private List<Template> templates;

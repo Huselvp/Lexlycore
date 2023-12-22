@@ -3,6 +3,7 @@ package com.iker.Lexly.service;
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Exceptions.TokenExpiredException;
+import com.iker.Lexly.Exceptions.UnauthorizedException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
@@ -31,7 +32,7 @@ public class UserService {
     @Autowired
     private final UserRepository userRepository;
     @Autowired
-    private  final  JwtService jwtService;
+    private final JwtService jwtService;
 
     public User findByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -51,15 +52,17 @@ public class UserService {
     public boolean emailExists(String email) {
         return userRepository.existsUserByEmail(email);
     }
+
     public void initiatePasswordReset(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             resetTokenService.deleteTokensByUser(user);
-            String resetToken= resetTokenService.generateAndSavePasswordResetToken(user);
+            String resetToken = resetTokenService.generateAndSavePasswordResetToken(user);
             emailService.sendResetPasswordEmail(user, resetToken);
         }
     }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -67,32 +70,28 @@ public class UserService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +id));
-           userRepository.delete(user);
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+        userRepository.delete(user);
 
     }
     public User updateUser(String token, User updatedUser) throws ChangeSetPersister.NotFoundException {
-        if (jwtService.isTokenExpired(token)) {
-            throw new TokenExpiredException("Token expired");
-        }
         String username = jwtService.extractUsername(token);
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            existingUser.setFirstname(updatedUser.getFirstname());
-            existingUser.setLastname(updatedUser.getLastname());
-            existingUser.setPhonenumber(updatedUser.getPhonenumber());
-            existingUser.setDescription(updatedUser.getDescription());
-            existingUser.setAdress(updatedUser.getAdress());
-            existingUser.setCountry(updatedUser.getCountry());
-            existingUser.setZipcode(updatedUser.getZipcode());
-            existingUser.setTown(updatedUser.getTown());
-            return userRepository.save(existingUser);
-        } else {
-            throw new ChangeSetPersister.NotFoundException();
+        if (jwtService.isTokenExpired(token)) {
+            throw new UnauthorizedException("Token expired");
         }
-    }
+        User existingUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+        existingUser.setFirstname(updatedUser.getFirstname());
+        existingUser.setLastname(updatedUser.getLastname());
+        existingUser.setPhonenumber(updatedUser.getPhonenumber());
+        existingUser.setDescription(updatedUser.getDescription());
+        existingUser.setAdress(updatedUser.getAdress());
+        existingUser.setCountry(updatedUser.getCountry());
+        existingUser.setZipcode(updatedUser.getZipcode());
+        existingUser.setTown(updatedUser.getTown());
 
+        return userRepository.save(existingUser);
+    }
 }
 
 

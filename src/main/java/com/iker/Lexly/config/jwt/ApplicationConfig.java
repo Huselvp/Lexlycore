@@ -81,5 +81,4 @@ public class ApplicationConfig {
         props.put("mail.smtp.starttls.enable", "true");
         return mailSender;
     }
-
 }
