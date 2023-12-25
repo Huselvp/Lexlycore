@@ -30,7 +30,6 @@ public class Template {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonIgnore
     private Category category;
 
 

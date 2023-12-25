@@ -28,14 +28,19 @@ public class UserDTO {
     private Role role;
 
 
-    public UserDTO(String username,Role role,Long userId, String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
+    public UserDTO(String country,String description,int zipcode, String town,String adress,String username,Role role,Long userId, String email, String firstName, String lastName, String phonenumber, String picture) {
         this.email = email;
         this.username=username;
+        this.country=country;
+        this.adress=adress;
+        this.description=description;
         this.role=role;
+        this.zipcode=zipcode;
+        this.town=town;
         this.firstname = firstName;
         this.lastname = lastName;
          this.userId = userId;
-        this.phonenumber=phoneNumber;
+        this.phonenumber=phonenumber;
         this.picture = picture;
 
     }

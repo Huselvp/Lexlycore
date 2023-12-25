@@ -83,7 +83,7 @@ public class adminController {
     }
 
     @GetMapping("/getMe/{token}")
-    public ResponseEntity<UserDTO> getUserByToken(@PathVariable String token) {
+    public ResponseEntity<User> getUserByToken(@PathVariable String token) {
         if (jwtService.isTokenExpired(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
@@ -92,24 +92,20 @@ public class adminController {
             Optional<User> optionalUser = userRepository.findByUsername(username);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                UserDTO userDTO = userTransformer.toDTO(user);
-                return ResponseEntity.ok(userDTO);
+                return ResponseEntity.ok(user);
             }
-
         } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
-
-    @DeleteMapping("/delete_user/{id}") //valide
+    @DeleteMapping("/delete_user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
 
-    @PutMapping("/update_user/{token}") //valide
+    @PutMapping("/update_user/{token}")
     public ResponseEntity<User> updateUser(@PathVariable String token, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
         User updatedUserResponse = userService.updateUser(token, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
@@ -144,15 +140,13 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
-
-    //@PreAuthorize("hasRole('ADMIN') ")
-    @GetMapping("/all_templates") // valide
+    @GetMapping("/all_templates")
     public List<Template> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
         return templates;
     }
 
-    @PostMapping(value = "/create_template")//valide
+    @PostMapping(value = "/create_template")
     public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
         Template createdTemplate = templateService.createTemplate(template);
         return ResponseEntity.ok(createdTemplate);

@@ -26,6 +26,11 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             user.setPhonenumber(dto.getPhonenumber());
             user.setPicture(dto.getPicture());
             user.setRole(dto.getRole());
+            user.setUsername(dto.getUsername());
+            user.setAdress(dto.getAdress());
+            user.setPhonenumber(dto.getPhonenumber());
+            user.setTown(dto.getTown());
+            user.setCountry(dto.getCountry());
             return user;
         }
     }
@@ -36,8 +41,8 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             return null;
         } else {
 
-            return new UserDTO(entity.getUsername(), entity.getRole(),entity.getUserId(), entity.getEmail(),
-                    entity.getFirstname(), entity.getLastname(), entity.getPassword(), entity.getPicture(), entity.getPhonenumber());
+            return new UserDTO(entity.getCountry(),entity.getDescription(),entity.getZipcode(),entity.getTown(),entity.getAdress(),entity.getUsername(), entity.getRole(),entity.getUserId(), entity.getEmail(),
+                    entity.getFirstname(), entity.getLastname(), entity.getPicture(), entity.getPhonenumber());
         }
 
     }

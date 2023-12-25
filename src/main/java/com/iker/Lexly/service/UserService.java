@@ -4,6 +4,7 @@ import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Exceptions.TokenExpiredException;
 import com.iker.Lexly.Exceptions.UnauthorizedException;
+import com.iker.Lexly.Exceptions.UsernameAlreadyExistsException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
 import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
@@ -79,6 +80,9 @@ public class UserService {
         if (jwtService.isTokenExpired(token)) {
             throw new UnauthorizedException("Token expired");
         }
+        if (!username.equals(updatedUser.getUsername()) && userRepository.existsByUsername(updatedUser.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username already exists");
+        }
         User existingUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
         existingUser.setFirstname(updatedUser.getFirstname());
@@ -89,9 +93,13 @@ public class UserService {
         existingUser.setCountry(updatedUser.getCountry());
         existingUser.setZipcode(updatedUser.getZipcode());
         existingUser.setTown(updatedUser.getTown());
+        if (!existingUser.getUsername().equals(updatedUser.getUsername())) {
+            existingUser.setUsername(updatedUser.getUsername());
+        }
 
         return userRepository.save(existingUser);
     }
+
 }
 
 
