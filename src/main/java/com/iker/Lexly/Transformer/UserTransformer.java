@@ -25,7 +25,6 @@ public class UserTransformer extends Transformer<User, UserDTO> {
             user.setRole(dto.getRole());
             user.setUsername(dto.getUsername());
             user.setAdress(dto.getAdress());
-            user.setPhonenumber(dto.getPhonenumber());
             user.setTown(dto.getTown());
             user.setCountry(dto.getCountry());
             return user;
