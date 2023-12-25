@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 public class UserTransformer extends Transformer<User, UserDTO> {
 
 
-
-    private UserRepository userRepository;
-
     @Override
     public User toEntity(UserDTO dto) {
         if (dto == null) {
