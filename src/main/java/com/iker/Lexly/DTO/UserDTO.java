@@ -39,7 +39,7 @@ public class UserDTO {
         this.town=town;
         this.firstname = firstName;
         this.lastname = lastName;
-         this.userId = userId;
+        this.userId = userId;
         this.phonenumber=phonenumber;
         this.picture = picture;
 

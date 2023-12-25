@@ -92,7 +92,6 @@ public class adminController {
             Optional<User> optionalUser = userRepository.findByUsername(username);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                //    UserDTO userDTO = userTransformer.toDTO(user);
                 return ResponseEntity.ok(user);
             }
         } else {

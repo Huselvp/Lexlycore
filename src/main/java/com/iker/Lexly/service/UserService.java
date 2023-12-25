@@ -99,7 +99,25 @@ public class UserService {
 
         return userRepository.save(existingUser);
     }
-
+//    public User updateUser(String token, User updatedUser) throws ChangeSetPersister.NotFoundException {
+//        String username = jwtService.extractUsername(token);
+//        if (jwtService.isTokenExpired(token)) {
+//            throw new UnauthorizedException("Token expired");
+//        }
+//
+//        User existingUser = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+//        existingUser.setFirstname(updatedUser.getFirstname());
+//        existingUser.setLastname(updatedUser.getLastname());
+//        existingUser.setPhonenumber(updatedUser.getPhonenumber());
+//        existingUser.setDescription(updatedUser.getDescription());
+//        existingUser.setAdress(updatedUser.getAdress());
+//        existingUser.setCountry(updatedUser.getCountry());
+//        existingUser.setZipcode(updatedUser.getZipcode());
+//        existingUser.setTown(updatedUser.getTown());
+//
+//        return userRepository.save(existingUser);
+//    }
 }
 
 
