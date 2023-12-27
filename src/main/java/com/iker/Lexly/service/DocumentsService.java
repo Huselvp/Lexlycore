@@ -18,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 @Transactional
 public class DocumentsService {
@@ -69,25 +68,6 @@ public class DocumentsService {
         dto.setDraft(documents.getDraft());
         return dto;
     }
-
-    public DocumentsDTO createDocument(DocumentCreateRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-        Template template = templateRepository.findById(request.getTemplateId())
-                .orElseThrow(() -> new IllegalArgumentException("Template not found with ID: " + request.getTemplateId()));
-        Documents document = new Documents();
-        document.setUser(user);
-        document.setTemplate(template);
-        document.setCreatedAt(request.getCreatedAt());
-        document.setDraft(request.isDraft());
-        document = documentsRepository.save(document);
-        DocumentsDTO documentDTO = new DocumentsDTO();
-        documentDTO.setId(document.getId());
-        documentDTO.setCreatedAt(document.getCreatedAt());
-        documentDTO.setDraft(document.getDraft());
-        return documentDTO;
-    }
-
     public ApiResponseDocuments createNewDocument(Long templateId) {
         Template template = templateRepository.findById(templateId).orElse(null);
         if (template != null) {
@@ -200,11 +180,8 @@ public class DocumentsService {
                 }
             }
         }
-
         return mainDocument.html().trim();
     }
-
-
     private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
         return documentQuestionValues.stream().anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
     }
@@ -225,15 +202,12 @@ public class DocumentsService {
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            // Ensure HTML is well-formed
             String wellFormedXml = "<div>" + html + "</div>";
-
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
             renderer.layout();
             renderer.createPDF(outputStream);
             renderer.finishPDF();
-
             return outputStream.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,11 +217,9 @@ public class DocumentsService {
     public Documents updatePaymentStatus(Long documentId) {
         Documents document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new NotFoundException("Document not found"));
-
         document.setPaymentStatus(true);
         return documentsRepository.save(document);
     }
-
 }
 
 

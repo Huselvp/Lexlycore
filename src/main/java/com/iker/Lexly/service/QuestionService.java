@@ -7,9 +7,14 @@ import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,13 +34,13 @@ public class QuestionService {
     private final DocumentsRepository documentsRepository;
 
     @Autowired
-    public QuestionService( TemplateService templateService,QuestionTransformer questionTransformer,DocumentQuestionValueRepository documentQuestionValueRepository,DocumentsRepository documentsRepository,QuestionRepository questionRepository,TemplateRepository templateRepository) {
+    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository) {
         this.questionRepository = questionRepository;
-        this.templateService=templateService;
-        this.questionTransformer=questionTransformer;
-        this.templateRepository=templateRepository;
-        this.documentsRepository=documentsRepository;
-        this.documentQuestionValueRepository=documentQuestionValueRepository;
+        this.templateService = templateService;
+        this.questionTransformer = questionTransformer;
+        this.templateRepository = templateRepository;
+        this.documentsRepository = documentsRepository;
+        this.documentQuestionValueRepository = documentQuestionValueRepository;
     }
 
     public List<Question> getAllQuestions() {
@@ -46,6 +51,7 @@ public class QuestionService {
         return questionRepository.findById(questionId)
                 .orElse(null);
     }
+
     @Transactional
     public Question updateQuestion(Long id, QuestionDTO questionDTO) {
         Optional<Question> existingQuestionOptional = questionRepository.findById(id);
@@ -73,6 +79,7 @@ public class QuestionService {
             return null;
         }
     }
+
     @Transactional
     public void deleteQuestion(Long questionId) {
         Question question = entityManager.find(Question.class, questionId);
@@ -103,6 +110,7 @@ public class QuestionService {
         DocumentQuestionValueDTO dto = convertToDTO(documentQuestionValue);
         return dto;
     }
+
     private DocumentQuestionValueDTO convertToDTO(DocumentQuestionValue documentQuestionValue) {
         DocumentQuestionValueDTO dto = new DocumentQuestionValueDTO();
         dto.setDocumentQuestionValueId(documentQuestionValue.getDocumentQuestionValueId());
@@ -111,6 +119,7 @@ public class QuestionService {
         dto.setValue(documentQuestionValue.getValue());
         return dto;
     }
+
     public List<DocumentQuestionValue> getValuesForDocument(Long documentId) {
         return documentQuestionValueRepository.findByDocumentId(documentId);
     }
@@ -120,13 +129,36 @@ public class QuestionService {
     }
 
     @Transactional
-    public Question createQuestion(Question question, Template template) {
-        if (questionRepository.existsByQuestionText(question.getQuestionText())) {
-            throw new IllegalArgumentException("Question with the same text already exists");
+        public Question createQuestion(Question question, Template template) {
+            if (questionRepository.existsByQuestionText(question.getQuestionText())) {
+                throw new IllegalArgumentException("Question with the same text already exists");
+            }
+            String xmlText = transformTextToXml(question.getTexte());
+            if (xmlText != null) {
+                question.setTexte(xmlText);
+                Question savedQuestion = questionRepository.save(question);
+                savedQuestion.setTemplate(template);
+
+                return questionRepository.save(savedQuestion);
+            } else {
+                throw new IllegalArgumentException("The content is not valid XML.");
+            }
         }
-        Question savedQuestion = questionRepository.save(question);
-        savedQuestion.setTemplate(template);
-        return questionRepository.save(savedQuestion);
+
+        private String transformTextToXml(String text) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(TextWrapper.class);
+                Marshaller marshaller = context.createMarshaller();
+                marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+                TextWrapper textWrapper = new TextWrapper(text);
+                StringWriter stringWriter = new StringWriter();
+                marshaller.marshal(textWrapper, stringWriter);
+                return stringWriter.toString();
+            } catch (JAXBException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        }
     }
 
-}

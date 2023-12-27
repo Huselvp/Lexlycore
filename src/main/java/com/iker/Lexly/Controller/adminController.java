@@ -24,8 +24,6 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -39,8 +37,6 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 
 public class adminController {
-    @PersistenceContext
-    private EntityManager entityManager;
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final UserRepository userRepository;
@@ -81,7 +77,6 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-
     @GetMapping("/getMe/{token}")
     public ResponseEntity<User> getUserByToken(@PathVariable String token) {
         if (jwtService.isTokenExpired(token)) {
@@ -152,7 +147,7 @@ public class adminController {
         return ResponseEntity.ok(createdTemplate);
     }
 
-    @PutMapping("/update_template/{templateId}")//valid
+    @PutMapping("/update_template/{templateId}")
     public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
             @RequestBody TemplateDTO updateRequest
