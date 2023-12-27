@@ -68,25 +68,6 @@ public class DocumentsService {
         dto.setDraft(documents.getDraft());
         return dto;
     }
-
-    public DocumentsDTO createDocument(DocumentCreateRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-        Template template = templateRepository.findById(request.getTemplateId())
-                .orElseThrow(() -> new IllegalArgumentException("Template not found with ID: " + request.getTemplateId()));
-        Documents document = new Documents();
-        document.setUser(user);
-        document.setTemplate(template);
-        document.setCreatedAt(request.getCreatedAt());
-        document.setDraft(request.isDraft());
-        document = documentsRepository.save(document);
-        DocumentsDTO documentDTO = new DocumentsDTO();
-        documentDTO.setId(document.getId());
-        documentDTO.setCreatedAt(document.getCreatedAt());
-        documentDTO.setDraft(document.getDraft());
-        return documentDTO;
-    }
-
     public ApiResponseDocuments createNewDocument(Long templateId) {
         Template template = templateRepository.findById(templateId).orElse(null);
         if (template != null) {

@@ -108,26 +108,21 @@ public class suserController {
         }
         return new ApiResponse("Temporary values saved successfully.", null);
     }
-
     @PatchMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
         ApiResponse response = documentsService.addOrUpdateValue(request);
         return response;
     }
-
-
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
         return response;
     }
-
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
@@ -152,10 +147,8 @@ public class suserController {
         }
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
-
             if (pdfContent.length > 0) {
                 HttpHeaders headers = new HttpHeaders();
-
                 headers.setContentType(MediaType.APPLICATION_PDF);
                 headers.setContentDispositionFormData("attachment", "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf");
                 return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
