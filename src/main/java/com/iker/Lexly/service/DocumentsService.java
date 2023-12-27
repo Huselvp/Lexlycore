@@ -18,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 @Transactional
 public class DocumentsService {
@@ -200,11 +199,8 @@ public class DocumentsService {
                 }
             }
         }
-
         return mainDocument.html().trim();
     }
-
-
     private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
         return documentQuestionValues.stream().anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
     }
@@ -225,15 +221,12 @@ public class DocumentsService {
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            // Ensure HTML is well-formed
             String wellFormedXml = "<div>" + html + "</div>";
-
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
             renderer.layout();
             renderer.createPDF(outputStream);
             renderer.finishPDF();
-
             return outputStream.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,11 +236,9 @@ public class DocumentsService {
     public Documents updatePaymentStatus(Long documentId) {
         Documents document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new NotFoundException("Document not found"));
-
         document.setPaymentStatus(true);
         return documentsRepository.save(document);
     }
-
 }
 
 
