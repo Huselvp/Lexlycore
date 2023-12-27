@@ -135,7 +135,7 @@ public class QuestionService {
             }
             String xmlText = transformTextToXml(question.getTexte());
             if (xmlText != null) {
-                question.setTexte(xmlText);
+                question.setTexte(question.getTexte());
                 Question savedQuestion = questionRepository.save(question);
                 savedQuestion.setTemplate(template);
 
