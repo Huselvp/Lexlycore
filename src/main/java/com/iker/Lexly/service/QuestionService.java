@@ -1,5 +1,4 @@
 package com.iker.Lexly.service;
-
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
@@ -10,18 +9,13 @@ import jakarta.transaction.Transactional;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public class QuestionService {
-    private EntityManagerFactory entityManagerFactory;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -160,5 +154,14 @@ public class QuestionService {
             }
 
         }
+
+    public DocumentQuestionValue getValueForDocumentAndQuestion(Long documentId, Long questionId) {
+        List<DocumentQuestionValue> values = getValuesForDocument(documentId);
+        return values.stream()
+                .filter(value -> value.getQuestion().getId().equals(questionId))
+                .findFirst()
+                .orElse(null);
     }
+
+}
 

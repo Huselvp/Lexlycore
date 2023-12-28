@@ -140,14 +140,12 @@ public class DocumentsService {
                     documentQuestionValue.setQuestion(question);
                     documentQuestionValue.setValue(relatedText);
                     documentQuestionValueRepository.save(documentQuestionValue);
-
                     return new ApiResponse("Value added and saved successfully.", null);
                 } else {
                     return new ApiResponse("Invalid choice ID.", null);
                 }
             } else {
                 DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
-
                 if (existingValue != null) {
                     existingValue.setValue(value);
                     documentQuestionValueRepository.save(existingValue);
