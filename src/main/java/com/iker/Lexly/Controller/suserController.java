@@ -1,6 +1,4 @@
 package com.iker.Lexly.Controller;
-
-import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -20,12 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/suser")
 @PreAuthorize("hasRole('ROLE_SUSER')")
@@ -39,7 +34,6 @@ public class suserController {
     private final DocumentQuestionValueService documentQuestionValueService;
     private final QuestionTransformer questionTransformer;
     private final PDFGenerationService pdfGenerationService;
-
     @Autowired
     public suserController(DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
@@ -51,9 +45,7 @@ public class suserController {
         this.documentsService = documentsService;
         this.questionService = questionService;
         this.templateService = templateService;
-
     }
-
     @GetMapping("/user_all_templates")
     public List<TemplateDTO> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -66,7 +58,6 @@ public class suserController {
     public List<DocumentsDTO> getDocumentsByUserId(@PathVariable String userId) {
         return documentsService.getDocumentsByUserId(Long.valueOf(userId));
     }
-
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
@@ -82,7 +73,7 @@ public class suserController {
         ApiResponseDocuments response = documentsService.createNewDocument(templateId);
         return response;
     }
-    @GetMapping("/suser_find_questions_by_template/{templateId}")
+    @GetMapping("/find_questions_by_template/{templateId}")
     public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
@@ -123,6 +114,19 @@ public class suserController {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
+    @GetMapping("/values/{documentId}/{questionId}")
+    public ResponseEntity<DocumentQuestionValue> getValueForDocumentAndQuestion(
+            @PathVariable Long documentId,
+            @PathVariable Long questionId) {
+        DocumentQuestionValue value = questionService.getValueForDocumentAndQuestion(documentId, questionId);
+
+        if (value != null) {
+            return new ResponseEntity<>(value, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
