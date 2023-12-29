@@ -13,6 +13,7 @@ import com.iker.Lexly.responses.ApiResponseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,20 +51,16 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public ApiResponseTemplate createTemplate(TemplateDTO templateDTO, Long userId) {
+    public ApiResponseTemplate createTemplate( Long userId) {
         User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
-
         if (user != null) {
-            Template template = Template.builder()
-                    .templateName(templateDTO.getTemplateName())
-                    .templateDescription(templateDTO.getTemplateDescription())
-                    .cost(templateDTO.getCost())
-                    .category(templateDTO.getCategory())
-                    .user(user)
-                    .build();
-
+            Template template = new Template();
+            template.setUser(user);
+           template.setTemplateName(template.getTemplateName());
+           template.setTemplateDescription(template.getTemplateDescription());
+           template.setCategory(template.getCategory());
+           template.setCost(template.getCost());
             Template savedTemplate = templateRepository.save(template);
-
             if (savedTemplate != null) {
                 return new ApiResponseTemplate("Template created successfully.", savedTemplate);
             } else {
@@ -73,9 +70,6 @@ public class TemplateService {
             return new ApiResponseTemplate("User not found.", null);
         }
     }
-
-
-
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
     }
