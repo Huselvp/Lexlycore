@@ -4,6 +4,7 @@ import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Template;
+import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.repository.*;
@@ -21,17 +22,19 @@ public class TemplateService {
     private final CategoryRepository categoryRepository;
 
     private final CategoryService categoryService;
+    private final UserRepository userRepository;
     private  final DocumentsRepository documentsRepository;
     private final QuestionRepository questionRepository;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public TemplateService(DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.categoryRepository = categoryRepository;
         this.documentsRepository=documentsRepository;
+        this.userRepository=userRepository;
         this.categoryService=categoryService;
         this.categoryTransformer=categoryTransformer;
         this.questionRepository=questionRepository;
@@ -46,8 +49,24 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public Template createTemplate(Template template) {
-        return templateRepository.save(template);
+    public Template createTemplate(TemplateDTO templateDTO, Long userId) {
+        Optional<User> optionalUser = userRepository.findById(Math.toIntExact(userId));
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            Template template = Template.builder()
+                    .templateName(templateDTO.getTemplateName())
+                    .templateDescription(templateDTO.getTemplateDescription())
+                    .cost(templateDTO.getCost())
+                    .category(templateDTO.getCategory())
+                    .user(user)
+                    .build();
+
+            return templateRepository.save(template);
+        } else {
+            return null;
+        }
     }
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
@@ -117,6 +136,7 @@ public class TemplateService {
         List<Template> templates = templateRepository.findByCategoryId(categoryId);
         return templates.size();
     }
+
 
 
 }

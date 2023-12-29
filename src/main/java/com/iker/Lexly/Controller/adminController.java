@@ -78,8 +78,9 @@ public class adminController {
         return userDTOs;
     }
     @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
-    @GetMapping("/getMe/{token}")
-    public ResponseEntity<User> getUserByToken(@PathVariable String token) {
+    @GetMapping("/getMe")
+    public ResponseEntity<User> getUserByToken(HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
         if (jwtService.isTokenExpired(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
@@ -101,15 +102,17 @@ public class adminController {
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
 
-    @PutMapping("/update_user/{token}")
-    public ResponseEntity<User> updateUser(@PathVariable String token, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
+    @PutMapping("/update_user")
+    public ResponseEntity<User> updateUser(HttpServletRequest request, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
+        String token = extractTokenFromRequest(request);
         User updatedUserResponse = userService.updateUser(token, updatedUser);
         return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
     }
-    @PatchMapping("updateEMailOrPassword/{token}")
+    @PatchMapping("/updateEMailOrPassword")
     public ResponseEntity<String> modifyEmailOrPassword(
-            @PathVariable String token,
+            HttpServletRequest request,
             @RequestBody UpdateEmailPassword updateRequest) {
+        String token = extractTokenFromRequest(request);
         if (jwtService.isTokenExpired(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
         }
@@ -144,9 +147,19 @@ public class adminController {
     }
 
     @PostMapping(value = "/create_template")
-    public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
-        Template createdTemplate = templateService.createTemplate(template);
-        return ResponseEntity.ok(createdTemplate);
+    public ResponseEntity<Template> createTemplate(@RequestBody TemplateDTO templateDTO, HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        String username = jwtService.extractUsername(token);
+
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isPresent()) {
+            Long userId = user.get().getId();
+            Template createdTemplate = templateService.createTemplate(templateDTO, userId);
+            return ResponseEntity.ok(createdTemplate);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PutMapping("/update_template/{templateId}")
@@ -176,7 +189,7 @@ public class adminController {
         }
     }
 
-    @PutMapping("/update_category/{categoryId}")//valid
+    @PutMapping("/update_category/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(
             @PathVariable Long categoryId,
             @RequestBody CategoryDTO updateRequest
@@ -420,6 +433,13 @@ public class adminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 
 }
