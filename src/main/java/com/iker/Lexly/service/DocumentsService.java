@@ -213,13 +213,18 @@ public class DocumentsService {
             for (DocumentQuestionValueDTO valueDto : values) {
                 Long questionId = valueDto.getQuestionId();
                 String value = valueDto.getValue();
+                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
+
+                if (existingValue != null) {
+                    return new ApiResponse("A value already exists for this question and document combination.", null);
+                }
                 Question question = questionRepository.findById(questionId).orElse(null);
 
                 if (question != null) {
                     DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue(question, document, value);
                     documentQuestionValueRepository.save(documentQuestionValue);
                 } else {
-                    return new ApiResponse("question not found.", null);
+                    return new ApiResponse("Question not found.", null);
                 }
             }
             return new ApiResponse("Values added successfully.", null);
