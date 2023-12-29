@@ -9,6 +9,7 @@ import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.responses.ApiResponse;
+import com.iker.Lexly.responses.ApiResponseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public Template createTemplate(TemplateDTO templateDTO, Long userId) {
+    public ApiResponseTemplate createTemplate(TemplateDTO templateDTO, Long userId) {
         User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
 
         if (user != null) {
@@ -60,12 +61,19 @@ public class TemplateService {
                     .category(templateDTO.getCategory())
                     .user(user)
                     .build();
-            return templateRepository.save(template);
+
+            Template savedTemplate = templateRepository.save(template);
+
+            if (savedTemplate != null) {
+                return new ApiResponseTemplate("Template created successfully.", savedTemplate);
+            } else {
+                return new ApiResponseTemplate("Failed to create template.", null);
+            }
         } else {
-            System.out.println("null");
-            return null;
+            return new ApiResponseTemplate("User not found.", null);
         }
     }
+
 
 
     public List<Template> getAllTemplatesByUserId(Long userId) {

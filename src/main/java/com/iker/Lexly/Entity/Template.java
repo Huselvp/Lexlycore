@@ -37,10 +37,11 @@ public class Template {
     private Category category;
 
 
-    public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
+    public Template(List<Question> questions,String name, Category category, String templateDescription,float cost,User user) {
         this.templateName = name;
         this.templateDescription=templateDescription;
         this.cost=cost;
+        this.user=user;
         this.category = category;
         this.questions=questions;
     }

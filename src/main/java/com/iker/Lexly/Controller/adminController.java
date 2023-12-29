@@ -13,6 +13,7 @@ import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
 
+import com.iker.Lexly.responses.ApiResponseTemplate;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -146,17 +147,9 @@ public class adminController {
         return templates;
     }
     @PostMapping(value = "/create_template")
-    public ResponseEntity<Template> createTemplate(@RequestBody TemplateDTO templateDTO, HttpServletRequest request) {
-        String token = extractTokenFromRequest(request);
-        String username = jwtService.extractUsername(token);
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            Long userId = user.get().getId();
-            Template createdTemplate = templateService.createTemplate(templateDTO, userId);
-            return ResponseEntity.ok(createdTemplate);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<ApiResponseTemplate> createTemplate(@RequestBody TemplateDTO templateDTO, @RequestParam Long userId) {
+        ApiResponseTemplate response = templateService.createTemplate(templateDTO, userId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update_template/{templateId}")
