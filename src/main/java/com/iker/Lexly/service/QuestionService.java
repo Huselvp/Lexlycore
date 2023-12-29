@@ -155,13 +155,6 @@ public class QuestionService {
 
         }
 
-    public DocumentQuestionValue getValueForDocumentAndQuestion(Long documentId, Long questionId) {
-        List<DocumentQuestionValue> values = getValuesForDocument(documentId);
-        return values.stream()
-                .filter(value -> value.getQuestion().getId().equals(questionId))
-                .findFirst()
-                .orElse(null);
-    }
 
 }
 

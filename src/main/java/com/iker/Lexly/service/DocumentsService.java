@@ -123,41 +123,20 @@ public class DocumentsService {
         }
     }
 
-    public ApiResponse addOrUpdateValue(UpdateValueRequest request) {
+    public ApiResponse updateValue(UpdateValueRequest request) {
         Long documentId = request.getDocumentId();
         Long questionId = request.getQuestionId();
-        int selectedChoiceId = request.getSelectedChoiceId();
         String value = request.getValue();
         Documents document = documentsRepository.findById(documentId).orElse(null);
         Question question = questionRepository.findById(questionId).orElse(null);
         if (document != null && question != null) {
-            if (question.getValueType() != null && question.getValueType().startsWith("checkbox/")) {
-                String[] choices = question.getValueType().split("/");
-                if (selectedChoiceId >= 1 && selectedChoiceId <= choices.length - 3) {
-                    String relatedText = choices[selectedChoiceId * 3 - 1];
-                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
-                    documentQuestionValue.setDocument(document);
-                    documentQuestionValue.setQuestion(question);
-                    documentQuestionValue.setValue(relatedText);
-                    documentQuestionValueRepository.save(documentQuestionValue);
-                    return new ApiResponse("Value added and saved successfully.", null);
-                } else {
-                    return new ApiResponse("Invalid choice ID.", null);
-                }
+            DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
+            if (existingValue != null) {
+                existingValue.setValue(value);
+                documentQuestionValueRepository.save(existingValue);
+                return new ApiResponse("Value updated successfully.", null);
             } else {
-                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
-                if (existingValue != null) {
-                    existingValue.setValue(value);
-                    documentQuestionValueRepository.save(existingValue);
-                    return new ApiResponse("Value updated successfully.", null);
-                } else {
-                    DocumentQuestionValue newValue = new DocumentQuestionValue();
-                    newValue.setDocument(document);
-                    newValue.setQuestion(question);
-                    newValue.setValue(value);
-                    documentQuestionValueRepository.save(newValue);
-                    return new ApiResponse("Value added and saved successfully.", null);
-                }
+                return new ApiResponse("Document and question combination not found.", null);
             }
         } else {
             return new ApiResponse("Document or question not found.", null);

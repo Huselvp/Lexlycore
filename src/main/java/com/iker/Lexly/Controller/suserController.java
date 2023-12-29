@@ -101,7 +101,7 @@ public class suserController {
     }
     @PatchMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
-        ApiResponse response = documentsService.addOrUpdateValue(request);
+        ApiResponse response = documentsService.updateValue(request);
         return response;
     }
     @PostMapping("/completeDocument/{documentId}")
@@ -114,19 +114,6 @@ public class suserController {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-    @GetMapping("/values/{documentId}/{questionId}")
-    public ResponseEntity<DocumentQuestionValue> getValueForDocumentAndQuestion(
-            @PathVariable Long documentId,
-            @PathVariable Long questionId) {
-        DocumentQuestionValue value = questionService.getValueForDocumentAndQuestion(documentId, questionId);
-
-        if (value != null) {
-            return new ResponseEntity<>(value, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
