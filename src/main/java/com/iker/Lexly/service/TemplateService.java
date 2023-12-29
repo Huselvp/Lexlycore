@@ -49,16 +49,24 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public Template createTemplate(TemplateDTO templateDTO) {
+    public Template createTemplate(TemplateDTO templateDTO, Long userId) {
+        User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
+
+        if (user != null) {
             Template template = Template.builder()
                     .templateName(templateDTO.getTemplateName())
                     .templateDescription(templateDTO.getTemplateDescription())
                     .cost(templateDTO.getCost())
                     .category(templateDTO.getCategory())
+                    .user(user)
                     .build();
-
             return templateRepository.save(template);
+        } else {
+            System.out.println("null");
+            return null;
         }
+    }
+
 
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);

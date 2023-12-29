@@ -145,12 +145,18 @@ public class adminController {
         List<Template> templates = templateService.getAllTemplates();
         return templates;
     }
-
     @PostMapping(value = "/create_template")
-    public ResponseEntity<Template> createTemplate(@RequestBody TemplateDTO templateDTO) {
-            Template createdTemplate = templateService.createTemplate(templateDTO);
+    public ResponseEntity<Template> createTemplate(@RequestBody TemplateDTO templateDTO, HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        String username = jwtService.extractUsername(token);
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            Long userId = user.get().getId();
+            Template createdTemplate = templateService.createTemplate(templateDTO, userId);
             return ResponseEntity.ok(createdTemplate);
-
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PutMapping("/update_template/{templateId}")
