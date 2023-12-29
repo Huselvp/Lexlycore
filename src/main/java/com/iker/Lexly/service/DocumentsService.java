@@ -5,7 +5,6 @@ import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.AddValuesRequest;
-import com.iker.Lexly.request.DocumentCreateRequest;
 import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
@@ -70,15 +69,23 @@ public class DocumentsService {
         dto.setDraft(documents.getDraft());
         return dto;
     }
-    public ApiResponseDocuments createNewDocument(Long templateId) {
+    public ApiResponseDocuments createNewDocument(Long templateId, Long userId) {
         Template template = templateRepository.findById(templateId).orElse(null);
+
         if (template != null) {
-            Documents document = new Documents();
-            document.setTemplate(template);
-            document.setCreatedAt(LocalDateTime.now());
-            document.setDraft(true);
-            Documents savedDocument = documentsRepository.save(document);
-            return new ApiResponseDocuments("Document created successfully.", savedDocument.getId());
+            User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
+
+            if (user != null) {
+                Documents document = new Documents();
+                document.setTemplate(template);
+                document.setCreatedAt(LocalDateTime.now());
+                document.setDraft(true);
+                document.setUser(user);
+                Documents savedDocument = documentsRepository.save(document);
+                return new ApiResponseDocuments("Document created successfully.", savedDocument.getId());
+            } else {
+                return new ApiResponseDocuments("User not found.", null);
+            }
         } else {
             return new ApiResponseDocuments("Template not found.", null);
         }

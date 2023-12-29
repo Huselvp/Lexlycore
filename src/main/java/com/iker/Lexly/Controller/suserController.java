@@ -1,7 +1,9 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.Transformer.QuestionTransformer;
+import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.RequestData;
 import com.iker.Lexly.request.UpdateValueRequest;
@@ -12,15 +14,18 @@ import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/suser")
@@ -31,13 +36,17 @@ public class suserController {
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final DocumentQuestionValueService documentQuestionValueService;
     private final QuestionTransformer questionTransformer;
     private final PDFGenerationService pdfGenerationService;
     @Autowired
-    public suserController(DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController( UserRepository userRepository,JwtService jwtService,DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
         this.templateTransformer = templateTransformer;
+        this.jwtService=jwtService;
+        this.userRepository=userRepository;
         this.documentQuestionValueService = documentQuestionValueService;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
         this.questionRepository = questionRepository;
@@ -70,9 +79,24 @@ public class suserController {
         }
     }
     @PostMapping("/createDocument/{templateId}")
-    public ApiResponseDocuments createNewDocument(@PathVariable Long templateId) {
-        ApiResponseDocuments response = documentsService.createNewDocument(templateId);
-        return response;
+    public ApiResponseDocuments createNewDocument(@PathVariable Long templateId, HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        String username = jwtService.extractUsername(token);
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user != null) {
+            Long userId = user.get().getUserId();
+            ApiResponseDocuments response = documentsService.createNewDocument(templateId, userId);
+            return response;
+        } else {
+            return new ApiResponseDocuments("User not found.", null);
+        }
+    }
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // Extract the token excluding "Bearer "
+        }
+        return null;
     }
     @GetMapping("/find_questions_by_template/{templateId}")
     public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
