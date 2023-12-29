@@ -53,16 +53,15 @@ public class TemplateService {
         User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
 
         if (user != null) {
-            Template template = Template.builder()
-                    .templateName(templateDTO.getTemplateName())
-                    .templateDescription(templateDTO.getTemplateDescription())
-                    .cost(templateDTO.getCost())
-                    .category(templateDTO.getCategory())
-                    .user(user)
-                    .build();
+            Template template = new Template();
+                    template.setTemplateName(templateDTO.getTemplateName());
+                    template.setTemplateDescription(templateDTO.getTemplateDescription());
+                    template.setCost(templateDTO.getCost());
+                    template.setCategory(templateDTO.getCategory());
+                    template.setUser(user);
             return templateRepository.save(template);
         } else {
-            System.out.println("null");
+            System.out.println("user not found");
             return null;
         }
     }
