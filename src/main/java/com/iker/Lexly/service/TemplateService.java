@@ -49,25 +49,17 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public Template createTemplate(TemplateDTO templateDTO, Long userId) {
-        Optional<User> optionalUser = userRepository.findById(Math.toIntExact(userId));
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-
+    public Template createTemplate(TemplateDTO templateDTO) {
             Template template = Template.builder()
                     .templateName(templateDTO.getTemplateName())
                     .templateDescription(templateDTO.getTemplateDescription())
                     .cost(templateDTO.getCost())
                     .category(templateDTO.getCategory())
-                    .user(user)
                     .build();
 
             return templateRepository.save(template);
-        } else {
-            return null;
         }
-    }
+
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
     }
