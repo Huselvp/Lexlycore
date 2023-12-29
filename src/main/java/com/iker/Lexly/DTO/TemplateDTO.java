@@ -13,7 +13,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Builder
 public class TemplateDTO {
     private Long id;
     private String templateName;
@@ -21,8 +20,6 @@ public class TemplateDTO {
     private float cost;
     private Category category;
 
-
-    @Builder
     public TemplateDTO(Long id, String templateName, String templateDescription, float cost, Category category) {
         this.id = id;
         this.templateName = templateName;
