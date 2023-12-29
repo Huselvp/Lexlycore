@@ -1,5 +1,4 @@
 package com.iker.Lexly.Controller;
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -81,26 +80,6 @@ public class suserController {
         return questionDTOs;
     }
 
-    @PostMapping("/saveTemporaryValues/{documentId}")
-    public ApiResponse saveTemporaryValues(
-            @PathVariable Long documentId,
-            @RequestBody List<Long> questionIds,
-            @RequestBody List<String> values
-    ) {
-        if (questionIds.size() != values.size()) {
-            return new ApiResponse("Mismatched question IDs and values.", null);
-        }
-
-        for (int i = 0; i < questionIds.size(); i++) {
-            Long questionId = questionIds.get(i);
-            String value = values.get(i);
-            ApiResponse response = documentsService.saveTemporaryValue(documentId, questionId, value);
-            if (!response.isSuccess()) {
-                return response;
-            }
-        }
-        return new ApiResponse("Temporary values saved successfully.", null);
-    }
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
         ApiResponse response = documentsService.addValues(request);
@@ -133,7 +112,6 @@ public class suserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();

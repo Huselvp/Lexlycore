@@ -83,30 +83,6 @@ public class DocumentsService {
             return new ApiResponseDocuments("Template not found.", null);
         }
     }
-
-    public ApiResponse saveTemporaryValue(Long documentId, Long questionId, String value) {
-        Documents document = documentsRepository.findById(documentId).orElse(null);
-        Question question = questionRepository.findById(questionId).orElse(null);
-
-        if (document != null && question != null) {
-            DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
-            if (existingValue != null) {
-                existingValue.setValue(value);
-            } else {
-                DocumentQuestionValue newValue = new DocumentQuestionValue();
-                newValue.setDocument(document);
-                newValue.setQuestion(question);
-                newValue.setValue(value);
-                documentQuestionValueRepository.save(newValue);
-            }
-
-            return new ApiResponse("Temporary value saved successfully.", null);
-        } else {
-            return new ApiResponse("Document or question not found.", null);
-        }
-    }
-
-
     public ApiResponse completeDocument(Long documentId) {
         Documents document = documentsRepository.findById(documentId).orElse(null);
 
@@ -206,15 +182,12 @@ public class DocumentsService {
     public ApiResponse addValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
         List<DocumentQuestionValueDTO> values = request.getValues();
-
         Documents document = documentsRepository.findById(documentId).orElse(null);
-
         if (document != null) {
             for (DocumentQuestionValueDTO valueDto : values) {
                 Long questionId = valueDto.getQuestionId();
                 String value = valueDto.getValue();
                 DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
-
                 if (existingValue != null) {
                     return new ApiResponse("A value already exists for this question and document combination.", null);
                 }
