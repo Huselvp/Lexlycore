@@ -1,10 +1,14 @@
 package com.iker.Lexly.DTO;
 
+import com.iker.Lexly.Entity.Documents;
+import com.iker.Lexly.Entity.Question;
+
 public class DocumentQuestionValueDTO {
     private Long documentQuestionValueId;
     private Long documentId;
     private Long questionId;
     private String value;
+
 
 
     public Long getDocumentQuestionValueId() {

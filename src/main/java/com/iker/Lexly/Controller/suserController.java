@@ -1,7 +1,9 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.RequestData;
 import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.DTO.DocumentsDTO;
@@ -99,6 +101,11 @@ public class suserController {
         }
         return new ApiResponse("Temporary values saved successfully.", null);
     }
+    @PostMapping("/addValues")
+    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
+        ApiResponse response = documentsService.addValues(request);
+        return response;
+    }
     @PatchMapping("/updateValue")
     public ApiResponse updateValue(@RequestBody UpdateValueRequest request) {
         ApiResponse response = documentsService.updateValue(request);
@@ -114,6 +121,19 @@ public class suserController {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
+    @GetMapping("/values/{documentId}/{questionId}")
+    public ResponseEntity<DocumentQuestionValue> getValueForDocumentAndQuestion(
+            @PathVariable Long documentId,
+            @PathVariable Long questionId) {
+        DocumentQuestionValue value = questionService.getValueForDocumentAndQuestion(documentId, questionId);
+
+        if (value != null) {
+            return new ResponseEntity<>(value, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();

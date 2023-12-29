@@ -1,8 +1,10 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
+import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.DocumentCreateRequest;
 import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
@@ -199,6 +201,31 @@ public class DocumentsService {
                 .orElseThrow(() -> new NotFoundException("Document not found"));
         document.setPaymentStatus(true);
         return documentsRepository.save(document);
+    }
+
+    public ApiResponse addValues(AddValuesRequest request) {
+        Long documentId = request.getDocumentId();
+        List<DocumentQuestionValueDTO> values = request.getValues();
+
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+
+        if (document != null) {
+            for (DocumentQuestionValueDTO valueDto : values) {
+                Long questionId = valueDto.getQuestionId();
+                String value = valueDto.getValue();
+                Question question = questionRepository.findById(questionId).orElse(null);
+
+                if (question != null) {
+                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue(question, document, value);
+                    documentQuestionValueRepository.save(documentQuestionValue);
+                } else {
+                    return new ApiResponse("question not found.", null);
+                }
+            }
+            return new ApiResponse("Values added successfully.", null);
+        } else {
+            return new ApiResponse("Document not found.", null);
+        }
     }
 }
 

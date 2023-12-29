@@ -18,6 +18,17 @@ public class DocumentQuestionValue {
 
 
     private String value;
+
+    public DocumentQuestionValue(Question question, Documents document, String value) {
+        this.question = question;
+        this.document = document;
+        this.value = value;
+    }
+
+    public DocumentQuestionValue() {
+
+    }
+
     public Long getDocumentQuestionValueId() {
         return documentQuestionValueId;
     }
