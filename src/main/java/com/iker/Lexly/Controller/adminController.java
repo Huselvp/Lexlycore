@@ -81,7 +81,7 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-
+    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
     @GetMapping("/getMe/{token}")
     public ResponseEntity<User> getUserByToken(@PathVariable String token) {
         if (jwtService.isTokenExpired(token)) {
@@ -140,6 +140,7 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
     @GetMapping("/all_templates")
     public List<Template> getAllTemplates() {
         List<Template> templates = templateService.getAllTemplates();
@@ -259,7 +260,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
     @GetMapping("/template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);

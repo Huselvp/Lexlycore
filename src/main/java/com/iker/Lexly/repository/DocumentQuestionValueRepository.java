@@ -21,4 +21,6 @@ public interface DocumentQuestionValueRepository extends JpaRepository<DocumentQ
     List<DocumentQuestionValue> findByQuestionId(Long id);
 
     void deleteByQuestion(Question question);
+
+    DocumentQuestionValue findByDocumentIdAndQuestionId(Long questionId, Long documentId);
 }

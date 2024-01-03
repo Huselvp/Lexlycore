@@ -1,8 +1,10 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
+import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.DocumentCreateRequest;
 import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
@@ -70,22 +72,25 @@ public class DocumentsService {
         return dto;
     }
 
-    public DocumentsDTO createDocument(DocumentCreateRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-        Template template = templateRepository.findById(request.getTemplateId())
-                .orElseThrow(() -> new IllegalArgumentException("Template not found with ID: " + request.getTemplateId()));
-        Documents document = new Documents();
-        document.setUser(user);
-        document.setTemplate(template);
-        document.setCreatedAt(request.getCreatedAt());
-        document.setDraft(request.isDraft());
-        document = documentsRepository.save(document);
-        DocumentsDTO documentDTO = new DocumentsDTO();
-        documentDTO.setId(document.getId());
-        documentDTO.setCreatedAt(document.getCreatedAt());
-        documentDTO.setDraft(document.getDraft());
-        return documentDTO;
+    public ApiResponseDocuments createNewDocument(Long templateId, Long userId) {
+        Template template = templateRepository.findById(templateId).orElse(null);
+
+        if (template != null) {
+            User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
+            if (user != null) {
+                Documents document = new Documents();
+                document.setTemplate(template);
+                document.setCreatedAt(LocalDateTime.now());
+                document.setDraft(true);
+                document.setUser(user);
+                Documents savedDocument = documentsRepository.save(document);
+                return new ApiResponseDocuments("Document created successfully.", savedDocument.getId());
+            } else {
+                return new ApiResponseDocuments("User not found.", null);
+            }
+        } else {
+            return new ApiResponseDocuments("Template not found.", null);
+        }
     }
 
     public ApiResponseDocuments createNewDocument(Long templateId) {
@@ -143,48 +148,7 @@ public class DocumentsService {
         }
     }
 
-    public ApiResponse addOrUpdateValue(UpdateValueRequest request) {
-        Long documentId = request.getDocumentId();
-        Long questionId = request.getQuestionId();
-        int selectedChoiceId = request.getSelectedChoiceId();
-        String value = request.getValue();
-        Documents document = documentsRepository.findById(documentId).orElse(null);
-        Question question = questionRepository.findById(questionId).orElse(null);
-        if (document != null && question != null) {
-            if (question.getValueType() != null && question.getValueType().startsWith("checkbox/")) {
-                String[] choices = question.getValueType().split("/");
-                if (selectedChoiceId >= 1 && selectedChoiceId <= choices.length - 3) {
-                    String relatedText = choices[selectedChoiceId * 3 - 1];
-                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
-                    documentQuestionValue.setDocument(document);
-                    documentQuestionValue.setQuestion(question);
-                    documentQuestionValue.setValue(relatedText);
-                    documentQuestionValueRepository.save(documentQuestionValue);
 
-                    return new ApiResponse("Value added and saved successfully.", null);
-                } else {
-                    return new ApiResponse("Invalid choice ID.", null);
-                }
-            } else {
-                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
-
-                if (existingValue != null) {
-                    existingValue.setValue(value);
-                    documentQuestionValueRepository.save(existingValue);
-                    return new ApiResponse("Value updated successfully.", null);
-                } else {
-                    DocumentQuestionValue newValue = new DocumentQuestionValue();
-                    newValue.setDocument(document);
-                    newValue.setQuestion(question);
-                    newValue.setValue(value);
-                    documentQuestionValueRepository.save(newValue);
-                    return new ApiResponse("Value added and saved successfully.", null);
-                }
-            }
-        } else {
-            return new ApiResponse("Document or question not found.", null);
-        }
-    }
     public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
@@ -248,6 +212,32 @@ public class DocumentsService {
         return documentsRepository.save(document);
     }
 
+    public ApiResponse addValues(AddValuesRequest request) {
+        Long documentId = request.getDocumentId();
+        List<DocumentQuestionValueDTO> values = request.getValues();
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+        if (document != null) {
+            for (DocumentQuestionValueDTO valueDto : values) {
+                Long questionId = valueDto.getQuestionId();
+                String value = valueDto.getValue();
+                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
+                if (existingValue != null) {
+                    return new ApiResponse("A value already exists for this question and document combination.", null);
+                }
+                Question question = questionRepository.findById(questionId).orElse(null);
+
+                if (question != null) {
+                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue(question, document, value);
+                    documentQuestionValueRepository.save(documentQuestionValue);
+                } else {
+                    return new ApiResponse("Question not found.", null);
+                }
+            }
+            return new ApiResponse("Values added successfully.", null);
+        } else {
+            return new ApiResponse("Document not found.", null);
+        }
+    }
 }
 
 
