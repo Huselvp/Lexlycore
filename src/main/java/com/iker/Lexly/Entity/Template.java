@@ -3,11 +3,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.DTO.CategoryDTO;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "template")
 public class Template {
 
@@ -25,7 +33,7 @@ public class Template {
     private float cost;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "owner_id")
     private User user;
 
     @ManyToOne
@@ -33,10 +41,11 @@ public class Template {
     private Category category;
 
 
-    public Template(List<Question> questions,String name, Category category, String templateDescription,float cost) {
+    public Template(List<Question> questions,String name, Category category, String templateDescription,float cost,User user) {
         this.templateName = name;
         this.templateDescription=templateDescription;
         this.cost=cost;
+        this.user=user;
         this.category = category;
         this.questions=questions;
     }
@@ -49,71 +58,11 @@ public class Template {
 
     public Template() {
     }
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
 
-    public String getTemplateName() {
-        return templateName;
-    }
-
-    public float getCost() {
-        return cost;
-    }
     public boolean isNew() {
         return id == null || id == 0;
     }
-    public void setTemplateName(String templateName) {
-        this.templateName = templateName;
-    }
-
-    public void setCost(float Cost) {
-        this.cost = Cost;
-    }
-
-    public String getTemplateDescription() {
-        return templateDescription;
-    }
-
-    public void setTemplateDescription(String templateDescription) {
-        this.templateDescription = templateDescription;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-    public List<Question> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-    }
-
-    public List<Documents> getDocuments() {
-        return documents;
-    }
-
-    public void setDocuments(List<Documents> documents) {
-        this.documents = documents;
-    }
-    public Category getCategory() {
-        return category;
-    }
-
 
 
 }

@@ -18,11 +18,9 @@ public class Documents {
     private LocalDateTime createdAt;
 
     @Column(name = "is_draft")
-    private boolean isDraft;
+    private boolean isDraft=true;
     @Column(name = "payment_status")
-    private Boolean paymentStatus;
-
-
+    private Boolean paymentStatus=false;
     @ManyToOne
     private User user;
 
@@ -32,7 +30,6 @@ public class Documents {
     @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues;
-
     public Long getId() {
         return id;
     }

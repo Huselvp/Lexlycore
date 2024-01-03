@@ -4,13 +4,16 @@ import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Template;
+import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Transformer.CategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.responses.ApiResponse;
+import com.iker.Lexly.responses.ApiResponseTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,17 +24,19 @@ public class TemplateService {
     private final CategoryRepository categoryRepository;
 
     private final CategoryService categoryService;
+    private final UserRepository userRepository;
     private  final DocumentsRepository documentsRepository;
     private final QuestionRepository questionRepository;
     private final TemplateTransformer templateTransformer;
     private final CategoryTransformer categoryTransformer;
 
     @Autowired
-    public TemplateService(DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.categoryRepository = categoryRepository;
         this.documentsRepository=documentsRepository;
+        this.userRepository=userRepository;
         this.categoryService=categoryService;
         this.categoryTransformer=categoryTransformer;
         this.questionRepository=questionRepository;
@@ -46,8 +51,24 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public Template createTemplate(Template template) {
-        return templateRepository.save(template);
+    public ApiResponseTemplate createTemplate( Long userId) {
+        User user = userRepository.findById(Math.toIntExact(userId)).orElse(null);
+        if (user != null) {
+            Template template = new Template();
+            template.setUser(user);
+           template.setTemplateName(template.getTemplateName());
+           template.setTemplateDescription(template.getTemplateDescription());
+           template.setCategory(template.getCategory());
+           template.setCost(template.getCost());
+            Template savedTemplate = templateRepository.save(template);
+            if (savedTemplate != null) {
+                return new ApiResponseTemplate("Template created successfully.", savedTemplate);
+            } else {
+                return new ApiResponseTemplate("Failed to create template.", null);
+            }
+        } else {
+            return new ApiResponseTemplate("User not found.", null);
+        }
     }
     public List<Template> getAllTemplatesByUserId(Long userId) {
         return templateRepository.findByUserId(userId);
@@ -117,6 +138,7 @@ public class TemplateService {
         List<Template> templates = templateRepository.findByCategoryId(categoryId);
         return templates.size();
     }
+
 
 
 }
