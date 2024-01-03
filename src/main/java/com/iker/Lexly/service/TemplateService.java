@@ -90,8 +90,6 @@ public class TemplateService {
             return new ApiResponse("Error", null);
         }
     }
-
-
     public ApiResponse assignCategoryToTemplate(Long templateId, Long categoryId) {
         Template template = templateRepository.findById(templateId).orElse(null);
         Category category = categoryService.getCategoryById(categoryId);
