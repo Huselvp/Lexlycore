@@ -1,6 +1,4 @@
 package com.iker.Lexly.Controller;
-
-import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
@@ -8,7 +6,6 @@ import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.RequestData;
-import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
@@ -28,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/suser")
 @PreAuthorize("hasRole('ROLE_SUSER')")
@@ -77,7 +73,6 @@ public class suserController {
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
-
         if (template != null) {
             return new ResponseEntity<>(template, HttpStatus.OK);
         } else {
@@ -131,34 +126,28 @@ public class suserController {
         }
         return new ApiResponse("Temporary values saved successfully.", null);
     }
-
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
         ApiResponse response = documentsService.addValues(request);
         return response;
     }
-
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
         return response;
     }
-
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
         List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
         Long templateId = requestData.getTemplateId();
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-
         String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
-
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
@@ -191,7 +180,6 @@ public class suserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error generating PDF: " + e.getMessage()).getBytes());
         }
     }
-
 }
 
 

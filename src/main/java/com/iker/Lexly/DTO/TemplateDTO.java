@@ -1,15 +1,7 @@
 package com.iker.Lexly.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.iker.Lexly.Entity.Category;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,15 +10,13 @@ public class TemplateDTO {
     private String templateName;
     private String templateDescription;
     private float cost;
-    private Category category;
 
-    public TemplateDTO(Long id, String templateName, String templateDescription, float cost, Category category) {
+
+    public TemplateDTO(Long id, String templateName, String templateDescription, float cost) {
         this.id = id;
         this.templateName = templateName;
         this.templateDescription = templateDescription;
         this.cost = cost;
-        this.category = category;
-
     }
 }
 

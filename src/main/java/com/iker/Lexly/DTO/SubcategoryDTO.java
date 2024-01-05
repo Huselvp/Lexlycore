@@ -6,17 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CategoryDTO {
+public class SubcategoryDTO {
     private Long id;
-    private String category;
+    private String name;
     private CategoryType categoryType;
-    private List<SubcategoryDTO> subcategories;
 
     public Long getId() {
         return id;
@@ -26,12 +23,12 @@ public class CategoryDTO {
         this.id = id;
     }
 
-    public String getCategory() {
-        return category;
+    public String getName() {
+        return name;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public CategoryType getCategoryType() {
@@ -41,12 +38,5 @@ public class CategoryDTO {
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
     }
-
-    public List<SubcategoryDTO> getSubcategories() {
-        return subcategories;
-    }
-
-    public void setSubcategories(List<SubcategoryDTO> subcategories) {
-        this.subcategories = subcategories;
-    }
 }
+

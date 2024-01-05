@@ -31,22 +31,19 @@ public class Template {
 
     @Column(name = "template_cost")
     private float cost;
-
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User user;
-
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category;
+    private Subcategory subcategory;
 
-
-    public Template(List<Question> questions,String name, Category category, String templateDescription,float cost,User user) {
+    public Template(List<Question> questions,String name,Subcategory subcategory, String templateDescription,float cost,User user) {
         this.templateName = name;
         this.templateDescription=templateDescription;
         this.cost=cost;
         this.user=user;
-        this.category = category;
+       this.subcategory=subcategory;
         this.questions=questions;
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -54,12 +51,8 @@ public class Template {
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL,  orphanRemoval = true)
     @JsonIgnore
     private List<Documents> documents = new ArrayList<>();
-
-
     public Template() {
     }
-
-
     public boolean isNew() {
         return id == null || id == 0;
     }
