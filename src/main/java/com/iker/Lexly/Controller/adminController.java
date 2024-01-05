@@ -85,6 +85,11 @@ public class adminController {
         String result = subcategoryService.deleteSubCategory(id);
         return ResponseEntity.ok(result);
     }
+    @PostMapping("/assignSubcategory/{templateId}/{subcategoryId}")
+    public ApiResponse assignSubcategoryToTemplate(@PathVariable Long templateId, @PathVariable Long subcategoryId) {
+        return templateService.assignSubcategoryToTemplate(templateId, subcategoryId);
+    }
+
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers(HttpServletRequest request) {
         List<User> users = userService.getAllUsers();

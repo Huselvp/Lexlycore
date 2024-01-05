@@ -1,9 +1,12 @@
 package com.iker.Lexly.service;
 
+import com.iker.Lexly.DTO.SubcategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Documents;
+import com.iker.Lexly.Entity.Subcategory;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
@@ -17,6 +20,8 @@ import java.util.Optional;
 @Service
 public class TemplateService {
     private final TemplateRepository templateRepository;
+    private final SubcategoryService subcategoryService;
+    private final SubCategoryTransformer subCategoryTransformer;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final UserRepository userRepository;
     private  final DocumentsRepository documentsRepository;
@@ -25,11 +30,13 @@ public class TemplateService {
     private final TemplateTransformer templateTransformer;
 
     @Autowired
-    public TemplateService(JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
+    public TemplateService(SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.documentsRepository=documentsRepository;
         this.jwtService=jwtService;
+        this.subCategoryTransformer=subCategoryTransformer;
+        this.subcategoryService=subcategoryService;
         this.userRepository=userRepository;
         this.questionRepository=questionRepository;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
@@ -58,42 +65,24 @@ public class TemplateService {
             return new ApiResponse("User not found.", null);
         }
     }
-    public List<Template> getAllTemplatesByUserId(Long userId) {
-        return templateRepository.findByUserId(userId);
+
+public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategoryId) {
+    Template template = templateRepository.findById(templateId).orElse(null);
+    SubcategoryDTO subcategory = subcategoryService.getSubcategoryById(subcategoryId);
+
+    if (template != null && subcategory != null) {
+        if (template.getSubcategory() != null) {
+            return new ApiResponse("Template already has a subcategory.", template.getSubcategory());
+        } else {
+            template.setSubcategory(subCategoryTransformer.toEntity(subcategory));
+            Template updatedTemplate = templateRepository.save(template);
+            return new ApiResponse("Subcategory assigned successfully.", updatedTemplate.getSubcategory());
+        }
+    } else {
+        return new ApiResponse("Error", null);
     }
-//    public ApiResponse updateCategoryForTemplate(Long templateId, Long newCategoryId) {
-//        Template template = templateRepository.findById(templateId).orElse(null);
-//        Category newCategory = categoryService.getCategoryById(newCategoryId);
-//
-//        if (template != null && newCategory != null) {
-//            Category existingCategory = template.getCategory();
-//            if (existingCategory != null) {
-//                template.setCategory(newCategory);
-//                Template updatedTemplate = templateRepository.save(template);
-//                return new ApiResponse("Category updated successfully.", updatedTemplate.getCategory());
-//            } else {
-//                return new ApiResponse("Template does not have a category.", null);
-//            }
-//        } else {
-//            return new ApiResponse("Error", null);
-//        }
-//    }
-//    public ApiResponse assignCategoryToTemplate(Long templateId, Long categoryId) {
-//        Template template = templateRepository.findById(templateId).orElse(null);
-//        Category category = categoryService.getCategoryById(categoryId);
-//
-//        if (template != null && category != null) {
-//            if (template.getCategory() != null) {
-//                return new ApiResponse("Template already has a category.", template.getCategory());
-//            } else {
-//                template.setCategory(category);
-//                Template updatedTemplate = templateRepository.save(template);
-//                return new ApiResponse("Category assigned successfully.", updatedTemplate.getCategory());
-//            }
-//        } else {
-//            return new ApiResponse("Error", null);
-//        }
-//    }
+}
+
     public Template updateTemplate(Long templateId, TemplateDTO templateDTO) {
         Optional<Template> existingTemplateOptional = templateRepository.findById(templateId);
         if (existingTemplateOptional.isPresent()) {

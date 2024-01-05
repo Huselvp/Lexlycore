@@ -4,6 +4,9 @@ import com.iker.Lexly.Entity.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "subcategory")
 public class Subcategory {
@@ -19,10 +22,12 @@ public class Subcategory {
     @NotNull
     private CategoryType categoryType;
 
+    @OneToMany(mappedBy = "subcategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Template> templates = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -41,5 +46,13 @@ public class Subcategory {
 
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
+    }
+
+    public List<Template> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<Template> templates) {
+        this.templates = templates;
     }
 }

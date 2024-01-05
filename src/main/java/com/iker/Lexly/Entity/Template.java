@@ -1,7 +1,5 @@
 package com.iker.Lexly.Entity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iker.Lexly.DTO.CategoryDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +54,4 @@ public class Template {
     public boolean isNew() {
         return id == null || id == 0;
     }
-
-
 }
