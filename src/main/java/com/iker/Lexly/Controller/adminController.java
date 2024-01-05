@@ -36,6 +36,7 @@ public class adminController {
     private final UserService userService;
     private final UserTransformer userTransformer;
     private final SubcategoryService subcategoryService;
+
     private final UserRepository userRepository;
     private  final PasswordEncoder passwordEncoder;
     private final QuestionTransformer questionTransformer;
@@ -121,7 +122,18 @@ public class adminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-
+    @PutMapping("/update_category/{templateId}/{newCategoryId}")
+    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
+            @PathVariable Long templateId,
+            @PathVariable Long newCategoryId
+    ) {
+        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @PutMapping("/update_user/{token}")
     public ResponseEntity<User> updateUser(@PathVariable String token, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
         User updatedUserResponse = userService.updateUser(token, updatedUser);

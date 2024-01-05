@@ -22,6 +22,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final SubcategoryService subcategoryService;
     private final SubCategoryTransformer subCategoryTransformer;
+    private final SubcategoryRepository subcategoryRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final UserRepository userRepository;
     private  final DocumentsRepository documentsRepository;
@@ -30,11 +31,12 @@ public class TemplateService {
     private final TemplateTransformer templateTransformer;
 
     @Autowired
-    public TemplateService(SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
+    public TemplateService(SubcategoryRepository subcategoryRepository,SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.documentsRepository=documentsRepository;
         this.jwtService=jwtService;
+        this.subcategoryRepository=subcategoryRepository;
         this.subCategoryTransformer=subCategoryTransformer;
         this.subcategoryService=subcategoryService;
         this.userRepository=userRepository;
@@ -65,7 +67,17 @@ public class TemplateService {
             return new ApiResponse("User not found.", null);
         }
     }
-
+    public ApiResponse updateCategoryForTemplate( Long templateId , Long newSubcategoryId){
+        Template template = templateRepository.findById(templateId).orElse(null);
+        if(template != null && template.getSubcategory() !=null){
+            SubcategoryDTO subcategoryDTO = subcategoryService.getSubcategoryById(newSubcategoryId);
+            template.setSubcategory(subCategoryTransformer.toEntity(subcategoryDTO));
+            return  new ApiResponse("SubCategory is updated" ,template );
+          }
+        else {
+            return new ApiResponse("template or subcategory is null", null);
+        }
+    }
 public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategoryId) {
     Template template = templateRepository.findById(templateId).orElse(null);
     SubcategoryDTO subcategory = subcategoryService.getSubcategoryById(subcategoryId);
