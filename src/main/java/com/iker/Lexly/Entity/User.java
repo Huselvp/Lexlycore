@@ -60,8 +60,6 @@ public class User implements UserDetails {
     @JsonIgnore
     @JsonManagedReference
     private List<Token> tokens;
-    @OneToMany(mappedBy = "user")
-    private List<Template> templates;
     public User(String username,String email, String firstName, String lastName, String password, String phonenumber, String picture, Role role) {
         this.email = email;
         this.username=username;
@@ -70,7 +68,6 @@ public class User implements UserDetails {
         this.password = password;
         this.phonenumber=phonenumber;
         this.picture = picture;
-
         this.role = role;
     }
     @Override

@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.Entity.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class Subcategory {
     private CategoryType categoryType;
 
     @OneToMany(mappedBy = "subcategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Template> templates = new ArrayList<>();
 
     public Long getId() {
