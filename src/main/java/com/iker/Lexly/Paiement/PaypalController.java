@@ -12,6 +12,10 @@ import java.util.Map;
 public class PaypalController {
     @Autowired
     private PaypalService paypalService;
+    @Autowired
+    public PaypalController(PaypalService paypalService) {
+        this.paypalService = paypalService;
+    }
 
     @PostMapping("/create-order/{templateId}")
     public ResponseEntity<String> createOrder(@PathVariable Long templateId) {

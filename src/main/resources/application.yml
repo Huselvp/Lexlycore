@@ -19,5 +19,7 @@ paypal:
   client:
     id: ASH-5W4rF097Wr96eqw-XHStDs7pZyRPz4cNihmr4dbUlBQEjTN-9-hBKjK3xgsFAWwifrHY10dbPBG_
     secret: EI-c8_-WM9UHSZdBGqzZNobFbpyZ_AnbMtl_4pWtlyZL13yhgAa0liPcDT5vMnqOPImhFaUWSlT8DFKN
+  base:
+    url: "https://api-m.sandbox.paypal.com"
 app:
   firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
