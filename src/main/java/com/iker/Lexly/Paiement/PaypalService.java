@@ -28,10 +28,13 @@ public class PaypalService {
     private String baseUrl;
 
     @Autowired
+
     private TemplateRepository templateRepository;
    @Autowired
+
     private final DocumentsRepository documentsRepository;
-    @Autowired
+   @Autowired
+
     private RestTemplate restTemplate;
 
     public PaypalService(DocumentsRepository documentsRepository) {
