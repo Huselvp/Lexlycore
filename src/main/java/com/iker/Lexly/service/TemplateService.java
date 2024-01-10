@@ -56,7 +56,6 @@ public class TemplateService {
         String username = jwtService.extractUsername(token);
         User user = userRepository.findByUsername(username).orElse(null);
         if (user != null) {
-            template.setUser(user);
             Template savedTemplate = templateRepository.save(template);
             if (savedTemplate != null) {
                 return new ApiResponse("Template created successfully.", savedTemplate);
