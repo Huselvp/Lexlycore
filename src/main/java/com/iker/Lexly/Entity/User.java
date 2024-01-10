@@ -3,7 +3,6 @@ package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.Entity.enums.Role;
-import com.iker.Lexly.Paiement.Order;
 import com.iker.Lexly.Token.Token;
 import lombok.*;
 import jakarta.persistence.*;
@@ -63,11 +62,6 @@ public class User implements UserDetails {
     private List<Token> tokens;
     @OneToMany(mappedBy = "user")
     private List<Template> templates;
-   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
-
-
-
     public User(String username,String email, String firstName, String lastName, String password, String phonenumber, String picture, Role role) {
         this.email = email;
         this.username=username;
@@ -119,12 +113,6 @@ public class User implements UserDetails {
     public void setRole(Role role) {
         this.role = role;
     }
-    public List<Order> getOrders() {
-        return orders;
-    }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
 }
 

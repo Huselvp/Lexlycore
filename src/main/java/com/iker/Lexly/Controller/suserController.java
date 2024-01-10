@@ -2,6 +2,7 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.DocumentQuestionValueRepository;
+import com.iker.Lexly.repository.DocumentsRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.AddValuesRequest;
@@ -37,12 +38,13 @@ public class suserController {
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final DocumentQuestionValueService documentQuestionValueService;
     private final JwtService jwtService;
+    private  final DocumentsRepository documentsRepository;
     private final QuestionTransformer questionTransformer;
     private final PDFGenerationService pdfGenerationService;
     private final UserRepository userRepository;
 
     @Autowired
-    public suserController(  UserRepository userRepository,JwtService jwtService,DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService) {
+    public suserController(UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository) {
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -54,6 +56,7 @@ public class suserController {
         this.jwtService= jwtService;
         this.questionService = questionService;
         this.templateService = templateService;
+        this.documentsRepository = documentsRepository;
     }
 
     @GetMapping("/user_all_templates")
@@ -157,29 +160,39 @@ public class suserController {
             @PathVariable Long templateId,
             @RequestParam(required = false) String htmlContent) {
 
-        if (htmlContent == null) {
-            List<Question> questions = questionRepository.findByTemplateId(templateId);
-            List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-            String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
-            concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
+        try {
+            Documents document = documentsRepository.findById(documentId)
+                    .orElseThrow(() -> new RuntimeException("Document not found"));
+            if (document.isPaymentStatus()) {
+                if (htmlContent == null) {
+                    List<Question> questions = questionRepository.findByTemplateId(templateId);
+                    List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
+                    String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
+                    concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
 
-            htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
-        }
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
-
-            if (pdfContent.length > 0) {
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_PDF);
-                headers.setContentDispositionFormData("attachment", "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf");
-                return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+                    htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
+                }
+                try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                    byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
+                    if (pdfContent.length > 0) {
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_PDF);
+                        headers.setContentDispositionFormData("attachment", "document_" + documentId + "_" + System.currentTimeMillis() + ".pdf");
+                        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+                    } else {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed".getBytes());
+                    }
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error generating PDF: " + e.getMessage()).getBytes());
+                }
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("PDF generation failed".getBytes());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Payment not completed. Cannot generate PDF.".getBytes());
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error generating PDF: " + e.getMessage()).getBytes());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error: " + e.getMessage()).getBytes());
         }
     }
+
 }
 
 

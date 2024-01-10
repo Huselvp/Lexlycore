@@ -49,10 +49,8 @@ public class QuestionService {
     @Transactional
     public Question updateQuestion(Long id, QuestionDTO questionDTO) {
         Optional<Question> existingQuestionOptional = questionRepository.findById(id);
-
         if (existingQuestionOptional.isPresent()) {
             Question existingQuestion = existingQuestionOptional.get();
-
             existingQuestion.setQuestionText(
                     questionDTO.getQuestionText() != null ? questionDTO.getQuestionText() : existingQuestion.getQuestionText()
             );
@@ -89,9 +87,7 @@ public class QuestionService {
         newQuestion.setTemplate(template);
         return questionRepository.save(newQuestion);
     }
-
     public DocumentQuestionValueDTO addValueToQuestion(Long questionId, Long documentId, String value) {
-        // Fetch question and document entities from repositories
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
         Documents document = documentsRepository.findById(documentId)
@@ -104,7 +100,6 @@ public class QuestionService {
         DocumentQuestionValueDTO dto = convertToDTO(documentQuestionValue);
         return dto;
     }
-
     private DocumentQuestionValueDTO convertToDTO(DocumentQuestionValue documentQuestionValue) {
         DocumentQuestionValueDTO dto = new DocumentQuestionValueDTO();
         dto.setDocumentQuestionValueId(documentQuestionValue.getDocumentQuestionValueId());
@@ -138,7 +133,6 @@ public class QuestionService {
                 throw new IllegalArgumentException("The content is not valid XML.");
             }
         }
-
         private String transformTextToXml(String text) {
             try {
                 JAXBContext context = JAXBContext.newInstance(TextWrapper.class);
@@ -152,9 +146,7 @@ public class QuestionService {
                 e.printStackTrace();
                 return null;
             }
-
         }
-
     public DocumentQuestionValue getValueForDocumentAndQuestion(Long documentId, Long questionId) {
         List<DocumentQuestionValue> values = getValuesForDocument(documentId);
         return values.stream()
@@ -162,6 +154,5 @@ public class QuestionService {
                 .findFirst()
                 .orElse(null);
     }
-
 }
 

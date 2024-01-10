@@ -12,14 +12,12 @@ spring:
   sql:
     init:
       platform: postgres
-
 server:
   port: 8081
 paypal:
   mode: sandbox
   client:
-    id: AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS
-    secret: EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL
-
+    id: ASH-5W4rF097Wr96eqw-XHStDs7pZyRPz4cNihmr4dbUlBQEjTN-9-hBKjK3xgsFAWwifrHY10dbPBG_
+    secret: EI-c8_-WM9UHSZdBGqzZNobFbpyZ_AnbMtl_4pWtlyZL13yhgAa0liPcDT5vMnqOPImhFaUWSlT8DFKN
 app:
   firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
