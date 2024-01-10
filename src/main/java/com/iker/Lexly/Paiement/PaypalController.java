@@ -31,12 +31,14 @@ public class PaypalController {
     @PostMapping("/orders/{orderId}/capture")
     public ResponseEntity<Map<String, Object>> captureOrder(
             @PathVariable String orderId,
-            @RequestParam Long documentId) {
+            @RequestBody Map<String, Long> requestBody) {
         try {
+            Long documentId = requestBody.get("documentId");
             paypalService.captureOrder(orderId, documentId);
             return ResponseEntity.ok(Collections.singletonMap("status", "success"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Failed to capture order."));
         }
     }
+
 }
