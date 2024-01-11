@@ -81,6 +81,7 @@ public class DocumentsService {
         dto.setId(documents.getId());
         dto.setCreatedAt(documents.getCreatedAt());
         dto.setDraft(documents.getDraft());
+        dto.setPayment_status(documents.isPaymentStatus());
         return dto;
     }
 
