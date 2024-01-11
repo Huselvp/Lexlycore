@@ -68,10 +68,16 @@ public class suserController {
         return templateDTOs;
     }
 
-    @GetMapping("/get_documents/{userId}")
-    public List<DocumentsDTO> getDocumentsByUserId(@PathVariable String userId) {
-        return documentsService.getDocumentsByUserId(Long.valueOf(userId));
+    @GetMapping("/get_documents/{token}")
+    public ResponseEntity<List<DocumentsDTO>> getDocumentsByToken(@PathVariable String token) {
+        List<DocumentsDTO> documents = documentsService.getDocumentsByUserId(token);
+        if (!documents.isEmpty()) {
+            return ResponseEntity.ok(documents);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
 
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {

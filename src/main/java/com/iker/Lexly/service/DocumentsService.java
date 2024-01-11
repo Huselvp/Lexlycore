@@ -3,10 +3,9 @@ package com.iker.Lexly.service;
 import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.AddValuesRequest;
-import com.iker.Lexly.request.DocumentCreateRequest;
-import com.iker.Lexly.request.UpdateValueRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import jakarta.transaction.Transactional;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,18 +26,20 @@ import java.util.stream.Collectors;
 public class DocumentsService {
     private final DocumentsRepository documentsRepository;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final TemplateRepository templateRepository;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
 
     @Autowired
-    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository) {
+    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
 
+        this.jwtService = jwtService;
     }
 
     public Documents createOrUpdateDocument(Documents document) {
@@ -56,13 +58,23 @@ public class DocumentsService {
         return documentsRepository.findByUser(user);
     }
 
-    public List<DocumentsDTO> getDocumentsByUserId(Long userId) {
-        List<Documents> documents = documentsRepository.findByUserId(userId);
-        List<DocumentsDTO> documentDTOs = documents.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return documentDTOs;
+    public List<DocumentsDTO> getDocumentsByUserId(String token) {
+        if (jwtService.isTokenExpired(token)) {
+            return Collections.emptyList();
+        }
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user != null) {
+            Long userId = user.getId();
+            List<Documents> documents = documentsRepository.findByUserId(userId);
+            return documents.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
+
 
     private DocumentsDTO convertToDTO(Documents documents) {
         DocumentsDTO dto = new DocumentsDTO();
