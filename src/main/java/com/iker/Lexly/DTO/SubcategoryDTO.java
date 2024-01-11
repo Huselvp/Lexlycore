@@ -22,11 +22,9 @@ public class SubcategoryDTO {
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -34,7 +32,6 @@ public class SubcategoryDTO {
     public CategoryType getCategoryType() {
         return categoryType;
     }
-
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
     }

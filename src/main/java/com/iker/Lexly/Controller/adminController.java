@@ -42,7 +42,7 @@ public class adminController {
     private final QuestionTransformer questionTransformer;
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
-    private final SubCategoryTransformer subCategoryTransformer;
+    private final SubCategoryTransformer subcategoryTransformer;
     @Autowired
     private final TemplateService templateService;
     @Autowired
@@ -54,7 +54,7 @@ public class adminController {
     public adminController( SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,UserRepository userRepository, PasswordEncoder passwordEncoder,JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService,  UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService,  QuestionService questionService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.jwtService=jwtService;
-        this.subCategoryTransformer=subCategoryTransformer;
+        this.subcategoryTransformer=subCategoryTransformer;
         this.subcategoryService=subcategoryService;
         this.passwordEncoder=passwordEncoder;
         this.userRepository=userRepository;
@@ -65,6 +65,11 @@ public class adminController {
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
+    }
+    @GetMapping("/all_subcategories")
+    public ResponseEntity<List<SubcategoryDTO>> getAllSubcategories() {
+        List<SubcategoryDTO> subcategories = subcategoryService.getAllSubcategories();
+        return ResponseEntity.ok(subcategories);
     }
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
@@ -90,7 +95,6 @@ public class adminController {
     public ApiResponse assignSubcategoryToTemplate(@PathVariable Long templateId, @PathVariable Long subcategoryId) {
         return templateService.assignSubcategoryToTemplate(templateId, subcategoryId);
     }
-
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers(HttpServletRequest request) {
         List<User> users = userService.getAllUsers();
@@ -279,14 +283,6 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-
-//    @PostMapping("/assignCategory/{templateId}/{categoryId}")//valide
-//    public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
-//   //     return templateService.assignCategoryToTemplate(templateId, categoryId);
-//    }
-
-
-
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(
             @PathVariable Long questionId,
@@ -382,11 +378,9 @@ public class adminController {
                     break;
                 }
             }
-
             if (!choiceFound) {
                 return ResponseEntity.notFound().build();
             }
-
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
