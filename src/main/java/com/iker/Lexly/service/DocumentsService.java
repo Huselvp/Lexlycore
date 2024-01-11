@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class DocumentsService {
         return documentsRepository.findByUser(user);
     }
 
-    public List<DocumentsDTO> getDocumentsByUserId(String token) {
+    public List<Documents> getDocumentsByUserId(String token) {
         if (jwtService.isTokenExpired(token)) {
             return Collections.emptyList();
         }
@@ -67,23 +68,12 @@ public class DocumentsService {
         if (user != null) {
             Long userId = user.getId();
             List<Documents> documents = documentsRepository.findByUserId(userId);
-            return documents.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+            return new ArrayList<>(documents);
         } else {
             return Collections.emptyList();
         }
     }
 
-
-    private DocumentsDTO convertToDTO(Documents documents) {
-        DocumentsDTO dto = new DocumentsDTO();
-        dto.setId(documents.getId());
-        dto.setCreatedAt(documents.getCreatedAt());
-        dto.setDraft(documents.getDraft());
-        dto.setPayment_status(documents.isPaymentStatus());
-        return dto;
-    }
 
     public ApiResponseDocuments createNewDocument(Long templateId, Long userId) {
         Template template = templateRepository.findById(templateId).orElse(null);

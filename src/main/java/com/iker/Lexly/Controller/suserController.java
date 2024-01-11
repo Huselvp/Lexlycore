@@ -7,7 +7,6 @@ import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.RequestData;
-import com.iker.Lexly.DTO.DocumentsDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -69,8 +68,8 @@ public class suserController {
     }
 
     @GetMapping("/get_documents/{token}")
-    public ResponseEntity<List<DocumentsDTO>> getDocumentsByToken(@PathVariable String token) {
-        List<DocumentsDTO> documents = documentsService.getDocumentsByUserId(token);
+    public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
+        List<Documents> documents = documentsService.getDocumentsByUserId(token);
         if (!documents.isEmpty()) {
             return ResponseEntity.ok(documents);
         } else {
@@ -108,7 +107,6 @@ public class suserController {
             return new ApiResponseDocuments("User not found.", null);
         }
     }
-
     @GetMapping("/suser_find_questions_by_template/{templateId}")
     public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
