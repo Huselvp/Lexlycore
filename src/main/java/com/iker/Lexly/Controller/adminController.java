@@ -178,7 +178,6 @@ public class adminController {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
         return ResponseEntity.ok(apiResponse);
     }
-
     @PutMapping("/update_template/{templateId}")
     public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
@@ -257,14 +256,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
-    @GetMapping("/template/{templateId}")
-    public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
-        Template template = templateService.getTemplateById(templateId);
-            return new ResponseEntity<>(template, HttpStatus.OK);
-    }
-
-
     @DeleteMapping("delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         Optional<Question> optionalQuestion = questionRepository.findById(id);
