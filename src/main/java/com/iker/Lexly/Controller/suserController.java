@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,9 +75,10 @@ public class suserController {
         if (!documents.isEmpty()) {
             return ResponseEntity.ok(documents);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.ok(Collections.emptyList());
         }
     }
+
 
 
     @GetMapping("/user_template/{templateId}")
