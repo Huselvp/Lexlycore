@@ -215,8 +215,7 @@ public class DocumentsService {
         document.setPaymentStatus(true);
         return documentsRepository.save(document);
     }
-
-    public ApiResponse addValues(AddValuesRequest request) {
+    public ApiResponse addOrUpdateValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
         List<DocumentQuestionValueDTO> values = request.getValues();
         Documents document = documentsRepository.findById(documentId).orElse(null);
@@ -224,42 +223,22 @@ public class DocumentsService {
             for (DocumentQuestionValueDTO valueDto : values) {
                 Long questionId = valueDto.getQuestionId();
                 String value = valueDto.getValue();
-                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
+                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(documentId, questionId);
                 if (existingValue != null) {
-                    return new ApiResponse("A value already exists for this question and document combination.", null);
-                }
-                Question question = questionRepository.findById(questionId).orElse(null);
-
-                if (question != null) {
-                    DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue(question, document, value);
-                    documentQuestionValueRepository.save(documentQuestionValue);
+                    existingValue.setValue(value);
+                    existingValue = documentQuestionValueRepository.save(existingValue);
                 } else {
-                    return new ApiResponse("Question not found.", null);
+                    Question question = questionRepository.findById(questionId).orElse(null);
+                    if (question != null) {
+                        existingValue = new DocumentQuestionValue(question, document, value);
+                        existingValue = documentQuestionValueRepository.save(existingValue);
+                    } else {
+                        return new ApiResponse("Question not found.", null);
+                    }
                 }
             }
-            return new ApiResponse("Values added successfully.", null);
-        } else {
-            return new ApiResponse("Document not found.", null);
-        }
-    }
-    public ApiResponse updateValues(UpdateValuesRequest request) {
-        Long documentId = request.getDocumentId();
-        List<DocumentQuestionValueDTO> values = request.getValues();
-        Documents document = documentsRepository.findById(documentId).orElse(null);
 
-        if (document != null) {
-            for (DocumentQuestionValueDTO valueDto : values) {
-                Long questionId = valueDto.getQuestionId();
-                String updatedValue = valueDto.getValue();
-                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
-                if (existingValue != null) {
-                    existingValue.setValue(updatedValue);
-                    documentQuestionValueRepository.save(existingValue);
-                } else {
-                    return new ApiResponse("Value not found for the given question and document combination.", null);
-                }
-            }
-            return new ApiResponse("Values updated successfully.", null);
+            return new ApiResponse("Values added or updated successfully.", null);
         } else {
             return new ApiResponse("Document not found.", null);
         }

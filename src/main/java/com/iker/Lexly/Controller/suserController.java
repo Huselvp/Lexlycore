@@ -136,14 +136,10 @@ public class suserController {
     }
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-        ApiResponse response = documentsService.addValues(request);
+        ApiResponse response = documentsService.addOrUpdateValues(request);
         return response;
     }
-    @PutMapping("/updateValues")
-    public ApiResponse updateValues(@RequestBody UpdateValuesRequest request) {
-        ApiResponse response = documentsService.updateValues(request);
-        return response;
-    }
+
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
