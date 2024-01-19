@@ -10,6 +10,7 @@ import com.iker.Lexly.request.RequestData;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.TemplateTransformer;
+import com.iker.Lexly.request.UpdateValuesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
@@ -136,6 +137,11 @@ public class suserController {
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
         ApiResponse response = documentsService.addValues(request);
+        return response;
+    }
+    @PutMapping("/updateValues")
+    public ApiResponse updateValues(@RequestBody UpdateValuesRequest request) {
+        ApiResponse response = documentsService.updateValues(request);
         return response;
     }
     @PostMapping("/completeDocument/{documentId}")

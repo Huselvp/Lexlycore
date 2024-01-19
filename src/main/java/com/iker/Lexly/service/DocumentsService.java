@@ -6,6 +6,7 @@ import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.AddValuesRequest;
+import com.iker.Lexly.request.UpdateValuesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import jakarta.transaction.Transactional;
@@ -237,6 +238,28 @@ public class DocumentsService {
                 }
             }
             return new ApiResponse("Values added successfully.", null);
+        } else {
+            return new ApiResponse("Document not found.", null);
+        }
+    }
+    public ApiResponse updateValues(UpdateValuesRequest request) {
+        Long documentId = request.getDocumentId();
+        List<DocumentQuestionValueDTO> values = request.getValues();
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+
+        if (document != null) {
+            for (DocumentQuestionValueDTO valueDto : values) {
+                Long questionId = valueDto.getQuestionId();
+                String updatedValue = valueDto.getValue();
+                DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentIdAndQuestionId(questionId, documentId);
+                if (existingValue != null) {
+                    existingValue.setValue(updatedValue);
+                    documentQuestionValueRepository.save(existingValue);
+                } else {
+                    return new ApiResponse("Value not found for the given question and document combination.", null);
+                }
+            }
+            return new ApiResponse("Values updated successfully.", null);
         } else {
             return new ApiResponse("Document not found.", null);
         }
