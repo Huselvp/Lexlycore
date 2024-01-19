@@ -173,12 +173,6 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
-    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
-    @GetMapping("/all_templates")
-    public List<Template> getAllTemplates() {
-        List<Template> templates = templateService.getAllTemplates();
-        return templates;
-    }
     @PostMapping(value = "/create_template/{token}", produces = "application/json")
     public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
         ApiResponse apiResponse = templateService.createTemplate(token, template);

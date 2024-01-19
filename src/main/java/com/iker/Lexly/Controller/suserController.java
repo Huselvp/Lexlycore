@@ -60,14 +60,7 @@ public class suserController {
         this.documentsRepository = documentsRepository;
     }
 
-    @GetMapping("/user_all_templates")
-    public List<TemplateDTO> getAllTemplates() {
-        List<Template> templates = templateService.getAllTemplates();
-        List<TemplateDTO> templateDTOs = templates.stream()
-                .map(templateTransformer::toDTO)
-                .collect(Collectors.toList());
-        return templateDTOs;
-    }
+
 
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
@@ -78,8 +71,6 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
-
-
 
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
@@ -115,7 +106,6 @@ public class suserController {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
-
     @PostMapping("/saveTemporaryValues/{documentId}")
     public ApiResponse saveTemporaryValues(
             @PathVariable Long documentId,
@@ -141,7 +131,6 @@ public class suserController {
         ApiResponse response = documentsService.addOrUpdateValues(request);
         return response;
     }
-
     @PostMapping("/completeDocument/{documentId}")
     public ApiResponse completeDocument(@PathVariable Long documentId) {
         ApiResponse response = documentsService.completeDocument(documentId);
