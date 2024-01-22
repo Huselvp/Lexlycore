@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +15,7 @@ public class DocumentQuestionValue {
 
     @ManyToOne
     @JoinColumn(name = "document_id")
+    @JsonIgnore
     private Documents document;
 
 
