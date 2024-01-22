@@ -11,13 +11,15 @@ public class TemplateDTO {
     private String templateName;
     private String templateDescription;
     private float cost;
+    private String content;
     private Subcategory subcategory;
 
 
-    public TemplateDTO(Long id, String templateName, String templateDescription, float cost, Subcategory subcategory) {
+    public TemplateDTO(Long id, String content,String templateName, String templateDescription, float cost, Subcategory subcategory) {
         this.id = id;
         this.subcategory=subcategory;
         this.templateName = templateName;
+        this.content=content;
         this.templateDescription = templateDescription;
         this.cost = cost;
     }

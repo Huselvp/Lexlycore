@@ -29,14 +29,17 @@ public class Template {
 
     @Column(name = "template_cost")
     private float cost;
+    @Column(name="template_content")
+    private String content;
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Subcategory subcategory;
 
-    public Template(List<Question> questions,String name,Subcategory subcategory, String templateDescription,float cost) {
+    public Template(List<Question> questions,String name,Subcategory subcategory, String templateDescription,float cost,String content) {
         this.templateName = name;
         this.templateDescription=templateDescription;
         this.cost=cost;
+        this.content = content ;
        this.subcategory=subcategory;
         this.questions=questions;
     }
