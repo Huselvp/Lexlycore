@@ -23,7 +23,7 @@ public class Documents {
     @ManyToOne
     private Template template;
     @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
-    @JsonIgnore
+
     private List<DocumentQuestionValue> documentQuestionValues;
     public Long getId() {
         return id;
