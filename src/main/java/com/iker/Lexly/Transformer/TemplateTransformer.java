@@ -23,7 +23,7 @@ public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
             template.setCost(dto.getCost());
             template.setTemplateName(dto.getTemplateName());
             template.setTemplateDescription(dto.getTemplateDescription());
-           // template.setCategory(dto.getCategory());
+            template.setSubcategory(dto.getSubcategory());
             return template;
         }
     }
@@ -38,7 +38,7 @@ public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
             dto.setCost(entity.getCost());
             dto.setTemplateName(entity.getTemplateName());
             dto.setTemplateDescription(entity.getTemplateDescription());
-       //     dto.setCategory(entity.getCategory());
+            dto.getSubcategory(entity.getSubcategory());
             return dto;
         }
     }
