@@ -14,6 +14,7 @@ import com.iker.Lexly.request.UpdateValuesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -114,7 +115,17 @@ public class suserController {
         List<DocumentQuestionValue> values =documentsService.getValuesByDocumentId(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
-
+    @DeleteMapping("/deleteDocument/{documentId}")
+    public ResponseEntity<String> deleteDocument(@PathVariable Long documentId) {
+        try {
+            documentsService.deleteDocument(documentId);
+            return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>("Document not found with ID: " + documentId, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error deleting document", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();

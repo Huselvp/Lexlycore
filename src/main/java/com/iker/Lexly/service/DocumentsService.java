@@ -42,25 +42,9 @@ public class DocumentsService {
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
-
         this.jwtService = jwtService;
     }
 
-    public Documents createOrUpdateDocument(Documents document) {
-        return documentsRepository.save(document);
-    }
-
-    public List<Documents> getDocumentsByUser(User user) {
-        return documentsRepository.findByUser(user);
-    }
-
-    public Documents getDocumentById(Long id) {
-        return documentsRepository.findById(id).orElse(null);
-    }
-
-    public List<Documents> getAllDocumentsByUser(User user) {
-        return documentsRepository.findByUser(user);
-    }
 
     public List<Documents> getDocumentsByUserId(String token) {
         if (jwtService.isTokenExpired(token)) {
@@ -76,8 +60,6 @@ public class DocumentsService {
             return Collections.emptyList();
         }
     }
-
-
     public ApiResponseDocuments createNewDocument(Long templateId, Long userId) {
         Template template = templateRepository.findById(templateId).orElse(null);
 
@@ -98,63 +80,6 @@ public class DocumentsService {
             return new ApiResponseDocuments("Template not found.", null);
         }
     }
-
-    public ApiResponseDocuments createNewDocument(Long templateId) {
-        Template template = templateRepository.findById(templateId).orElse(null);
-        if (template != null) {
-            Documents document = new Documents();
-            document.setTemplate(template);
-            document.setCreatedAt(LocalDateTime.now());
-            document.setDraft(true);
-            Documents savedDocument = documentsRepository.save(document);
-            return new ApiResponseDocuments("Document created successfully.", savedDocument.getId());
-        } else {
-            return new ApiResponseDocuments("Template not found.", null);
-        }
-    }
-
-    public ApiResponse saveTemporaryValue(Long documentId, Long questionId, String value) {
-        Documents document = documentsRepository.findById(documentId).orElse(null);
-        Question question = questionRepository.findById(questionId).orElse(null);
-
-        if (document != null && question != null) {
-            DocumentQuestionValue existingValue = documentQuestionValueRepository.findByDocumentAndQuestion(document, question);
-            if (existingValue != null) {
-                existingValue.setValue(value);
-            } else {
-                DocumentQuestionValue newValue = new DocumentQuestionValue();
-                newValue.setDocument(document);
-                newValue.setQuestion(question);
-                newValue.setValue(value);
-                documentQuestionValueRepository.save(newValue);
-            }
-
-            return new ApiResponse("Temporary value saved successfully.", null);
-        } else {
-            return new ApiResponse("Document or question not found.", null);
-        }
-    }
-
-
-    public ApiResponse completeDocument(Long documentId) {
-        Documents document = documentsRepository.findById(documentId).orElse(null);
-
-        if (document != null) {
-            List<Question> templateQuestions = document.getTemplate().getQuestions();
-            List<DocumentQuestionValue> documentValues = document.getDocumentQuestionValues();
-            if (documentValues.size() == templateQuestions.size()) {
-                document.setDraft(false);
-                documentsRepository.save(document);
-                return new ApiResponse("Document completed successfully.", null);
-            } else {
-                return new ApiResponse("All questions must have values to complete the document.", null);
-            }
-        } else {
-            return new ApiResponse("Document not found.", null);
-        }
-    }
-
-
     public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
@@ -210,13 +135,6 @@ public class DocumentsService {
             return new byte[0];
         }
     }
-    public Documents updatePaymentStatus(Long documentId) {
-        Documents document = documentsRepository.findById(documentId)
-                .orElseThrow(() -> new NotFoundException("Document not found"));
-
-        document.setPaymentStatus(true);
-        return documentsRepository.save(document);
-    }
     public ApiResponse addOrUpdateValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
         List<DocumentQuestionValueDTO> values = request.getValues();
@@ -254,6 +172,15 @@ public class DocumentsService {
         }
     }
 
+    public void deleteDocument(Long documentId) {
+        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            documentsRepository.delete(document);
+        } else {
+            throw new EntityNotFoundException("Document not found with ID: " + documentId);
+        }
+    }
 }
 
 
