@@ -76,7 +76,7 @@ public class adminController {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
         return ResponseEntity.ok(result);
     }
-    @PutMapping("updateSubcategory/{id}")
+    @PutMapping("/updateSubcategory/{id}")
     public ResponseEntity<ApiResponse> updateSubCategory(@PathVariable Long id, @RequestBody SubcategoryDTO subcategoryDTO) {
         ApiResponse response = subcategoryService.updateSubCategory(id, subcategoryDTO);
 
@@ -86,7 +86,7 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
-    @DeleteMapping("DeleteSubcategory/{id}")
+    @DeleteMapping("/DeleteSubcategory/{id}")
     public ResponseEntity<String> deleteSubCategory(@PathVariable Long id) {
         String result = subcategoryService.deleteSubCategory(id);
         return ResponseEntity.ok(result);
