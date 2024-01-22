@@ -103,24 +103,6 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-    @PreAuthorize("(hasRole('ROLE_ADMIN') or hasRole('ROLE_SUSER'))")
-    @GetMapping("/getMe/{token}")
-    public ResponseEntity<User> getUserByToken(@PathVariable String token) {
-        if (jwtService.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        String username = jwtService.extractUsername(token);
-        if (username != null) {
-            Optional<User> optionalUser = userRepository.findByUsername(username);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                return ResponseEntity.ok(user);
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-    }
     @DeleteMapping("/delete_user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -138,41 +120,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PutMapping("/update_user/{token}")
-    public ResponseEntity<User> updateUser(@PathVariable String token, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
-        User updatedUserResponse = userService.updateUser(token, updatedUser);
-        return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
-    }
-    @PatchMapping("updateEMailOrPassword/{token}")
-    public ResponseEntity<String> modifyEmailOrPassword(
-            @PathVariable String token,
-            @RequestBody UpdateEmailPassword updateRequest) {
-        if (jwtService.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-        }
-        String username = jwtService.extractUsername(token);
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
-                if (updateRequest.getEmail() != null) {
-                    if (userRepository.existsUserByEmail(updateRequest.getEmail())) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The updated email is already in use.");
-                    }
-                    user.setEmail(updateRequest.getEmail());
-                }
-                if (updateRequest.getNewPassword() != null) {
-                    user.setPassword(passwordEncoder.encode(updateRequest.getNewPassword()));
-                }
-                userRepository.save(user);
-                return ResponseEntity.ok("User information updated successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current password.");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        }
-    }
+
     @PostMapping(value = "/create_template/{token}", produces = "application/json")
     public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
