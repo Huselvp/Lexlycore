@@ -9,6 +9,7 @@ import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.UpdateValuesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.jsoup.Jsoup;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -237,12 +239,21 @@ public class DocumentsService {
                     }
                 }
             }
-
             return new ApiResponse("Values added or updated successfully.", null);
         } else {
             return new ApiResponse("Document not found.", null);
         }
     }
+    public List<DocumentQuestionValue> getValuesByDocumentId(Long documentId) {
+        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            return document.getDocumentQuestionValues();
+        } else {
+            throw new EntityNotFoundException("Document not found with ID: " + documentId);
+        }
+    }
+
 }
 
 

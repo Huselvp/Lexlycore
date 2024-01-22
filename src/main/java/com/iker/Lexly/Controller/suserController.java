@@ -59,9 +59,6 @@ public class suserController {
         this.templateService = templateService;
         this.documentsRepository = documentsRepository;
     }
-
-
-
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
@@ -71,7 +68,6 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
-
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
@@ -106,41 +102,19 @@ public class suserController {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
-    @PostMapping("/saveTemporaryValues/{documentId}")
-    public ApiResponse saveTemporaryValues(
-            @PathVariable Long documentId,
-            @RequestBody List<Long> questionIds,
-            @RequestBody List<String> values
-    ) {
-        if (questionIds.size() != values.size()) {
-            return new ApiResponse("Mismatched question IDs and values.", null);
-        }
 
-        for (int i = 0; i < questionIds.size(); i++) {
-            Long questionId = questionIds.get(i);
-            String value = values.get(i);
-            ApiResponse response = documentsService.saveTemporaryValue(documentId, questionId, value);
-            if (!response.isSuccess()) {
-                return response;
-            }
-        }
-        return new ApiResponse("Temporary values saved successfully.", null);
-    }
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
         ApiResponse response = documentsService.addOrUpdateValues(request);
         return response;
     }
-    @PostMapping("/completeDocument/{documentId}")
-    public ApiResponse completeDocument(@PathVariable Long documentId) {
-        ApiResponse response = documentsService.completeDocument(documentId);
-        return response;
-    }
+
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
-        List<DocumentQuestionValue> values = questionService.getValuesForDocument(documentId);
+        List<DocumentQuestionValue> values =documentsService.getValuesByDocumentId(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
+
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
@@ -156,7 +130,6 @@ public class suserController {
             @PathVariable Long documentId,
             @PathVariable Long templateId,
             @RequestParam(required = false) String htmlContent) {
-
         try {
             Documents document = documentsRepository.findById(documentId)
                     .orElseThrow(() -> new RuntimeException("Document not found"));
@@ -166,7 +139,6 @@ public class suserController {
                     List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
                     String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
                     concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
-
                     htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
                 }
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -189,7 +161,6 @@ public class suserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error: " + e.getMessage()).getBytes());
         }
     }
-
 }
 
 
