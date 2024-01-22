@@ -40,7 +40,6 @@ public class ApplicationConfig {
             }
         };
     }
-
     @Bean
     public AuthenticationProvider authentificationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -67,8 +66,6 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

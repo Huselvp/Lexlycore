@@ -109,14 +109,6 @@ public class QuestionService {
         return dto;
     }
 
-    public List<DocumentQuestionValue> getValuesForDocument(Long documentId) {
-        return documentQuestionValueRepository.findByDocumentId(documentId);
-    }
-
-    public boolean doesQuestionExist(Long templateId, String questionText) {
-        return questionRepository.existsByTemplateIdAndQuestionText(templateId, questionText);
-    }
-
     @Transactional
         public Question createQuestion(Question question, Template template) {
             if (questionRepository.existsByQuestionText(question.getQuestionText())) {
@@ -147,12 +139,6 @@ public class QuestionService {
                 return null;
             }
         }
-    public DocumentQuestionValue getValueForDocumentAndQuestion(Long documentId, Long questionId) {
-        List<DocumentQuestionValue> values = getValuesForDocument(documentId);
-        return values.stream()
-                .filter(value -> value.getQuestion().getId().equals(questionId))
-                .findFirst()
-                .orElse(null);
-    }
+
 }
 

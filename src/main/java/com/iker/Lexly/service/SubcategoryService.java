@@ -44,7 +44,6 @@ public class SubcategoryService {
             Subcategory updatedSubcategory = subcategoryTransformer.toEntity(subcategoryDTO);
             updatedSubcategory.setId(existingSubcategory.getId());
             subcategoryRepository.save(updatedSubcategory);
-
             return new ApiResponse("Subcategory updated successfully.", null);
         } else {
             return new ApiResponse("Subcategory with ID " + subcategoryId + " not found.", null);
@@ -54,7 +53,6 @@ public class SubcategoryService {
 
     public String deleteSubCategory(Long subcategoryId) {
         Optional<Subcategory> subcategoryOptional = subcategoryRepository.findById(subcategoryId);
-
         if (subcategoryOptional.isPresent()) {
             Subcategory subcategory = subcategoryOptional.get();
             subcategoryRepository.delete(subcategory);
