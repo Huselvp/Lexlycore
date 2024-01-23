@@ -6,6 +6,7 @@ import com.iker.Lexly.repository.DocumentsRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.AddValuesRequest;
+import com.iker.Lexly.request.ChargeRequest;
 import com.iker.Lexly.request.RequestData;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
@@ -126,13 +127,29 @@ public class suserController {
             return new ResponseEntity<>("Error deleting document", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/initiate-/{templateId}")
+    @GetMapping("/initiate-payment/{templateId}")
     public ResponseEntity<Map<String, Object>> initiatePayment(@PathVariable String templateId) {
         try {
             String paymentId = paymentService.initiatePayment(templateId);
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("data", paymentId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @PostMapping("/charge")
+    public ResponseEntity<Map<String, Object>> chargePayment(@RequestBody ChargeRequest chargeRequest) {
+        try {
+            String chargeId = paymentService.chargePayment(chargeRequest);
+            paymentService.updatePaymentStatus(chargeRequest.getDocumentId());
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", chargeId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
