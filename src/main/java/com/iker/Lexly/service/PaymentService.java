@@ -10,10 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PaymentService {
@@ -34,44 +31,31 @@ public class PaymentService {
         this.templateRepository = templateRepository;
     }
 
-
     public String initiatePayment(String templateId) {
         try {
-
+            // Fetch the template to get the dynamic cost
             Template template = templateRepository.findById(Long.parseLong(templateId))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + templateId));
-            PaymentRequest paymentRequest = new PaymentRequest();
-            Checkout checkout = new Checkout();
-            checkout.setIntegrationType("EmbeddedCheckout");
-            checkout.setUrl("http://localhost:3000/pay");
-            checkout.setTermsUrl("http://localhost:8000/terms");
-            checkout.setCountryCode("DNK");
-            Order order = new Order();
-            Item item = new Item();
-            item.setReference("Template #" + template.getId());
-            item.setName(template.getTemplateName());
-            item.setQuantity(1);
-            item.setUnit("pcs");
-            item.setUnitPrice((int) template.getCost());
-            item.setGrossTotalAmount((int) template.getCost());
-            item.setNetTotalAmount((int) template.getCost());
-            order.setItems(Collections.singletonList(item));
-            order.setAmount((int) template.getCost());
-            order.setCurrency("DKK");
-            order.setReference("Template #" + template.getId());
-            paymentRequest.setCheckout(checkout);
-            paymentRequest.setOrder(order);
+
+            // Construct the payload directly
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("checkout", createCheckoutObject());
+            payload.put("order", createOrderObject(template));
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", SECRET_KEY);
-            HttpEntity<PaymentRequest> requestEntity = new HttpEntity<>(paymentRequest, headers);
+
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
+
+            // Make the HTTP request to initiate payment
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     PAYMENT_API_URL,
                     requestEntity,
                     String.class
             );
 
-            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else {
                 throw new RuntimeException("Payment initiation failed");
@@ -80,22 +64,59 @@ public class PaymentService {
             throw new RuntimeException("Payment initiation failed", e);
         }
     }
+
+    private Map<String, Object> createCheckoutObject() {
+        Map<String, Object> checkout = new HashMap<>();
+        checkout.put("integrationType", "EmbeddedCheckout");
+        checkout.put("url", "http://localhost:3000/pay");
+        checkout.put("termsUrl", "http://localhost:8000/terms");
+        checkout.put("countryCode", "DNK");
+        return checkout;
+    }
+
+    private Map<String, Object> createOrderObject(Template template) {
+        Map<String, Object> order = new HashMap<>();
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> item = new HashMap<>();
+        item.put("reference", "Template #" + template.getId());
+        item.put("name", template.getTemplateName());
+        item.put("quantity", 1);
+        item.put("unit", "pcs");
+        item.put("unitPrice", (int) template.getCost());
+        item.put("grossTotalAmount", (int) template.getCost());
+        item.put("netTotalAmount", (int) template.getCost());
+
+        items.add(item);
+
+        order.put("items", items);
+        order.put("amount", (int) template.getCost());
+        order.put("currency", "DKK");
+        order.put("reference", "Template #" + template.getId());
+
+        return order;
+    }
+
     public String chargePayment(ChargeRequest chargeRequest) {
         try {
-            String chargeApiUrl = String.format(CHARGE_API_URL_TEMPLATE, chargeRequest.getPaymentId());
+            String chargeApiUrl = "https://test.api.dibspayment.eu/v1/payments/" + chargeRequest.getPaymentId() + "/charges";
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Idempotency-Key", generateUniqueString());
             headers.set("Authorization", SECRET_KEY);
+
             Template template = templateRepository.findById(Long.parseLong(chargeRequest.getTemplateId()))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + chargeRequest.getTemplateId()));
+
             Map<String, Object> payload = new HashMap<>();
             payload.put("amount", (int) template.getCost());
+
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     chargeApiUrl,
                     new HttpEntity<>(payload, headers),
                     String.class
             );
+
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 updatePaymentStatus(chargeRequest.getDocumentId());
                 return responseEntity.getBody();
@@ -106,6 +127,7 @@ public class PaymentService {
             throw new RuntimeException("Payment charging failed", e);
         }
     }
+
     public void updatePaymentStatus(Long documentId) {
         Documents document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("Document not found for id: " + documentId));
