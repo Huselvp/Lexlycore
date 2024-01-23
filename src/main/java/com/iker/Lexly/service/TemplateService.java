@@ -108,7 +108,6 @@ public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategory
         }
     }
     public void deleteTemplate(Long id) {
-
         Optional<Template> templateOptional = templateRepository.findById(id);
         if (templateOptional.isPresent()) {
             Template template = templateOptional.get();

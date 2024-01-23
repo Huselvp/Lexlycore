@@ -24,9 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/suser")
@@ -35,6 +33,7 @@ public class suserController {
     private final DocumentsService documentsService;
     private final TemplateService templateService;
     private final QuestionService questionService;
+    private final PaymentService paymentService;
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
@@ -46,7 +45,7 @@ public class suserController {
     private final UserRepository userRepository;
 
     @Autowired
-    public suserController(UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository) {
+    public suserController( PaymentService paymentService,UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository) {
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -56,6 +55,7 @@ public class suserController {
         this.pdfGenerationService = pdfGenerationService;
         this.documentsService = documentsService;
         this.jwtService= jwtService;
+        this.paymentService=paymentService;
         this.questionService = questionService;
         this.templateService = templateService;
         this.documentsRepository = documentsRepository;
@@ -124,6 +124,21 @@ public class suserController {
             return new ResponseEntity<>("Document not found with ID: " + documentId, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>("Error deleting document", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/initiate-/{templateId}")
+    public ResponseEntity<Map<String, Object>> initiatePayment(@PathVariable String templateId) {
+        try {
+            String paymentId = paymentService.initiatePayment(templateId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", paymentId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "failed");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
     @GetMapping("/test")
