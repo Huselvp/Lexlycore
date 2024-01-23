@@ -83,17 +83,14 @@ public class PaymentService {
     public String chargePayment(ChargeRequest chargeRequest) {
         try {
             String chargeApiUrl = String.format(CHARGE_API_URL_TEMPLATE, chargeRequest.getPaymentId());
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Idempotency-Key", generateUniqueString());
             headers.set("Authorization", SECRET_KEY);
             Template template = templateRepository.findById(Long.parseLong(chargeRequest.getTemplateId()))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + chargeRequest.getTemplateId()));
-
             Map<String, Object> payload = new HashMap<>();
             payload.put("amount", (int) template.getCost());
-
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     chargeApiUrl,
                     new HttpEntity<>(payload, headers),

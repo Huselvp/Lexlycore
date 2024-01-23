@@ -142,7 +142,7 @@ public class suserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
-    @PostMapping("/charge")
+    @PostMapping("/charge-payment")
     public ResponseEntity<Map<String, Object>> chargePayment(@RequestBody ChargeRequest chargeRequest) {
         try {
             String chargeId = paymentService.chargePayment(chargeRequest);

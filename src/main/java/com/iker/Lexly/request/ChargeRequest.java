@@ -1,7 +1,6 @@
 package com.iker.Lexly.request;
 
-// ChargeRequest.java
-public class ChargeRequest {
+public class  ChargeRequest {
     private String paymentId;
     private Long documentId;
     private String templateId;
