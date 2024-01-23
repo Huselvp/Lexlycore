@@ -101,6 +101,7 @@ public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategory
             existingTemplate.setTemplateName(templateDTO.getTemplateName());
             existingTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
             existingTemplate.setCost(templateDTO.getCost());
+            existingTemplate.setContent(templateDTO.getContent());
             return templateRepository.save(existingTemplate);
         } else {
             return null;
