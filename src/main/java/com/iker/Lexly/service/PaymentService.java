@@ -33,29 +33,41 @@ public class PaymentService {
 
     public String initiatePayment(String templateId) {
         try {
-            // Fetch the template to get the dynamic cost
+
             Template template = templateRepository.findById(Long.parseLong(templateId))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + templateId));
-
-            // Construct the payload directly
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("checkout", createCheckoutObject());
-            payload.put("order", createOrderObject(template));
-
+            PaymentRequest paymentRequest = new PaymentRequest();
+            Checkout checkout = new Checkout();
+            checkout.setIntegrationType("EmbeddedCheckout");
+            checkout.setUrl("http://localhost:3000/pay");
+            checkout.setTermsUrl("http://localhost:8000/terms");
+            checkout.setCountryCode("DNK");
+            Order order = new Order();
+            Item item = new Item();
+            item.setReference("Template #" + template.getId());
+            item.setName(template.getTemplateName());
+            item.setQuantity(1);
+            item.setUnit("pcs");
+            item.setUnitPrice((int) template.getCost());
+            item.setGrossTotalAmount((int) template.getCost());
+            item.setNetTotalAmount((int) template.getCost());
+            order.setItems(Collections.singletonList(item));
+            order.setAmount((int) template.getCost());
+            order.setCurrency("DKK");
+            order.setReference("Template #" + template.getId());
+            paymentRequest.setCheckout(checkout);
+            paymentRequest.setOrder(order);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", SECRET_KEY);
-
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
-
-            // Make the HTTP request to initiate payment
+            HttpEntity<PaymentRequest> requestEntity = new HttpEntity<>(paymentRequest, headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     PAYMENT_API_URL,
                     requestEntity,
                     String.class
             );
 
-            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 return responseEntity.getBody();
             } else {
                 throw new RuntimeException("Payment initiation failed");
@@ -63,37 +75,6 @@ public class PaymentService {
         } catch (Exception e) {
             throw new RuntimeException("Payment initiation failed", e);
         }
-    }
-
-    private Map<String, Object> createCheckoutObject() {
-        Map<String, Object> checkout = new HashMap<>();
-        checkout.put("integrationType", "EmbeddedCheckout");
-        checkout.put("url", "http://localhost:3000/pay");
-        checkout.put("termsUrl", "http://localhost:8000/terms");
-        checkout.put("countryCode", "DNK");
-        return checkout;
-    }
-
-    private Map<String, Object> createOrderObject(Template template) {
-        Map<String, Object> order = new HashMap<>();
-        List<Map<String, Object>> items = new ArrayList<>();
-        Map<String, Object> item = new HashMap<>();
-        item.put("reference", "Template #" + template.getId());
-        item.put("name", template.getTemplateName());
-        item.put("quantity", 1);
-        item.put("unit", "pcs");
-        item.put("unitPrice", (int) template.getCost());
-        item.put("grossTotalAmount", (int) template.getCost());
-        item.put("netTotalAmount", (int) template.getCost());
-
-        items.add(item);
-
-        order.put("items", items);
-        order.put("amount", (int) template.getCost());
-        order.put("currency", "DKK");
-        order.put("reference", "Template #" + template.getId());
-
-        return order;
     }
 
     public String chargePayment(ChargeRequest chargeRequest) {
