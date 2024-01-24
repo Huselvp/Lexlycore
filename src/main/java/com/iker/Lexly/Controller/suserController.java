@@ -34,6 +34,7 @@ public class suserController {
     private final DocumentsService documentsService;
     private final TemplateService templateService;
     private final QuestionService questionService;
+    @Autowired
     private final PaymentService paymentService;
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
