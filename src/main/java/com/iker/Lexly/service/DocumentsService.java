@@ -120,7 +120,6 @@ public class DocumentsService {
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            // Ensure HTML is well-formed
             String wellFormedXml = "<div>" + html + "</div>";
 
             ITextRenderer renderer = new ITextRenderer();

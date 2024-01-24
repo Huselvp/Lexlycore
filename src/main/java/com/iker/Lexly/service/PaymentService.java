@@ -16,9 +16,6 @@ import java.util.*;
 public class PaymentService {
     private static final String SECRET_KEY = "test-secret-key-3783402397d14a1696bf0c8beaf259ce";
     private static final String PAYMENT_API_URL = "https://test.api.dibspayment.eu/v1/payments";
-    private static final String CHARGE_API_URL_TEMPLATE = PAYMENT_API_URL + "/%s/charges";
-
-
 
     private final RestTemplate restTemplate;
     private final DocumentsRepository documentsRepository;
@@ -48,11 +45,11 @@ public class PaymentService {
             item.setName(template.getTemplateName());
             item.setQuantity(1);
             item.setUnit("pcs");
-            item.setUnitPrice((int) template.getCost());
-            item.setGrossTotalAmount((int) template.getCost());
-            item.setNetTotalAmount((int) template.getCost());
+            item.setUnitPrice((float) template.getCost());
+            item.setGrossTotalAmount((float) template.getCost());
+            item.setNetTotalAmount((float) template.getCost());
             order.setItems(Collections.singletonList(item));
-            order.setAmount((int) template.getCost());
+            order.setAmount((float) template.getCost());
             order.setCurrency("DKK");
             order.setReference("Template #" + template.getId());
             paymentRequest.setCheckout(checkout);
@@ -85,19 +82,15 @@ public class PaymentService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Idempotency-Key", generateUniqueString());
             headers.set("Authorization", SECRET_KEY);
-
             Template template = templateRepository.findById(Long.parseLong(chargeRequest.getTemplateId()))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + chargeRequest.getTemplateId()));
-
             Map<String, Object> payload = new HashMap<>();
-            payload.put("amount", (int) template.getCost());
-
+            payload.put("amount", (float) template.getCost());
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     chargeApiUrl,
                     new HttpEntity<>(payload, headers),
                     String.class
             );
-
             if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 updatePaymentStatus(chargeRequest.getDocumentId());
                 return responseEntity.getBody();
