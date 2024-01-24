@@ -158,6 +158,7 @@ public class DocumentsService {
         List<DocumentQuestionValueDTO> values = request.getValues();
         boolean isDraft = request.isDraft();
         Documents document = documentsRepository.findById(documentId).orElse(null);
+        document.setDraft(isDraft);
         if (document != null) {
             for (DocumentQuestionValueDTO valueDto : values) {
                 Long questionId = valueDto.getQuestionId();
