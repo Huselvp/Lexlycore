@@ -6,9 +6,9 @@ public class Item {
     private String name;
     private int quantity=1;
     private String unit="pcs";
-    private  float unitPrice;
-    private float grossTotalAmount;
-    private float netTotalAmount;
+    private  int unitPrice;
+    private int grossTotalAmount;
+    private int netTotalAmount;
 
     public String getReference() {
         return reference;
@@ -42,27 +42,27 @@ public class Item {
         this.unit = unit;
     }
 
-    public float getUnitPrice() {
+    public int getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(float unitPrice) {
+    public void setUnitPrice(int unitPrice) {
         this.unitPrice = unitPrice;
     }
 
-    public float getGrossTotalAmount() {
+    public int getGrossTotalAmount() {
         return grossTotalAmount;
     }
 
-    public void setGrossTotalAmount(float grossTotalAmount) {
+    public void setGrossTotalAmount(int grossTotalAmount) {
         this.grossTotalAmount = grossTotalAmount;
     }
 
-    public float getNetTotalAmount() {
+    public int getNetTotalAmount() {
         return netTotalAmount;
     }
 
-    public void setNetTotalAmount(float netTotalAmount) {
+    public void setNetTotalAmount(int netTotalAmount) {
         this.netTotalAmount = netTotalAmount;
     }
 }
