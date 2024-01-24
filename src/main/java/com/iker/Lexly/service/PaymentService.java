@@ -45,11 +45,11 @@ public class PaymentService {
             item.setName(template.getTemplateName());
             item.setQuantity(1);
             item.setUnit("pcs");
-            item.setUnitPrice((float) template.getCost());
-            item.setGrossTotalAmount((float) template.getCost());
-            item.setNetTotalAmount((float) template.getCost());
+            item.setUnitPrice((int) template.getCost());
+            item.setGrossTotalAmount((int) template.getCost());
+            item.setNetTotalAmount((int) template.getCost());
             order.setItems(Collections.singletonList(item));
-            order.setAmount((float) template.getCost());
+            order.setAmount((int) template.getCost());
             order.setCurrency("DKK");
             order.setReference("Template #" + template.getId());
             paymentRequest.setCheckout(checkout);
