@@ -138,6 +138,7 @@ public class DocumentsService {
     public ApiResponse addOrUpdateValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
         List<DocumentQuestionValueDTO> values = request.getValues();
+        boolean isDraft = request.isDraft();
         Documents document = documentsRepository.findById(documentId).orElse(null);
         if (document != null) {
             for (DocumentQuestionValueDTO valueDto : values) {

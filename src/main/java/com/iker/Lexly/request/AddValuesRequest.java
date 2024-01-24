@@ -7,11 +7,13 @@ import java.util.List;
 public class AddValuesRequest {
     private Long documentId;
     private List<DocumentQuestionValueDTO> values;
+    private boolean isDraft;
 
 
-    public AddValuesRequest(Long documentId, List<DocumentQuestionValueDTO> values) {
+    public AddValuesRequest(Long documentId, List<DocumentQuestionValueDTO> values, boolean isDraft) {
         this.documentId = documentId;
         this.values = values;
+        this.isDraft = isDraft;
     }
 
     public Long getDocumentId() {
@@ -22,13 +24,11 @@ public class AddValuesRequest {
         return values;
     }
 
-    public static class ValueDTO {
-        private Long questionId;
-        private String value;
+    public boolean isDraft() {
+        return isDraft;
+    }
 
-        public ValueDTO(Long questionId, String value) {
-            this.questionId = questionId;
-            this.value = value;
-        }
+    public void setDraft(boolean draft) {
+        isDraft = draft;
     }
 }
