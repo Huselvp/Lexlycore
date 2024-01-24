@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Order {
     private List<Item> items;
-    //templatePrice
-    private int amount;
+
+    private float amount;
     private String currency="DKK";
     private String reference;
 
@@ -19,7 +19,7 @@ public class Order {
         this.items = items;
     }
 
-    public int getAmount() {
+    public float getAmount() {
         return amount;
     }
 
