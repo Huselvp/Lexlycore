@@ -98,7 +98,7 @@ public class PaymentService {
                     String.class
             );
 
-            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            if (responseEntity.getStatusCode() == HttpStatus.CREATED) {
                 updatePaymentStatus(chargeRequest.getDocumentId());
                 return responseEntity.getBody();
             } else {
