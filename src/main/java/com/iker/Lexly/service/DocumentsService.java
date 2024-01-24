@@ -120,8 +120,8 @@ public class DocumentsService {
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            String wellFormedXml = wrapHtmlContent(html);
-
+            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0");
+            String wellFormedXml = wrapHtmlContent(sanitizedHtml);
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
             renderer.layout();
@@ -151,6 +151,7 @@ public class DocumentsService {
 
         return html;
     }
+
 
     public ApiResponse addOrUpdateValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
