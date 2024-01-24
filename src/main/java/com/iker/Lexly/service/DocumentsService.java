@@ -120,7 +120,7 @@ public class DocumentsService {
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            String wellFormedXml = "<div>" + html + "</div>";
+            String wellFormedXml = wrapHtmlContent(html);
 
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
@@ -134,6 +134,24 @@ public class DocumentsService {
             return new byte[0];
         }
     }
+
+    private String wrapHtmlContent(String html) {
+        if (!html.toLowerCase().contains("<html")) {
+            html = "<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "    <meta charset=\"UTF-8\">\n" +
+                    "    <title>Generated PDF</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    html +
+                    "</body>\n" +
+                    "</html>";
+        }
+
+        return html;
+    }
+
     public ApiResponse addOrUpdateValues(AddValuesRequest request) {
         Long documentId = request.getDocumentId();
         List<DocumentQuestionValueDTO> values = request.getValues();
