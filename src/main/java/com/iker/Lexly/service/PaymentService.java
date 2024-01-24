@@ -85,7 +85,7 @@ public class PaymentService {
             Template template = templateRepository.findById(Long.parseLong(chargeRequest.getTemplateId()))
                     .orElseThrow(() -> new RuntimeException("Template not found for id: " + chargeRequest.getTemplateId()));
             Map<String, Object> payload = new HashMap<>();
-            payload.put("amount", (float) template.getCost());
+            payload.put("amount", (int) template.getCost());
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(
                     chargeApiUrl,
                     new HttpEntity<>(payload, headers),
