@@ -1,4 +1,5 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.DTO.SubcategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Entity.User;
@@ -6,6 +7,7 @@ import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.UpdateEmailPassword;
+import com.iker.Lexly.service.SubcategoryService;
 import com.iker.Lexly.service.TemplateService;
 import com.iker.Lexly.service.UserService;
 import jakarta.security.enterprise.credential.Password;
@@ -25,15 +27,22 @@ public class TemplateController {
     private final TemplateTransformer templateTransformer;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final SubcategoryService subcategoryService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    public TemplateController(PasswordEncoder passwordEncoder,UserService userService,UserRepository userRepository,JwtService jwtService,TemplateService templateService, TemplateTransformer templateTransformer) {
+    public TemplateController( SubcategoryService subcategoryService,PasswordEncoder passwordEncoder,UserService userService,UserRepository userRepository,JwtService jwtService,TemplateService templateService, TemplateTransformer templateTransformer) {
         this.templateService = templateService;
         this.jwtService=jwtService;
+        this.subcategoryService=subcategoryService;
         this.passwordEncoder=passwordEncoder;
         this.userService = userService;
         this.templateTransformer = templateTransformer;
         this.userRepository=userRepository;
+    }
+    @GetMapping("/all_subcategories")
+    public ResponseEntity<List<SubcategoryDTO>> getAllSubcategories() {
+        List<SubcategoryDTO> subcategories = subcategoryService.getAllSubcategories();
+        return ResponseEntity.ok(subcategories);
     }
     @GetMapping("/all_templates")
     public List<TemplateDTO> getAllTemplates() {

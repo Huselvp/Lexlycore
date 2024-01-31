@@ -66,11 +66,6 @@ public class adminController {
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
     }
-    @GetMapping("/all_subcategories")
-    public ResponseEntity<List<SubcategoryDTO>> getAllSubcategories() {
-        List<SubcategoryDTO> subcategories = subcategoryService.getAllSubcategories();
-        return ResponseEntity.ok(subcategories);
-    }
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
