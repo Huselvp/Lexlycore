@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Token.Token;
 import com.iker.Lexly.Token.TokenRepository;
 import com.iker.Lexly.Token.TokenType;
@@ -34,7 +35,6 @@ public class AuthenticationService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private final UserTransformer userTransformer;
-
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -53,6 +53,7 @@ public class AuthenticationService {
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role(request.getRole())
                     .build();
+            user.setRole(Role.valueOf("SUSER"));
             User savedUser = repository.save(user);
             var jwtToken = jwtService.generateToken((UserDetails) user);
             saveUserToken(savedUser, jwtToken);

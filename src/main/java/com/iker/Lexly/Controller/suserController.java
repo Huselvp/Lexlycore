@@ -45,7 +45,6 @@ public class suserController {
     private final QuestionTransformer questionTransformer;
     private final PDFGenerationService pdfGenerationService;
     private final UserRepository userRepository;
-
     @Autowired
     public suserController( PaymentService paymentService,UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository) {
         this.templateTransformer = templateTransformer;

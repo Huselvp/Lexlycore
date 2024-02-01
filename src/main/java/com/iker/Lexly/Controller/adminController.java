@@ -115,7 +115,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @PostMapping(value = "/create_template/{token}", produces = "application/json")
     public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
@@ -174,7 +173,6 @@ public class adminController {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
-
     @PutMapping("/update_question/{id}") //valide
     public ResponseEntity<QuestionDTO> updateQuestion(
             @PathVariable Long id,
@@ -188,7 +186,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @GetMapping("question/{questionId}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
