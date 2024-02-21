@@ -13,7 +13,7 @@ spring:
     init:
       platform: postgres
 server:
-  port: 8081
+  port: 8080
 paypal:
   mode: sandbox
   client:
@@ -23,3 +23,5 @@ paypal:
     url: "https://api-m.sandbox.paypal.com"
 app:
   firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
+  secret-key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
+my-custom-cookie-name: "MyCookie"
