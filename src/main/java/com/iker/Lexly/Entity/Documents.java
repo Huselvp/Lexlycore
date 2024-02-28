@@ -18,6 +18,8 @@ public class Documents {
     private boolean isDraft=true;
     @Column(name = "payment_status")
     private Boolean paymentStatus=false;
+    @ElementCollection
+    private List<Integer> questionOrder;
     @ManyToOne
     private User user;
     @ManyToOne
@@ -65,5 +67,13 @@ public class Documents {
     }
     public void setPaymentStatus(boolean paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public List<Integer> getQuestionOrder() {
+        return questionOrder;
+    }
+
+    public void setQuestionOrder(List<Integer> questionOrder) {
+        this.questionOrder = questionOrder;
     }
 }

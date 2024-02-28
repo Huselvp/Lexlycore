@@ -168,14 +168,21 @@ public class suserController {
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
+
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,
             @PathVariable Long templateId,
-            @RequestParam(required = false) String htmlContent) {
+            @RequestParam(required = false) String htmlContent,
+            @RequestParam(required = false) List<Integer> questionOrder) {
         try {
             Documents document = documentsRepository.findById(documentId)
                     .orElseThrow(() -> new RuntimeException("Document not found"));
+            if (questionOrder != null && !questionOrder.isEmpty()) {
+                document.setQuestionOrder(questionOrder);
+                documentsRepository.save(document);
+            }
+
             if (document.isPaymentStatus()) {
                 if (htmlContent == null) {
                     List<Question> questions = questionRepository.findByTemplateId(templateId);

@@ -81,12 +81,22 @@ public class DocumentsService {
         }
     }
     public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
+        Documents document = documentsRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
+
+        List<Integer> questionOrder = document.getQuestionOrder();
+        if (questionOrder == null || questionOrder.isEmpty()) {
+            return "Question order not specified.";
+        }
+
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
         }
+
         Document mainDocument = Jsoup.parse("<div></div>");
-        for (Question question : questions) {
-            if (question.getTemplate().getId().equals(templateId)) {
+        for (Integer questionId : questionOrder) {
+            Question question = findQuestionById(questions, questionId);
+            if (question != null && question.getTemplate().getId().equals(templateId)) {
                 String text = question.getTexte();
                 text = replaceValues(text, question.getId(), documentQuestionValues);
                 Document questionDocument = Jsoup.parseBodyFragment(text);
@@ -98,6 +108,16 @@ public class DocumentsService {
 
         return mainDocument.html().trim();
     }
+
+    private Question findQuestionById(List<Question> questions, Integer questionId) {
+        for (Question question : questions) {
+            if (question.getId().equals(questionId)) {
+                return question;
+            }
+        }
+        return null;
+    }
+
 
 
     private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
