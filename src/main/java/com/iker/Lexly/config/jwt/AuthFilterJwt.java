@@ -32,7 +32,6 @@ public class AuthFilterJwt extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwtToken = null;
-
         // Extract JWT from Cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
