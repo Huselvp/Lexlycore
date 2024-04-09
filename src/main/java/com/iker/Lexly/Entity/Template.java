@@ -32,7 +32,7 @@ public class Template {
     @Column(name="template_content")
     private String content;
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;
 
     public Template(List<Question> questions,String name,Subcategory subcategory, String templateDescription,float cost,String content) {
