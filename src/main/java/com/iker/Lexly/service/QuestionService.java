@@ -18,8 +18,6 @@ import java.util.Optional;
 public class QuestionService {
     @PersistenceContext
     private EntityManager entityManager;
-
-
     private final QuestionRepository questionRepository;
     private final TemplateService templateService;
     private final TemplateRepository templateRepository;
@@ -80,35 +78,6 @@ public class QuestionService {
         }
     }
 
-
-    public Question createQuestionByTemplateId(Long templateId, Question newQuestion) {
-        Template template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new EntityNotFoundException("Template not found with ID: " + templateId));
-        newQuestion.setTemplate(template);
-        return questionRepository.save(newQuestion);
-    }
-    public DocumentQuestionValueDTO addValueToQuestion(Long questionId, Long documentId, String value) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
-        Documents document = documentsRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Document not found with ID: " + documentId));
-        DocumentQuestionValue documentQuestionValue = new DocumentQuestionValue();
-        documentQuestionValue.setQuestion(question);
-        documentQuestionValue.setDocument(document);
-        documentQuestionValue.setValue(value);
-        documentQuestionValue = documentQuestionValueRepository.save(documentQuestionValue);
-        DocumentQuestionValueDTO dto = convertToDTO(documentQuestionValue);
-        return dto;
-    }
-    private DocumentQuestionValueDTO convertToDTO(DocumentQuestionValue documentQuestionValue) {
-        DocumentQuestionValueDTO dto = new DocumentQuestionValueDTO();
-        dto.setDocumentQuestionValueId(documentQuestionValue.getDocumentQuestionValueId());
-        dto.setDocumentId(documentQuestionValue.getDocument().getId());
-        dto.setQuestionId(documentQuestionValue.getQuestion().getId());
-        dto.setValue(documentQuestionValue.getValue());
-        return dto;
-    }
-
     @Transactional
         public Question createQuestion(Question question, Template template) {
             if (questionRepository.existsByQuestionText(question.getQuestionText())) {
@@ -139,6 +108,7 @@ public class QuestionService {
                 return null;
             }
         }
+
 
 }
 

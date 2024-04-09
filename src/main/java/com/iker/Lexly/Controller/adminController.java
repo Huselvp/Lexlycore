@@ -7,7 +7,6 @@ import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.request.ChoiceUpdate;
-import com.iker.Lexly.request.UpdateEmailPassword;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -16,7 +15,6 @@ import com.iker.Lexly.Transformer.UserTransformer;
 import com.iker.Lexly.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +32,7 @@ import java.util.stream.Collectors;
 
 public class adminController {
     private final UserService userService;
+    private final SubQuestionService subQuestionService;
     private final UserTransformer userTransformer;
     private final SubcategoryService subcategoryService;
 
@@ -51,7 +50,8 @@ public class adminController {
     private final JwtService jwtService;
 
     @Autowired
-    public adminController( SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,UserRepository userRepository, PasswordEncoder passwordEncoder,JwtService jwtService ,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService,  UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService,  QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer) {
+        this.subQuestionService = subQuestionService;
         this.templateService = templateService;
         this.jwtService=jwtService;
         this.subcategoryTransformer=subCategoryTransformer;
@@ -207,6 +207,34 @@ public class adminController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    @GetMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
+        List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
+        return ResponseEntity.ok(subQuestions);
+    }
+
+    @PostMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<SubQuestion> createSubQuestion(@PathVariable Long questionId, @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion createdSubQuestion = subQuestionService.createSubQuestion(questionId, subQuestionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
+    }
+    @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
+        SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+        return ResponseEntity.ok(subQuestion);
+    }
+
+    @PutMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> updateSubQuestion(@PathVariable Long questionId, @PathVariable Long subQuestionId, @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion updatedSubQuestion = subQuestionService.updateSubQuestion(questionId, subQuestionId, subQuestionDTO);
+        return ResponseEntity.ok(updatedSubQuestion);
+    }
+
+    @DeleteMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<String> deleteSubQuestion(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
+        subQuestionService.deleteSubQuestion(subQuestionId);
+        return ResponseEntity.ok("Subquestion with ID " + subQuestionId + " has been successfully deleted.");
     }
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(

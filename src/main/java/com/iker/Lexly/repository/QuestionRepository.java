@@ -9,12 +9,9 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository  extends JpaRepository<Question,Long> {
-    Question findByQuestionText(String questionText);
 
     List<Question> findByTemplateId(Long templateId);
 
-
-    boolean existsByTemplateIdAndQuestionText(Long templateId, String questionText);
 
     boolean existsByQuestionText(String questionText);
 }

@@ -28,4 +28,4 @@ my-custom-cookie-name: "MyCookie"
 session:
     store-type: jdbc
     jdbc:
-      initialize-schema: always # Optionally, you can specify schema initialization behavior
+      initialize-schema: always

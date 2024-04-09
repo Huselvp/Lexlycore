@@ -106,4 +106,7 @@ public class Question {
     public void setTemplate(Template template) {
         this.template = template;
     }
+
+
+
 }
