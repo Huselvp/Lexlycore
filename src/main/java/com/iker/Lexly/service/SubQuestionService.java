@@ -29,6 +29,13 @@ public class SubQuestionService {
     public List<SubQuestion> getAllSubQuestionsByQuestionId(Long questionId) {
         return subQuestionRepository.findByParentQuestionId(questionId);
     }
+    @Transactional
+    public void updateSubQuestionOrder(Long questionId, List<Long> subQuestionOrder) {
+        Question parentQuestion = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent question not found"));
+        parentQuestion.setSubquestionOrder(subQuestionOrder);
+        questionRepository.save(parentQuestion);
+    }
 
     @Transactional
     public SubQuestion createSubQuestion(Long questionId, SubQuestionDTO subQuestionDTO) {

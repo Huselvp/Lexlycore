@@ -93,4 +93,5 @@ public class SubQuestion {
     public void setParentQuestion(Question parentQuestion) {
         this.parentQuestion = parentQuestion;
     }
+
 }
