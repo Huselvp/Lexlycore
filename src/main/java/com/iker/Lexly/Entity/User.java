@@ -3,7 +3,6 @@ package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.Entity.enums.Role;
-import com.iker.Lexly.Token.Token;
 import lombok.*;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,11 +54,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    @ToString.Exclude
-    @JsonIgnore
-    @JsonManagedReference
-    private List<Token> tokens;
     public User(String username,String email, String firstName, String lastName, String password, String phonenumber, String picture, Role role) {
         this.email = email;
         this.username=username;
