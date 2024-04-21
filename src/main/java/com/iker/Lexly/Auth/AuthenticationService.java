@@ -2,11 +2,8 @@ package com.iker.Lexly.Auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.iker.Lexly.Entity.User;
-import com.iker.Lexly.Token.Token;
-import com.iker.Lexly.Token.TokenRepository;
-import com.iker.Lexly.Token.TokenType;
+
 import com.iker.Lexly.config.jwt.JwtService;
-import org.springframework.session.FindByIndexNameSessionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,13 +30,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
-import org.springframework.session.Session;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository repository;
-    private final TokenRepository tokenRepository;
     private  final  UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -120,16 +116,7 @@ public class AuthenticationService {
             throw e;
         }
     }
-    private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(Math.toIntExact(user.getUserId()));
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
+
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
@@ -147,7 +134,6 @@ public class AuthenticationService {
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
-                revokeAllUserTokens(user);
              //   saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)

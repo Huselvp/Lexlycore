@@ -35,11 +35,11 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/admin").hasAnyRole(Role.ADMIN.name())
                                 .requestMatchers("/api/superadmin").hasAnyRole(Role.SUPERADMIN.name())
                                 .requestMatchers("/api/suser").hasAnyRole((Role.SUSER.name()))
-                                //.requestMatchers("/api/advisor").hasAnyRole(Role.ADVISOR.name())
+                                .requestMatchers("/api/public").permitAll()
                                 .requestMatchers("/get_templates").permitAll()
-                            //    .anyRequest().authenticated()
                                 .anyRequest().permitAll()
                 );
+
         http.authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
