@@ -1,7 +1,6 @@
 package com.iker.Lexly.Auth;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
-import com.iker.Lexly.Token.TokenRepository;
 import com.iker.Lexly.repository.UserRepository;
 import com.iker.Lexly.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,8 +34,6 @@ public class AuthController {
     private  final AuthenticationService service;
     @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private final TokenRepository tokenRepository;
 
 
     @PostMapping("/register")
@@ -93,28 +90,6 @@ public class AuthController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-        }
-    }
-    @PostMapping("/logout")
-    @Transactional
-    public void logout(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Authentication authentication
-    ) {
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        jwt = authHeader.substring(7);
-        var storedToken = tokenRepository.findByToken(jwt).orElse(null);
-        if (storedToken != null) {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-            tokenRepository.deleteByToken(jwt);
-            SecurityContextHolder.clearContext();
         }
     }
 
