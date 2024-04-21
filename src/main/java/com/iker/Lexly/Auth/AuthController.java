@@ -52,13 +52,6 @@ public class AuthController {
         AuthenticationResponse authenticationResponse = service.authenticate(request, response);
         return ResponseEntity.ok(authenticationResponse);
     }
-    @PostMapping("/refresh-token")
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        service.refreshToken(request, response);
-    }
     @PostMapping("/forgot-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {
             String email = request.get("email");
