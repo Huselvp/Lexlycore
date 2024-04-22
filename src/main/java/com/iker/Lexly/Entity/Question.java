@@ -34,6 +34,7 @@ public class Question {
     private String Texte;
     @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @JsonIgnore
     private List<SubQuestion> subQuestions = new ArrayList<>();
     @Column(name = "subquestion_order")
     @Convert(converter = StringListConverter.class)

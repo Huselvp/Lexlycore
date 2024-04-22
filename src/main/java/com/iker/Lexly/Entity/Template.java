@@ -53,6 +53,7 @@ public class Template {
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
+
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL,  orphanRemoval = true)
     @JsonIgnore
     private List<Documents> documents = new ArrayList<>();
