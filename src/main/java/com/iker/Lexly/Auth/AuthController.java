@@ -69,7 +69,6 @@ public class AuthController {
         String newPassword = request.get("newPassword");
         if (resetTokenService.validateToken(token)) {
             Optional<User> optionalUser = resetTokenService.findUserByPasswordToken(token);
-
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 passwordEncoder.encode(newPassword);
@@ -85,5 +84,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
     }
-
 }

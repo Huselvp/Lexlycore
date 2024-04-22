@@ -46,7 +46,6 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
             return dto;
         }
     }
-
     private SubQuestionDTO mapToSubQuestionDTO(SubQuestion subQuestion) {
         SubQuestionDTO subQuestionDTO = new SubQuestionDTO();
         subQuestionDTO.setQuestionText(subQuestion.getQuestionText());
