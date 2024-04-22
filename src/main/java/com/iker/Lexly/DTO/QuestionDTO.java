@@ -16,6 +16,7 @@ public class QuestionDTO {
     private String texte;
     private String description;
     private String descriptionDetails;
+    private List<SubQuestionDTO> subQuestions;
 
 
     public QuestionDTO( Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
@@ -26,6 +27,10 @@ public class QuestionDTO {
         this.description = description;
         this.descriptionDetails = descriptionDetails;
 
+
+    }
+
+    public QuestionDTO() {
 
     }
 }

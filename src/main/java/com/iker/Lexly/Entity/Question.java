@@ -2,6 +2,7 @@ package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ public class Question {
     @Column(name="description")
     @JsonProperty("Description")
     private String Description;
-
     @Column(name="description_details")
     @JsonProperty("description_details")
     private String DescriptionDetails;
@@ -32,6 +32,12 @@ public class Question {
     @Column(name= "text_area")
     @JsonProperty("text_area")
     private String Texte;
+    @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<SubQuestion> subQuestions = new ArrayList<>();
+    @Column(name = "subquestion_order")
+    @Convert(converter = StringListConverter.class)
+    private List<Long> subquestionOrder;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
@@ -107,6 +113,19 @@ public class Question {
         this.template = template;
     }
 
+    public List<Long> getSubquestionOrder() {
+        return subquestionOrder;
+    }
 
+    public void setSubquestionOrder(List<Long> subquestionOrder) {
+        this.subquestionOrder = subquestionOrder;
+    }
 
+    public List<SubQuestion> getSubQuestions() {
+        return subQuestions;
+    }
+
+    public void setSubQuestions(List<SubQuestion> subQuestions) {
+        this.subQuestions = subQuestions;
+    }
 }

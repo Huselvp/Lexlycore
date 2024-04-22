@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,13 @@ public class Template {
     @ManyToOne
     @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;
+    @Column(name = "question_order")
+    @Convert(converter = StringListConverter.class)
+    private List<Long> questionOrder;
+
+    @Column(name = "subquestion_order")
+    @Convert(converter = StringListConverter.class)
+    private List<Long> subquestionOrder;
 
     public Template(List<Question> questions,String name,Subcategory subcategory, String templateDescription,float cost,String content) {
         this.templateName = name;

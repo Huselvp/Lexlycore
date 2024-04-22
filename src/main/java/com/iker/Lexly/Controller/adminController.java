@@ -196,6 +196,14 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    @PutMapping("/update_question_order/{templateId}")
+    public ResponseEntity<Void> updateQuestionOrder(
+            @PathVariable Long templateId,
+            @RequestBody List<Long> questionOrder
+    ) {
+        questionService.updateQuestionOrder(templateId, questionOrder);
+        return ResponseEntity.ok().build();
+    }
     @DeleteMapping("delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         Optional<Question> optionalQuestion = questionRepository.findById(id);
@@ -235,6 +243,13 @@ public class adminController {
     public ResponseEntity<String> deleteSubQuestion(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
         subQuestionService.deleteSubQuestion(subQuestionId);
         return ResponseEntity.ok("Subquestion with ID " + subQuestionId + " has been successfully deleted.");
+    }
+    @PutMapping("/questions/subquestions/{questionId}/order")
+    public ResponseEntity<Void> updateSubQuestionOrder(
+            @PathVariable Long questionId,
+            @RequestBody List<Long> subQuestionOrder) {
+        subQuestionService.updateSubQuestionOrder(questionId, subQuestionOrder);
+        return ResponseEntity.ok().build();
     }
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(

@@ -94,6 +94,15 @@ public class QuestionService {
                 throw new IllegalArgumentException("The content is not valid XML.");
             }
         }
+
+    @Transactional
+    public void updateQuestionOrder(Long templateId, List<Long> questionOrder) {
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+        template.setQuestionOrder(questionOrder);
+        templateRepository.save(template);
+    }
+
         private String transformTextToXml(String text) {
             try {
                 JAXBContext context = JAXBContext.newInstance(TextWrapper.class);

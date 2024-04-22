@@ -27,7 +27,6 @@ public class UserDTO {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
     public UserDTO(String country,String description,int zipcode, String town,String adress,String username,Role role,Long userId, String email, String firstName, String lastName, String phonenumber, String picture) {
         this.email = email;
         this.username=username;
