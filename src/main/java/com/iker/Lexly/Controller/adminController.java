@@ -103,18 +103,7 @@ public class adminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-    @PutMapping("/update_category/{templateId}/{newCategoryId}")
-    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
-            @PathVariable Long templateId,
-            @PathVariable Long newCategoryId
-    ) {
-        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
     @PostMapping(value = "/create_template/{token}", produces = "application/json")
     public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
@@ -354,6 +343,31 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+//kawtar code
+@PostMapping("add-order-subquestions/{questionId}")
+public ResponseEntity<List<Long>> deleteSubQuestion(@PathVariable Long questionId, @RequestBody  List<Long> subquestionOrder) {
+    Question question = questionService.getQuestionById(questionId);
+    if (question != null) {
+        question.setSubquestionOrder(subquestionOrder);
+        return new ResponseEntity<>(subquestionOrder, HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+}
+
+    @PutMapping("/update_category/{templateId}/{newCategoryId}")
+    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
+            @PathVariable Long templateId,
+            @PathVariable Long newCategoryId
+    ) {
+        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }
 

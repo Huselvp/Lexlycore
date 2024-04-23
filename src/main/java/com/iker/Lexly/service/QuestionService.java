@@ -118,6 +118,20 @@ public class QuestionService {
             }
         }
 
+    // kawtar code
+    @Transactional
+    public Question addSubQuestions(Long questionId, List<Long> subquestionOrder) {
+        Question question = questionRepository.findById(questionId)
+                .orElse(null);
+        if (question != null) {
+            question.setSubquestionOrder(subquestionOrder);
+
+
+            return questionRepository.save(question);
+        } else {
+            throw new IllegalArgumentException("The content is not valid XML.");
+        }
+    }
 
 }
 
