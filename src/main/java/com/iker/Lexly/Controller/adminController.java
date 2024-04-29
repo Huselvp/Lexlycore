@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -103,7 +104,18 @@ public class adminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-
+    @PutMapping("/update_category/{templateId}/{newCategoryId}")
+    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
+            @PathVariable Long templateId,
+            @PathVariable Long newCategoryId
+    ) {
+        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @PostMapping(value = "/create_template/{token}", produces = "application/json")
     public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
@@ -147,7 +159,7 @@ public class adminController {
         return questionDTOs;
     }
 
-    @PostMapping("/create_question/{templateId}")
+    @PostMapping(value = "/create_question/{templateId}", consumes = "application/json;charset=UTF-8")
     public ResponseEntity<Question> createQuestion(
             @PathVariable Long templateId,
             @RequestBody Question request) {
@@ -162,6 +174,14 @@ public class adminController {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
     }
+
+//    @GetMapping("/find_questions_by_questionsOrder/{templateId}")
+//    public List<Question> getAllQuestionsByQuestionsOrder(@PathVariable Long templateId) {
+//        return questionService.getAllQuestionsByTemplateIdOrderByOrder(templateId);
+//
+//    }
+
+
     @PutMapping("/update_question/{id}") //valide
     public ResponseEntity<QuestionDTO> updateQuestion(
             @PathVariable Long id,
@@ -185,14 +205,29 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PutMapping("/update_question_order/{templateId}")
-    public ResponseEntity<Void> updateQuestionOrder(
-            @PathVariable Long templateId,
-            @RequestBody List<Long> questionOrder
-    ) {
-        questionService.updateQuestionOrder(templateId, questionOrder);
-        return ResponseEntity.ok().build();
+    @PutMapping("question/reorder")
+    public ResponseEntity<String> reoderQuestion (@RequestBody List<Long> questionIds) {
+        try {
+            questionService.reorderQuestions(questionIds);
+            return new ResponseEntity<>("Questions reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering questions.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
+
+
+//    @PutMapping("/update_question_order/{templateId}")
+//    public ResponseEntity<Void> updateQuestionOrder(
+//            @PathVariable Long templateId,
+//            @RequestBody List<Long> questionOrder
+//    ) {
+//        questionService.updateQuestionOrder(templateId, questionOrder);
+//        return ResponseEntity.ok().build();
+//    }
+
+
+
     @DeleteMapping("delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
         Optional<Question> optionalQuestion = questionRepository.findById(id);
@@ -233,13 +268,33 @@ public class adminController {
         subQuestionService.deleteSubQuestion(subQuestionId);
         return ResponseEntity.ok("Subquestion with ID " + subQuestionId + " has been successfully deleted.");
     }
-    @PutMapping("/questions/subquestions/{questionId}/order")
-    public ResponseEntity<Void> updateSubQuestionOrder(
-            @PathVariable Long questionId,
-            @RequestBody List<Long> subQuestionOrder) {
-        subQuestionService.updateSubQuestionOrder(questionId, subQuestionOrder);
-        return ResponseEntity.ok().build();
+    @PutMapping("/questions/subquestions/reorder/{questionId}")
+    public ResponseEntity<String> reorderSubQuestion(@PathVariable Long questionId, @RequestBody List<Long> subQuestionIds) {
+        try{
+            subQuestionService.reorderSubQuestions(questionId,subQuestionIds);
+            return new ResponseEntity<>("SubQuestions reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering sbquestions.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+//    @PutMapping("/questions/subquestions/{questionId}/order")
+//    public ResponseEntity<Void> updateSubQuestionOrder(
+//            @PathVariable Long questionId,
+//            @RequestBody List<Long> subQuestionOrder) {
+//        subQuestionService.updateSubQuestionOrder(questionId, subQuestionOrder);
+//        return ResponseEntity.ok().build();
+//    }
+
+
+//    @GetMapping("/questions/subquestions/{questionId}/order")
+//    public List<SubQuestion> getAll(@PathVariable Long questionId) {
+//        return subQuestionService.getAllSubQuestionsBySubquestionOrder(questionId);
+//
+//    }
+
+
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(
             @PathVariable Long questionId,
@@ -343,31 +398,6 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-//kawtar code
-@PostMapping("add-order-subquestions/{questionId}")
-public ResponseEntity<List<Long>> deleteSubQuestion(@PathVariable Long questionId, @RequestBody  List<Long> subquestionOrder) {
-    Question question = questionService.getQuestionById(questionId);
-    if (question != null) {
-        question.setSubquestionOrder(subquestionOrder);
-        return new ResponseEntity<>(subquestionOrder, HttpStatus.OK);
-    } else {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-}
-
-    @PutMapping("/update_category/{templateId}/{newCategoryId}")
-    public ResponseEntity<ApiResponse> updateCategoryForTemplate(
-            @PathVariable Long templateId,
-            @PathVariable Long newCategoryId
-    ) {
-        ApiResponse response = templateService.updateCategoryForTemplate(templateId, newCategoryId);
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
 
 }
 

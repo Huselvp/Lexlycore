@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -33,9 +34,13 @@ public class SubQuestion {
     @JsonProperty("text_area")
     private String textArea;
 
+    @Column(name="position")
+    private int position;
+
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "parent_question_id")
-    @JsonIgnore
+//    @JsonIgnore
     private Question parentQuestion;
 
     public Long getId() {
@@ -85,6 +90,10 @@ public class SubQuestion {
     public void setTextArea(String textArea) {
         this.textArea = textArea;
     }
+
+    public int getPosition() {return position;}
+
+    public void setPosition(int position) {this.position = position;}
 
     public Question getParentQuestion() {
         return parentQuestion;

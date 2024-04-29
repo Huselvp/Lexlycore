@@ -10,8 +10,9 @@ import java.util.List;
 @Repository
 public interface QuestionRepository  extends JpaRepository<Question,Long> {
 
-    List<Question> findByTemplateId(Long templateId);
+    List<Question> findByTemplateIdOrderByPositionAsc(Long templateId);
 
+    List<Question> findByTemplateId(Long templateId);
 
     boolean existsByQuestionText(String questionText);
 }

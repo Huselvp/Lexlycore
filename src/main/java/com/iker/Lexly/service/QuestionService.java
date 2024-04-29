@@ -1,5 +1,4 @@
 package com.iker.Lexly.service;
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.QuestionTransformer;
@@ -12,8 +11,12 @@ import jakarta.xml.bind.Marshaller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.StringWriter;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+
 @Service
 public class QuestionService {
     @PersistenceContext
@@ -38,6 +41,28 @@ public class QuestionService {
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
     }
+
+
+
+//    public List<Question> getAllQuestionsByTemplateIdOrderByOrder(Long templateId ) {
+//        Template template = templateRepository.findById(templateId)
+//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+//        List<Long> order=template.getQuestionOrder();
+//        if (order == null || order.isEmpty()) {
+//            return questionRepository.findByTemplateIdOrderByPositionAsc(templateId);
+//        }
+////        List<Question> orderedQuestion = new LinkedList<>(); ;
+////        for (Long orderId : order) {
+////            Question question=questionRepository.findById(orderId).orElse(null);
+////            if (question==null) continue;
+////            orderedQuestion.add(question);
+////        }
+////        return orderedQuestion;
+//        return order.stream()
+//                .map(orderId -> questionRepository.findById(orderId).orElse(null))
+//                .filter(question -> question != null)
+//                .collect(Collectors.toList());
+//    }
 
     public Question getQuestionById(Long questionId) {
         return questionRepository.findById(questionId)
@@ -87,20 +112,39 @@ public class QuestionService {
             if (xmlText != null) {
                 question.setTexte(question.getTexte());
                 Question savedQuestion = questionRepository.save(question);
+                savedQuestion.setPosition(savedQuestion.getId().intValue());
+
                 savedQuestion.setTemplate(template);
 
                 return questionRepository.save(savedQuestion);
+
             } else {
                 throw new IllegalArgumentException("The content is not valid XML.");
             }
         }
 
-    @Transactional
-    public void updateQuestionOrder(Long templateId, List<Long> questionOrder) {
-        Template template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
-        template.setQuestionOrder(questionOrder);
-        templateRepository.save(template);
+//    @Transactional
+//    public void updateQuestionOrder(Long templateId, List<Long> questionOrder) {
+//        Template template = templateRepository.findById(templateId)
+//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+//        template.setQuestionOrder(questionOrder);
+//        templateRepository.save(template);
+//    }
+    public void reorderQuestions(List<Long> questionsIds) {
+
+        Set<Long> uniqueQuestionIds = new HashSet<>(questionsIds);
+        if (uniqueQuestionIds.size() < questionsIds.size()) {
+            throw new IllegalArgumentException("Duplicate user IDs found in the list.");
+        }
+        List<Question> questions = questionRepository.findAllById(questionsIds);
+        for (int i = 0; i < questionsIds.size(); i++) {
+            long questionId = questionsIds.get(i);
+            Question question = questions.stream().filter(u -> u.getId().equals(questionId)).findFirst().orElse(null);
+            if (question != null) {
+                question.setPosition(i);
+                questionRepository.save(question);
+            }
+        }
     }
 
         private String transformTextToXml(String text) {
@@ -118,20 +162,7 @@ public class QuestionService {
             }
         }
 
-    // kawtar code
-    @Transactional
-    public Question addSubQuestions(Long questionId, List<Long> subquestionOrder) {
-        Question question = questionRepository.findById(questionId)
-                .orElse(null);
-        if (question != null) {
-            question.setSubquestionOrder(subquestionOrder);
 
-
-            return questionRepository.save(question);
-        } else {
-            throw new IllegalArgumentException("The content is not valid XML.");
-        }
-    }
 
 }
 

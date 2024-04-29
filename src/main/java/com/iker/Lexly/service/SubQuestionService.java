@@ -4,38 +4,59 @@ import com.iker.Lexly.DTO.SubQuestionDTO;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.SubQuestion;
 import com.iker.Lexly.DTO.QuestionDTO;
+import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.SubQuestionRepository;
+import com.iker.Lexly.repository.SubcategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SubQuestionService {
 
     private final SubQuestionRepository subQuestionRepository;
     private final QuestionRepository questionRepository;
+    private final SubcategoryRepository subcategoryRepository;
 
     @Autowired
-    public SubQuestionService(SubQuestionRepository subQuestionRepository, QuestionRepository questionRepository) {
+    public SubQuestionService(SubQuestionRepository subQuestionRepository, QuestionRepository questionRepository, SubcategoryRepository subcategoryRepository) {
         this.subQuestionRepository = subQuestionRepository;
         this.questionRepository= questionRepository;
+        this.subcategoryRepository = subcategoryRepository;
     }
 
     @Transactional(readOnly = true)
     public List<SubQuestion> getAllSubQuestionsByQuestionId(Long questionId) {
         return subQuestionRepository.findByParentQuestionId(questionId);
     }
-    @Transactional
-    public void updateSubQuestionOrder(Long questionId, List<Long> subQuestionOrder) {
-        Question parentQuestion = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent question not found"));
-        parentQuestion.setSubquestionOrder(subQuestionOrder);
-        questionRepository.save(parentQuestion);
-    }
+
+//    public List<SubQuestion> getAllSubQuestionsBySubquestionOrder(Long questionId ) {
+//        Question question = questionRepository.findById(questionId)
+//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+//        List<Long> orderSubquestions=question.getSubquestionOrder();
+//        if (orderSubquestions == null || orderSubquestions.isEmpty()) {
+//            return subQuestionRepository.findByParentQuestionId(questionId);
+//        }
+//        return orderSubquestions.stream()
+//                .map(orderId -> subQuestionRepository.findById(orderId).orElse(null))
+//                .filter(subQuestion -> subQuestion != null)
+//                .collect(Collectors.toList());
+//    }
+
+//    @Transactional
+//    public void updateSubQuestionOrder(Long questionId, List<Long> subQuestionOrder) {
+//        Question parentQuestion = questionRepository.findById(questionId)
+//                .orElseThrow(() -> new IllegalArgumentException("Parent question not found"));
+//        parentQuestion.setSubquestionOrder(subQuestionOrder);
+//        questionRepository.save(parentQuestion);
+//    }
 
     @Transactional
     public SubQuestion createSubQuestion(Long questionId, SubQuestionDTO subQuestionDTO) {
@@ -47,7 +68,9 @@ public class SubQuestionService {
         subQuestion.setValueType(subQuestionDTO.getValueType());
         subQuestion.setTextArea(subQuestionDTO.getTextArea());
         subQuestion.setParentQuestion(parentQuestion);
-        return subQuestionRepository.save(subQuestion);
+        SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
+        subQuestionsaved.setPosition(subQuestionsaved.getId().intValue());
+        return subQuestionRepository.save(subQuestionsaved);
     }
 
     @Transactional(readOnly = true)
@@ -82,6 +105,22 @@ public class SubQuestionService {
         }
     }
 
+    public void reorderSubQuestions(Long questionId, List<Long> subQuestionsIds) {
+
+        Set<Long> uniqueSubQuestionIds = new HashSet<>(subQuestionsIds);
+        if (uniqueSubQuestionIds.size() < subQuestionsIds.size()) {
+            throw new IllegalArgumentException("Duplicate user IDs found in the list.");
+        }
+        List<SubQuestion> subQuestions = subQuestionRepository.findAllById(subQuestionsIds);
+        for (int i = 0; i < subQuestionsIds.size(); i++) {
+            long subQuestionId = subQuestionsIds.get(i);
+            SubQuestion subQuestion = subQuestions.stream().filter(u -> u.getId().equals(subQuestionId)).findFirst().orElse(null);
+            if (subQuestion != null) {
+                subQuestion.setPosition(i);
+                subQuestionRepository.save(subQuestion);
+            }
+        }
+    }
 
     @Transactional
     public void deleteSubQuestion(Long subQuestionId) {

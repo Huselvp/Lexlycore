@@ -1,4 +1,5 @@
 package com.iker.Lexly.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "question")
 public class Question {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,19 +36,22 @@ public class Question {
     private String Texte;
     @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
     @JsonManagedReference
+//    @JsonIgnore
     private List<SubQuestion> subQuestions = new ArrayList<>();
 
-    @Column(name = "subquestion_order")
-    @Convert(converter = StringListConverter.class)
-    private List<Long> subquestionOrder;
+    private int position;
+
+//    @Column(name = "subquestion_order")
+//    @Convert(converter = StringListConverter.class)
+//    private List<Long> subquestionOrder;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
 
     @ManyToOne
-    @JsonManagedReference
-    @JsonIgnore
+    @JsonBackReference
+//    @JsonIgnore
     private Template template;
 
 
@@ -114,14 +119,16 @@ public class Question {
         this.template = template;
     }
 
-    public List<Long> getSubquestionOrder() {
-        return subquestionOrder;
-    }
+//    public List<Long> getSubquestionOrder() {
+//        return subquestionOrder;
+//    }
 
-    public void setSubquestionOrder(List<Long> subquestionOrder) {
-        this.subquestionOrder = subquestionOrder;
-    }
+//    public void setSubquestionOrder(List<Long> subquestionOrder) {
+//        this.subquestionOrder = subquestionOrder;
+//    }
+    public int getPosition() {return position;}
 
+    public void setPosition(int position) {this.position = position;}
     public List<SubQuestion> getSubQuestions() {
         return subQuestions;
     }

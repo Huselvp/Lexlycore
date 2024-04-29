@@ -1,5 +1,6 @@
 package com.iker.Lexly.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,10 @@ public class Template {
         this.questions=questions;
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+
     private List<Question> questions = new ArrayList<>();
+
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL,  orphanRemoval = true)
     @JsonIgnore
     private List<Documents> documents = new ArrayList<>();

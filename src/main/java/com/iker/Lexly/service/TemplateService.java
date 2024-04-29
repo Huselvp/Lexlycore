@@ -44,6 +44,7 @@ public class TemplateService {
         this.documentQuestionValueRepository=documentQuestionValueRepository;
     }
 
+
     public List<Template> getAllTemplates() {
         return templateRepository.findAll();
     }

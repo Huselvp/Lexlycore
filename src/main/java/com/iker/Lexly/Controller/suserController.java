@@ -34,6 +34,7 @@ public class suserController {
     private final DocumentsService documentsService;
     private final TemplateService templateService;
     private final QuestionService questionService;
+
     @Autowired
     private final PaymentService paymentService;
     private final TemplateTransformer templateTransformer;
@@ -45,8 +46,10 @@ public class suserController {
     private final QuestionTransformer questionTransformer;
     private final PDFGenerationService pdfGenerationService;
     private final UserRepository userRepository;
+    private final SubQuestionService subQuestionService;
+
     @Autowired
-    public suserController( PaymentService paymentService,UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository) {
+    public suserController( PaymentService paymentService,UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository,SubQuestionService subQuestionService) {
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -60,6 +63,7 @@ public class suserController {
         this.questionService = questionService;
         this.templateService = templateService;
         this.documentsRepository = documentsRepository;
+        this.subQuestionService=subQuestionService;
     }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
@@ -158,6 +162,20 @@ public class suserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @GetMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
+        List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
+        return ResponseEntity.ok(subQuestions);
+    }
+
+    @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
+        SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+        return ResponseEntity.ok(subQuestion);
+    }
+
+
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
         Long documentId = requestData.getDocumentId();
