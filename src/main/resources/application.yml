@@ -7,13 +7,13 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/lexly_database
     username: postgres
-    password: password
+    password: pqsszord
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
 server:
-  port: 8082
+  port: 8081
   servlet:
     encoding:
       charset: UTF-8
