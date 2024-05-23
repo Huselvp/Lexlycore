@@ -1,0 +1,242 @@
+:root {
+  /* Border radius */
+  --rounded-none: 0px;
+  --rounded-sm: 3px; /* 2px */
+  --rounded: 4px; /* 4px */
+  --rounded-md: 6px; /* 6px */
+  --rounded-lg: 8px; /* 8px */
+  --rounded-xl: 12px; /* 12px */
+  --rounded-2xl: 16px; /* 16px */
+  --rounded-3xl: 24px; /* 24px */
+  --rounded-4xl: 30px; /* 24px */
+  /* Box shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --shadow-none: 0 0 #0000;
+  /* Colors */
+  --backdrop-color: rgba(255, 255, 255, 0.1);
+  --white: #fff;
+  --color-stone-50: #ffffff;
+  --color-stone-150: #f5f4ef;
+  --color-stone-200: #eceae1;
+  --color-stone-250: #e3e0d3;
+  --color-stone-300: #dad6c5;
+  --color-stone-350: #d1ccb8;
+  --color-stone-400: #c8c2ab;
+  --color-stone-450: #bfb89e;
+  --color-stone-500: #b6ae92;
+  --color-stone-550: #ada587;
+  --color-stone-600: #9a9278;
+  --color-stone-650: #868069;
+  --color-stone-700: #736e5a;
+  --color-stone-750: #605b4b;
+  --color-stone-800: #4d493c;
+  --color-stone-850: #39372d;
+  --color-stone-900: #26241e;
+  --color-stone-950: #13120f;
+  --color-stone-1000: #000000;
+
+  /* Grey */
+
+  --color-grey-0: #fff;
+  --color-grey-50: #f9fafb;
+  --color-grey-100: #f3f4f6;
+  --color-grey-200: #e5e7eb;
+  --color-grey-300: #d1d5db;
+  --color-grey-400: #9ca3af;
+  --color-grey-500: #6b7280;
+  --color-grey-600: #4b5563;
+  --color-grey-700: #374151;
+  --color-grey-800: #1f2937;
+  --color-grey-900: #111827;
+  /* Blue */
+  --color-blue-50: rgb(239 246 255);
+  --color-blue-100: rgb(219 234 254);
+  --color-blue-200: rgb(191 219 254);
+  --color-blue-300: rgb(147 197 253);
+  --color-blue-400: rgb(96 165 250);
+  --color-blue-500: rgb(59 130 246);
+  --color-blue-600: rgb(37 99 235);
+  --color-blue-700: rgb(29 78 216);
+  --color-blue-800: rgb(30 64 175);
+  --color-blue-900: rgb(30 58 138);
+  --color-blue-950: rgb(23 37 84);
+  /* Indigo */
+  --color-indigo-50: rgb(238 242 255);
+  --color-indigo-100: rgb(224 231 255);
+  --color-indigo-200: rgb(199 210 254);
+  --color-indigo-300: rgb(165 180 252);
+  --color-indigo-400: rgb(129 140 248);
+  --color-indigo-500: rgb(99 102 241);
+  --color-indigo-600: rgb(79 70 229);
+  --color-indigo-700: rgb(67 56 202);
+  --color-indigo-800: rgb(55 48 163);
+  --color-indigo-900: rgb(49 46 129);
+  --color-indigo-950: rgb(30 27 75);
+  /* Indigo */
+
+  --color-green-100: #dcfce7;
+  --color-green-700: #15803d;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-700: #a16207;
+  --color-silver-100: #e5e7eb;
+  --color-silver-700: #374151;
+
+  --color-red-100: #fee2e2;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+html {
+  font-size: 62.5%;
+  @media screen and (max-width: 75em) {
+    font-size: 56.25%;
+  }
+
+  @media screen and (max-width: 56.25em) {
+    font-size: 50%;
+  }
+
+  @media screen and (max-width: 37.5em) {
+    font-size: 43.75%;
+  }
+
+  @media screen and (min-width: 90.625em) {
+    /* 1450 */
+    font-size: 68.75%;
+  }
+
+  @media screen and (min-width: 112.5em) {
+    /* 1800 */
+    font-size: 75%;
+  }
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-grey-600);
+  /* background-color: var(--color-grey-50); */
+
+  scroll-behavior: smooth;
+  transition: all 0.3s ease-in;
+}
+/* section {
+  padding: 5rem 2rem;
+} */
+header {
+  /* border-bottom: 2px solid var(--color-grey-100); */
+  background-color: var(--white);
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-grey-700);
+}
+h1 {
+  font-size: 5rem;
+  font-weight: 900;
+}
+h2 {
+  font-size: 4rem;
+  font-weight: 700;
+}
+h3 {
+  font-size: 3rem;
+  font-weight: 600;
+}
+h4 {
+  font-size: 2rem;
+  font-weight: 500;
+}
+input {
+  display: block;
+  width: 100%;
+}
+button {
+  cursor: pointer;
+  /* border: none; */
+}
+input,
+button,
+textarea,
+select,
+a {
+  font: inherit;
+  color: inherit;
+}
+/* input,
+button,
+textarea,
+select,
+a {
+  font: inherit;
+  color: inherit;
+  border-radius: var(--rounded);
+} */
+input:focus,
+button:focus,
+textarea:focus,
+select:focus,
+a:focus {
+  border-radius: var(--rounded);
+  /* border-radius: var(--rounded); */
+  /* outline: 2px solid var(--color-indigo-500); */
+  outline: 2px solid var(--color-stone-550);
+  outline-offset: -1px;
+}
+/* input:focus,
+button:focus,
+textarea:focus,
+select:focus,
+a:focus {
+  outline: 2px solid var(--color-stone-550);
+  outline-offset: -1px;
+} */
+ul {
+  list-style: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+svg {
+  display: block;
+}
+*:disabled {
+  cursor: not-allowed !important;
+}
+select:disabled,
+input:disabled {
+  background-color: var(--color-grey-200);
+  color: var(--color-grey-500);
+}
+.questions{
+  font-weight: 600;
+}
+.hideOverflow {
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide the overflowing content */
+  text-overflow: ellipsis; /* Display ellipsis (...) for overflow */
+  width: -webkit-fill-available;
+
+}
