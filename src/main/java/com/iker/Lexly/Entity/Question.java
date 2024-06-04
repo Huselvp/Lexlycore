@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,9 @@ public class Question {
     @Column(name="description")
     @JsonProperty("Description")
     private String Description;
-    @Column(name="description_details")
+
+
+    @Column(name="description_details",length = 10000)
     @JsonProperty("description_details")
     private String DescriptionDetails;
 
@@ -34,12 +37,20 @@ public class Question {
     @Column(name= "text_area")
     @JsonProperty("text_area")
     private String Texte;
-    @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
-    @JsonManagedReference
-//    @JsonIgnore
-    private List<SubQuestion> subQuestions = new ArrayList<>();
 
     private int position;
+
+    @ElementCollection
+    @CollectionTable(name = "list", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option")
+    private List<String> list = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<SubQuestion> subQuestions = new ArrayList<>();
+
+
 
 //    @Column(name = "subquestion_order")
 //    @Convert(converter = StringListConverter.class)
@@ -49,9 +60,9 @@ public class Question {
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
 
+
     @ManyToOne
     @JsonBackReference
-//    @JsonIgnore
     private Template template;
 
 
@@ -136,4 +147,8 @@ public class Question {
     public void setSubQuestions(List<SubQuestion> subQuestions) {
         this.subQuestions = subQuestions;
     }
+
+    public List<String> getList() {return list;}
+
+    public void setList(List<String> list) {this.list = list;}
 }

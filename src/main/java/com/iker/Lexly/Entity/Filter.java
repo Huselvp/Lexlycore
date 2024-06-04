@@ -1,4 +1,5 @@
 package com.iker.Lexly.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.Entity.enums.FilterType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class Filter {
 
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "question_id")
     private Question question;
 

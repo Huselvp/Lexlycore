@@ -10,11 +10,14 @@ public class AddValuesRequest {
     private boolean isDraft;
 
 
-    public AddValuesRequest(Long documentId, List<DocumentQuestionValueDTO> values, boolean isDraft) {
+
+    public AddValuesRequest(Long documentId, List<DocumentQuestionValueDTO> values, boolean isDraft,List<FormValuesRequest> formsValues) {
         this.documentId = documentId;
         this.values = values;
         this.isDraft = isDraft;
     }
+
+
 
     public Long getDocumentId() {
         return documentId;

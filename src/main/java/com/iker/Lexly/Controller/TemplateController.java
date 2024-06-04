@@ -1,6 +1,7 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.SubcategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
+
 import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Entity.User;
 import com.iker.Lexly.Transformer.TemplateTransformer;
@@ -10,7 +11,7 @@ import com.iker.Lexly.request.UpdateEmailPassword;
 import com.iker.Lexly.service.SubcategoryService;
 import com.iker.Lexly.service.TemplateService;
 import com.iker.Lexly.service.UserService;
-import jakarta.security.enterprise.credential.Password;
+
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -109,4 +110,9 @@ public class TemplateController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
     }
+
+
+
+
+
 }

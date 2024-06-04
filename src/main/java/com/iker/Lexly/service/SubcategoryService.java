@@ -5,6 +5,8 @@ import com.iker.Lexly.Entity.Subcategory;
 import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.repository.SubcategoryRepository;
 import com.iker.Lexly.responses.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,7 @@ public class SubcategoryService {
 
     private final SubcategoryRepository subcategoryRepository;
     private final SubCategoryTransformer subcategoryTransformer;
-
+    private static final Logger logger = LoggerFactory.getLogger(SubcategoryService.class);
     @Autowired
     public SubcategoryService(SubcategoryRepository subcategoryRepository, SubCategoryTransformer subcategoryTransformer) {
         this.subcategoryRepository = subcategoryRepository;
@@ -29,6 +31,7 @@ public class SubcategoryService {
         }
         Subcategory subcategory = subcategoryTransformer.toEntity(subcategoryDTO);
         subcategoryRepository.save(subcategory);
+        logger.info("Created Subcategory successfully {} ",subcategory );
         return "Subcategory added successfully.";
     }
 
@@ -43,7 +46,8 @@ public class SubcategoryService {
             Subcategory existingSubcategory = existingSubcategoryOptional.get();
             Subcategory updatedSubcategory = subcategoryTransformer.toEntity(subcategoryDTO);
             updatedSubcategory.setId(existingSubcategory.getId());
-            subcategoryRepository.save(updatedSubcategory);
+            Subcategory savedSubcategory = subcategoryRepository.save(updatedSubcategory);
+            logger.info("Subcategory updated successfully : {}",savedSubcategory);
             return new ApiResponse("Subcategory updated successfully.", null);
         } else {
             return new ApiResponse("Subcategory with ID " + subcategoryId + " not found.", null);

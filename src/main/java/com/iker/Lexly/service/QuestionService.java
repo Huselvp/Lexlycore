@@ -8,13 +8,20 @@ import jakarta.transaction.Transactional;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.StringWriter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.time.DayOfWeek;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 
 @Service
@@ -27,42 +34,24 @@ public class QuestionService {
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final QuestionTransformer questionTransformer;
     private final DocumentsRepository documentsRepository;
+    private final FilterService filterService;
+    Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
-    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository) {
+    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository,FilterService filterService) {
         this.questionRepository = questionRepository;
         this.templateService = templateService;
         this.questionTransformer = questionTransformer;
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
+        this.filterService =filterService;
     }
 
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
     }
 
-
-
-//    public List<Question> getAllQuestionsByTemplateIdOrderByOrder(Long templateId ) {
-//        Template template = templateRepository.findById(templateId)
-//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
-//        List<Long> order=template.getQuestionOrder();
-//        if (order == null || order.isEmpty()) {
-//            return questionRepository.findByTemplateIdOrderByPositionAsc(templateId);
-//        }
-////        List<Question> orderedQuestion = new LinkedList<>(); ;
-////        for (Long orderId : order) {
-////            Question question=questionRepository.findById(orderId).orElse(null);
-////            if (question==null) continue;
-////            orderedQuestion.add(question);
-////        }
-////        return orderedQuestion;
-//        return order.stream()
-//                .map(orderId -> questionRepository.findById(orderId).orElse(null))
-//                .filter(question -> question != null)
-//                .collect(Collectors.toList());
-//    }
 
     public Question getQuestionById(Long questionId) {
         return questionRepository.findById(questionId)
@@ -89,7 +78,9 @@ public class QuestionService {
             existingQuestion.setTexte(
                     questionDTO.getTexte() != null ? questionDTO.getTexte() : existingQuestion.getTexte()
             );
-            return questionRepository.save(existingQuestion);
+            Question savedQuestion = questionRepository.save(existingQuestion);
+            logger.info("Updated Question successfully :{}",savedQuestion);
+            return savedQuestion;
         } else {
             return null;
         }
@@ -99,6 +90,9 @@ public class QuestionService {
     public void deleteQuestion(Long questionId) {
         Question question = entityManager.find(Question.class, questionId);
         if (question != null) {
+            if (question.getValueType().equals("filter")){
+                filterService.deleteFiltersByQuestionId(questionId);
+            }
             entityManager.remove(question);
         }
     }
@@ -115,21 +109,16 @@ public class QuestionService {
                 savedQuestion.setPosition(savedQuestion.getId().intValue());
 
                 savedQuestion.setTemplate(template);
-
+                logger.info("Created Question successfully :{}",savedQuestion);
                 return questionRepository.save(savedQuestion);
 
             } else {
+                logger.error("The content is not valid XML.");
                 throw new IllegalArgumentException("The content is not valid XML.");
             }
         }
 
-//    @Transactional
-//    public void updateQuestionOrder(Long templateId, List<Long> questionOrder) {
-//        Template template = templateRepository.findById(templateId)
-//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
-//        template.setQuestionOrder(questionOrder);
-//        templateRepository.save(template);
-//    }
+
     public void reorderQuestions(List<Long> questionsIds) {
 
         Set<Long> uniqueQuestionIds = new HashSet<>(questionsIds);
@@ -147,22 +136,152 @@ public class QuestionService {
         }
     }
 
-        private String transformTextToXml(String text) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(TextWrapper.class);
-                Marshaller marshaller = context.createMarshaller();
-                marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-                TextWrapper textWrapper = new TextWrapper(text);
-                StringWriter stringWriter = new StringWriter();
-                marshaller.marshal(textWrapper, stringWriter);
-                return stringWriter.toString();
-            } catch (JAXBException e) {
-                e.printStackTrace();
-                return null;
+
+    public Question addOptions(Long questionId, List<String> options) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            question.getList().addAll(options);
+            return questionRepository.save(question);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+        }
+    }
+
+    public Question deleteOptions(Long questionId, List<String> options) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            if (question.getList().removeAll(options)) {
+                return questionRepository.save(question);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Options not found.");
             }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+        }
+    }
+
+
+    public Question updateOption(Long questionId, String oldOption, String newOption) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            List<String> options = question.getList();
+            int index = options.indexOf(oldOption);
+            if (index != -1) {
+                options.set(index, newOption);
+                return questionRepository.save(question);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Option not found: " + oldOption);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+        }
+    }
+
+
+    public List<String> getOptions(Long questionId) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isPresent()) {
+            Question question = optionalQuestion.get();
+            return question.getList();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+        }
+    }
+
+    private String transformTextToXml(String text) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(TextWrapper.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            TextWrapper textWrapper = new TextWrapper(text);
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(textWrapper, stringWriter);
+            return stringWriter.toString();
+        } catch (JAXBException e) {
+//            e.printStackTrace();
+            logger.error("Error transforming text to XML: ", e);
+            return null;
+        }
+    }
+
+    public long calculateDuration(Long startDay, Long  endDay) {
+
+
+        if (startDay == null || endDay == null) {
+            throw new IllegalArgumentException("Invalid day name");
         }
 
+        long daysBetween = endDay - startDay;
 
+        if (daysBetween < 0) {
+            daysBetween += 7;
+        }
+
+        return daysBetween;
+    }
+
+
+
+
+
+//    public List<Question> getAllQuestionsByTemplateIdOrderByOrder(Long templateId ) {
+//        Template template = templateRepository.findById(templateId)
+//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+//        List<Long> order=template.getQuestionOrder();
+//        if (order == null || order.isEmpty()) {
+//            return questionRepository.findByTemplateIdOrderByPositionAsc(templateId);
+//        }
+////        List<Question> orderedQuestion = new LinkedList<>(); ;
+////        for (Long orderId : order) {
+////            Question question=questionRepository.findById(orderId).orElse(null);
+////            if (question==null) continue;
+////            orderedQuestion.add(question);
+////        }
+////        return orderedQuestion;
+//        return order.stream()
+//                .map(orderId -> questionRepository.findById(orderId).orElse(null))
+//                .filter(question -> question != null)
+//                .collect(Collectors.toList());
+//    }
+//    @Transactional
+//    public void updateQuestionOrder(Long templateId, List<Long> questionOrder) {
+//        Template template = templateRepository.findById(templateId)
+//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+//        template.setQuestionOrder(questionOrder);
+//        templateRepository.save(template);
+//    }
+
+
+//    public Question deleteAllOptions(Long questionId) {
+//        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+//        if (optionalQuestion.isPresent()) {
+//            Question question = optionalQuestion.get();
+//            question.getList().clear();
+//            return questionRepository.save(question);
+//        } else {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+//        }
+//    }
+
+
+    //    @Transactional
+//    public Question duplicateList(Long questionId) {
+//        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+//        if (optionalQuestion.isPresent()) {
+//            Question question = optionalQuestion.get();
+//            List<String> originalList = question.getList();
+//            List<String> duplicatedList = new ArrayList<>(originalList);
+//
+//            question.setSecondList(duplicatedList);
+//            return questionRepository.save(question);
+//        } else {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found with id: " + questionId);
+//        }
+//    }
+//
 
 }
 

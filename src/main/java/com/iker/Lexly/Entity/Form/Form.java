@@ -26,8 +26,7 @@ public class Form {
     private Question question;
 
 
-//    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Block> blocks = new ArrayList<>();
+
 
 
 }

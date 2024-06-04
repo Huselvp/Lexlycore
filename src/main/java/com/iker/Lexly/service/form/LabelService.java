@@ -7,6 +7,8 @@ import com.iker.Lexly.repository.form.LabelRepository;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.request.AddLabelOption;
 import com.iker.Lexly.responses.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import java.util.*;
 @Service
 public class LabelService {
 
+    Logger logger = LoggerFactory.getLogger(LabelService.class);
     private final LabelRepository labelRepository;
     private final BlockRepository blockRepository;
 
@@ -35,7 +38,9 @@ public class LabelService {
         Block block = blockRepository.findById(blockId).orElseThrow(() -> new IllegalArgumentException("block not found with ID"+blockId));
 
         label.setBlock(block);
-        return labelRepository.save(label);
+        Label savedLabel = labelRepository.save(label);
+        logger.info("Created Label successfully :{}",savedLabel);
+        return savedLabel;
     }
     @Transactional
     public List<Label> createManyLabels(Long blockId, List<Label> labels) {
@@ -46,6 +51,7 @@ public class LabelService {
         savedLabels.add(labelRepository.save(label));
 
         }
+        logger.info("Created Labels successfully :{}",savedLabels);
         return savedLabels;
     }
 
@@ -67,9 +73,11 @@ public class LabelService {
             label.setId(existingLabel.getId());
             label.setBlock(existingLabel.getBlock());
 
-            labelRepository.save(label);
-            return new ApiResponse("Label updated successfully.", label);
+            Label savedLabel= labelRepository.save(label);
+            logger.info("Updated Label successfully :{}",savedLabel);
+            return new ApiResponse("Label updated successfully.",savedLabel);
         } else {
+
             return new ApiResponse("Label with ID " + label + " not found.", label);
         }
     }

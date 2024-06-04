@@ -21,6 +21,8 @@ public class Label {
     private String name;
     @Enumerated(EnumType.STRING)
     private LabelType type;
+
+
     @ElementCollection
     @CollectionTable(name = "label_options", joinColumns = @JoinColumn(name = "label_id"))
     @MapKeyColumn(name = "option_key")

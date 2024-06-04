@@ -5,13 +5,10 @@ import com.iker.Lexly.repository.DocumentQuestionValueRepository;
 import com.iker.Lexly.repository.DocumentsRepository;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.UserRepository;
-import com.iker.Lexly.request.AddValuesRequest;
-import com.iker.Lexly.request.ChargeRequest;
-import com.iker.Lexly.request.RequestData;
+import com.iker.Lexly.request.*;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.TemplateTransformer;
-import com.iker.Lexly.request.UpdateValuesRequest;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
@@ -26,6 +23,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/suser")
@@ -111,9 +110,11 @@ public class suserController {
 
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-        ApiResponse response = documentsService.addOrUpdateValues(request);
+        ApiResponse response = documentsService.addValues(request);
         return response;
     }
+
+
 
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {

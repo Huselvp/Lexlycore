@@ -1,4 +1,5 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
@@ -7,6 +8,7 @@ import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.FormValues;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.service.DocumentsService;
+import com.iker.Lexly.service.QuestionService;
 import com.iker.Lexly.service.form.BlockService;
 import com.iker.Lexly.service.form.FormService;
 import com.iker.Lexly.service.form.LabelService;
@@ -18,9 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/form")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class FormController {
     @Autowired
@@ -32,6 +35,8 @@ public class FormController {
     @Autowired
     LabelService labelService;
     @Autowired
+    QuestionService questionService;
+    @Autowired
     private DocumentsService documentsService;
 
 
@@ -42,7 +47,9 @@ public class FormController {
 
         return formService.getAllForms();
     }
-    @GetMapping("form/{idForm}")
+
+
+    @GetMapping("/{idForm}")
     public ResponseEntity<Form> getFormById(@PathVariable Long idForm) {
         Form form = formService.getFormById(idForm);
         if (form != null) {
@@ -52,12 +59,18 @@ public class FormController {
         }
     }
 
-    @PostMapping(value = "/create_form")
-    public ResponseEntity<Form> createForm( @RequestBody Form form) {
-        Form newForm= formService.createForm(form);
-        return ResponseEntity.ok(newForm);
+    @PostMapping("/create/{questionId}")
+    public ResponseEntity<Form> createForm(@PathVariable Long questionId, @RequestBody Form form) {
+        try {
+            Form createdForm = formService.createForm(questionId, form);
+            return new ResponseEntity<>(createdForm, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>( HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    @PutMapping("/update_form/{formId}")
+    @PutMapping("/update/{formId}")
     public ResponseEntity<Form> updateForm(
             @PathVariable Long formId,
             @RequestBody Form updateRequest
@@ -70,35 +83,34 @@ public class FormController {
         }
     }
 
-    @DeleteMapping("delete_form/{idForm}")
+    @DeleteMapping("/delete/{idForm}")
     public ResponseEntity<String> deleteForm(@PathVariable Long idForm) {
         Optional<Form> optionalForm = formRepository.findById(idForm);
         if (optionalForm.isPresent()) {
-            Form form = optionalForm.get();
             formService.deleteForm(idForm);
-            return ResponseEntity.ok("Form with ID " + idForm + " has been deleted successfully. DTO: " + form);
+            return ResponseEntity.ok("Form with ID " + idForm + " has been deleted successfully. DTO: " + optionalForm.get());
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body("Form not found with ID: " + idForm);
         }
     }
-    @PostMapping("/duplicate_form/{formId}")
-    public ResponseEntity<Form> duplicateForm(@PathVariable Long formId) {
-        Form duplicatedForm = formService.duplicateForm(formId);
-        return ResponseEntity.ok().body(duplicatedForm);
-    }
-    @PostMapping("form/block/duplicate/{formId}/{blockId}")
+//    @PostMapping("/duplicate_form/{formId}")
+//    public ResponseEntity<Form> duplicateForm(@PathVariable Long formId) {
+//        Form duplicatedForm = formService.duplicateForm(formId);
+//        return ResponseEntity.ok().body(duplicatedForm);
+//    }
+    @PostMapping("/block/duplicate/{formId}/{blockId}")
     public ResponseEntity<Block> duplicateBlock(@PathVariable Long formId, @PathVariable Long blockId) {
         Block duplicatedBlock = blockService.duplicateBlock(formId, blockId);
         return ResponseEntity.ok().body(duplicatedBlock);
     }
 
-    @GetMapping("form/blocks/{idForm}")
+    @GetMapping("/blocks/{idForm}")
     public ResponseEntity<List<Block>> getAllBlocksByFormId(@PathVariable Long idForm) {
         List<Block> blocks = blockService.getAllBlocksByFormId(idForm);
         return ResponseEntity.ok(blocks);
     }
 
-    @GetMapping("form/block/{idForm}/{idBlock}")
+    @GetMapping("/block/{idForm}/{idBlock}")
     public ResponseEntity<Block> getBlockById(@PathVariable Long idForm,@PathVariable Long idBlock) {
         Block block = blockService.getBlockById(idBlock);
         if (block != null) {
@@ -110,16 +122,16 @@ public class FormController {
 
 
 
-    @PostMapping("form/block/{idForm}")
+    @PostMapping("/block/{idForm}")
     public ResponseEntity<Object> createBlock(@PathVariable Long idForm,@RequestBody Block block) {
         try {
-            Block newBlock = blockService.createBlock(idForm, block);
+            Block newBlock = blockService.createBlock(idForm);
             return ResponseEntity.status(HttpStatus.CREATED).body(newBlock);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-    @PostMapping("form/blocks/{idForm}")
+    @PostMapping("/blocks/{idForm}")
     public ResponseEntity<Object> createManyBlock(@PathVariable Long idForm,@RequestBody List<Block> blocks) {
         try {
 
@@ -132,7 +144,7 @@ public class FormController {
 
 
 
-    @PutMapping("form/block/{idForm}/{idBlock}")
+    @PutMapping("/block/{idForm}/{idBlock}")
     public ResponseEntity<Block> updateBlock(
             @PathVariable Long idForm,
             @PathVariable Long idBlock,
@@ -146,7 +158,7 @@ public class FormController {
         }
     }
 
-    @DeleteMapping("form/block/{idForm}/{idBlock}")
+    @DeleteMapping("/block/{idForm}/{idBlock}")
     public ResponseEntity<String> deleteBlock(@PathVariable Long idForm ,@PathVariable Long idBlock) {
         try {
             blockService.deleteBlock(idBlock);
@@ -287,7 +299,7 @@ public class FormController {
         }
     }
     @PostMapping("/block/label/options/{labelId}")
-    public ResponseEntity<?> addOptions(@PathVariable Long labelId, @RequestBody Map<String, String> optionsToAdd) {
+    public ResponseEntity<Object> addOptions(@PathVariable Long labelId, @RequestBody Map<String, String> optionsToAdd) {
         try {
             Label label = labelService.addOptions(labelId, optionsToAdd);
             return new ResponseEntity<>(label, HttpStatus.CREATED);
@@ -298,27 +310,27 @@ public class FormController {
         }
     }
 
-    @PostMapping("/add-form-values/{questionId}/{documentId}")
-    public ResponseEntity<Void> addFormValuesToQuestion(
-            @PathVariable Long questionId,
-            @PathVariable Long documentId,
-            @RequestBody List<FormValues> formValues) {
-        return documentsService.addFormValuesToQuestion(questionId, documentId, formValues);
-    }
-    @PutMapping("/{questionId}/{documentId}")
-    public ResponseEntity<Void> updateFormValues(@PathVariable Long questionId,
-                                                 @PathVariable Long documentId,
-                                                 @RequestBody List<FormValues> formValues) {
-        return documentsService.updateFormValuesToQuestion(questionId, documentId, formValues);
-    }
+//    @PostMapping("/add-form-values/{questionId}/{documentId}")
+//    public ResponseEntity<Void> addFormValuesToQuestion(
+//            @PathVariable Long questionId,
+//            @PathVariable Long documentId,
+//            @RequestBody List<FormValues> formValues) {
+//        return documentsService.addFormValuesToQuestion(questionId, documentId, formValues);
+//    }
+//    @PutMapping("/{questionId}/{documentId}")
+//    public ResponseEntity<Void> updateFormValues(@PathVariable Long questionId,
+//                                                 @PathVariable Long documentId,
+//                                                 @RequestBody List<FormValues> formValues) {
+//        return documentsService.updateFormValuesToQuestion(questionId, documentId, formValues);
+//    }
     @PostMapping("/add")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
 
         return documentsService.addValues(request);
     }
-    @PutMapping("/up")
-    public ApiResponse updateValues(@RequestBody AddValuesRequest request) {
-        return documentsService.updateValues(request);
+    @PutMapping("/up/{valueId}")
+    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody DocumentQuestionValueDTO request) {
+        return documentsService.updateValues(valueId ,request);
     }
 
 //    @PostMapping("/test/replaceValues/{questionId}/{DocumentQuestionValue}")
@@ -336,4 +348,18 @@ public class FormController {
 //            @RequestParam Long documentQuestionValues) {
 //        return documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
 //    }
+
+    @GetMapping("/duration")
+    public ResponseEntity<Long> calculateDuration(@RequestParam Long startDay, @RequestParam Long endDay) {
+        try {
+            long duration = questionService.calculateDuration(startDay, endDay);
+            return new ResponseEntity<>(duration, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

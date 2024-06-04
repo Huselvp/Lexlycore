@@ -1,11 +1,16 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Entity.Form.Block;
+import com.iker.Lexly.Entity.Form.Form;
+import com.iker.Lexly.Entity.Form.Label;
 import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.repository.UserRepository;
+import com.iker.Lexly.repository.form.FormRepository;
+import com.iker.Lexly.request.AddLabelOption;
 import com.iker.Lexly.request.ChoiceUpdate;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
@@ -13,6 +18,9 @@ import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
 
 import com.iker.Lexly.service.*;
+import com.iker.Lexly.service.form.BlockService;
+import com.iker.Lexly.service.form.FormService;
+import com.iker.Lexly.service.form.LabelService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,6 +49,8 @@ public class adminController {
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     private final SubCategoryTransformer subcategoryTransformer;
+
+
     @Autowired
     private final TemplateService templateService;
     @Autowired
@@ -51,7 +59,7 @@ public class adminController {
     private final JwtService jwtService;
 
     @Autowired
-    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository) {
         this.subQuestionService = subQuestionService;
         this.templateService = templateService;
         this.jwtService=jwtService;
@@ -66,6 +74,8 @@ public class adminController {
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
+
+
     }
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
@@ -121,6 +131,8 @@ public class adminController {
         ApiResponse apiResponse = templateService.createTemplate(token, template);
         return ResponseEntity.ok(apiResponse);
     }
+
+
     @PutMapping("/update_template/{templateId}")
     public ResponseEntity<TemplateDTO> updateTemplate(
             @PathVariable Long templateId,
@@ -158,6 +170,8 @@ public class adminController {
                 .collect(Collectors.toList());
         return questionDTOs;
     }
+
+
 
     @PostMapping(value = "/create_question/{templateId}", consumes = "application/json;charset=UTF-8")
     public ResponseEntity<Question> createQuestion(
@@ -215,7 +229,34 @@ public class adminController {
         }
 
     }
+//    @PostMapping("/{questionId}/duplicate")
+//    public ResponseEntity<Question> duplicateOptions(@PathVariable Long questionId) {
+//        Question duplicatedQuestion = questionService.duplicateList(questionId);
+//        return new ResponseEntity<>(duplicatedQuestion, HttpStatus.OK);
+//    }
 
+    @PostMapping("/{questionId}/options")
+    public ResponseEntity<Question> addOptions(@PathVariable Long questionId, @RequestBody List<String> options) {
+        Question updatedQuestion = questionService.addOptions(questionId, options);
+        return ResponseEntity.ok(updatedQuestion);
+    }
+
+    @DeleteMapping("/{questionId}/options")
+    public ResponseEntity<Question> deleteOptions(@PathVariable Long questionId, @RequestBody List<String> options) {
+        Question updatedQuestion = questionService.deleteOptions(questionId, options);
+        return ResponseEntity.ok(updatedQuestion);
+    }
+    @PutMapping("/{questionId}/options")
+    public ResponseEntity<Question> updateOption(@PathVariable Long questionId, @RequestParam String oldOption, @RequestParam String newOption) {
+        Question updatedQuestion = questionService.updateOption(questionId, oldOption, newOption);
+        return ResponseEntity.ok(updatedQuestion);
+    }
+
+    @GetMapping("/{questionId}/options")
+    public ResponseEntity<List<String>> getOptions(@PathVariable Long questionId) {
+        List<String> options = questionService.getOptions(questionId);
+        return ResponseEntity.ok(options);
+    }
 
 //    @PutMapping("/update_question_order/{templateId}")
 //    public ResponseEntity<Void> updateQuestionOrder(
@@ -277,6 +318,8 @@ public class adminController {
             return new ResponseEntity<>("Error reordering sbquestions.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
 
 //    @PutMapping("/questions/subquestions/{questionId}/order")
@@ -355,7 +398,6 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
     @DeleteMapping("delete-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> deleteChoiceFromQuestion(
             @PathVariable Long questionId,

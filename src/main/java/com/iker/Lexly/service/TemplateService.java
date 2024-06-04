@@ -11,6 +11,9 @@ import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.responses.ApiResponse;
+import com.iker.Lexly.service.form.FormService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +32,7 @@ public class TemplateService {
     private final QuestionRepository questionRepository;
     private final JwtService jwtService;
     private final TemplateTransformer templateTransformer;
-
+    private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
     @Autowired
     public TemplateService(SubcategoryRepository subcategoryRepository,SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
@@ -60,6 +63,7 @@ public class TemplateService {
             Template savedTemplate = templateRepository.save(template);
             if (savedTemplate != null) {
                 return new ApiResponse("Template created successfully.", savedTemplate);
+
             } else {
                 return new ApiResponse("Failed to create template.", null);
             }
@@ -103,7 +107,9 @@ public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategory
             existingTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
             existingTemplate.setCost(templateDTO.getCost());
             existingTemplate.setContent(templateDTO.getContent());
-            return templateRepository.save(existingTemplate);
+            Template savedTemplate = templateRepository.save(existingTemplate);
+            logger.info("Updated template successfully :{}",savedTemplate );
+            return savedTemplate;
         } else {
             return null;
         }

@@ -5,6 +5,8 @@ import com.iker.Lexly.repository.DocumentsRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.request.ChargeRequest;
 import com.iker.Lexly.request.PaymentRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.*;
 
 @Service
 public class PaymentService {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
     private static final String SECRET_KEY = "test-secret-key-3783402397d14a1696bf0c8beaf259ce";
     private static final String PAYMENT_API_URL = "https://test.api.dibspayment.eu/v1/payments";
 
@@ -70,6 +73,7 @@ public class PaymentService {
                 throw new RuntimeException("Payment initiation failed");
             }
         } catch (Exception e) {
+            logger.error("Payment initiation failed", e);
             throw new RuntimeException("Payment initiation failed", e);
         }
     }
@@ -98,6 +102,7 @@ public class PaymentService {
                 throw new RuntimeException("Payment charging failed");
             }
         } catch (Exception e) {
+            logger.error("Payment charging failed", e);
             throw new RuntimeException("Payment charging failed", e);
         }
     }

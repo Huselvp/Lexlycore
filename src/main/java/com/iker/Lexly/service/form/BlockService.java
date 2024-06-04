@@ -4,9 +4,13 @@ package com.iker.Lexly.service.form;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
+import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.repository.form.LabelRepository;
+import com.iker.Lexly.service.FilterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,7 @@ import java.util.*;
 @Service
 public class BlockService {
 
+    Logger logger = LoggerFactory.getLogger(BlockService.class);
     private final BlockRepository blockRepository;
     private final FormRepository formRepository;
     private final LabelRepository labelRepository;
@@ -35,13 +40,14 @@ public class BlockService {
     }
 
     @Transactional
-    public Block createBlock(Long formId, Block block) {
+    public Block createBlock(Long formId) {
         Form form = formRepository.findById(formId).orElseThrow(() -> new IllegalArgumentException("form not found with ID"+formId));
-        if (blockRepository.existsByFormIdAndNumberOfBloc(formId, block.getNumberOfBloc())) {
-            throw new IllegalArgumentException("Block with number " + block.getNumberOfBloc() + " already exists in form with ID " + formId);
-        }
+        Block block = new Block();
         block.setForm(form);
-        return blockRepository.save(block);
+        Block savedBlock =  blockRepository.save(block);
+        savedBlock.setNumberOfBloc(savedBlock.getId().intValue());
+        logger.info("Created Block :{}",savedBlock);
+        return savedBlock;
     }
     @Transactional
     public List<Block> createManyBlocks(Long formId, List<Block> blocks) {
@@ -53,6 +59,7 @@ public class BlockService {
             block.setForm(form);
             savedBlocks.add(blockRepository.save(block));
         }
+        logger.info("Created Blocks :{}",savedBlocks);
         return savedBlocks;
     }
 
@@ -68,8 +75,10 @@ public class BlockService {
         if (blockOptional.isPresent()) {
             Block existingBlock = blockOptional.get();
             existingBlock.setNumberOfBloc(block.getNumberOfBloc());
+            logger.info("updated block successfully {}",existingBlock);
             return blockRepository.save(existingBlock);
         } else {
+            logger.error("Block not found with id :{}",blockId);
             throw new IllegalArgumentException("Block not found");
         }
     }
@@ -84,6 +93,7 @@ public class BlockService {
 
             blockRepository.deleteById(blockId);
         } else {
+            logger.error("Block not found with id :{}",blockId);
             throw new IllegalArgumentException("Block not found");
         }
     }
@@ -116,7 +126,22 @@ public class BlockService {
 //
 //        return blockRepository.save(newBlock);
 //    }
+public void reorderBlocks(List<Long> blocksIds) {
 
+    Set<Long> uniqueBlockIds = new HashSet<>(blocksIds);
+    if (uniqueBlockIds.size() < blocksIds.size()) {
+        throw new IllegalArgumentException("Duplicate user IDs found in the list.");
+    }
+    List<Block> blocks = blockRepository.findAllById(blocksIds);
+    for (int i = 0; i < blocksIds.size(); i++) {
+        long blockId =  blocksIds.get(i);
+        Block block = blocks.stream().filter(u -> u.getId().equals(blockId)).findFirst().orElse(null);
+        if (block != null) {
+            block.setNumberOfBloc(i);
+            blockRepository.save(block);
+        }
+    }
+}
     @Transactional
     public Block duplicateBlock(Long formId, Long blockId) {
         Form form = formRepository.findById(formId)
@@ -136,7 +161,7 @@ public class BlockService {
         return blockRepository.save(newBlock);
     }
 
-    public void duplicateLabel(Label originalLabel, Block Block) {
+    public void duplicateLabel(Label originalLabel, Block block) {
         Label newLabel = new Label();
         newLabel.setName(originalLabel.getName());
 
@@ -149,7 +174,7 @@ public class BlockService {
         newLabel.setOptions(newOptions);
 
         newLabel.setType(originalLabel.getType());
-        newLabel.setBlock(Block); // Set the new block for the duplicated label
+        newLabel.setBlock(block); // Set the new block for the duplicated label
         labelRepository.save(newLabel);
     }
 

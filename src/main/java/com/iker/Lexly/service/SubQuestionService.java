@@ -8,6 +8,8 @@ import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.SubQuestionRepository;
 import com.iker.Lexly.repository.SubcategoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,7 @@ public class SubQuestionService {
     private final SubQuestionRepository subQuestionRepository;
     private final QuestionRepository questionRepository;
     private final SubcategoryRepository subcategoryRepository;
-
+    private static final Logger logger = LoggerFactory.getLogger(SubQuestionService.class);
     @Autowired
     public SubQuestionService(SubQuestionRepository subQuestionRepository, QuestionRepository questionRepository, SubcategoryRepository subcategoryRepository) {
         this.subQuestionRepository = subQuestionRepository;
@@ -70,7 +72,8 @@ public class SubQuestionService {
         subQuestion.setParentQuestion(parentQuestion);
         SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
         subQuestionsaved.setPosition(subQuestionsaved.getId().intValue());
-        return subQuestionRepository.save(subQuestionsaved);
+        logger.info("Created Subquestion successfully :{}",subQuestionsaved );
+        return subQuestionsaved;
     }
 
     @Transactional(readOnly = true)
@@ -99,7 +102,9 @@ public class SubQuestionService {
             if (subQuestionDTO.getTextArea() != null) {
                 subQuestion.setTextArea(subQuestionDTO.getTextArea());
             }
-            return subQuestionRepository.save(subQuestion);
+            SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
+            logger.info("Updated Subquestion successfully :{}",subQuestionsaved );
+            return subQuestionsaved;
         } else {
             throw new IllegalArgumentException("Subquestion not found");
         }
