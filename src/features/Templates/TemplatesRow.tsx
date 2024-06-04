@@ -1,21 +1,21 @@
-import { HiEye, HiPencil, HiTrash } from "react-icons/hi2"
-import Menus from "../../ui/Menus"
-import Table from "../../ui/Table"
-import { formatCurrency } from "../../utils/helpers"
-import { useNavigate } from "react-router-dom"
-import Modal from "../../ui/Modal"
-import ConfirmDeleteTemplate from "./ConfirmDeleteTemplate"
-import { BiCategory as CategoriesIcon } from "react-icons/bi"
-import AssignUpdateCategory from "../Categories/AssignUpdateCategory"
+import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
+import Menus from "../../ui/Menus";
+import Table from "../../ui/Table";
+import { formatCurrency } from "../../utils/helpers";
+import { useNavigate } from "react-router-dom";
+import Modal from "../../ui/Modal";
+import ConfirmDeleteTemplate from "./ConfirmDeleteTemplate";
+import { BiCategory as CategoriesIcon } from "react-icons/bi";
+import AssignUpdateCategory from "../Categories/AssignUpdateCategory";
 
 const TemplatesRow = ({
   template,
-  onMobile
+  onMobile,
 }: {
-  template: Template
-  onMobile: boolean
+  template: Template;
+  onMobile: boolean;
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <Table.Row id={`menus-row--${template.id}`}>
       <div></div>
@@ -54,6 +54,7 @@ const TemplatesRow = ({
         >
           Edit
         </Menus.Button>
+
         <Modal.Open opens={`delete-template-${template.id}`}>
           <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
         </Modal.Open>
@@ -68,10 +69,10 @@ const TemplatesRow = ({
         />
       </Modal.Window>
     </Table.Row>
-  )
-}
+  );
+};
 
-export default TemplatesRow
+export default TemplatesRow;
 // import { HiEye, HiPencil, HiTrash } from "react-icons/hi2"
 // import Menus from "../../ui/Menus"
 // import Table from "../../ui/Table"

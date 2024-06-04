@@ -52,8 +52,7 @@ const Profile = ({ userRole }: { userRole: "ADMIN" | "SUSER" }) => {
   if (isLoading) return <Spinner />
   if (!isLoading && !isAuthenticated) return null
   if (user?.role !== userRole) return <Navigate to="/pageNotFound" />
-  // console.log(user.role, userRole)
-  // if (user?.role !== userRole) return <div>KOKO</div>
+ 
   return (
     <Container>
       {onMobile ? (

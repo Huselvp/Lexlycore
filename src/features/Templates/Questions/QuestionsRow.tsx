@@ -46,11 +46,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     reorderQuestions(squestionIds);
   }, [squestionOrderTest]);
 
-  useEffect(()=>{
-    setSQuestionOrderTest(question?.subQuestions)
-    },[question?.subQuestions])
-    
-
+  useEffect(() => {
+    setSQuestionOrderTest(question?.subQuestions);
+  }, [question?.subQuestions]);
 
   return (
     <>
@@ -67,7 +65,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 </button>
               ) : null}
             </div>
-            <div className="hideOverflow questions">{question.questionText}</div>
+            <div className="hideOverflow questions">
+              {question.questionText}
+            </div>
             <div className="hideOverflow questions">{question.description}</div>
 
             <Menus.Toggle id={String(question.id)} />
@@ -78,6 +78,15 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   onClick={() => navigate(`${question.id}`)}
                 >
                   See Choices
+                </Menus.Button>
+              )}
+
+              {question.valueType.startsWith("form") && (
+                <Menus.Button
+                  icon={<HiEye />}
+                  onClick={() => navigate(`addNewForm/${question.id}`)}
+                >
+                  Add form
                 </Menus.Button>
               )}
               <Menus.Button
@@ -110,8 +119,18 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 <Reorder.Item value={sq} key={sq.id}>
                   <Table.Row id={`menus-row--sq--${sq.id}`}>
                     <div></div>
-                    <div className="hideOverflow questionColor" style={{marginLeft:"35px", color:"#646464"}}>{sq.questionText}</div>
-                    <div className="hideOverflow questionColor" style={{marginLeft:"35px", color:"#646464"}}>{sq.Description}</div>
+                    <div
+                      className="hideOverflow questionColor"
+                      style={{ marginLeft: "35px", color: "#646464" }}
+                    >
+                      {sq.questionText}
+                    </div>
+                    <div
+                      className="hideOverflow questionColor"
+                      style={{ marginLeft: "35px", color: "#646464" }}
+                    >
+                      {sq.Description}
+                    </div>
                     <Menus.Toggle id={String(sq.id)} />
                     <Menus.ListSub id={String(sq.id)}>
                       <Menus.Button
@@ -150,4 +169,3 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 };
 
 export default QuestionsRow;
-
