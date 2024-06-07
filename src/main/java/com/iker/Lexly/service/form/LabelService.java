@@ -83,6 +83,31 @@ public class LabelService {
     }
 
     @Transactional
+    public ApiResponse updateLabels(Long blockId, List<Label> labels) {
+        List<ApiResponse> responses = new ArrayList<>();
+
+        for (Label label : labels) {
+            if (label.getType() == null) {
+                responses.add(new ApiResponse("Label type is not specified.", null));
+                continue;
+            }
+            Optional<Label> labelOptional = labelRepository.findById(label.getId());
+            if (labelOptional.isPresent()) {
+                Label existingLabel = labelOptional.get();
+                label.setId(existingLabel.getId());
+                label.setBlock(existingLabel.getBlock());
+                Label savedLabel = labelRepository.save(label);
+                logger.info("Updated Label successfully :{}", savedLabel);
+                responses.add(new ApiResponse("Label updated successfully.",null));
+            } else {
+                responses.add(new ApiResponse("Label with ID " + label.getId() + " not found.", label));
+            }
+        }
+
+        return new ApiResponse("Batch label update completed.", responses);
+    }
+
+    @Transactional
     public void deleteLabel(Long labelId) {
         Label label= labelRepository.findById(labelId).orElse(null);
         if (label !=null) {
