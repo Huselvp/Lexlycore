@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface FormRepository extends JpaRepository<Form, Long> {
     Optional<Form> findByQuestionId(Long questionId);
-
+    void deleteByQuestionId(Long questionId);
 
 }

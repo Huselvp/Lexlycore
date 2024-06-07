@@ -6,7 +6,11 @@ import com.iker.Lexly.Entity.Form.Label;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.request.AddValuesRequest;
 import com.iker.Lexly.request.FormValues;
+import com.iker.Lexly.request.UserInputs;
+import com.iker.Lexly.request.UserInputsSubQuestion;
 import com.iker.Lexly.responses.ApiResponse;
+import com.iker.Lexly.service.DocumentQuestionValueService;
+import com.iker.Lexly.service.DocumentSubQuestionValueService;
 import com.iker.Lexly.service.DocumentsService;
 import com.iker.Lexly.service.QuestionService;
 import com.iker.Lexly.service.form.BlockService;
@@ -38,6 +42,10 @@ public class FormController {
     QuestionService questionService;
     @Autowired
     private DocumentsService documentsService;
+    @Autowired
+    private DocumentQuestionValueService documentQuestionValueService;
+    @Autowired
+    private DocumentSubQuestionValueService documentSubQuestionValueService;
 
 
 
@@ -63,6 +71,17 @@ public class FormController {
     public ResponseEntity<Form> createForm(@PathVariable Long questionId, @RequestBody Form form) {
         try {
             Form createdForm = formService.createForm(questionId, form);
+            return new ResponseEntity<>(createdForm, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>( HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/create/{subQuestionId}")
+    public ResponseEntity<Form> createSubquestionForm(@PathVariable Long subQuestionId, @RequestBody Form form) {
+        try {
+            Form createdForm = formService.createSubQuestionForm(subQuestionId, form);
             return new ResponseEntity<>(createdForm, HttpStatus.CREATED);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>( HttpStatus.NOT_FOUND);
@@ -227,7 +246,10 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedLabel);
         }
     }
-
+    @PutMapping("/block/labels/{idBlock}")
+    public ApiResponse updateLabels(@PathVariable Long idBlock, @RequestBody List<Label> labels) {
+        return labelService.updateLabels(idBlock, labels);
+    }
 
     @DeleteMapping("/block/label/{idBlock}/{idLabel}")
     public ResponseEntity<String> deleteLabel(@PathVariable Long idBlock ,@PathVariable Long idLabel) {
@@ -326,11 +348,15 @@ public class FormController {
     @PostMapping("/add")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
 
-        return documentsService.addValues(request);
+        return documentQuestionValueService.addValues(request);
     }
     @PutMapping("/up/{valueId}")
-    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody DocumentQuestionValueDTO request) {
-        return documentsService.updateValues(valueId ,request);
+    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody UserInputs request) {
+        return documentQuestionValueService.updateValues(valueId ,request);
+    }
+    @PutMapping("/up-sub/{valueId}")
+    public ApiResponse updateSubQuestionValues(@PathVariable Long valueId ,@RequestBody UserInputsSubQuestion request) {
+        return documentSubQuestionValueService.updateSubQuestionValues(valueId ,request);
     }
 
 //    @PostMapping("/test/replaceValues/{questionId}/{DocumentQuestionValue}")

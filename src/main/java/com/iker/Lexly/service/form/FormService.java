@@ -5,7 +5,9 @@ package com.iker.Lexly.service.form;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Question;
+import com.iker.Lexly.Entity.SubQuestion;
 import com.iker.Lexly.repository.QuestionRepository;
+import com.iker.Lexly.repository.SubQuestionRepository;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.repository.form.BlockRepository;
 import org.slf4j.Logger;
@@ -26,13 +28,15 @@ public class FormService {
     private final BlockRepository blockRepository;
     private final BlockService blockService;
     private final QuestionRepository questionRepository;
+    private final SubQuestionRepository subQuestionRepository;
     private String errMsg= "Form not found";
     @Autowired
-    public FormService(FormRepository formRepository, BlockRepository blockRepository, BlockService blockService,QuestionRepository questionRepository) {
+    public FormService(FormRepository formRepository, BlockRepository blockRepository, BlockService blockService,QuestionRepository questionRepository,SubQuestionRepository subQuestionRepository) {
         this.formRepository = formRepository;
         this.blockRepository = blockRepository;
         this.blockService = blockService;
         this.questionRepository=questionRepository;
+        this.subQuestionRepository=subQuestionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +44,15 @@ public class FormService {
         return formRepository.findAll();
     }
 
-
+    public void deleteFormByQuestionId(Long questionId) {
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (optionalQuestion.isEmpty()) {
+            String errorMessage = "Question not found with id: " + questionId;
+            logger.error(errorMessage);
+            throw new IllegalArgumentException("Question not found with id: " + questionId);
+        }
+        formRepository.deleteByQuestionId(questionId);
+    }
 
     public Optional<Form> getFormsByQuestionId(Long questionId) {
         return formRepository.findByQuestionId(questionId);
@@ -53,15 +65,22 @@ public class FormService {
         // Associate the form with the question
         form.setQuestion(question);
         Form savedForm = formRepository.save(form);
-        // Create and save the block associated with the form
-//        Block block = new Block();
-//        block.setForm(savedForm);
-//        blockRepository.save(block);
         blockService.createBlock(savedForm.getId());
         logger.info("Created form successfully :{}",savedForm);
         return savedForm;
     }
 
+    @Transactional
+    public Form createSubQuestionForm(Long subQuestionId,Form form ) {
+        SubQuestion subQuestion = subQuestionRepository.findById(subQuestionId)
+                .orElseThrow(() -> new NoSuchElementException("SubQuestion not found with id: " +subQuestionId));
+        // Associate the form with the question
+        form.setSubQuestion(subQuestion);
+        Form savedForm = formRepository.save(form);
+        blockService.createBlock(savedForm.getId());
+        logger.info("Created form successfully :{}",savedForm);
+        return savedForm;
+    }
     @Transactional(readOnly = true)
     public Form getFormById(Long formId) {
         return formRepository.findById(formId)
