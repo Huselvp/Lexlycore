@@ -3,6 +3,7 @@ import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
+import com.iker.Lexly.service.form.FormService;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import jakarta.xml.bind.JAXBContext;
@@ -35,10 +36,11 @@ public class QuestionService {
     private final QuestionTransformer questionTransformer;
     private final DocumentsRepository documentsRepository;
     private final FilterService filterService;
+    private final FormService formService;
     Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
-    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository,FilterService filterService) {
+    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, FilterService filterService, FormService formService) {
         this.questionRepository = questionRepository;
         this.templateService = templateService;
         this.questionTransformer = questionTransformer;
@@ -46,6 +48,7 @@ public class QuestionService {
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
         this.filterService =filterService;
+        this.formService = formService;
     }
 
     public List<Question> getAllQuestions() {
@@ -92,6 +95,9 @@ public class QuestionService {
         if (question != null) {
             if (question.getValueType().equals("filter")){
                 filterService.deleteFiltersByQuestionId(questionId);
+            }
+            if (question.getValueType().equals("form")){
+                formService.deleteFormByQuestionId(questionId);
             }
             entityManager.remove(question);
         }

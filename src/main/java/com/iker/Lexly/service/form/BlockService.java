@@ -166,9 +166,9 @@ public void reorderBlocks(List<Long> blocksIds) {
         newLabel.setName(originalLabel.getName());
 
         // Duplicate options
-        Map<String, String> originalOptions = originalLabel.getOptions();
-        Map<String, String> newOptions = new HashMap<>();
-        for (Map.Entry<String, String> entry : originalOptions.entrySet()) {
+        Map<Long, String> originalOptions = originalLabel.getOptions();
+        Map<Long, String> newOptions = new HashMap<>();
+        for (Map.Entry<Long, String> entry : originalOptions.entrySet()) {
             newOptions.put(entry.getKey(), entry.getValue());
         }
         newLabel.setOptions(newOptions);

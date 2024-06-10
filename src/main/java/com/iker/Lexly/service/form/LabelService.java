@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class LabelService {
@@ -21,6 +22,7 @@ public class LabelService {
     Logger logger = LoggerFactory.getLogger(LabelService.class);
     private final LabelRepository labelRepository;
     private final BlockRepository blockRepository;
+    private AtomicLong optionKeyGenerator = new AtomicLong();
 
     @Autowired
     public LabelService(LabelRepository labelRepository, BlockRepository blockRepository) {
@@ -146,7 +148,7 @@ public class LabelService {
     }
 
 
-    public Label deleteOption(Long labelId, String optionKey) {
+    public Label deleteOption(Long labelId, Long optionKey) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
@@ -158,11 +160,11 @@ public class LabelService {
         }
     }
 
-    public Label deleteOptions(Long labelId, List<String> optionKeys) {
+    public Label deleteOptions(Long labelId, List<Long> optionKeys) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
         Map<Long, String> options = label.getOptions();
-        for (String optionKey : optionKeys) {
+        for (Long optionKey : optionKeys) {
             if (options.containsKey(optionKey)) {
                 options.remove(optionKey);
             } else {
@@ -181,24 +183,42 @@ public class LabelService {
     }
 
     @Transactional(readOnly = true)
-    public String getOptionByKey (Long labelId, String optionKey) {
+    public String getOptionByKey (Long labelId, Long optionKey) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
         return label.getOptions().get(optionKey);
     }
 
     @Transactional
-    public Label addOptions(Long labelId, Map<Long, String> optionsToAdd) {
+    public Label addOptions(Long labelId, List<String> optionsToAdd) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
         Map<Long, String> existingOptions = label.getOptions();
-        existingOptions.putAll(optionsToAdd);
+        long currentMaxKey = existingOptions.keySet().stream().mapToLong(v -> v).max().orElse(0);
+        // Initialize the key generator based on the current maximum key
+        AtomicLong optionKeyGenerator = new AtomicLong(currentMaxKey);
+
+        for (String optionValue : optionsToAdd) {
+            long newKey = optionKeyGenerator.incrementAndGet();
+            existingOptions.put(newKey, optionValue);
+        }
 
         label.setOptions(existingOptions);
-
         return labelRepository.save(label);
     }
+//    @Transactional
+//    public Label addOptions(Long labelId, Map<Long, String> optionsToAdd) {
+//        Label label = labelRepository.findById(labelId)
+//                .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
+//
+//        Map<Long, String> existingOptions = label.getOptions();
+//        existingOptions.putAll(optionsToAdd);
+//
+//        label.setOptions(existingOptions);
+//
+//        return labelRepository.save(label);
+//    }
 
 
 }

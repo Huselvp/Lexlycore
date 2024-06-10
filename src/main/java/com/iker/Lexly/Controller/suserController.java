@@ -110,7 +110,7 @@ public class suserController {
 
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-        ApiResponse response = documentsService.addValues(request);
+        ApiResponse response = documentQuestionValueService.addValues(request);
         return response;
     }
 

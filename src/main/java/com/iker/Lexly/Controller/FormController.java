@@ -275,7 +275,7 @@ public class FormController {
     }
 
     @GetMapping("block/label/option/{labelId}/{optionKey}")
-    public ResponseEntity<?> getOptionByKey(@PathVariable Long labelId, @PathVariable String optionKey) {
+    public ResponseEntity<?> getOptionByKey(@PathVariable Long labelId, @PathVariable Long optionKey) {
         try {
             String optionValue = labelService.getOptionByKey(labelId, optionKey);
             return ResponseEntity.ok(optionValue);
@@ -306,12 +306,12 @@ public class FormController {
     }
 
     @DeleteMapping("/block/label/option/{labelId}/{optionKey}")
-    public ResponseEntity<Label> deleteOption(@PathVariable Long labelId, @PathVariable String optionKey) {
+    public ResponseEntity<Label> deleteOption(@PathVariable Long labelId, @PathVariable Long optionKey) {
         Label updatedLabel = labelService.deleteOption(labelId, optionKey);
         return ResponseEntity.ok().body(updatedLabel);
     }
     @DeleteMapping("/block/label/options/{labelId}")
-    public ResponseEntity<?> deleteOptions(@PathVariable Long labelId, @RequestBody List<String> optionKeys) {
+    public ResponseEntity<?> deleteOptions(@PathVariable Long labelId, @RequestBody List<Long> optionKeys) {
         try {
             Label deletedLabel = labelService.deleteOptions(labelId, optionKeys);
             return ResponseEntity.ok(deletedLabel);
@@ -322,7 +322,7 @@ public class FormController {
         }
     }
     @PostMapping("/block/label/options/{labelId}")
-    public ResponseEntity<Object> addOptions(@PathVariable Long labelId, @RequestBody Map<Long, String> optionsToAdd) {
+    public ResponseEntity<Object> addOptions(@PathVariable Long labelId, @RequestBody List<String> optionsToAdd) {
         try {
             Label label = labelService.addOptions(labelId, optionsToAdd);
             return new ResponseEntity<>(label, HttpStatus.CREATED);

@@ -1,12 +1,11 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.DTO.UserDTO;
 import com.iker.Lexly.Entity.User;
-import com.iker.Lexly.Exceptions.TokenExpiredException;
+
 import com.iker.Lexly.Exceptions.UnauthorizedException;
 import com.iker.Lexly.Exceptions.UsernameAlreadyExistsException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
-import com.iker.Lexly.Transformer.UserTransformer;
+
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -60,7 +60,6 @@ public class Question {
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
 
-
     @ManyToOne
     @JsonBackReference
     private Template template;

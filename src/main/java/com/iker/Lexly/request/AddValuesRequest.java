@@ -6,12 +6,12 @@ import java.util.List;
 
 public class AddValuesRequest {
     private Long documentId;
-    private List<DocumentQuestionValueDTO> values;
+    private List<UserInputs> values;
     private boolean isDraft;
 
 
 
-    public AddValuesRequest(Long documentId, List<DocumentQuestionValueDTO> values, boolean isDraft,List<FormValuesRequest> formsValues) {
+    public AddValuesRequest(Long documentId, List<UserInputs> values, boolean isDraft) {
         this.documentId = documentId;
         this.values = values;
         this.isDraft = isDraft;
@@ -23,7 +23,7 @@ public class AddValuesRequest {
         return documentId;
     }
 
-    public List<DocumentQuestionValueDTO> getValues() {
+    public List<UserInputs>getValues() {
         return values;
     }
 

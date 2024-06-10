@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 
 public class AddLabelOption {
-    private String  optionKey;
+    private Long  optionKey;
     private String optionValue;
 
 }

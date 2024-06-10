@@ -21,10 +21,10 @@ public class FilterController {
     public FilterController(FilterService filterService) {
         this.filterService = filterService;
     }
-    @PostMapping("/add/{questionId}")
+    @PostMapping("/add-question/{questionId}")
     public ResponseEntity<Object> addFilter(@PathVariable Long questionId, @RequestBody FilterRequest filterRequest) {
         try {
-            Filter filter = filterService.addFilter(questionId, filterRequest);
+            Filter filter = filterService.addFilterToQuestion(questionId, filterRequest);
             return ResponseEntity.ok(filter);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Error adding filter: " + e.getMessage());
@@ -32,7 +32,17 @@ public class FilterController {
             return ResponseEntity.status(500).body("Unexpected error occurred while adding filter.");
         }
     }
-
+    @PostMapping("/add-subQuestion/{subQuestionId}")
+    public ResponseEntity<Object> addFilterToSubQuestion(@PathVariable Long subQuestionId, @RequestBody FilterRequest filterRequest) {
+        try {
+            Filter filter = filterService.addFilterToSubQuestion(subQuestionId, filterRequest);
+            return ResponseEntity.ok(filter);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Error adding filter: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Unexpected error occurred while adding filter.");
+        }
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Filter> getFilter(@PathVariable Long id) {
         try {

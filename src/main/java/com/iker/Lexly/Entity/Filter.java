@@ -23,6 +23,11 @@ public class Filter {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    @OneToOne
+    @JoinColumn(name = "subQuestion_id")
+    private SubQuestion subQuestion;
+
+
     @Enumerated(EnumType.STRING)
     private FilterType filterType;
     private Integer filterStartInt;
