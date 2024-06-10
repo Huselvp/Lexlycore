@@ -3,7 +3,7 @@ import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
 import Menus from "../../../ui/Menus";
 import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
 import { useEffect, useRef, useState } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
@@ -17,6 +17,10 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   const [caret_icon_active, setcaret] = useState(false);
 
   const navigate = useNavigate();
+
+  const { templateId } = useParams<{ templateId: string }>();
+
+  const [formBlocs, setFormBlocs] = useState([]);
 
   const [squestionOrderTest, setSQuestionOrderTest] = useState(
     question?.subQuestions.sort((a, b) => a.position - b.position)
@@ -50,6 +54,51 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     setSQuestionOrderTest(question?.subQuestions);
   }, [question?.subQuestions]);
 
+  // const getBlocInputs = await axios.get(
+  //   `http://localhost:8081/api/form/block/label/${templateId}`,
+  //   getApiConfig()
+  // );
+
+  // useEffect(() => {
+  //   const getFormBlocs = async () => {
+  //     try {
+  //       const getBlocInputs = await axios.get(
+  //         `http://localhost:8081/api/form/blocks/${question.id}`,
+  //         getApiConfig()
+  //       );
+
+  //       setFormBlocs(getBlocInputs.data);
+
+  //       console.log(formBlocs, "this is the form blocs");
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   getFormBlocs();
+  // }, [question.id]);
+
+  useEffect(() => {
+    const getFormBlocs = async () => {
+      try {
+        await axios
+          .get(
+            `http://localhost:8081/api/form/blocks/${question.id}`,
+            getApiConfig()
+          )
+          .then((result) => {
+            setFormBlocs(result.data);
+          });
+
+        console.log(formBlocs, "this is the form blocs");
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getFormBlocs();
+  }, [question.id]);
+
   return (
     <>
       <Reorder.Item value={question} key={question.id}>
@@ -81,14 +130,22 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 </Menus.Button>
               )}
 
-              {question.valueType.startsWith("form") && (
-                <Menus.Button
-                  icon={<HiEye />}
-                  onClick={() => navigate(`addNewForm/${question.id}`)}
-                >
-                  Add form
-                </Menus.Button>
-              )}
+              {question.valueType.startsWith("form") &&
+                (formBlocs.length === 0 ? (
+                  <Menus.Button
+                    icon={<HiEye />}
+                    onClick={() => navigate(`addNewForm/${question.id}`)}
+                  >
+                    Add form
+                  </Menus.Button>
+                ) : (
+                  <Menus.Button
+                    icon={<HiEye />}
+                    onClick={() => navigate(`seeBlocks/${question.id}`)}
+                  >
+                    See Blocs
+                  </Menus.Button>
+                ))}
               <Menus.Button
                 icon={<HiEye />}
                 onClick={() => navigate(`addSubQuestion/${question.id}`)}

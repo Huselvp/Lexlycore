@@ -39,6 +39,7 @@ import AddSubQuestion from "./pages/admin/AddSubQuestion";
 import EditSubQuestion from "./pages/admin/EditSubQuestion";
 import QuestionnaireWizard from "./ui/Testing/Wizard";
 import AddNewForm from "./pages/admin/addNewForm";
+import FormBlocs from "./pages/admin/formBlocs";
 
 function App() {
   return (
@@ -75,9 +76,15 @@ function App() {
           />
 
           <Route
-            path="templates/:templateId/addNewForm/:templateId"
+            path="templates/:templateId/seeBlocks/:blocId"
+            element={<FormBlocs />}
+          />
+
+          <Route
+            path="templates/:templateId/addNewForm/:formId"
             element={<AddNewForm />}
           />
+
           <Route path="templates/:templateId" element={<Questions />} />
           <Route
             path="templates/:templateId/:questionId"
