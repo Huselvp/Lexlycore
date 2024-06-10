@@ -2,6 +2,7 @@ package com.iker.Lexly.Entity.Form;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iker.Lexly.Entity.Question;
+import com.iker.Lexly.Entity.SubQuestion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,11 @@ public class Form {
 
     @OneToOne
     @JoinColumn(name = "question_id")
-    @JsonIgnore
     private Question question;
+
+    @OneToOne
+    @JoinColumn(name = "subQuestion_id")
+    private SubQuestion subQuestion;
 
 
 

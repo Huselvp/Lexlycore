@@ -246,6 +246,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedLabel);
         }
     }
+
     @PutMapping("/block/labels/{idBlock}")
     public ApiResponse updateLabels(@PathVariable Long idBlock, @RequestBody List<Label> labels) {
         return labelService.updateLabels(idBlock, labels);
@@ -264,7 +265,7 @@ public class FormController {
     @GetMapping("block/label/options/{labelId}")
     public ResponseEntity<?> getAllOptionsByLabelId(@PathVariable Long labelId) {
         try {
-            Map<String, String> options = labelService.getAllOptionsByLabelId(labelId);
+            Map<Long, String> options = labelService.getAllOptionsByLabelId(labelId);
             return ResponseEntity.ok(options);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -299,7 +300,7 @@ public class FormController {
 //    }
 
     @PatchMapping("/block/label/options/{labelId}/{optionKey}")
-    public ResponseEntity<Label> updateOption(@PathVariable Long labelId, @PathVariable String optionKey, @RequestParam String newValue) {
+    public ResponseEntity<Label> updateOption(@PathVariable Long labelId, @PathVariable Long optionKey, @RequestParam String newValue) {
         Label updatedLabel = labelService.updateOption(labelId, optionKey, newValue);
         return ResponseEntity.ok().body(updatedLabel);
     }
@@ -321,7 +322,7 @@ public class FormController {
         }
     }
     @PostMapping("/block/label/options/{labelId}")
-    public ResponseEntity<Object> addOptions(@PathVariable Long labelId, @RequestBody Map<String, String> optionsToAdd) {
+    public ResponseEntity<Object> addOptions(@PathVariable Long labelId, @RequestBody Map<Long, String> optionsToAdd) {
         try {
             Label label = labelService.addOptions(labelId, optionsToAdd);
             return new ResponseEntity<>(label, HttpStatus.CREATED);

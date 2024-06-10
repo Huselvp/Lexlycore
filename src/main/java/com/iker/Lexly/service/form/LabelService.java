@@ -124,7 +124,7 @@ public class LabelService {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
-        Map<String, String> options = label.getOptions();
+        Map<Long, String> options = label.getOptions();
 
         options.put(request.getOptionKey(),request.getOptionValue());
 
@@ -133,7 +133,7 @@ public class LabelService {
         return labelRepository.save(label);
     }
 
-    public Label updateOption(Long labelId, String optionKey, String newValue) {
+    public Label updateOption(Long labelId, Long optionKey, String newValue) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
@@ -161,7 +161,7 @@ public class LabelService {
     public Label deleteOptions(Long labelId, List<String> optionKeys) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
-        Map<String, String> options = label.getOptions();
+        Map<Long, String> options = label.getOptions();
         for (String optionKey : optionKeys) {
             if (options.containsKey(optionKey)) {
                 options.remove(optionKey);
@@ -174,7 +174,7 @@ public class LabelService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, String> getAllOptionsByLabelId(Long labelId) {
+    public Map<Long, String> getAllOptionsByLabelId(Long labelId) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
         return label.getOptions();
@@ -188,11 +188,11 @@ public class LabelService {
     }
 
     @Transactional
-    public Label addOptions(Long labelId, Map<String, String> optionsToAdd) {
+    public Label addOptions(Long labelId, Map<Long, String> optionsToAdd) {
         Label label = labelRepository.findById(labelId)
                 .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
-        Map<String, String> existingOptions = label.getOptions();
+        Map<Long, String> existingOptions = label.getOptions();
         existingOptions.putAll(optionsToAdd);
 
         label.setOptions(existingOptions);

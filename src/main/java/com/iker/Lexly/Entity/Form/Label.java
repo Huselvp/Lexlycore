@@ -27,7 +27,7 @@ public class Label {
     @CollectionTable(name = "label_options", joinColumns = @JoinColumn(name = "label_id"))
     @MapKeyColumn(name = "option_key")
     @Column(name = "option_value")
-    private Map<String, String> options = new HashMap<>();
+    private Map<Long, String> options = new HashMap<>();
 
     @ManyToOne
     @JsonBackReference
