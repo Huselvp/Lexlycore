@@ -3,6 +3,7 @@ package com.iker.Lexly.service.form;
 
 import com.iker.Lexly.Entity.Form.Label;
 import com.iker.Lexly.Entity.Form.Block;
+import com.iker.Lexly.Entity.Form.LabelType;
 import com.iker.Lexly.repository.form.LabelRepository;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.request.AddLabelOption;
@@ -96,17 +97,21 @@ public class LabelService {
             Optional<Label> labelOptional = labelRepository.findById(label.getId());
             if (labelOptional.isPresent()) {
                 Label existingLabel = labelOptional.get();
+                // Check if the type has changed from SELECT to another type so, we can delete the existing options
+                if (existingLabel.getType() == LabelType.SELECT && label.getType() != LabelType.SELECT) {
+                    existingLabel.getOptions().clear();
+                }
                 label.setId(existingLabel.getId());
                 label.setBlock(existingLabel.getBlock());
                 Label savedLabel = labelRepository.save(label);
                 logger.info("Updated Label successfully :{}", savedLabel);
-                responses.add(new ApiResponse("Label updated successfully.",null));
+                responses.add(new ApiResponse("Label updated successfully.",savedLabel));
             } else {
                 responses.add(new ApiResponse("Label with ID " + label.getId() + " not found.", label));
             }
         }
 
-        return new ApiResponse("Batch label update completed.", responses);
+        return new ApiResponse("Batch label update completed.",null);
     }
 
     @Transactional
