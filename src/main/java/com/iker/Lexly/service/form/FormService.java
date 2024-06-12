@@ -43,7 +43,17 @@ public class FormService {
     public List<Form> getAllForms() {
         return formRepository.findAll();
     }
-
+//
+//    public void deleteFormByQuestionId(Long questionId) {
+//        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+//        if (optionalQuestion.isEmpty()) {
+//            String errorMessage = "Question not found with id: " + questionId;
+//            logger.error(errorMessage);
+//            throw new IllegalArgumentException("Question not found with id: " + questionId);
+//        }
+//        formRepository.deleteByQuestionId(questionId);
+//    }
+    @Transactional
     public void deleteFormByQuestionId(Long questionId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionId);
         if (optionalQuestion.isEmpty()) {
@@ -51,11 +61,25 @@ public class FormService {
             logger.error(errorMessage);
             throw new IllegalArgumentException("Question not found with id: " + questionId);
         }
-        formRepository.deleteByQuestionId(questionId);
+        Question question = optionalQuestion.get();
+        if (question.getValueType().equals("form")) {
+            Form form = formRepository.findByQuestionId(questionId).orElseThrow(() ->
+                    new IllegalArgumentException("Form not found for questionId: " + questionId)
+            );
+            List<Block> formBlocks = blockService.getAllBlocksByFormId(form.getId());
+            for (Block formBlock : formBlocks) {
+                blockService.deleteBlock(formBlock.getId());
+            }
+            formRepository.deleteById(form.getId());
+        } else {
+            throw new IllegalArgumentException("Question with id: " + questionId + " does not have a form");
+        }
     }
 
-    public Optional<Form> getFormsByQuestionId(Long questionId) {
-        return formRepository.findByQuestionId(questionId);
+    public Long getFormsByQuestionId(Long questionId) {
+        Form form = formRepository.findByQuestionId(questionId)
+                .orElseThrow(() -> new NoSuchElementException("Form not found for questionId: " + questionId));
+        return form.getId();
     }
 
     @Transactional
@@ -104,6 +128,7 @@ public class FormService {
 
     @Transactional
     public void deleteForm(Long formId) {
+
         if (formRepository.existsById(formId)) {
             List<Block> formBlocks = blockService.getAllBlocksByFormId(formId);
             for (Block formBlock : formBlocks) {
@@ -116,6 +141,8 @@ public class FormService {
             throw new IllegalArgumentException(errMsg);
         }
     }
+
+
 
 //    @Transactional
 //    public Form duplicateForm(Long formId) {
