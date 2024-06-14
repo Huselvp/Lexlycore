@@ -204,6 +204,26 @@ public class FormController {
             return ResponseEntity.ok("Blocks are not equal");
         }
     }
+    @PutMapping("/blocks/reorder")
+    public ResponseEntity<String> reorderBlocks( @RequestBody List<Long> blocksIds) {
+        try{
+            blockService.reorderBlocks(blocksIds);
+            return new ResponseEntity<>("Blocks reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering blocks.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PutMapping("/blocks/labels/reorder")
+    public ResponseEntity<String> reorderLabels( @RequestBody List<Long> labelsIds) {
+        try{
+            labelService.reorderLabels(labelsIds);
+            return new ResponseEntity<>("labels reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering labels.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/block/label/{idBlock}")
     public ResponseEntity<List<Label>> getAllLabelsByBlockId(@PathVariable Long idBlock) {

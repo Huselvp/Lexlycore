@@ -42,6 +42,8 @@ public class LabelService {
 
         label.setBlock(block);
         Label savedLabel = labelRepository.save(label);
+        savedLabel.setPosition(savedLabel.getId().intValue());
+
         logger.info("Created Label successfully :{}",savedLabel);
         return savedLabel;
     }
@@ -124,6 +126,22 @@ public class LabelService {
             labelRepository.deleteById(labelId);
         } else {
             throw new IllegalArgumentException("Label not found");
+        }
+    }
+    public void reorderLabels(List<Long> labelsIds) {
+
+        Set<Long> uniqueLabelIds = new HashSet<>(labelsIds);
+        if (uniqueLabelIds.size() < labelsIds.size()) {
+            throw new IllegalArgumentException("Duplicate user IDs found in the list.");
+        }
+        List<Label> labels =labelRepository.findAllById(labelsIds);
+        for (int i = 0; i < labelsIds.size(); i++) {
+            long labelId =  labelsIds.get(i);
+            Label label = labels.stream().filter(u -> u.getId().equals(labelId)).findFirst().orElse(null);
+            if (label != null) {
+                label.setPosition(i);
+                labelRepository.save(label);
+            }
         }
     }
     @Transactional
