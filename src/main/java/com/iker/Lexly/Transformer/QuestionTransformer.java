@@ -1,15 +1,27 @@
 package com.iker.Lexly.Transformer;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.SubQuestionDTO;
+import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.SubQuestion;
+import com.iker.Lexly.repository.form.FormRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
+
+    private final FormTransformer formTransformer;
+    private final FormRepository formRepository;
+    @Autowired
+    public QuestionTransformer(FormTransformer formTransformer, FormRepository formRepository) {
+        this.formTransformer = formTransformer;
+        this.formRepository = formRepository;
+    }
 
     @Override
     public Question toEntity(QuestionDTO dto) {
@@ -53,6 +65,10 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
         subQuestionDTO.setDescriptionDetails(subQuestion.getDescriptionDetails());
         subQuestionDTO.setValueType(subQuestion.getValueType());
         subQuestionDTO.setTextArea(subQuestion.getTextArea());
+        if ("form".equals(subQuestion.getValueType())) {
+            Optional<Form> formOptional = formRepository.findByQuestionId(subQuestion.getId());
+            formOptional.ifPresent(form -> subQuestionDTO.setForm(formTransformer.toDTO(form)));
+        }
         return subQuestionDTO;
     }
 }

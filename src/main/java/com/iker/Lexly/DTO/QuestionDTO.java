@@ -18,6 +18,7 @@ public class QuestionDTO {
     private String descriptionDetails;
     private List<SubQuestionDTO> subQuestions;
     private String informations;
+    private FormDTO form;
 
 
 

@@ -1,8 +1,19 @@
 package com.iker.Lexly.service;
+import com.iker.Lexly.DTO.BlockDTO;
+import com.iker.Lexly.DTO.FormDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Entity.*;
+import com.iker.Lexly.Entity.Form.Block;
+import com.iker.Lexly.Entity.Form.Form;
+import com.iker.Lexly.Entity.Form.Label;
+import com.iker.Lexly.Transformer.BlockTransformer;
+import com.iker.Lexly.Transformer.FormTransformer;
+import com.iker.Lexly.Transformer.LabelTransformer;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.repository.*;
+import com.iker.Lexly.repository.form.BlockRepository;
+import com.iker.Lexly.repository.form.FormRepository;
+import com.iker.Lexly.repository.form.LabelRepository;
 import com.iker.Lexly.service.form.FormService;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
@@ -24,11 +35,11 @@ import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-
 @Service
 public class QuestionService {
     @PersistenceContext
     private EntityManager entityManager;
+
     private final QuestionRepository questionRepository;
     private final TemplateService templateService;
     private final TemplateRepository templateRepository;
@@ -37,18 +48,46 @@ public class QuestionService {
     private final DocumentsRepository documentsRepository;
     private final FilterService filterService;
     private final FormService formService;
+    private final FormRepository formRepository;
+    private final BlockRepository blockRepository;
+    private final LabelRepository labelRepository;
+    private final FormTransformer formTransformer;
+    private final BlockTransformer blockTransformer;
+    private final LabelTransformer labelTransformer;
+
     Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
-    public QuestionService(TemplateService templateService, QuestionTransformer questionTransformer, DocumentQuestionValueRepository documentQuestionValueRepository, DocumentsRepository documentsRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, FilterService filterService, FormService formService) {
+    public QuestionService(
+            TemplateService templateService,
+            QuestionTransformer questionTransformer,
+            DocumentQuestionValueRepository documentQuestionValueRepository,
+            DocumentsRepository documentsRepository,
+            QuestionRepository questionRepository,
+            TemplateRepository templateRepository,
+            FilterService filterService,
+            FormService formService,
+            FormRepository formRepository,
+            BlockRepository blockRepository,
+            LabelRepository labelRepository,
+            FormTransformer formTransformer,
+            BlockTransformer blockTransformer,
+            LabelTransformer labelTransformer
+    ) {
         this.questionRepository = questionRepository;
         this.templateService = templateService;
         this.questionTransformer = questionTransformer;
         this.templateRepository = templateRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
-        this.filterService =filterService;
+        this.filterService = filterService;
         this.formService = formService;
+        this.formRepository = formRepository;
+        this.blockRepository = blockRepository;
+        this.labelRepository = labelRepository;
+        this.formTransformer = formTransformer;
+        this.blockTransformer = blockTransformer;
+        this.labelTransformer = labelTransformer;
     }
 
     public List<Question> getAllQuestions() {
@@ -124,6 +163,35 @@ public class QuestionService {
             }
         }
 
+
+    @Transactional()
+    public QuestionDTO getQuestionWithDetails(Long questionId) {
+        // Fetch the Question
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new NoSuchElementException("Question not found for id: " + questionId));
+
+        // Fetch the Form
+        Form form = formRepository.findByQuestionId(questionId)
+                .orElseThrow(() -> new NoSuchElementException("Form not found for questionId: " + questionId));
+
+        // Fetch the Blocks
+        List<Block> blocks = blockRepository.findByFormId(form.getId());
+
+        // Fetch the Labels for each Block
+        Map<Long, List<Label>> labelsByBlockId = blocks.stream()
+                .collect(Collectors.toMap(Block::getId, block -> labelRepository.findByBlockId(block.getId())));
+
+        // Assemble the DTO
+        QuestionDTO questionDTO = questionTransformer.toDTO(question);
+        FormDTO formDTO = formTransformer.toDTO(form);
+        List<BlockDTO> blockDTOs = blocks.stream()
+                .map(block -> blockTransformer.toDTO(block, labelsByBlockId.get(block.getId())))
+                .collect(Collectors.toList());
+        formDTO.setBlocks(blockDTOs);
+        questionDTO.setForm(formDTO);
+
+        return questionDTO;
+    }
 
     public void reorderQuestions(List<Long> questionsIds) {
 

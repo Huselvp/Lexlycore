@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class FormValuesRequest {
-    private Long Id;
-    private List<FormValues> formValues;
+@AllArgsConstructor
+public class CheckboxValue {
 
+    private String value;
+    private String relatedText;
 
 }

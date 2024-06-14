@@ -5,10 +5,7 @@ import com.iker.Lexly.Entity.Documents;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.SubQuestion;
 import com.iker.Lexly.repository.*;
-import com.iker.Lexly.request.AddValuesRequest;
-import com.iker.Lexly.request.DayRequest;
-import com.iker.Lexly.request.FormValues;
-import com.iker.Lexly.request.UserInputs;
+import com.iker.Lexly.request.*;
 import com.iker.Lexly.responses.ApiResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +120,18 @@ public class DocumentQuestionValueService {
             saveDocumentQuestionValue(question, document, value);
             return true;
         }
+//        private boolean processCheckboxQuestionValue(Question question, Documents document, UserInputs valueDto) {
+//            if (valueDto.getCheckboxValue() == null || valueDto.getCheckboxValue().isEmpty()) {
+//                return false;
+//            }
+//
+//            String value = "checkbox" + valueDto.getCheckboxValue().stream()
+//                    .flatMap(val -> List.of("/" + val.getValue(), "/" + val.getRelatedText()).stream())
+//                    .collect(Collectors.joining());
+//
+//            saveDocumentQuestionValue(question, document, value);
+//            return true;
+//        }
 
         private boolean processDayQuestionValue(Question question, Documents document, UserInputs valueDto) {
             List<DayRequest> days = Optional.ofNullable(valueDto.getDays()).orElse(Collections.emptyList());
@@ -229,6 +238,21 @@ public class DocumentQuestionValueService {
             documentQuestionValueRepository.save(existingValue);
             return new ApiResponse("Checkbox values updated successfully.", null);
         }
+//        public ApiResponse updateCheckboxQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {
+//            List<CheckboxValue> checkboxValues = newValue.getCheckboxValue();
+//
+//            if (checkboxValues == null || checkboxValues.isEmpty()) {
+//                return new ApiResponse("Checkbox values are missing.", null);
+//            }
+//
+//            String updatedValue = "checkbox" + checkboxValues.stream()
+//                    .map(val -> "/" + val.getValue() + " " + val.getRelatedText())
+//                    .collect(Collectors.joining("/"));
+//
+//            existingValue.setValue(updatedValue);
+//            documentQuestionValueRepository.save(existingValue);
+//            return new ApiResponse("Checkbox values updated successfully.", null);
+//        }
 
         private ApiResponse updateDayQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {
             List<DayRequest> days = Optional.ofNullable(newValue.getDays()).orElse(Collections.emptyList());

@@ -1,10 +1,8 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
-import com.iker.Lexly.repository.DocumentQuestionValueRepository;
-import com.iker.Lexly.repository.DocumentsRepository;
-import com.iker.Lexly.repository.QuestionRepository;
-import com.iker.Lexly.repository.UserRepository;
+import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.*;
 import com.iker.Lexly.DTO.TemplateDTO;
 import com.iker.Lexly.Entity.*;
@@ -39,6 +37,7 @@ public class suserController {
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
+    private final DocumentSubQuestionValueRepository documentSubQuestionValueRepository;
     private final DocumentQuestionValueService documentQuestionValueService;
     private final JwtService jwtService;
     private  final DocumentsRepository documentsRepository;
@@ -48,7 +47,8 @@ public class suserController {
     private final SubQuestionService subQuestionService;
 
     @Autowired
-    public suserController( PaymentService paymentService,UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository,SubQuestionService subQuestionService) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService) {
+        this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
@@ -73,6 +73,12 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
+    @GetMapping("/{id}/details")
+    public ResponseEntity<QuestionDTO> getQuestionWithDetails(@PathVariable Long id) {
+        QuestionDTO questionDTO = questionService.getQuestionWithDetails(id);
+        return ResponseEntity.ok(questionDTO);
+    }
+
     @GetMapping("/user_template/{templateId}")
     public ResponseEntity<Template> getTemplateById(@PathVariable Long templateId) {
         Template template = templateService.getTemplateById(templateId);
@@ -183,7 +189,8 @@ public class suserController {
         Long templateId = requestData.getTemplateId();
         List<Question> questions = questionRepository.findByTemplateId(templateId);
         List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-        String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
+        List<DocumentSubQuestionValue> documentSubQuestionValues = documentSubQuestionValueRepository.findByDocumentId(documentId);
+        String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues ,documentSubQuestionValues);
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
@@ -206,7 +213,8 @@ public class suserController {
                 if (htmlContent == null) {
                     List<Question> questions = questionRepository.findByTemplateId(templateId);
                     List<DocumentQuestionValue> documentQuestionValues = documentQuestionValueRepository.findByDocumentId(documentId);
-                    String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
+                    List<DocumentSubQuestionValue> documentSubQuestionValues = documentSubQuestionValueRepository.findByDocumentId(documentId);
+                    String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues ,documentSubQuestionValues );
                     concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
                     htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
                 }

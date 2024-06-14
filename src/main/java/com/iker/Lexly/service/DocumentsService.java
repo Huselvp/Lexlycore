@@ -6,6 +6,7 @@ import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.repository.form.FormRepository;
+import com.iker.Lexly.request.UserInputs;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.form.BlockService;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,11 +36,10 @@ public class DocumentsService {
     private final BlockRepository blockRepository;
     private final BlockService blockService;
     private final FormRepository formRepository;
-    private final FilterService filterService;
-    private final QuestionService questionService;
+    private final SubQuestionRepository subQuestionRepository;
 
     @Autowired
-    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository, JwtService jwtService, BlockRepository blockRepository, BlockService blockService , FormRepository formRepository, FilterService filterService, QuestionService questionService) {
+    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository, JwtService jwtService, BlockRepository blockRepository, BlockService blockService , FormRepository formRepository, SubQuestionRepository subQuestionRepository) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
@@ -49,10 +49,9 @@ public class DocumentsService {
         this.blockRepository=blockRepository;
         this.blockService=blockService;
         this.formRepository = formRepository;
-        this.filterService = filterService;
-        this.questionService = questionService;
-    }
 
+        this.subQuestionRepository = subQuestionRepository;
+    }
 
     public List<Documents> getDocumentsByUserId(String token) {
         if (jwtService.isTokenExpired(token)) {
@@ -119,7 +118,7 @@ public class DocumentsService {
 //    }
 
 
-    public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues) {
+    public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues, List<DocumentSubQuestionValue> documentSubQuestionValues) {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
         }
@@ -133,11 +132,319 @@ public class DocumentsService {
                 for (org.jsoup.nodes.Node child : questionDocument.body().childNodes()) {
                     mainDocument.body().appendChild(child.clone());
                 }
+                if (!question.getSubQuestions().isEmpty()){
+                    prossesSubQuestion(question.getSubQuestions(),documentSubQuestionValues,mainDocument);
+                }
             }
         }
 
         return mainDocument.html().trim();
     }
+    private void prossesSubQuestion(List<SubQuestion> subQuestions, List<DocumentSubQuestionValue> documentSubQuestionValues,Document mainDocument) {
+        subQuestions.sort(Comparator.comparingInt(SubQuestion::getPosition));
+        for (SubQuestion subQuestion : subQuestions) {
+            if (subQuestion != null ) {
+                String text = subQuestion.getTextArea();
+                text = replaceSubQuestionValues(text, subQuestion.getId(),documentSubQuestionValues);
+                Document questionDocument = Jsoup.parseBodyFragment(text);
+                for (org.jsoup.nodes.Node child : questionDocument.body().childNodes()) {
+                    mainDocument.body().appendChild(child.clone());
+                }
+            }
+        }
+    }
+    public String replaceSubQuestionValues(String text, Long subQuestionId, List<DocumentSubQuestionValue> documentSubQuestionValues) {
+        for (DocumentSubQuestionValue documentSubQuestionValue : documentSubQuestionValues) {
+            if (documentSubQuestionValue.getValue() == null) {
+                text = text.replace("[value]", "null");
+            } else if (documentSubQuestionValue.getSubQuestion().getId().equals(subQuestionId)) {
+                text = processDocumentSubQuestionValue(text, subQuestionId, documentSubQuestionValue);
+            }
+        }
+        return text;
+    }
+
+    private String processDocumentSubQuestionValue(String text, Long subQuestionId, DocumentSubQuestionValue documentSubQuestionValue) {
+
+
+        if ("form".equals(documentSubQuestionValue.getSubQuestion().getValueType())) {
+            return processSubQuestionFormValue(text, subQuestionId, documentSubQuestionValue);
+        }
+        if (documentSubQuestionValue.getSubQuestion().getValueType().startsWith("checkbox")) {
+            return processSubQuestionCheckboxValue( subQuestionId, documentSubQuestionValue);
+        }
+        else {
+            String[] value = extractSubQuestionValues(documentSubQuestionValue,subQuestionId);
+            return processDefaultValue(text,value);
+        }
+    }
+
+    private String processSubQuestionCheckboxValue(Long subQuestionId, DocumentSubQuestionValue documentSubQuestionValue) {
+        StringBuilder textBuilder = new StringBuilder();
+        String[] values = extractSubQuestionValues(documentSubQuestionValue, subQuestionId);
+
+        for (int i = 0; i < values.length; i += 2) {
+            String value = values[i]; // value part
+            String text = values[i+ 1]; // text part
+            text = text.replaceFirst("\\[value\\]", value);
+            textBuilder.append(text).append(", ");
+        }
+
+        if (textBuilder.length() > 0) {
+            textBuilder.setLength(textBuilder.length() - 2);
+        }
+
+        return textBuilder.toString();
+    }
+    private String processSubQuestionFormValue(String text, Long subQuestionId, DocumentSubQuestionValue documentSubQuestionValue) {
+        Optional<Form> formOptional = formRepository.findBySubQuestionId(subQuestionId);
+        if (!formOptional.isPresent()) {
+            return text;
+        }
+        Form form = formOptional.get();
+        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
+        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
+
+        if (blocksOfForm.size() > 1 && areBlocksEqual) {
+            return processEqualSubQuestionBlocks(text, blocksOfForm, documentSubQuestionValue);
+        } else {
+            return processNonEqualSubQuestionBlocks(text, documentSubQuestionValue);
+        }
+    }
+
+    private String processEqualSubQuestionBlocks(String text, List<Block> blocksOfForm, DocumentSubQuestionValue documentSubQuestionValue) {
+        StringBuilder textBuilder = new StringBuilder();
+        String[] values = extractSubQuestionValues(documentSubQuestionValue,documentSubQuestionValue.getSubQuestion().getId());
+        for (Block block : blocksOfForm) {
+            String blockText = text;
+            for (int i = 0; i < values.length; i += 3) {
+                int blockId = Integer.parseInt(values[i]);
+                String value = values[i + 2];
+                if (blockId == block.getId()) {
+                    blockText = blockText.replaceFirst("\\[value\\]", value);
+                }
+            }
+            textBuilder.append(blockText).append(", ");
+        }
+        if (textBuilder.length() > 2) {
+            textBuilder.setLength(textBuilder.length() - 2);
+        }
+        return textBuilder.toString();
+    }
+
+    private String processNonEqualSubQuestionBlocks(String text, DocumentSubQuestionValue documentSubQuestionValue) {
+        String blockText = text;
+        String[] values = extractSubQuestionValues(documentSubQuestionValue,documentSubQuestionValue.getSubQuestion().getId());
+
+        for (int i = 0; i < values.length; i += 3) {
+            String value = values[i + 2];
+            blockText = blockText.replaceFirst("\\[value\\]", value);
+        }
+        return blockText;
+    }
+    private String[] extractSubQuestionValues(DocumentSubQuestionValue documentSubQuestionValue , Long subQuestionId) {
+        SubQuestion subQuestion = subQuestionRepository.findById(subQuestionId).orElseThrow();
+        String concatenatedValues = documentSubQuestionValue.getValue();
+        String formPrefix = subQuestion.getValueType().split("/")[0] +"/";
+        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
+        return valueTypeWithoutForm.split("/");
+    }
+
+    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
+        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
+            if (documentQuestionValue.getValue() == null) {
+                text = text.replace("[value]", "");
+            } else if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
+                text = processDocumentQuestionValue(text, questionId, documentQuestionValue);
+            }
+        }
+        text = text.replace("[value]", "");
+        return text;
+
+    }
+
+    private String processDocumentQuestionValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
+
+
+        if ("form".equals(documentQuestionValue.getQuestion().getValueType())) {
+            return processFormValue(text, questionId, documentQuestionValue);
+        }
+        if (documentQuestionValue.getQuestion().getValueType().startsWith("checkbox")) {
+            return processCheckboxValue(text, documentQuestionValue);
+        }
+        else {
+            String [] value = extractValues(documentQuestionValue ,questionId);
+            return processDefaultValue( text, value);
+        }
+    }
+
+//    private String processCheckboxValue(Long questionId, DocumentQuestionValue documentQuestionValue) {
+//        StringBuilder textBuilder = new StringBuilder();
+//        String[] values = extractValues(documentQuestionValue, questionId);
+//
+//        for (int i = 0; i < values.length; i += 2) {
+//            String value = values[i]; // value part
+//            String text = values[i+ 1]; // text part
+//            text = text.replaceFirst("\\[value\\]", value);
+//            textBuilder.append(text).append(", ");
+//        }
+//
+//        if (textBuilder.length() > 0) {
+//            textBuilder.setLength(textBuilder.length() - 2);
+//        }
+//
+//        return textBuilder.toString();
+//    }
+    private String processCheckboxValue(String text, DocumentQuestionValue documentQuestionValue) {
+        String blockText = text;
+        String[] values = extractValues(documentQuestionValue,documentQuestionValue.getQuestion().getId());
+
+        for (String value : values) {
+
+            blockText = blockText.replaceFirst("\\[value\\]", value);
+        }
+        return blockText;
+    }
+
+    private String processDefaultValue(String text, String [] value) {
+        String blockText = text;
+        for (String s : value) {
+            blockText = blockText.replaceFirst("\\[value\\]", s);
+        }
+        return blockText;
+    }
+    private String processFormValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
+        Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
+        if (!formOptional.isPresent()) {
+            return text;
+        }
+        Form form = formOptional.get();
+        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
+        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
+
+        if (blocksOfForm.size() > 1 && areBlocksEqual) {
+            return processEqualBlocks(text, blocksOfForm, documentQuestionValue);
+        } else {
+            return processNonEqualBlocks(text, documentQuestionValue);
+        }
+    }
+
+    private String processEqualBlocks(String text, List<Block> blocksOfForm, DocumentQuestionValue documentQuestionValue) {
+        StringBuilder textBuilder = new StringBuilder();
+        String[] values = extractValues(documentQuestionValue,documentQuestionValue.getQuestion().getId());
+        for (Block block : blocksOfForm) {
+            String blockText = text;
+            for (int i = 0; i < values.length; i += 3) {
+                int blockId = Integer.parseInt(values[i]);
+                String value = values[i + 2];
+                if (blockId == block.getId()) {
+                    blockText = blockText.replaceFirst("\\[value\\]", value);
+                }
+            }
+            textBuilder.append(blockText);
+        }
+        return textBuilder.toString();
+    }
+
+    private String processNonEqualBlocks(String text, DocumentQuestionValue documentQuestionValue) {
+        String blockText = text;
+        String[] values = extractValues(documentQuestionValue,documentQuestionValue.getQuestion().getId());
+
+        for (int i = 0; i < values.length; i += 3) {
+            String value = values[i + 2];
+            blockText = blockText.replaceFirst("\\[value\\]", value);
+        }
+        return blockText;
+    }
+    private String[] extractValues(DocumentQuestionValue documentQuestionValue , Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow();
+        String concatenatedValues = documentQuestionValue.getValue();
+        String formPrefix = question.getValueType().split("/")[0] +"/";
+        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
+        return valueTypeWithoutForm.split("/");
+    }
+
+
+
+    private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
+        return documentQuestionValues.stream().anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
+    }
+
+
+//    private String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
+//        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
+//            if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
+//                if (documentQuestionValue.getValue() != null) {
+//                    text = text.replace("[value]", documentQuestionValue.getValue());
+//                } else {
+//                    text = text.replace("[value]", "null");
+//                }
+//                break;
+//            }
+//
+//        }
+//        return text;
+//    }
+
+    public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
+        try {
+            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0");
+            String wellFormedXml = wrapHtmlContent(sanitizedHtml);
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(wellFormedXml);
+            renderer.layout();
+            renderer.createPDF(outputStream);
+            renderer.finishPDF();
+
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Error generating PDF from XML: ", e);
+            return new byte[0];
+        }
+    }
+
+    private String wrapHtmlContent(String html) {
+        if (!html.toLowerCase().contains("<html")) {
+            html = "<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "    <meta charset=\"UTF-8\">\n" +
+                    "    <title>Generated PDF</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    html +
+                    "</body>\n" +
+                    "</html>";
+        }
+
+        return html;
+    }
+
+
+
+    public List<DocumentQuestionValue> getValuesByDocumentId(Long documentId) {
+        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            return document.getDocumentQuestionValues();
+        } else {
+            throw new EntityNotFoundException("Document not found with ID: " + documentId);
+        }
+    }
+
+    public void deleteDocument(Long documentId) {
+        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            Documents document = documentOptional.get();
+            documentsRepository.delete(document);
+        } else {
+            throw new EntityNotFoundException("Document not found with ID: " + documentId);
+        }
+    }
+
+
+
 //    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
 //        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
 //            if (documentQuestionValue != null && documentQuestionValue.getQuestion().getId().equals(questionId)) {
@@ -203,72 +510,6 @@ public class DocumentsService {
 //        return text;
 //    }
 
-//public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-//    for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-//
-//        if (documentQuestionValue.getValue() == null) {
-//            text = text.replace("[value]", "null");
-//        }
-//
-//        if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
-//                if (documentQuestionValue.getQuestion().getValueType().equals("form")) {
-//                    Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
-//                    if (formOptional.isPresent()) {
-//                        Form form = formOptional.get();
-//
-//                        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
-//                        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
-//
-//                        // If there are multiple blocks and they are equal we're going to duplicate the text for each block and replace the values
-//                        if (blocksOfForm.size() > 1 && areBlocksEqual) {
-//                            StringBuilder textBuilder = new StringBuilder();
-//                            for (Block block : blocksOfForm) {
-//                                String blockText = text;
-//                                String concatenatedValues = documentQuestionValue.getValue();
-//                                String formPrefix = "form/";
-//                                String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
-//                                String[] values = valueTypeWithoutForm.split("/");
-//
-//                                for (int i = 0; i < values.length; i += 3) {
-//                                    int blockId = Integer.parseInt(values[i]);
-//                                    String value = values[i + 2];
-//                                    if (blockId == block.getId()) {
-//                                        blockText = blockText.replaceFirst("\\[value\\]", value);
-//                                    }
-//                                }
-//                                textBuilder.append(blockText).append(", ");
-//                            }
-//
-//                            if (textBuilder.length() > 2) {
-//                                textBuilder.setLength(textBuilder.length() - 2);
-//                            }
-//                            text = textBuilder.toString();
-//
-//                        } else {
-//                            StringBuilder textBuilder = new StringBuilder();
-//                            String blockText = text;
-//                            String values = documentQuestionValue.getValue();
-//                            String formPrefix = "form/";
-//                            String valueTypeWithoutForm = values.substring(formPrefix.length());
-//                            String[] choices = valueTypeWithoutForm.split("/");
-//                            for (int i = 0; i < choices.length; i += 3) {
-//                                String value = choices[i + 2];
-//                                blockText = blockText.replaceFirst("\\[value\\]", value);
-//                            }
-//
-//                            textBuilder.append(blockText);
-//                            text = textBuilder.toString();
-//                        }
-//                    }
-//                } else {
-//                    text = text.replace("[value]", documentQuestionValue.getValue());
-//                }
-//
-//        }
-//
-//    }
-//    return text;
-//}
 //
 //    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
 //        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
@@ -343,86 +584,7 @@ public class DocumentsService {
 //        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
 //        return valueTypeWithoutForm.split("/");
 //    }
-public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-    for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-        if (documentQuestionValue.getValue() == null) {
-            text = text.replace("[value]", "null");
-        } else if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
-            text = processDocumentQuestionValue(text, questionId, documentQuestionValue);
-        }
-    }
-    return text;
-}
 
-    private String processDocumentQuestionValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
-
-
-        if ("form".equals(documentQuestionValue.getQuestion().getValueType())) {
-            return processFormValue(text, questionId, documentQuestionValue);
-        }
-
-        else {
-            String value = extractValues(documentQuestionValue);
-            return text.replaceFirst("[value]", value);
-        }
-    }
-
-    private String processFormValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
-        Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
-        if (!formOptional.isPresent()) {
-            return text;
-        }
-        Form form = formOptional.get();
-        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
-        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
-
-        if (blocksOfForm.size() > 1 && areBlocksEqual) {
-            return processEqualBlocks(text, blocksOfForm, documentQuestionValue);
-        } else {
-            return processNonEqualBlocks(text, documentQuestionValue);
-        }
-    }
-
-    private String processEqualBlocks(String text, List<Block> blocksOfForm, DocumentQuestionValue documentQuestionValue) {
-        StringBuilder textBuilder = new StringBuilder();
-        String[] values = extractValues(documentQuestionValue).split("/");;
-        for (Block block : blocksOfForm) {
-            String blockText = text;
-            for (int i = 0; i < values.length; i += 3) {
-                int blockId = Integer.parseInt(values[i]);
-                String value = values[i + 2];
-                if (blockId == block.getId()) {
-                    blockText = blockText.replaceFirst("\\[value\\]", value);
-                }
-            }
-            textBuilder.append(blockText).append(", ");
-        }
-        if (textBuilder.length() > 2) {
-            textBuilder.setLength(textBuilder.length() - 2);
-        }
-        return textBuilder.toString();
-    }
-
-    private String processNonEqualBlocks(String text, DocumentQuestionValue documentQuestionValue) {
-        String blockText = text;
-        String[] values = extractValues(documentQuestionValue).split("/");;
-
-        for (int i = 0; i < values.length; i += 3) {
-            String value = values[i + 2];
-            blockText = blockText.replaceFirst("\\[value\\]", value);
-        }
-        return blockText;
-    }
-
-    private String extractValues(DocumentQuestionValue documentQuestionValue) {
-        String valueWithType = documentQuestionValue.getValue();
-        Question currentQuestion = documentQuestionValue.getQuestion();
-        String type = currentQuestion.getValueType() + "/";
-        if (currentQuestion.getValueType().startsWith("checkbox")) {
-            type ="checkbox/";
-        }
-        return valueWithType.replaceFirst(type, "");
-    }
 
 //    private Question findQuestionById(List<Question> questions, Integer questionId) {
 //        for (Question question : questions) {
@@ -518,83 +680,6 @@ public String replaceValues(String text, Long questionId, List<DocumentQuestionV
 //        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
 //        return valueTypeWithoutForm.split("/");
 //    }
-
-    private boolean isExist(Long documentId, List<DocumentQuestionValue> documentQuestionValues) {
-        return documentQuestionValues.stream().anyMatch(dqv -> dqv.getDocument().getId().equals(documentId));
-    }
-
-
-//    private String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-//        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-//            if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
-//                if (documentQuestionValue.getValue() != null) {
-//                    text = text.replace("[value]", documentQuestionValue.getValue());
-//                } else {
-//                    text = text.replace("[value]", "null");
-//                }
-//                break;
-//            }
-//
-//        }
-//        return text;
-//    }
-
-    public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
-        try {
-            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0");
-            String wellFormedXml = wrapHtmlContent(sanitizedHtml);
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(wellFormedXml);
-            renderer.layout();
-            renderer.createPDF(outputStream);
-            renderer.finishPDF();
-
-            return outputStream.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Error generating PDF from XML: ", e);
-            return new byte[0];
-        }
-    }
-
-    private String wrapHtmlContent(String html) {
-        if (!html.toLowerCase().contains("<html")) {
-            html = "<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "    <meta charset=\"UTF-8\">\n" +
-                    "    <title>Generated PDF</title>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    html +
-                    "</body>\n" +
-                    "</html>";
-        }
-
-        return html;
-    }
-
-
-
-    public List<DocumentQuestionValue> getValuesByDocumentId(Long documentId) {
-        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
-        if (documentOptional.isPresent()) {
-            Documents document = documentOptional.get();
-            return document.getDocumentQuestionValues();
-        } else {
-            throw new EntityNotFoundException("Document not found with ID: " + documentId);
-        }
-    }
-
-    public void deleteDocument(Long documentId) {
-        Optional<Documents> documentOptional = documentsRepository.findById(documentId);
-        if (documentOptional.isPresent()) {
-            Documents document = documentOptional.get();
-            documentsRepository.delete(document);
-        } else {
-            throw new EntityNotFoundException("Document not found with ID: " + documentId);
-        }
-    }
 
 }
 

@@ -21,8 +21,5 @@ public class UserInputs {
     private List<String> checkboxValue;
     private List<DayRequest> days;
     private List<UserInputsSubQuestion> subquestionsValues;
-
-
-
 }
 

@@ -6,6 +6,15 @@ public class SubQuestionDTO {
     private String descriptionDetails;
     private String valueType;
     private String textArea;
+    private FormDTO form;
+
+    public FormDTO getForm() {
+        return form;
+    }
+
+    public void setForm(FormDTO form) {
+        this.form = form;
+    }
 
     public String getQuestionText() {
         return questionText;

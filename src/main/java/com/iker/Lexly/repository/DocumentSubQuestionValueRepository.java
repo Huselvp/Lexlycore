@@ -13,4 +13,5 @@ import java.util.List;
 @Repository
 public interface DocumentSubQuestionValueRepository extends JpaRepository<DocumentSubQuestionValue,Long> {
 
+    List<DocumentSubQuestionValue> findByDocumentId(Long documentId);
 }
