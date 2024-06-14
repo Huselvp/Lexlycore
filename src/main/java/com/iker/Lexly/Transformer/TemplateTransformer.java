@@ -1,23 +1,14 @@
 package com.iker.Lexly.Transformer;
 
-import com.iker.Lexly.DTO.CategoryDTO;
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
-import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Template;
-import com.iker.Lexly.Entity.Category; // Import the Category entity
 
-import com.iker.Lexly.Transformer.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
 
-    @Autowired
-    private CategoryTransformer categoryTransformer;
 
     @Autowired
     private DocumentQuestionValueTransformer documentQuestionValueTransformer;
@@ -32,7 +23,8 @@ public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
             template.setCost(dto.getCost());
             template.setTemplateName(dto.getTemplateName());
             template.setTemplateDescription(dto.getTemplateDescription());
-            template.setCategory(dto.getCategory());
+            template.setSubcategory(dto.getSubcategory());
+            template.setContent(dto.getContent());
             return template;
         }
     }
@@ -47,7 +39,8 @@ public class TemplateTransformer extends Transformer<Template, TemplateDTO> {
             dto.setCost(entity.getCost());
             dto.setTemplateName(entity.getTemplateName());
             dto.setTemplateDescription(entity.getTemplateDescription());
-            dto.setCategory(entity.getCategory());
+            dto.setSubcategory(entity.getSubcategory());
+            dto.setContent(entity.getContent());
             return dto;
         }
     }

@@ -1,7 +1,10 @@
 package com.iker.Lexly.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iker.Lexly.Entity.Form.Form;
+import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "question")
 public class Question {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +25,8 @@ public class Question {
     @JsonProperty("Description")
     private String Description;
 
-    @Column(name="description_details")
+
+    @Column(name="description_details",length = 10000)
     @JsonProperty("description_details")
     private String DescriptionDetails;
 
@@ -33,13 +38,30 @@ public class Question {
     @JsonProperty("text_area")
     private String Texte;
 
+    private int position;
+
+    @ElementCollection
+    @CollectionTable(name = "list", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "option")
+    private List<String> list = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<SubQuestion> subQuestions = new ArrayList<>();
+
+
+
+//    @Column(name = "subquestion_order")
+//    @Convert(converter = StringListConverter.class)
+//    private List<Long> subquestionOrder;
+
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<DocumentQuestionValue> documentQuestionValues = new ArrayList<>();
 
     @ManyToOne
-    @JsonManagedReference
-    @JsonIgnore
+    @JsonBackReference
     private Template template;
 
 
@@ -106,4 +128,26 @@ public class Question {
     public void setTemplate(Template template) {
         this.template = template;
     }
+
+//    public List<Long> getSubquestionOrder() {
+//        return subquestionOrder;
+//    }
+
+//    public void setSubquestionOrder(List<Long> subquestionOrder) {
+//        this.subquestionOrder = subquestionOrder;
+//    }
+    public int getPosition() {return position;}
+
+    public void setPosition(int position) {this.position = position;}
+    public List<SubQuestion> getSubQuestions() {
+        return subQuestions;
+    }
+
+    public void setSubQuestions(List<SubQuestion> subQuestions) {
+        this.subQuestions = subQuestions;
+    }
+
+    public List<String> getList() {return list;}
+
+    public void setList(List<String> list) {this.list = list;}
 }

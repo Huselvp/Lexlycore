@@ -1,128 +1,105 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
-import com.iker.Lexly.Transformer.CategoryTransformer;
+import com.iker.Lexly.Entity.Form.Block;
+import com.iker.Lexly.Entity.Form.Form;
+import com.iker.Lexly.Entity.Form.Label;
+import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
 import com.iker.Lexly.repository.TemplateRepository;
 import com.iker.Lexly.repository.UserRepository;
+import com.iker.Lexly.repository.form.FormRepository;
+import com.iker.Lexly.request.AddLabelOption;
 import com.iker.Lexly.request.ChoiceUpdate;
-import com.iker.Lexly.request.UpdateEmailPassword;
 import com.iker.Lexly.responses.ApiResponse;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.Transformer.UserTransformer;
 
 import com.iker.Lexly.service.*;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.iker.Lexly.service.form.BlockService;
+import com.iker.Lexly.service.form.FormService;
+import com.iker.Lexly.service.form.LabelService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasRole;
-
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 
 public class adminController {
-    @PersistenceContext
-    private EntityManager entityManager;
     private final UserService userService;
+    private final SubQuestionService subQuestionService;
     private final UserTransformer userTransformer;
-    private final QuestionTransformer questionTransformer;
-    private final CategoryService categoryService;
-    private final QuestionRepository questionRepository;
+    private final SubcategoryService subcategoryService;
+
+    private final UserRepository userRepository;
     private  final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final QuestionTransformer questionTransformer;
+    private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
+    private final SubCategoryTransformer subcategoryTransformer;
+
+
     @Autowired
     private final TemplateService templateService;
     @Autowired
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
-    private final CategoryTransformer categoryTransformer;
-    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     @Autowired
-    public adminController( PasswordEncoder passwordEncoder,UserRepository userRepository,JwtService jwtService,TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, CategoryTransformer categoryTransformer, UserService userService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, CategoryService categoryService, QuestionService questionService, TemplateTransformer templateTransformer) {
+    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository) {
+        this.subQuestionService = subQuestionService;
         this.templateService = templateService;
+        this.jwtService=jwtService;
+        this.subcategoryTransformer=subCategoryTransformer;
+        this.subcategoryService=subcategoryService;
+        this.passwordEncoder=passwordEncoder;
+        this.userRepository=userRepository;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
         this.userTransformer = userTransformer;
-        this.categoryService = categoryService;
-        this.jwtService=jwtService;
-        this.passwordEncoder=passwordEncoder;
-        this.userRepository=userRepository;
         this.questionService = questionService;
-        this.categoryTransformer = categoryTransformer;
         this.templateTransformer = templateTransformer;
         this.questionTransformer = questionTransformer1;
         this.userService = userService;
+
+
     }
-    @GetMapping("getMe")
-    public ResponseEntity<User> getUserByToken(@RequestParam String token) {
-        if (jwtService.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        String username = jwtService.extractUsername(token);
-        if (username != null) {
-            Optional<User> optionalUser = userRepository.findByUsername(username);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                return ResponseEntity.ok(user);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
+    @PostMapping("/addSubCategory")
+    public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
+        String result = subcategoryService.addSubCategory(subcategoryDTO);
+        return ResponseEntity.ok(result);
+    }
+    @PutMapping("/updateSubcategory/{id}")
+    public ResponseEntity<ApiResponse> updateSubCategory(@PathVariable Long id, @RequestBody SubcategoryDTO subcategoryDTO) {
+        ApiResponse response = subcategoryService.updateSubCategory(id, subcategoryDTO);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
-    @PatchMapping("updateEMailOrPassword/{token}")
-    public ResponseEntity<String> modifyEmailOrPassword(
-            @PathVariable String token,
-            @RequestBody UpdateEmailPassword updateRequest) {
-        if (jwtService.isTokenExpired(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-        }
-        String username = jwtService.extractUsername(token);
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
-                if (updateRequest.getEmail() != null) {
-                    user.setEmail(updateRequest.getEmail());
-                }
-                if (updateRequest.getNewPassword() != null) {
-                    user.setPassword(passwordEncoder.encode(updateRequest.getNewPassword()));
-                }
-                userRepository.save(user);
-                return ResponseEntity.ok("User information updated successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid current password.");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        }
+    @DeleteMapping("/DeleteSubcategory/{id}")
+    public ResponseEntity<String> deleteSubCategory(@PathVariable Long id) {
+        String result = subcategoryService.deleteSubCategory(id);
+        return ResponseEntity.ok(result);
+    }
+    @PostMapping("/assignSubcategory/{templateId}/{subcategoryId}")
+    public ApiResponse assignSubcategoryToTemplate(@PathVariable Long templateId, @PathVariable Long subcategoryId) {
+        return templateService.assignSubcategoryToTemplate(templateId, subcategoryId);
     }
     @GetMapping("/all_users")
     public List<UserDTO> getAllUsers(HttpServletRequest request) {
@@ -132,47 +109,11 @@ public class adminController {
                 .collect(Collectors.toList());
         return userDTOs;
     }
-    @DeleteMapping("/delete_user/{id}") //valide
+    @DeleteMapping("/delete_user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("question with ID " + id + " has been deleted successfully.");
     }
-    @PutMapping("update_user/{userId}") //valide
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) throws ChangeSetPersister.NotFoundException {
-        User updatedUserResponse = userService.updateUser(userId, updatedUser);
-        return new ResponseEntity<>(updatedUserResponse, HttpStatus.OK);
-    }
-
-     //@PreAuthorize("hasRole('ADMIN') ")
-    @GetMapping("/all_templates") // valide
-    public List<TemplateDTO> getAllTemplates() {
-        List<Template> templates = templateService.getAllTemplates();
-        List<TemplateDTO> templateDTOs = templates.stream()
-                .map(templateTransformer::toDTO)
-                .collect(Collectors.toList());
-        return templateDTOs;
-    }
-
-    @PostMapping(value = "/create_template")//valide
-    public ResponseEntity<Template> createTemplate(@RequestBody Template template) {
-        Template createdTemplate = templateService.createTemplate(template);
-        return ResponseEntity.ok(createdTemplate);
-    }
-
-    @PutMapping("/update_template/{templateId}")//valid
-    public ResponseEntity<TemplateDTO> updateTemplate(
-            @PathVariable Long templateId,
-            @RequestBody TemplateDTO updateRequest
-    ) {
-        Template updatedTemplate = templateService.updateTemplate(templateId, updateRequest);
-        if (updatedTemplate != null) {
-            TemplateDTO updatedTemplateDTO = templateTransformer.toDTO(updatedTemplate);
-            return new ResponseEntity<>(updatedTemplateDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @PutMapping("/update_category/{templateId}/{newCategoryId}")
     public ResponseEntity<ApiResponse> updateCategoryForTemplate(
             @PathVariable Long templateId,
@@ -185,21 +126,26 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    @PostMapping(value = "/create_template/{token}", produces = "application/json")
+    public ResponseEntity<ApiResponse> createTemplate(@PathVariable String token, @RequestBody Template template) {
+        ApiResponse apiResponse = templateService.createTemplate(token, template);
+        return ResponseEntity.ok(apiResponse);
+    }
 
-    @PutMapping("/update_category/{categoryId}")//valid
-    public ResponseEntity<CategoryDTO> updateCategory(
-            @PathVariable Long categoryId,
-            @RequestBody CategoryDTO updateRequest
+
+    @PutMapping("/update_template/{templateId}")
+    public ResponseEntity<TemplateDTO> updateTemplate(
+            @PathVariable Long templateId,
+            @RequestBody TemplateDTO updateRequest
     ) {
-        Category updatedCategory = categoryService.updateCategory(categoryId, updateRequest);
-        if (updatedCategory != null) {
-            CategoryDTO updatedCategoryDTO = categoryTransformer.toDTO(updatedCategory);
-            return new ResponseEntity<>(updatedCategoryDTO, HttpStatus.OK);
+        Template updatedTemplate = templateService.updateTemplate(templateId, updateRequest);
+        if (updatedTemplate != null) {
+            TemplateDTO updatedTemplateDTO = templateTransformer.toDTO(updatedTemplate);
+            return new ResponseEntity<>(updatedTemplateDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @DeleteMapping("delete_template/{id}")
     public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
         Template template = templateService.getTemplateById(id);
@@ -216,8 +162,7 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/all_questions") // valide
+    @GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
         List<QuestionDTO> questionDTOs = questions.stream()
@@ -226,7 +171,9 @@ public class adminController {
         return questionDTOs;
     }
 
-    @PostMapping("/create_question/{templateId}")
+
+
+    @PostMapping(value = "/create_question/{templateId}", consumes = "application/json;charset=UTF-8")
     public ResponseEntity<Question> createQuestion(
             @PathVariable Long templateId,
             @RequestBody Question request) {
@@ -242,6 +189,13 @@ public class adminController {
         return questionDTOs;
     }
 
+//    @GetMapping("/find_questions_by_questionsOrder/{templateId}")
+//    public List<Question> getAllQuestionsByQuestionsOrder(@PathVariable Long templateId) {
+//        return questionService.getAllQuestionsByTemplateIdOrderByOrder(templateId);
+//
+//    }
+
+
     @PutMapping("/update_question/{id}") //valide
     public ResponseEntity<QuestionDTO> updateQuestion(
             @PathVariable Long id,
@@ -255,7 +209,6 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
     @GetMapping("question/{questionId}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
@@ -266,27 +219,53 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-    @GetMapping("/template/{templateId}")
-    public ResponseEntity<TemplateDTO> getTemplateById(@PathVariable Long templateId) {
-        TemplateDTO templateDTO = templateService.getTemplateDTOById(templateId);
-
-        if (templateDTO != null) {
-            return new ResponseEntity<>(templateDTO, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping("question/reorder")
+    public ResponseEntity<String> reoderQuestion (@RequestBody List<Long> questionIds) {
+        try {
+            questionService.reorderQuestions(questionIds);
+            return new ResponseEntity<>("Questions reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering questions.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+//    @PostMapping("/{questionId}/duplicate")
+//    public ResponseEntity<Question> duplicateOptions(@PathVariable Long questionId) {
+//        Question duplicatedQuestion = questionService.duplicateList(questionId);
+//        return new ResponseEntity<>(duplicatedQuestion, HttpStatus.OK);
+//    }
+
+    @PostMapping("/{questionId}/options")
+    public ResponseEntity<Question> addOptions(@PathVariable Long questionId, @RequestBody List<String> options) {
+        Question updatedQuestion = questionService.addOptions(questionId, options);
+        return ResponseEntity.ok(updatedQuestion);
     }
 
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
-        Category category = categoryService.getCategoryById(categoryId);
-        if (category != null) {
-            return new ResponseEntity<>(category, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @DeleteMapping("/{questionId}/options")
+    public ResponseEntity<Question> deleteOptions(@PathVariable Long questionId, @RequestBody List<String> options) {
+        Question updatedQuestion = questionService.deleteOptions(questionId, options);
+        return ResponseEntity.ok(updatedQuestion);
     }
+    @PutMapping("/{questionId}/options")
+    public ResponseEntity<Question> updateOption(@PathVariable Long questionId, @RequestParam String oldOption, @RequestParam String newOption) {
+        Question updatedQuestion = questionService.updateOption(questionId, oldOption, newOption);
+        return ResponseEntity.ok(updatedQuestion);
+    }
+
+    @GetMapping("/{questionId}/options")
+    public ResponseEntity<List<String>> getOptions(@PathVariable Long questionId) {
+        List<String> options = questionService.getOptions(questionId);
+        return ResponseEntity.ok(options);
+    }
+
+//    @PutMapping("/update_question_order/{templateId}")
+//    public ResponseEntity<Void> updateQuestionOrder(
+//            @PathVariable Long templateId,
+//            @RequestBody List<Long> questionOrder
+//    ) {
+//        questionService.updateQuestionOrder(templateId, questionOrder);
+//        return ResponseEntity.ok().build();
+//    }
 
 
 
@@ -302,35 +281,63 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @PostMapping("/add_category") // valide
-    public ResponseEntity<Category> addCategory(@Valid @RequestBody Category category) {
-        Category newCategory = categoryService.addCategory(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
+    @GetMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
+        List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
+        return ResponseEntity.ok(subQuestions);
     }
 
-    @PostMapping("/assignCategory/{templateId}/{categoryId}")//valide
-    public ApiResponse assignCategoryToTemplate(@PathVariable Long templateId, @PathVariable Long categoryId) {
-        return templateService.assignCategoryToTemplate(templateId, categoryId);
+    @PostMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<SubQuestion> createSubQuestion(@PathVariable Long questionId, @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion createdSubQuestion = subQuestionService.createSubQuestion(questionId, subQuestionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
+    }
+    @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
+        SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+        return ResponseEntity.ok(subQuestion);
     }
 
-    @DeleteMapping("/delete_category/{categoryId}") //valide
-    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-        String deletionMessage = categoryService.deleteCategory(categoryId);
+    @PutMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> updateSubQuestion(@PathVariable Long questionId, @PathVariable Long subQuestionId, @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion updatedSubQuestion = subQuestionService.updateSubQuestion(questionId, subQuestionId, subQuestionDTO);
+        return ResponseEntity.ok(updatedSubQuestion);
+    }
 
-        if (deletionMessage != null) {
-            return ResponseEntity.ok(deletionMessage);
-        } else {
-            return ResponseEntity.notFound().build();
+    @DeleteMapping("/questions/subquestions/{questionId}/{subQuestionId}")
+    public ResponseEntity<String> deleteSubQuestion(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
+        subQuestionService.deleteSubQuestion(subQuestionId);
+        return ResponseEntity.ok("Subquestion with ID " + subQuestionId + " has been successfully deleted.");
+    }
+    @PutMapping("/questions/subquestions/reorder/{questionId}")
+    public ResponseEntity<String> reorderSubQuestion(@PathVariable Long questionId, @RequestBody List<Long> subQuestionIds) {
+        try{
+            subQuestionService.reorderSubQuestions(questionId,subQuestionIds);
+            return new ResponseEntity<>("SubQuestions reordered successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error reordering sbquestions.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("all_categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
 
-        return ResponseEntity.ok(categories);
-    }
+
+
+//    @PutMapping("/questions/subquestions/{questionId}/order")
+//    public ResponseEntity<Void> updateSubQuestionOrder(
+//            @PathVariable Long questionId,
+//            @RequestBody List<Long> subQuestionOrder) {
+//        subQuestionService.updateSubQuestionOrder(questionId, subQuestionOrder);
+//        return ResponseEntity.ok().build();
+//    }
+
+
+//    @GetMapping("/questions/subquestions/{questionId}/order")
+//    public List<SubQuestion> getAll(@PathVariable Long questionId) {
+//        return subQuestionService.getAllSubQuestionsBySubquestionOrder(questionId);
+//
+//    }
+
+
     @PostMapping("add-choice-question/{questionId}")
     public ResponseEntity<Void> addChoiceToQuestion(
             @PathVariable Long questionId,
@@ -391,7 +398,6 @@ public class adminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
     @DeleteMapping("delete-choice/{questionId}/{choiceId}")
     public ResponseEntity<Void> deleteChoiceFromQuestion(
             @PathVariable Long questionId,
@@ -405,13 +411,21 @@ public class adminController {
             String valueTypeWithoutCheckbox = question.getValueType().substring(checkboxPrefix.length());
             String[] choices = valueTypeWithoutCheckbox.split("/");
             boolean choiceFound = false;
+
             for (int i = 0; i < choices.length; i += 3) {
                 int currentChoiceId = Integer.parseInt(choices[i]);
                 if (currentChoiceId == choiceId) {
-                    String[] updatedChoices = new String[choices.length - 3];
-                    System.arraycopy(choices, 0, updatedChoices, 0, i);
-                    System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
-                    String updatedValueType = checkboxPrefix + String.join("/", updatedChoices);
+                    String[] updatedChoices;
+                    if (choices.length == 3) {
+                        updatedChoices = new String[0];
+                    } else {
+                        updatedChoices = new String[choices.length - 3];
+                        System.arraycopy(choices, 0, updatedChoices, 0, i);
+                        System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
+                    }
+                    String updatedValueType = updatedChoices.length == 0 ?
+                            checkboxPrefix.substring(0, checkboxPrefix.length() - 1) :
+                            checkboxPrefix + String.join("/", updatedChoices);
                     question.setValueType(updatedValueType);
                     questionRepository.save(question);
                     choiceFound = true;
@@ -423,12 +437,9 @@ public class adminController {
             }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
 
 }
 

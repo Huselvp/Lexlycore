@@ -1,5 +1,6 @@
 package com.iker.Lexly.DTO;
 
+
 public class DocumentQuestionValueDTO {
     private Long documentQuestionValueId;
     private Long documentId;
@@ -35,4 +36,6 @@ public class DocumentQuestionValueDTO {
     public void setValue(String value) {
         this.value = value;
     }
+
+
 }

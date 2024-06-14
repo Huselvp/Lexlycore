@@ -16,16 +16,25 @@ public class QuestionDTO {
     private String texte;
     private String description;
     private String descriptionDetails;
+    private List<SubQuestionDTO> subQuestions;
+    private String informations;
+    private FormDTO form;
 
 
-    public QuestionDTO( Long id, String questionText, String valueType, String texte, String description, String descriptionDetails) {
+
+    public QuestionDTO( Long id, String questionText, String valueType, String texte, String description, String descriptionDetails,String informations) {
         this.id = id;
         this.questionText = questionText;
         this.valueType = valueType;
         this.texte = texte;
         this.description = description;
         this.descriptionDetails = descriptionDetails;
+        this.informations=informations;
 
+
+    }
+
+    public QuestionDTO() {
 
     }
 }

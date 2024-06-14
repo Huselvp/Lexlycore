@@ -13,6 +13,7 @@ public class DocumentsDTO {
     private Long id;
     private LocalDateTime createdAt;
     private boolean isDraft;
+    private boolean payment_status;
     public Long getId() {
         return id;
     }

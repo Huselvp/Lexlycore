@@ -1,13 +1,9 @@
 package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.iker.Lexly.Entity.enums.Role;
-import com.iker.Lexly.Paiement.Order;
-import com.iker.Lexly.Token.Token;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +27,7 @@ public class User implements UserDetails {
     private Long userId;
     @Column(length = 50)
     private String firstname;
-    @Column(length = 100)
+    @Column(length = 100,name = "username", unique = true)
     private String username;
     @Column(length = 50)
     private String lastname;
@@ -55,30 +51,16 @@ public class User implements UserDetails {
     @Column(length = 50)
     private boolean verificationemail;
     private String picture;
-    private String sessionId;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @PrePersist
-    @PreUpdate
-    private void updateUsername() {
-        this.username = firstname + " " + lastname;
-    }
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
-    @OneToMany(mappedBy = "user")
-    private List<Template> templates;
-   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
-
-
-
-    public User(String email, String firstName, String lastName, String password, String phoneNumber, String picture, Role role) {
+    public User(String username,String email, String firstName, String lastName, String password, String phonenumber, String picture, Role role) {
         this.email = email;
+        this.username=username;
         this.firstname = firstName;
         this.lastname = lastName;
         this.password = password;
-        this.phonenumber=phoneNumber;
+        this.phonenumber=phonenumber;
         this.picture = picture;
         this.role = role;
     }
@@ -122,14 +104,6 @@ public class User implements UserDetails {
     public void setRole(Role role) {
         this.role = role;
     }
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
 
 }
 

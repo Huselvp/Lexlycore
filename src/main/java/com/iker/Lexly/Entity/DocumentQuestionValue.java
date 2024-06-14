@@ -1,5 +1,5 @@
 package com.iker.Lexly.Entity;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -12,12 +12,27 @@ public class DocumentQuestionValue {
     @JoinColumn(name = "question_id")
     private Question question;
 
+
     @ManyToOne
     @JoinColumn(name = "document_id")
+    @JsonIgnore
     private Documents document;
 
-
+    @Column(columnDefinition = "TEXT")
     private String value;
+
+
+    public DocumentQuestionValue(Question question, Documents document, String value) {
+        this.question = question;
+        this.document = document;
+        this.value = value;
+
+    }
+
+    public DocumentQuestionValue() {
+
+    }
+
     public Long getDocumentQuestionValueId() {
         return documentQuestionValueId;
     }
@@ -45,6 +60,7 @@ public class DocumentQuestionValue {
     public String getValue() {
         return value;
     }
+
 
     public void setValue(String value) {
         this.value = value;

@@ -1,35 +1,31 @@
 package com.iker.Lexly.DTO;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.iker.Lexly.Entity.Category;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.iker.Lexly.Entity.Subcategory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
-@Builder
 public class TemplateDTO {
     private Long id;
     private String templateName;
     private String templateDescription;
     private float cost;
-    private Category category;
+    private String content;
+    private Subcategory subcategory;
 
 
-    @Builder
-    public TemplateDTO(Long id, String templateName, String templateDescription, float cost, Category category) {
+    public TemplateDTO(Long id, String content,String templateName, String templateDescription, float cost, Subcategory subcategory) {
         this.id = id;
+        this.subcategory=subcategory;
         this.templateName = templateName;
+        this.content=content;
         this.templateDescription = templateDescription;
         this.cost = cost;
-        this.category = category;
+    }
 
+    public void getSubcategory(Subcategory subcategory) {
+        this.subcategory=subcategory;
     }
 }
 

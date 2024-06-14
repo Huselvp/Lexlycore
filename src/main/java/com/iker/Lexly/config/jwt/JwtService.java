@@ -3,13 +3,8 @@ package com.iker.Lexly.config.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +13,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private  static final String SECRET_KEY= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
-    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+    private static final long EXPIRATION_TIME= 24*60*60*1000;
     public String extractUsername(String token) {
         return extractClaim(token,Claims::getSubject);
     }
@@ -30,7 +25,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
     public String generateToken(Map<String,Object> extraClaims, UserDetails userDetails){
-        Date expirationDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+        Date expirationDate= new Date(System.currentTimeMillis()+EXPIRATION_TIME);
         return Jwts
                 .builder()
                 .setClaims(extraClaims).
@@ -58,5 +53,9 @@ public class JwtService {
                 .getBody();
     }
 
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
 }
 

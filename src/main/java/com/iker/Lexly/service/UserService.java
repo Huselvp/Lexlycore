@@ -1,9 +1,11 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.Entity.Category;
 import com.iker.Lexly.Entity.User;
-import com.iker.Lexly.Exceptions.UserNotFoundException;
+
+import com.iker.Lexly.Exceptions.UnauthorizedException;
+import com.iker.Lexly.Exceptions.UsernameAlreadyExistsException;
 import com.iker.Lexly.ResetSecurity.ResetTokenService;
+
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +31,7 @@ public class UserService {
     private final EmailService emailService;
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final JwtService jwtService;
 
     public User findByEmail(String email) {
@@ -40,42 +43,26 @@ public class UserService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
     }
-    public String loginUser(String email, String password) throws Exception {
-        User user = findByEmail(email);
-        if (!userServicepasswordEncoder().matches(password, user.getPassword())) {
-            throw new Exception("Invalid credentials");
-        }
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getEmail(), user.getPassword(), user.getAuthorities());
-        String token = jwtService.generateToken(userDetails);
-        return token;
-    }
+
     @Bean
     public PasswordEncoder userServicepasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    public void resetPassword(User user, String newPassword) {
-        user.setPassword(newPassword);
-    }
-    public void markEmailAsVerified(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        optionalUser.ifPresent(user -> {
-            user.setEmailVerified(true);
-            userRepository.save(user);});
-    }
     public boolean emailExists(String email) {
         return userRepository.existsUserByEmail(email);
     }
+
     public void initiatePasswordReset(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             resetTokenService.deleteTokensByUser(user);
-            String resetToken= resetTokenService.generateAndSavePasswordResetToken(user);
+            String resetToken = resetTokenService.generateAndSavePasswordResetToken(user);
             emailService.sendResetPasswordEmail(user, resetToken);
         }
     }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -83,26 +70,35 @@ public class UserService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(Math.toIntExact(id))
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +id));
-           userRepository.delete(user);
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+        userRepository.delete(user);
 
     }
-    public User updateUser(Long userId, User updatedUser) throws ChangeSetPersister.NotFoundException {
-
-        User existingUser = userRepository.findById(Math.toIntExact(userId))
+    public User updateUser(String token, User updatedUser) throws ChangeSetPersister.NotFoundException {
+        String username = jwtService.extractUsername(token);
+        if (jwtService.isTokenExpired(token)) {
+            throw new UnauthorizedException("Token expired");
+        }
+        if (!username.equals(updatedUser.getUsername()) && userRepository.existsByUsername(updatedUser.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username already exists");
+        }
+        User existingUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
-
         existingUser.setFirstname(updatedUser.getFirstname());
         existingUser.setLastname(updatedUser.getLastname());
         existingUser.setPhonenumber(updatedUser.getPhonenumber());
         existingUser.setDescription(updatedUser.getDescription());
         existingUser.setAdress(updatedUser.getAdress());
-        existingUser.setEmail(updatedUser.getEmail());
         existingUser.setCountry(updatedUser.getCountry());
         existingUser.setZipcode(updatedUser.getZipcode());
         existingUser.setTown(updatedUser.getTown());
+        if (!existingUser.getUsername().equals(updatedUser.getUsername())) {
+            existingUser.setUsername(updatedUser.getUsername());
+        }
+
         return userRepository.save(existingUser);
     }
+
 }
 
 

@@ -18,15 +18,12 @@ import lombok.NoArgsConstructor;
 public class Advisor extends User{
     private int NUmberofexperience;
     private String specialite;
-
     public void setNumberOfExperience(int numberOfExperience) {
         this.NUmberofexperience = numberOfExperience;
     }
-
     public void setSpecialite(String specialite) {
         this.specialite = specialite;
     }
-
 }
 
 

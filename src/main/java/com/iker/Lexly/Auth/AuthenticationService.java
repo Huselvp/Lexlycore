@@ -2,11 +2,8 @@ package com.iker.Lexly.Auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.iker.Lexly.Entity.User;
-import com.iker.Lexly.Token.Token;
-import com.iker.Lexly.Token.TokenRepository;
-import com.iker.Lexly.Token.TokenType;
+
 import com.iker.Lexly.config.jwt.JwtService;
-import org.springframework.session.FindByIndexNameSessionRepository;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,13 +30,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
-import org.springframework.session.Session;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository repository;
-    private final TokenRepository tokenRepository;
     private  final  UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -93,14 +89,6 @@ public class AuthenticationService {
         }
     }
 
-    private void saveUserToken(User user, String sessionId) {
-
-        Session session = springSessionRepository.findById(sessionId);
-        if (session != null) {
-            session.setAttribute("email", user.getEmail());
-            springSessionRepository.save(session);
-        }
-    }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletResponse response) {
         try {
@@ -117,7 +105,6 @@ public class AuthenticationService {
             Cookie cookie = new Cookie(cookieName, jwtToken);
             cookie.setMaxAge(1800);
             cookie.setPath("/");
-          //  cookie.setSecure(true);
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
             return AuthenticationResponse.builder()
@@ -126,43 +113,6 @@ public class AuthenticationService {
         } catch (AuthenticationException e) {
             e.printStackTrace();
             throw e;
-        }
-    }
-    private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(Math.toIntExact(user.getUserId()));
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
-        final String userEmail;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        refreshToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(refreshToken);
-        if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail)
-                    .orElseThrow();
-            if (jwtService.isTokenValid(refreshToken, user)) {
-                var accessToken = jwtService.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
-                var authResponse = AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
-            }
         }
     }
 }

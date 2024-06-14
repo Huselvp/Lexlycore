@@ -11,4 +11,5 @@ import java.util.List;
 public interface DocumentsRepository extends JpaRepository<Documents,Long> {
     List<Documents> findByUser(User user);
     List<Documents> findByUserId(Long userId);
+
 }

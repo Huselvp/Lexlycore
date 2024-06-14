@@ -1,46 +1,52 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
+import com.iker.Lexly.DTO.SubcategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
-import com.iker.Lexly.Entity.Category;
-import com.iker.Lexly.Entity.DocumentQuestionValue;
 import com.iker.Lexly.Entity.Documents;
+import com.iker.Lexly.Entity.Subcategory;
 import com.iker.Lexly.Entity.Template;
-import com.iker.Lexly.Transformer.CategoryTransformer;
+import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
+import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.responses.ApiResponse;
+import com.iker.Lexly.service.form.FormService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TemplateService {
     private final TemplateRepository templateRepository;
+    private final SubcategoryService subcategoryService;
+    private final SubCategoryTransformer subCategoryTransformer;
+    private final SubcategoryRepository subcategoryRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
-    private final CategoryRepository categoryRepository;
-
-    private final CategoryService categoryService;
+    private final UserRepository userRepository;
     private  final DocumentsRepository documentsRepository;
     private final QuestionRepository questionRepository;
+    private final JwtService jwtService;
     private final TemplateTransformer templateTransformer;
-    private final CategoryTransformer categoryTransformer;
-
+    private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
     @Autowired
-    public TemplateService(DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,CategoryTransformer categoryTransformer,TemplateTransformer templateTransformer,CategoryService categoryService,QuestionRepository questionRepository,CategoryRepository categoryRepository, TemplateRepository templateRepository) {
+    public TemplateService(SubcategoryRepository subcategoryRepository,SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
-        this.categoryRepository = categoryRepository;
         this.documentsRepository=documentsRepository;
-        this.categoryService=categoryService;
-        this.categoryTransformer=categoryTransformer;
+        this.jwtService=jwtService;
+        this.subcategoryRepository=subcategoryRepository;
+        this.subCategoryTransformer=subCategoryTransformer;
+        this.subcategoryService=subcategoryService;
+        this.userRepository=userRepository;
         this.questionRepository=questionRepository;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
     }
+
 
     public List<Template> getAllTemplates() {
         return templateRepository.findAll();
@@ -50,55 +56,49 @@ public class TemplateService {
         return templateRepository.findById(templateId)
                 .orElse(null);
     }
-    public TemplateDTO getTemplateDTOById(Long templateId) {
-        Template template = templateRepository.findById(templateId).orElse(null);
-        if (template != null) {
-            return templateTransformer.toDTO(template);
-        }
-        return null;
-    }
+    public ApiResponse createTemplate(String token, Template template) {
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user != null) {
+            Template savedTemplate = templateRepository.save(template);
+            if (savedTemplate != null) {
+                return new ApiResponse("Template created successfully.", savedTemplate);
 
-    public Template createTemplate(Template template) {
-        return templateRepository.save(template);
-    }
-    public List<Template> getAllTemplatesByUserId(Long userId) {
-        return templateRepository.findByUserId(userId);
-    }
-    public ApiResponse updateCategoryForTemplate(Long templateId, Long newCategoryId) {
-        Template template = templateRepository.findById(templateId).orElse(null);
-        Category newCategory = categoryService.getCategoryById(newCategoryId);
-
-        if (template != null && newCategory != null) {
-            Category existingCategory = template.getCategory();
-            if (existingCategory != null) {
-                template.setCategory(newCategory);
-                Template updatedTemplate = templateRepository.save(template);
-                return new ApiResponse("Category updated successfully.", updatedTemplate.getCategory());
             } else {
-                return new ApiResponse("Template does not have a category.", null);
+                return new ApiResponse("Failed to create template.", null);
             }
         } else {
-            return new ApiResponse("Error", null);
+            return new ApiResponse("User not found.", null);
         }
     }
-
-
-    public ApiResponse assignCategoryToTemplate(Long templateId, Long categoryId) {
+    public ApiResponse updateCategoryForTemplate( Long templateId , Long newSubcategoryId){
         Template template = templateRepository.findById(templateId).orElse(null);
-        Category category = categoryService.getCategoryById(categoryId);
-
-        if (template != null && category != null) {
-            if (template.getCategory() != null) {
-                return new ApiResponse("Template already has a category.", template.getCategory());
-            } else {
-                template.setCategory(category);
-                Template updatedTemplate = templateRepository.save(template);
-                return new ApiResponse("Category assigned successfully.", updatedTemplate.getCategory());
-            }
-        } else {
-            return new ApiResponse("Error", null);
+        if(template != null && template.getSubcategory() !=null){
+            SubcategoryDTO subcategoryDTO = subcategoryService.getSubcategoryById(newSubcategoryId);
+            template.setSubcategory(subCategoryTransformer.toEntity(subcategoryDTO));
+            return  new ApiResponse("SubCategory is updated" ,template );
+          }
+        else {
+            return new ApiResponse("template or subcategory is null", null);
         }
     }
+public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategoryId) {
+    Template template = templateRepository.findById(templateId).orElse(null);
+    SubcategoryDTO subcategory = subcategoryService.getSubcategoryById(subcategoryId);
+
+    if (template != null && subcategory != null) {
+        if (template.getSubcategory() != null) {
+            return new ApiResponse("Template already has a subcategory.", template.getSubcategory());
+        } else {
+            template.setSubcategory(subCategoryTransformer.toEntity(subcategory));
+            Template updatedTemplate = templateRepository.save(template);
+            return new ApiResponse("Subcategory assigned successfully.", updatedTemplate.getSubcategory());
+        }
+    } else {
+        return new ApiResponse("Error", null);
+    }
+}
+
     public Template updateTemplate(Long templateId, TemplateDTO templateDTO) {
         Optional<Template> existingTemplateOptional = templateRepository.findById(templateId);
         if (existingTemplateOptional.isPresent()) {
@@ -106,13 +106,15 @@ public class TemplateService {
             existingTemplate.setTemplateName(templateDTO.getTemplateName());
             existingTemplate.setTemplateDescription(templateDTO.getTemplateDescription());
             existingTemplate.setCost(templateDTO.getCost());
-            return templateRepository.save(existingTemplate);
+            existingTemplate.setContent(templateDTO.getContent());
+            Template savedTemplate = templateRepository.save(existingTemplate);
+            logger.info("Updated template successfully :{}",savedTemplate );
+            return savedTemplate;
         } else {
             return null;
         }
     }
     public void deleteTemplate(Long id) {
-
         Optional<Template> templateOptional = templateRepository.findById(id);
         if (templateOptional.isPresent()) {
             Template template = templateOptional.get();
@@ -121,14 +123,8 @@ public class TemplateService {
             templateRepository.deleteById(id);
         }
     }
-    public List<Template> getTemplatesByCategoryId(Long categoryId) {
-        return templateRepository.findByCategoryId(categoryId);
-    }
 
-    public int getNumberOfTemplatesByCategoryId(Long categoryId) {
-        List<Template> templates = templateRepository.findByCategoryId(categoryId);
-        return templates.size();
-    }
+
 
 
 }

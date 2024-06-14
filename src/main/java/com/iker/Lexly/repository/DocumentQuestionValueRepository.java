@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
 @Repository
 public interface DocumentQuestionValueRepository extends JpaRepository<DocumentQuestionValue,Long> {
     static void deleteByTemplateId(Long templateId) {
@@ -16,9 +17,10 @@ public interface DocumentQuestionValueRepository extends JpaRepository<DocumentQ
     List<DocumentQuestionValue> findByDocumentId(Long documentId);
 
     DocumentQuestionValue findByDocumentAndQuestion(Documents document, Question question);
+    DocumentQuestionValue findByDocumentIdAndQuestionId(Long documentId, Long questionId);
 
-
-    List<DocumentQuestionValue> findByQuestionId(Long id);
+//    List<DocumentQuestionValue> findByQuestionId(Long id);
+    DocumentQuestionValue findByQuestionId(Long id);
 
     void deleteByQuestion(Question question);
 }

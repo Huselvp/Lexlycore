@@ -1,6 +1,8 @@
 package com.iker.Lexly.DTO;
 
 import com.iker.Lexly.Entity.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 @Data
 @AllArgsConstructor
@@ -22,14 +24,22 @@ public class UserDTO {
     private String town;
     private boolean verificationemail;
     private String picture;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-
-    public UserDTO(Long userId, String email, String firstName, String lastName, String password, String phoneNumber, String picture) {
+    public UserDTO(String country,String description,int zipcode, String town,String adress,String username,Role role,Long userId, String email, String firstName, String lastName, String phonenumber, String picture) {
         this.email = email;
+        this.username=username;
+        this.country=country;
+        this.adress=adress;
+        this.description=description;
+        this.role=role;
+        this.zipcode=zipcode;
+        this.town=town;
         this.firstname = firstName;
         this.lastname = lastName;
-         this.userId = userId;
-        this.phonenumber=phoneNumber;
+        this.userId = userId;
+        this.phonenumber=phonenumber;
         this.picture = picture;
 
     }

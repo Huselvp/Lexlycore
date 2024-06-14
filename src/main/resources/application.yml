@@ -13,18 +13,24 @@ spring:
     url: jdbc:postgresql://localhost:5432/lexly_database
     username: postgres
     password: password
-  driverClassName: org.postgresql.Driver
+    driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
 server:
-  port: 8081
+  port: 8082
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 paypal:
   mode: sandbox
   client:
-    id: AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS
-    secret: EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL
-
+    id: ASH-5W4rF097Wr96eqw-XHStDs7pZyRPz4cNihmr4dbUlBQEjTN-9-hBKjK3xgsFAWwifrHY10dbPBG_
+    secret: EI-c8_-WM9UHSZdBGqzZNobFbpyZ_AnbMtl_4pWtlyZL13yhgAa0liPcDT5vMnqOPImhFaUWSlT8DFKN
+  base:
+    url: "https://api-m.sandbox.paypal.com"
 app:
   firebase-configuration-file: docura-fbcf0-firebase-adminsdk-flaal-99a8fba29f.json
   secret-key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
