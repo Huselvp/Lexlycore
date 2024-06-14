@@ -327,11 +327,24 @@ public class FormController {
 //        }
 //    }
 
-    @PatchMapping("/block/label/options/{labelId}/{optionKey}")
+    @PatchMapping("/block/label/option/{labelId}/{optionKey}")
     public ResponseEntity<Label> updateOption(@PathVariable Long labelId, @PathVariable Long optionKey, @RequestParam String newValue) {
         Label updatedLabel = labelService.updateOption(labelId, optionKey, newValue);
         return ResponseEntity.ok().body(updatedLabel);
     }
+    @PutMapping("/block/label/options/{labelId}")
+    public ResponseEntity<Label> updateLabelOptions(
+            @PathVariable Long labelId,
+            @RequestBody List<Map<Long, String>> optionsToUpdate
+    ) {
+        try {
+            Label updatedLabel = labelService.updateOptions(labelId, optionsToUpdate);
+            return ResponseEntity.ok(updatedLabel);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 
     @DeleteMapping("/block/label/option/{labelId}/{optionKey}")
     public ResponseEntity<Label> deleteOption(@PathVariable Long labelId, @PathVariable Long optionKey) {

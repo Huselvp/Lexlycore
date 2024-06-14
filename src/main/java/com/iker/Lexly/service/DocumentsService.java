@@ -37,9 +37,10 @@ public class DocumentsService {
     private final BlockService blockService;
     private final FormRepository formRepository;
     private final SubQuestionRepository subQuestionRepository;
+    private final TemplateService templateService;
 
     @Autowired
-    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository, JwtService jwtService, BlockRepository blockRepository, BlockService blockService , FormRepository formRepository, SubQuestionRepository subQuestionRepository) {
+    public DocumentsService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, TemplateRepository templateRepository, UserRepository userRepository, DocumentsRepository documentsRepository, JwtService jwtService, BlockRepository blockRepository, BlockService blockService , FormRepository formRepository, SubQuestionRepository subQuestionRepository, TemplateService templateService) {
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.templateRepository = templateRepository;
@@ -51,6 +52,7 @@ public class DocumentsService {
         this.formRepository = formRepository;
 
         this.subQuestionRepository = subQuestionRepository;
+        this.templateService = templateService;
     }
 
     public List<Documents> getDocumentsByUserId(String token) {
@@ -122,8 +124,19 @@ public class DocumentsService {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
         }
+        Template template = templateService.getTemplateById(templateId);
         questions.sort(Comparator.comparingInt(Question::getPosition));
         Document mainDocument = Jsoup.parse("<div></div>");
+        // Create the header div
+        String headerHtml = "<div style='width: 100%; height: 15%;background-color:gray; display: flex; align-items: center;'>" +
+                "" +
+                "<span style='margin-left: 20px; font-size: 24px; font-weight: bold;'>" +template.getTemplateName() + "</span>" +
+                "</div>";
+
+        // Parse the header div and add it to the main document
+        Document headerDocument = Jsoup.parseBodyFragment(headerHtml);
+        mainDocument.body().appendChild(headerDocument.body().child(0));
+
         for (Question question : questions) {
             if (question != null && question.getTemplate().getId().equals(templateId)) {
                 String text = question.getTexte();

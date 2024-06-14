@@ -216,7 +216,11 @@ public class suserController {
                     List<DocumentSubQuestionValue> documentSubQuestionValues = documentSubQuestionValueRepository.findByDocumentId(documentId);
                     String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues ,documentSubQuestionValues );
                     concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
-                    htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
+//                    htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
+                    htmlContent = "<!DOCTYPE html>" +
+                            "<html xmlns='http://www.w3.org/1999/xhtml'>" +
+                            "<head><title>Document</title></head>" +
+                            "<body>" + concatenatedText + "</body></html>";
                 }
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                     byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);

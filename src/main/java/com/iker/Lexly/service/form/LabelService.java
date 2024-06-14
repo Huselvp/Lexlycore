@@ -169,7 +169,25 @@ public class LabelService {
             throw new IllegalArgumentException("Option with key " + optionKey + " not found in label with ID " + labelId);
         }
     }
+    public Label updateOptions(Long labelId, List<Map<Long, String>> optionsToUpdate) {
+        Label label = labelRepository.findById(labelId)
+                .orElseThrow(() -> new IllegalArgumentException("Label not found with ID " + labelId));
 
+        for (Map<Long, String> optionMap : optionsToUpdate) {
+            for (Map.Entry<Long, String> entry : optionMap.entrySet()) {
+                Long optionKey = entry.getKey();
+                String newValue = entry.getValue();
+
+                if (label.getOptions().containsKey(optionKey)) {
+                    label.getOptions().put(optionKey, newValue);
+                } else {
+                    throw new IllegalArgumentException("Option with key " + optionKey + " not found in label with ID " + labelId);
+                }
+            }
+        }
+
+        return labelRepository.save(label);
+    }
 
     public Label deleteOption(Long labelId, Long optionKey) {
         Label label = labelRepository.findById(labelId)
