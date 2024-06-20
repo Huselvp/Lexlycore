@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
@@ -118,6 +119,58 @@ public class DocumentsService {
 //
 //        return mainDocument.html().trim();
 //    }
+public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream outputStream, Long templateId) throws Exception {
+    String headerHtml = getHeaderHtml(templateId);
+    String wellFormedXml = wrapHtmlContent(htmlContent, headerHtml);
+    ITextRenderer renderer = new ITextRenderer();
+    renderer.setDocumentFromString(wellFormedXml);
+    renderer.layout();
+    renderer.createPDF(outputStream);
+    renderer.finishPDF();
+    return outputStream.toByteArray();
+}
+
+    private String getHeaderHtml(Long templateId) {
+        Template template = templateService.getTemplateById(templateId);
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/static/img/docura.png").toUriString();
+        return "<div style='width: 100%; height: 26%;'>" +
+                "<table style='width: 100%;'><tr>" +
+                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
+                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
+                "</tr></table>" +
+                "</div>";
+    }
+
+    private String wrapHtmlContent(String htmlContent, String headerHtml) {
+        String sanitizedHtml = sanitizeHtml(htmlContent);
+        String html = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\" />\n" + // self-closing meta tag
+                "    <title>Generated PDF</title>\n" +
+                "    <style>\n" +
+                "        @page {\n" +
+                "            margin-top: 150px;\n" +
+                "            @top-center { content: element(header) }\n" +
+                "        }\n" +
+                "        div.header { display: block; position: running(header) }\n" +
+                "    </style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <div class='header'>" + headerHtml + "</div>\n" +
+                sanitizedHtml +
+                "</body>\n" +
+                "</html>";
+        return html;
+    }
+
+    private String sanitizeHtml(String html) {
+        return html.replaceAll("&nbsp;", "\u00A0")
+//                .replaceAll("<img([^>]*)>", "<img$1 />")
+                .replaceAll("<br([^>]*)>", "<br$1 />")
+                .replaceAll("<hr([^>]*)>", "<hr$1 />")
+                .replaceAll("<meta([^>]*)>", "<meta$1 />"); // Ensure meta tags are self-closed
+    }
 
 
     public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues, List<DocumentSubQuestionValue> documentSubQuestionValues) {
@@ -127,15 +180,7 @@ public class DocumentsService {
         Template template = templateService.getTemplateById(templateId);
         questions.sort(Comparator.comparingInt(Question::getPosition));
         Document mainDocument = Jsoup.parse("<div></div>");
-        // Create the header div
-        String headerHtml = "<div style='width: 100%; height: 15%;background-color:gray; display: flex; align-items: center;'>" +
-                "" +
-                "<span style='margin-left: 20px; font-size: 24px; font-weight: bold;'>" +template.getTemplateName() + "</span>" +
-                "</div>";
 
-        // Parse the header div and add it to the main document
-        Document headerDocument = Jsoup.parseBodyFragment(headerHtml);
-        mainDocument.body().appendChild(headerDocument.body().child(0));
 
         for (Question question : questions) {
             if (question != null && question.getTemplate().getId().equals(templateId)) {

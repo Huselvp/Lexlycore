@@ -34,9 +34,10 @@ public class Question {
     @NotNull
     private String valueType;
 
+
     @Column(name= "text_area")
-    @JsonProperty("text_area")
-    private String Texte;
+//    @JsonProperty("text_area")
+    private String texte;
 
     private int position;
 
@@ -106,11 +107,11 @@ public class Question {
     }
 
     public String getTexte() {
-        return Texte;
+        return texte;
     }
 
     public void setTexte(String texte) {
-        this.Texte = texte;
+        this.texte = texte;
     }
 
     public List<DocumentQuestionValue> getDocumentQuestionValues() {

@@ -32,9 +32,7 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.DayOfWeek;
-import java.time.format.TextStyle;
-import java.util.Locale;
+
 
 @Service
 public class QuestionService {
@@ -277,9 +275,9 @@ public class QuestionService {
             marshaller.marshal(textWrapper, stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             logger.error("Error transforming text to XML: ", e);
-            return null;
+            return "Error transforming text to XML: ";
         }
     }
 

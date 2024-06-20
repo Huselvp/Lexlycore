@@ -217,13 +217,12 @@ public class suserController {
                     String concatenatedText = documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues ,documentSubQuestionValues );
                     concatenatedText = concatenatedText.replaceAll("<br\\s*/?>", "<br></br>");
 //                    htmlContent = "<html><head></head><body>" + concatenatedText + "</body></html>";
-                    htmlContent = "<!DOCTYPE html>" +
-                            "<html xmlns='http://www.w3.org/1999/xhtml'>" +
-                            "<head><title>Document</title></head>" +
-                            "<body>" + concatenatedText + "</body></html>";
+                    htmlContent = concatenatedText;
                 }
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
+//                    byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
+                    byte[] pdfContent = documentsService.generatePdfWithHeader(htmlContent, outputStream, templateId);
+
                     if (pdfContent.length > 0) {
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_PDF);
