@@ -122,6 +122,14 @@
   justify-content: space-between;
 }
 
+.bloc-inputs form label span {
+  display: none;
+}
+
+.bloc-inputs:hover form label span {
+  display: block;
+}
+
 .bloc-inputs button {
   background-color: #9a9278;
   border: none;
@@ -141,6 +149,25 @@
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
   position: relative;
+}
+
+.add-inputs-container .btns {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: right;
+  margin-top: 2rem;
+}
+
+.add-inputs-container .btns button {
+  background-color: #9a9278;
+  border: none;
+  padding: 1rem 1.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+.add-inputs-container .btns button.delete {
+  background-color: rgb(243, 44, 44);
 }
 
 .add-inputs-container form {
@@ -306,7 +333,6 @@
 .add-inputs-container-popup {
   width: 100%;
   height: 100vh;
-  /* background-color: red; */
   z-index: 111111111;
   top: 0;
   left: 0;
@@ -358,4 +384,17 @@
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   border-radius: 10px;
   position: relative;
+}
+
+.select-container {
+  background-color: white;
+  padding: 40px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.add-options {
+  width: fit-content;
+  padding: 0.5rem;
 }

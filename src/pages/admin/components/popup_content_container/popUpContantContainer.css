@@ -1,0 +1,19 @@
+.pop-up-content-container {
+  background-color: white;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 10px;
+  position: relative;
+  padding: 3.2rem 4rem;
+  transition: all 0.5s;
+  max-height: 95dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 92%;
+}
+
+.pop-up-content-container .close {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  cursor: pointer;
+}

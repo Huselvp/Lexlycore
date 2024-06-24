@@ -1,0 +1,25 @@
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+form input {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding-right: 30px;
+}
+
+form input label {
+  font-weight: 500;
+}
+
+form .controllers {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: right;
+}

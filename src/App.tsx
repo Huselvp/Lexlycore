@@ -38,8 +38,8 @@ import ProtectedRoute from "./ui/protectedRoute";
 import AddSubQuestion from "./pages/admin/AddSubQuestion";
 import EditSubQuestion from "./pages/admin/EditSubQuestion";
 import QuestionnaireWizard from "./ui/Testing/Wizard";
-import AddNewForm from "./pages/admin/addNewForm";
-import FormBlocs from "./pages/admin/formBlocs";
+// import AddNewForm from "./pages/admin/addNewForm";
+// import FormBlocs from "./pages/admin/formBlocs";
 
 function App() {
   return (
@@ -75,7 +75,7 @@ function App() {
             element={<EditTemplate />}
           />
 
-          <Route
+          {/* <Route
             path="templates/:templateId/seeBlocks/:blocId"
             element={<FormBlocs />}
           />
@@ -83,7 +83,7 @@ function App() {
           <Route
             path="templates/:templateId/addNewForm/:formId"
             element={<AddNewForm />}
-          />
+          /> */}
 
           <Route path="templates/:templateId" element={<Questions />} />
           <Route

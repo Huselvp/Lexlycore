@@ -1,0 +1,141 @@
+.edit-block-container .add-input button {
+  width: fit-content;
+}
+
+.edit-block-container .form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-block-container select {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding-right: 30px;
+}
+
+.edit-block-container .add-input select {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding-right: 30px;
+}
+
+.add-new-input {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: right;
+  gap: 1rem;
+}
+
+.add-new-input button {
+  background-color: white;
+  border: 1px solid #ada587;
+  color: black;
+}
+
+.add-new-input button:hover {
+  color: white;
+  background-color: #ada587;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.options p {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.options p span {
+  cursor: pointer;
+}
+
+.labels-container {
+  display: flex;
+  /* align-items: center; */
+  /* flex-direction: column; */
+  width: 100%;
+}
+
+.labels-container span {
+  margin-bottom: 1.5rem;
+}
+
+.frm {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.frm .icon {
+  cursor: pointer;
+}
+
+.frm input,
+.frm select {
+  width: 100%;
+  margin-right: 1rem;
+  /* margin-top: 1.5rem; */
+}
+
+.labels-container.changed {
+  display: flex;
+  align-items: center;
+  /* background-color: red; */
+}
+
+.labels-container.changed .text {
+  display: flex;
+  margin-right: 2rem;
+  max-width: 20rem;
+  width: 100%;
+}
+
+.edit-input-container .select {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-input-container .select label {
+  margin-bottom: 1.5rem;
+}
+
+.edit-option {
+  padding: 0.8rem 1.2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding-right: 30px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-option:last-child {
+  margin-bottom: 0;
+}
+
+.edit-option .icon {
+  cursor: pointer;
+}
+
+.edit-options .select {
+  display: flex;
+  flex-direction: column;
+}

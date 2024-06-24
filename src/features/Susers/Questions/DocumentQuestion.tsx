@@ -1,9 +1,13 @@
-import { ReactNode, useMemo, useState } from "react"
-import Form from "../../../ui/AuthForm"
-import { extractChoicesFromString } from "../../../utils/helpers"
-import styled from "styled-components"
-import { HiMiniChevronDown } from "react-icons/hi2"
-import { HiMiniChevronUp } from "react-icons/hi2"
+// this is the types controllers
+
+import { ReactNode, useMemo, useState, useEffect } from "react";
+import Form from "../../../ui/AuthForm";
+import { extractChoicesFromString } from "../../../utils/helpers";
+import styled from "styled-components";
+import { HiMiniChevronDown } from "react-icons/hi2";
+import { HiMiniChevronUp } from "react-icons/hi2";
+import "./styles/form.css";
+import { IoIosClose } from "react-icons/io";
 
 const Checkbox = styled.input`
   /* accent-color: var(--color-stone-300); */
@@ -47,7 +51,7 @@ const Checkbox = styled.input`
     background-color: var(--color-stone-150);
     border: 1px solid var(--color-stone-500);
   }
-`
+`;
 const Choices = styled.div`
   display: flex;
   flex-direction: column;
@@ -68,7 +72,7 @@ const Choices = styled.div`
       }
     }
   }
-`
+`;
 // const ChoiceLabel = styled(Form.Label)`
 //   font-size: 1.4rem;
 //   color: var(--color-stone-500);
@@ -87,7 +91,7 @@ const Description = styled.div`
   margin-bottom: 1rem;
   color: var(--color-grey-500);
   font-size: 1.3rem;
-`
+`;
 const DetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -108,7 +112,7 @@ const DetailsContainer = styled.div`
     border-radius: var(--rounded-3xl);
     box-shadow: var(--shadow);
   }
-`
+`;
 const Details = styled(Description)`
   align-self: center;
   display: inline-block;
@@ -119,7 +123,7 @@ const Details = styled(Description)`
   color: var(--color-grey-500);
   font-size: 1.3rem;
   font-weight: 500;
-`
+`;
 const InputContainer = styled.div`
   width: 50vw;
   align-self: center;
@@ -135,31 +139,36 @@ const InputContainer = styled.div`
   @media screen and (max-width: 25em) {
     width: 85vw;
   }
-`
+`;
 const Input = styled(Form.Input)`
   padding: 0.8rem 1.2rem;
-`
+`;
 const Textarea = styled(Form.Textarea)`
   width: 100%;
   min-height: 12rem;
-`
+`;
+
 const DocumentQuestion = ({
   question,
   children,
   value,
-  setValue
+  setValue,
 }: {
-  question: Question
-  children: ReactNode
-  setValue: (value: string) => void
-  value: string | number
+  question: Question;
+  children: ReactNode;
+  setValue: (value: string) => void;
+  value: string | number;
 }) => {
-  const [showDetails, setShowDetails] = useState(false)
-  if (typeof question === "undefined") return null
+  const [showDetails, setShowDetails] = useState(false);
+  if (typeof question === "undefined") return null;
   const choices = useMemo(
     () => extractChoicesFromString(question!.valueType),
     [question!.valueType]
-  )
+  );
+
+  useEffect(() => {
+    console.log(question.id);
+  }, [question.id]);
 
   return (
     <>
@@ -221,10 +230,127 @@ const DocumentQuestion = ({
             ))}
           </Choices>
         )}
+        {question.valueType.startsWith("form") && (
+          <Choices>
+            {choices.map((choice) => (
+              <div key={choice.id} className="form_type">
+                {/* <Checkbox
+                  name="choice"
+                  id={choice.choice}
+                  value={choice.newRelatedText}
+                  type="radio"
+                  onChange={() => setValue(choice.newRelatedText)}
+                  checked={value === choice.newRelatedText}
+                />
+                <label htmlFor={choice.choice}>{choice.choice}</label> */}
+              </div>
+            ))}
+          </Choices>
+        )}
+        <div className="form_type">
+          <div className="form-block-user">
+            <IoIosClose className="form_type_controllers" size={20} />
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+          </div>
+
+          <div className="form-block-user">
+            <IoIosClose className="form_type_controllers" size={20} />
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+          </div>
+
+          <div className="form-block-user">
+            <IoIosClose className="form_type_controllers" size={20} />
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            <div className="block-input">
+              <label>Enter</label>
+              <Input
+                placeholder={question.questionText}
+                // value={value}
+                // onChange={(e) => setValue(e.target.value)}
+                type="text"
+              />
+            </div>
+          </div>
+        </div>
         {children}
       </InputContainer>
     </>
-  )
-}
+  );
+};
 
-export default DocumentQuestion
+export default DocumentQuestion;
