@@ -34,6 +34,8 @@ public class SecurityConfiguration {
                         auth.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
                                 .requestMatchers("/api/admin").hasAnyRole(Role.ADMIN.name())
+
+                                .requestMatchers("/api/admin").hasAnyRole(Role.ADMIN.name())
                                 .requestMatchers("/api/superadmin").hasAnyRole(Role.SUPERADMIN.name())
                                 .requestMatchers("/api/suser").hasAnyRole((Role.SUSER.name()))
                                 .requestMatchers("/api/public").permitAll()
