@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FilterRequest {
-    private FilterType filterType;
+//    private FilterType filterType;
     private String filterStart;
     private String filterEnd;
 }

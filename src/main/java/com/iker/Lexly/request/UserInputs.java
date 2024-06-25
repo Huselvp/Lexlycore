@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,5 +23,6 @@ public class UserInputs {
     private List<String> checkboxValue;
     private List<DayRequest> days;
     private List<UserInputsSubQuestion> subquestionsValues;
+    private Map<Long,String> mapValues;
 }
 

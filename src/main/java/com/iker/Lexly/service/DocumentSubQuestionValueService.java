@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,8 +53,20 @@ public class DocumentSubQuestionValueService {
             case "form" -> processFormSubQuestionValue(subQuestion, document, subValueDto);
             case "time" -> processTimeSubQuestionValue(subQuestion, document, subValueDto);
             case "checkbox" -> processCheckboxSubQuestionValue(subQuestion, document, subValueDto);
+            case "day" -> processDaySubQuestionValue(subQuestion, document, subValueDto);
+            case "map" -> processMapSubQuestionValue(subQuestion, document, subValueDto);
             default -> processDefaultSubQuestionValue(subQuestion, document, subValueDto);
         };
+    }
+    private boolean processMapSubQuestionValue(SubQuestion subQuestion, Documents document, UserInputsSubQuestion valueDto) {
+        Map<Long, String> mapValues = valueDto.getMapValues();
+        String value = "map" + mapValues.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> "/" + entry.getValue())
+                .collect(Collectors.joining());
+
+        saveDocumentSubQuestionValue(subQuestion, document, value);
+        return true;
     }
 
     private boolean processFormSubQuestionValue(SubQuestion subQuestion,Documents document, UserInputsSubQuestion valueDto) {
@@ -120,11 +129,11 @@ public class DocumentSubQuestionValueService {
 //    return true;
 //}
 
-    private void processDaySubQuestionValue(SubQuestion subQuestion, Documents document, UserInputs valueDto) {
+    private boolean processDaySubQuestionValue(SubQuestion subQuestion, Documents document, UserInputsSubQuestion valueDto) {
         List<DayRequest> days = Optional.ofNullable(valueDto.getDays()).orElse(Collections.emptyList());
 
         if (days.size() < 2) {
-            return;
+            return false;
         }
 
         days.sort(Comparator.comparingLong(DayRequest::getIndex));
@@ -134,6 +143,7 @@ public class DocumentSubQuestionValueService {
         String value = constructDayValueString(days, duration);
 
         saveDocumentSubQuestionValue(subQuestion, document, value);
+        return true;
     }
 
     private String constructDayValueString(List<DayRequest> days, Long duration) {
@@ -170,6 +180,8 @@ public class DocumentSubQuestionValueService {
         return switch (subQuestionType) {
             case "form" -> updateFormSubQuestionValue(existingValue, newValue);
             case "time" -> updateTimeSubQuestionValue(existingValue, newValue);
+            case "map" -> updateMapSubQuestionValue(existingValue, newValue);
+            case "day" -> updateDaySubQuestionValue(existingValue, newValue);
             case "checkbox" -> updateCheckboxSubQuestionValue(existingValue, newValue);
             default -> updateDefaultSubQuestionValue(existingValue, newValue);
         };
@@ -208,7 +220,37 @@ public class DocumentSubQuestionValueService {
         documentSubQuestionValueRepository.save(existingValue);
         return new ApiResponse("Time subquestion values updated successfully.", null);
     }
+    private ApiResponse updateMapSubQuestionValue(DocumentSubQuestionValue existingValue, UserInputsSubQuestion newValue) {
+        Map<Long, String> mapValues = newValue.getMapValues();
 
+        if (mapValues == null || mapValues.isEmpty()) {
+            return new ApiResponse("Map values are missing.", null);
+        }
+
+        String updatedValue = "map" + mapValues.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> "/" + entry.getValue())
+                .collect(Collectors.joining());
+
+        existingValue.setValue(updatedValue);
+        documentSubQuestionValueRepository.save(existingValue);
+        return new ApiResponse("Map values updated successfully.", null);
+    }
+    private ApiResponse updateDaySubQuestionValue(DocumentSubQuestionValue existingValue, UserInputsSubQuestion newValue) {
+        List<DayRequest> days = Optional.ofNullable(newValue.getDays()).orElse(Collections.emptyList());
+
+        if (days.size() < 2) {
+            return new ApiResponse("Day values are missing.", null);
+        }
+
+        days.sort(Comparator.comparingLong(DayRequest::getIndex));
+        Long duration = questionService.calculateDuration(days.get(0).getIndex(), days.get(1).getIndex());
+        String updatedValue = constructDayValueString(days, duration);
+
+        existingValue.setValue(updatedValue);
+        documentSubQuestionValueRepository.save(existingValue);
+        return new ApiResponse("Day values updated successfully.", null);
+    }
     private ApiResponse updateCheckboxSubQuestionValue(DocumentSubQuestionValue existingValue, UserInputsSubQuestion newValue) {
         List<String> checkboxValues = newValue.getCheckboxValue();
 

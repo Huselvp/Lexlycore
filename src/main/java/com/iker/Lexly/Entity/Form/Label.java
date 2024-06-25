@@ -18,7 +18,6 @@ public class Label {
     private Long id;
     @Column(length = 20)
     private String name;
-
     private int position;
     @Enumerated(EnumType.STRING)
     private LabelType type;

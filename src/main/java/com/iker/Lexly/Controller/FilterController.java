@@ -2,6 +2,7 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.Entity.Filter;
 import com.iker.Lexly.request.FilterRequest;
 import com.iker.Lexly.service.FilterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +18,7 @@ public class FilterController {
     private static final Logger logger = LoggerFactory.getLogger(FilterController.class);
 
     private final FilterService filterService;
-
+    @Autowired
     public FilterController(FilterService filterService) {
         this.filterService = filterService;
     }

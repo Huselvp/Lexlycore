@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
@@ -47,6 +50,34 @@ public class FilterService {
         return createAndSaveFilter(null, optionalSubQuestion.get(), filterDTO);
     }
 
+//    private Filter createAndSaveFilter(Question question, SubQuestion subQuestion, FilterRequest filterDTO) {
+//        Filter filter = new Filter();
+//        if (question != null) {
+//            filter.setQuestion(question);
+//        } else if (subQuestion != null) {
+//            filter.setSubQuestion(subQuestion);
+//        }
+//
+//        filter.setFilterType(filterDTO.getFilterType());
+//
+//        switch (filterDTO.getFilterType()) {
+//            case INTEGER:
+//                filter.setFilterStartInt(Integer.parseInt(filterDTO.getFilterStart()));
+//                filter.setFilterEndInt(Integer.parseInt(filterDTO.getFilterEnd()));
+//                break;
+//            case DOUBLE:
+//                filter.setFilterStartDouble(Double.parseDouble(filterDTO.getFilterStart()));
+//                filter.setFilterEndDouble(Double.parseDouble(filterDTO.getFilterEnd()));
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Invalid filter type: " + filterDTO.getFilterType());
+//        }
+//
+//        Filter savedFilter = filterRepository.save(filter);
+//        logger.info("Created Filter: {}", savedFilter);
+//        return savedFilter;
+//    }
+
     private Filter createAndSaveFilter(Question question, SubQuestion subQuestion, FilterRequest filterDTO) {
         Filter filter = new Filter();
         if (question != null) {
@@ -55,19 +86,17 @@ public class FilterService {
             filter.setSubQuestion(subQuestion);
         }
 
-        filter.setFilterType(filterDTO.getFilterType());
+        String filterStart = filterDTO.getFilterStart();
+        String filterEnd = filterDTO.getFilterEnd();
 
-        switch (filterDTO.getFilterType()) {
-            case INTEGER:
-                filter.setFilterStartInt(Integer.parseInt(filterDTO.getFilterStart()));
-                filter.setFilterEndInt(Integer.parseInt(filterDTO.getFilterEnd()));
-                break;
-            case DOUBLE:
-                filter.setFilterStartDouble(Double.parseDouble(filterDTO.getFilterStart()));
-                filter.setFilterEndDouble(Double.parseDouble(filterDTO.getFilterEnd()));
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid filter type: " + filterDTO.getFilterType());
+        if (isInteger(filterStart) && isInteger(filterEnd)) {
+            filter.setFilterStartInt(Integer.parseInt(filterStart));
+            filter.setFilterEndInt(Integer.parseInt(filterEnd));
+        } else if (isDouble(filterStart) || isDouble(filterEnd)) {
+            filter.setFilterStartDouble(Double.parseDouble(filterStart));
+            filter.setFilterEndDouble(Double.parseDouble(filterEnd));
+        } else {
+            throw new IllegalArgumentException("Invalid filter type: Cannot determine filter type from values.");
         }
 
         Filter savedFilter = filterRepository.save(filter);
@@ -75,6 +104,17 @@ public class FilterService {
         return savedFilter;
     }
 
+    private boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^-?\\d+$");
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
+    }
+
+    private boolean isDouble(String str) {
+        Pattern pattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
+    }
 
     public Filter getFilter(Long filterId) {
         return filterRepository.findById(filterId)
@@ -102,57 +142,99 @@ public class FilterService {
             throw new IllegalArgumentException("Filter not found with id: " + filterId);
         }
     }
+
     @Transactional
     public Filter updateFilter(Long filterId, FilterRequest updatedFilter) {
         Filter existingFilter = filterRepository.findById(filterId)
-                .orElseThrow(() -> {String errorMessage = "Filter not found with id: " + filterId;
+                .orElseThrow(() -> {
+                    String errorMessage = "Filter not found with id: " + filterId;
                     logger.error(errorMessage);
                     return new NoSuchElementException(errorMessage);
                 });
-        FilterType newFilterType = updatedFilter.getFilterType();
-        existingFilter.setFilterType(newFilterType != null ? newFilterType : existingFilter.getFilterType());
-        // Clear previous values if the filter type changes
-        if (newFilterType != null && newFilterType != existingFilter.getFilterType()) {
-            existingFilter.setFilterStartInt(null);
-            existingFilter.setFilterEndInt(null);
-            existingFilter.setFilterStartDouble(null);
-            existingFilter.setFilterEndDouble(null);
+
+        String filterStart = updatedFilter.getFilterStart();
+        String filterEnd = updatedFilter.getFilterEnd();
+
+        // Clear previous values
+        existingFilter.setFilterStartInt(null);
+        existingFilter.setFilterEndInt(null);
+        existingFilter.setFilterStartDouble(null);
+        existingFilter.setFilterEndDouble(null);
+
+        if (isInteger(filterStart) && isInteger(filterEnd)) {
+            setIntegerFilterValues(existingFilter, updatedFilter);
+        } else if (isDouble(filterStart)|| isDouble(filterEnd)) {
+            setDoubleFilterValues(existingFilter, updatedFilter);
+        } else {
+            throw new IllegalArgumentException("Invalid filter type: Cannot determine filter type from values.");
         }
-        // Set filter values based on the filter type
-            switch (existingFilter.getFilterType()) {
-                case INTEGER:
-                    setIntegerFilterValues(existingFilter, updatedFilter);
-                    break;
-                case DOUBLE:
-                    setDoubleFilterValues(existingFilter, updatedFilter);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid filter type: " + updatedFilter.getFilterType());
-            }
+
         Filter savedFilter = filterRepository.save(existingFilter);
-        logger.info("update filter successfully : {}" , savedFilter);
+        logger.info("Updated Filter: {}", savedFilter);
         return savedFilter;
     }
 
-    private void setIntegerFilterValues(Filter existingFilter, FilterRequest updatedFilter) {
-        if (updatedFilter.getFilterStart() != null) {
-            existingFilter.setFilterStartInt(Integer.parseInt(updatedFilter.getFilterStart()));
-        }
-        if (updatedFilter.getFilterEnd() != null) {
-            existingFilter.setFilterEndInt(Integer.parseInt(updatedFilter.getFilterEnd()));
-        }
-
+    private void setIntegerFilterValues(Filter filter, FilterRequest filterDTO) {
+        filter.setFilterStartInt(Integer.parseInt(filterDTO.getFilterStart()));
+        filter.setFilterEndInt(Integer.parseInt(filterDTO.getFilterEnd()));
     }
 
-    private void setDoubleFilterValues(Filter existingFilter, FilterRequest updatedFilter) {
-        if (updatedFilter.getFilterStart() != null) {
-            existingFilter.setFilterStartDouble(Double.parseDouble(updatedFilter.getFilterStart()));
-        }
-        if (updatedFilter.getFilterEnd() != null) {
-            existingFilter.setFilterEndDouble(Double.parseDouble(updatedFilter.getFilterEnd()));
-        }
-
+    private void setDoubleFilterValues(Filter filter, FilterRequest filterDTO) {
+        filter.setFilterStartDouble(Double.parseDouble(filterDTO.getFilterStart()));
+        filter.setFilterEndDouble(Double.parseDouble(filterDTO.getFilterEnd()));
     }
+
+//    @Transactional
+//    public Filter updateFilter(Long filterId, FilterRequest updatedFilter) {
+//        Filter existingFilter = filterRepository.findById(filterId)
+//                .orElseThrow(() -> {String errorMessage = "Filter not found with id: " + filterId;
+//                    logger.error(errorMessage);
+//                    return new NoSuchElementException(errorMessage);
+//                });
+//        FilterType newFilterType = updatedFilter.getFilterType();
+//        existingFilter.setFilterType(newFilterType != null ? newFilterType : existingFilter.getFilterType());
+//        // Clear previous values if the filter type changes
+//        if (newFilterType != null && newFilterType != existingFilter.getFilterType()) {
+//            existingFilter.setFilterStartInt(null);
+//            existingFilter.setFilterEndInt(null);
+//            existingFilter.setFilterStartDouble(null);
+//            existingFilter.setFilterEndDouble(null);
+//        }
+//        // Set filter values based on the filter type
+//            switch (existingFilter.getFilterType()) {
+//                case INTEGER:
+//                    setIntegerFilterValues(existingFilter, updatedFilter);
+//                    break;
+//                case DOUBLE:
+//                    setDoubleFilterValues(existingFilter, updatedFilter);
+//                    break;
+//                default:
+//                    throw new IllegalArgumentException("Invalid filter type: " + updatedFilter.getFilterType());
+//            }
+//        Filter savedFilter = filterRepository.save(existingFilter);
+//        logger.info("update filter successfully : {}" , savedFilter);
+//        return savedFilter;
+//    }
+//
+//    private void setIntegerFilterValues(Filter existingFilter, FilterRequest updatedFilter) {
+//        if (updatedFilter.getFilterStart() != null) {
+//            existingFilter.setFilterStartInt(Integer.parseInt(updatedFilter.getFilterStart()));
+//        }
+//        if (updatedFilter.getFilterEnd() != null) {
+//            existingFilter.setFilterEndInt(Integer.parseInt(updatedFilter.getFilterEnd()));
+//        }
+//
+//    }
+//
+//    private void setDoubleFilterValues(Filter existingFilter, FilterRequest updatedFilter) {
+//        if (updatedFilter.getFilterStart() != null) {
+//            existingFilter.setFilterStartDouble(Double.parseDouble(updatedFilter.getFilterStart()));
+//        }
+//        if (updatedFilter.getFilterEnd() != null) {
+//            existingFilter.setFilterEndDouble(Double.parseDouble(updatedFilter.getFilterEnd()));
+//        }
+//
+//    }
 
 }
 

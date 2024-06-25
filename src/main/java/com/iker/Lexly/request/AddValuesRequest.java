@@ -7,6 +7,7 @@ import java.util.List;
 public class AddValuesRequest {
     private Long documentId;
     private List<UserInputs> values;
+
     private boolean isDraft;
 
 

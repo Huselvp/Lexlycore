@@ -1,4 +1,6 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.Auth.AuthenticationResponse;
+import com.iker.Lexly.Auth.RegisterRequest;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Entity.Form.Block;
@@ -22,6 +24,7 @@ import com.iker.Lexly.service.form.BlockService;
 import com.iker.Lexly.service.form.FormService;
 import com.iker.Lexly.service.form.LabelService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,6 +80,7 @@ public class adminController {
 
 
     }
+
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);

@@ -24,12 +24,13 @@ public class Filter {
     private Question question;
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "subQuestion_id")
     private SubQuestion subQuestion;
 
 
-    @Enumerated(EnumType.STRING)
-    private FilterType filterType;
+//    @Enumerated(EnumType.STRING)
+//    private FilterType filterType;
     private Integer filterStartInt;
     private Integer filterEndInt;
     private Double filterStartDouble;

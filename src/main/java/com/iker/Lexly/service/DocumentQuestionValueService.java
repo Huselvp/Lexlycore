@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,6 +82,7 @@ public class DocumentQuestionValueService {
                 case "time" -> processTimeQuestionValue(question, document, valueDto);
                 case "checkbox" -> processCheckboxQuestionValue(question, document, valueDto);
                 case "day" -> processDayQuestionValue(question, document, valueDto);
+                case "map" -> processMapQuestionValue(question, document, valueDto);
                 default -> processDefaultQuestionValue(question, document, valueDto);
             };
         }
@@ -115,6 +113,16 @@ public class DocumentQuestionValueService {
         private boolean processCheckboxQuestionValue(Question question, Documents document, UserInputs valueDto) {
             String value = "checkbox" + valueDto.getCheckboxValue().stream()
                     .map(val -> "/" + val)
+                    .collect(Collectors.joining());
+
+            saveDocumentQuestionValue(question, document, value);
+            return true;
+        }
+        private boolean processMapQuestionValue(Question question, Documents document, UserInputs valueDto) {
+            Map<Long, String> mapValues = valueDto.getMapValues();
+            String value = "map" + mapValues.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(entry -> "/" + entry.getValue())
                     .collect(Collectors.joining());
 
             saveDocumentQuestionValue(question, document, value);
@@ -185,6 +193,7 @@ public class DocumentQuestionValueService {
                 case "time" -> updateTimeQuestionValue(existingValue, newValue);
                 case "checkbox" -> updateCheckboxQuestionValue(existingValue, newValue);
                 case "day" -> updateDayQuestionValue(existingValue, newValue);
+                case "map" -> updateMapQuestionValue(existingValue, newValue);
                 default -> updateDefaultQuestionValue(existingValue, newValue);
             };
         }
@@ -268,6 +277,22 @@ public class DocumentQuestionValueService {
             existingValue.setValue(updatedValue);
             documentQuestionValueRepository.save(existingValue);
             return new ApiResponse("Day values updated successfully.", null);
+        }
+        private ApiResponse updateMapQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {
+            Map<Long, String> mapValues = newValue.getMapValues();
+
+            if (mapValues == null || mapValues.isEmpty()) {
+                return new ApiResponse("Map values are missing.", null);
+            }
+
+            String updatedValue = "map" + mapValues.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(entry -> "/" + entry.getValue())
+                    .collect(Collectors.joining());
+
+            existingValue.setValue(updatedValue);
+            documentQuestionValueRepository.save(existingValue);
+            return new ApiResponse("Map values updated successfully.", null);
         }
 
         private ApiResponse updateDefaultQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {

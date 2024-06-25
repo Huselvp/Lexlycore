@@ -220,8 +220,8 @@ public class suserController {
                     htmlContent = concatenatedText;
                 }
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-//                    byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
-                    byte[] pdfContent = documentsService.generatePdfWithHeader(htmlContent, outputStream, templateId);
+                    byte[] pdfContent = documentsService.generatePdfFromHtml(htmlContent, outputStream);
+//                    byte[] pdfContent = documentsService.generatePdfWithHeader(htmlContent, outputStream, templateId);
 
                     if (pdfContent.length > 0) {
                         HttpHeaders headers = new HttpHeaders();

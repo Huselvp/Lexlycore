@@ -6,7 +6,6 @@ import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.repository.form.FormRepository;
-import com.iker.Lexly.request.UserInputs;
 import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.form.BlockService;
 import jakarta.persistence.EntityNotFoundException;
@@ -119,60 +118,86 @@ public class DocumentsService {
 //
 //        return mainDocument.html().trim();
 //    }
-public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream outputStream, Long templateId) throws Exception {
-    String headerHtml = getHeaderHtml(templateId);
-    String wellFormedXml = wrapHtmlContent(htmlContent, headerHtml);
-    ITextRenderer renderer = new ITextRenderer();
-    renderer.setDocumentFromString(wellFormedXml);
-    renderer.layout();
-    renderer.createPDF(outputStream);
-    renderer.finishPDF();
-    return outputStream.toByteArray();
-}
 
-    private String getHeaderHtml(Long templateId) {
-        Template template = templateService.getTemplateById(templateId);
-        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/static/img/docura.png").toUriString();
-        return "<div style='width: 100%; height: 26%;'>" +
-                "<table style='width: 100%;'><tr>" +
-                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
-                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
-                "</tr></table>" +
-                "</div>";
-    }
-
-    private String wrapHtmlContent(String htmlContent, String headerHtml) {
-        String sanitizedHtml = sanitizeHtml(htmlContent);
-        String html = "<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "    <meta charset=\"UTF-8\" />\n" + // self-closing meta tag
-                "    <title>Generated PDF</title>\n" +
-                "    <style>\n" +
-                "        @page {\n" +
-                "            margin-top: 150px;\n" +
-                "            @top-center { content: element(header) }\n" +
-                "        }\n" +
-                "        div.header { display: block; position: running(header) }\n" +
-                "    </style>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "    <div class='header'>" + headerHtml + "</div>\n" +
-                sanitizedHtml +
-                "</body>\n" +
-                "</html>";
-        return html;
-    }
-
-    private String sanitizeHtml(String html) {
-        return html.replaceAll("&nbsp;", "\u00A0")
-//                .replaceAll("<img([^>]*)>", "<img$1 />")
-                .replaceAll("<br([^>]*)>", "<br$1 />")
-                .replaceAll("<hr([^>]*)>", "<hr$1 />")
-                .replaceAll("<meta([^>]*)>", "<meta$1 />"); // Ensure meta tags are self-closed
-    }
-
-
+    //****************** add header to all pages *************************
+//public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream outputStream, Long templateId) throws Exception {
+//    String headerHtml = getHeaderHtml(templateId);
+//    String wellFormedXml = wrapHtmlContent(htmlContent, headerHtml);
+//    ITextRenderer renderer = new ITextRenderer();
+//    renderer.setDocumentFromString(wellFormedXml);
+//    renderer.layout();
+//    renderer.createPDF(outputStream);
+//    renderer.finishPDF();
+//    return outputStream.toByteArray();
+//}
+//
+//    private String getHeaderHtml(Long templateId) {
+//        Template template = templateService.getTemplateById(templateId);
+//        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/img/docura-short.png").toUriString();
+//        return "<div style='width: 100%; height: 26%;'>" +
+//                "<table style='width: 100%;'><tr>" +
+//                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
+//                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
+//                "</tr></table>" +
+//                "</div>";
+//    }
+//
+//    private String wrapHtmlContent(String htmlContent, String headerHtml) {
+//        String sanitizedHtml = sanitizeHtml(htmlContent);
+//        String html = "<!DOCTYPE html>\n" +
+//                "<html>\n" +
+//                "<head>\n" +
+//                "    <meta charset=\"UTF-8\" />\n" + // self-closing meta tag
+//                "    <title>Generated PDF</title>\n" +
+//                "    <style>\n" +
+//                "        @page {\n" +
+//                "            margin-top: 150px;\n" +
+//                "            @top-center { content: element(header) }\n" +
+//                "        }\n" +
+//                "        div.header { display: block; position: running(header) }\n" +
+//                "    </style>\n" +
+//                "</head>\n" +
+//                "<body>\n" +
+//                "    <div class='header'>" + headerHtml + "</div>\n" +
+//                sanitizedHtml +
+//                "</body>\n" +
+//                "</html>";
+//        return html;
+//    }
+//
+//    private String sanitizeHtml(String html) {
+//        return html.replaceAll("&nbsp;", "\u00A0")
+////                .replaceAll("<img([^>]*)>", "<img$1 />")
+//                .replaceAll("<br([^>]*)>", "<br$1 />")
+//                .replaceAll("<hr([^>]*)>", "<hr$1 />")
+//                .replaceAll("<meta([^>]*)>", "<meta$1 />"); // Ensure meta tags are self-closed
+//    }
+//
+//
+//    public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues, List<DocumentSubQuestionValue> documentSubQuestionValues) {
+//        if (!isExist(documentId, documentQuestionValues)) {
+//            return "Invalid documentId or document not found.";
+//        }
+//        questions.sort(Comparator.comparingInt(Question::getPosition));
+//        Document mainDocument = Jsoup.parse("<div></div>");
+//
+//
+//        for (Question question : questions) {
+//            if (question != null && question.getTemplate().getId().equals(templateId)) {
+//                String text = question.getTexte();
+//                text = replaceValues(text, question.getId(), documentQuestionValues);
+//                Document questionDocument = Jsoup.parseBodyFragment(text);
+//                for (org.jsoup.nodes.Node child : questionDocument.body().childNodes()) {
+//                    mainDocument.body().appendChild(child.clone());
+//                }
+//                if (!question.getSubQuestions().isEmpty()){
+//                    prossesSubQuestion(question.getSubQuestions(),documentSubQuestionValues,mainDocument);
+//                }
+//            }
+//        }
+//
+//        return mainDocument.html().trim();
+//    }
     public String documentProcess(List<Question> questions, Long documentId, Long templateId, List<DocumentQuestionValue> documentQuestionValues, List<DocumentSubQuestionValue> documentSubQuestionValues) {
         if (!isExist(documentId, documentQuestionValues)) {
             return "Invalid documentId or document not found.";
@@ -180,7 +205,20 @@ public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream ou
         Template template = templateService.getTemplateById(templateId);
         questions.sort(Comparator.comparingInt(Question::getPosition));
         Document mainDocument = Jsoup.parse("<div></div>");
-
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/img/docura-short.png").toUriString();        // Create the header div
+//        String headerHtml = "<div style='width: 100%; height: 26%; display: flex; align-items: center; justify-content: space-between;'>" +
+//                "<span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span>" +
+//                "<img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' />" +
+//                "</div>";
+        String headerHtml = "<div style='width: 100%; height: 26%;'>" +
+                "<table style='width: 100%;'><tr>" +
+                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
+                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
+                "</tr></table>" +
+                "</div>";
+        // Parse the header div and add it to the main document
+        Document headerDocument = Jsoup.parseBodyFragment(headerHtml);
+        mainDocument.body().appendChild(headerDocument.body().child(0));
 
         for (Question question : questions) {
             if (question != null && question.getTemplate().getId().equals(templateId)) {
@@ -195,9 +233,9 @@ public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream ou
                 }
             }
         }
-
         return mainDocument.html().trim();
     }
+
     private void prossesSubQuestion(List<SubQuestion> subQuestions, List<DocumentSubQuestionValue> documentSubQuestionValues,Document mainDocument) {
         subQuestions.sort(Comparator.comparingInt(SubQuestion::getPosition));
         for (SubQuestion subQuestion : subQuestions) {
@@ -446,7 +484,11 @@ public byte[] generatePdfWithHeader(String htmlContent, ByteArrayOutputStream ou
 
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0");
+            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0")
+                    .replaceAll("<img([^>]*)>", "<img$1 />")
+                    .replaceAll("<br([^>]*)>", "<br$1 />")
+                    .replaceAll("<hr([^>]*)>", "<hr$1 />");
+
             String wellFormedXml = wrapHtmlContent(sanitizedHtml);
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
