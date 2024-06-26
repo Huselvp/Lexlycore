@@ -1,0 +1,18 @@
+.add-new-block {
+  background-color: #fffdf0;
+  border-radius: 10px;
+  border: 1px solid #9e977e;
+  max-width: 25rem;
+  height: 25rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  cursor: pointer;
+}
+
+.add-new-block .icon {
+  color: #9e977e;
+}

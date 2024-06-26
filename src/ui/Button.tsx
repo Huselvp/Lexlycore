@@ -19,6 +19,7 @@ const sizes = {
     font-weight: 500;
   `
 }
+
 const variations = {
   priamry: css`
     color: var(--color-stone-50);

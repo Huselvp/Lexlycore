@@ -1,12 +1,12 @@
-import styled from "styled-components"
-import Form from "../../../ui/AuthForm"
-import Button from "../../../ui/Button"
-import Editor from "../../../ui/Editor"
-import { FormEventHandler } from "react"
-import Row from "../../../ui/Row"
-import { questionsAnsewersTypes } from "../../../utils/constants"
-import { useAddSubQuestion } from "./UseAddSubQuestion"
-import { useUpdateSubQuestion } from "./useUpdateSubQuestion"
+import styled from "styled-components";
+import Form from "../../../ui/AuthForm";
+import Button from "../../../ui/Button";
+import Editor from "../../../ui/Editor";
+import { FormEventHandler } from "react";
+import Row from "../../../ui/Row";
+import { questionsAnsewersTypes } from "../../../utils/constants";
+import { useAddSubQuestion } from "./UseAddSubQuestion";
+import { useUpdateSubQuestion } from "./useUpdateSubQuestion";
 
 const Container = styled.div`
   border-radius: var(--rounded-lg);
@@ -17,39 +17,30 @@ const Container = styled.div`
   @media screen and (max-width: 25em) {
     padding: 2rem 1rem 5rem;
   }
-`
-
-
-// type SubQuestion = {
-//   questionText : string 
-//   description : string 
-//   descriptionDetails : string 
-//   valueType : string 
-//   textArea : string 
-// }
+`;
 
 const AddEditSubQuestion = ({
   onAdd,
-  question
+  question,
 }: {
-  onAdd: boolean
-  question?: SubQuestion
+  onAdd: boolean;
+  question?: SubQuestion;
 }) => {
-  const { isLoading: isLoading1, addSubQuestion } = useAddSubQuestion()
-  const { isLoading: isLoading2, updateSubQuestion } = useUpdateSubQuestion()
-  const isLoading = isLoading1 || isLoading2
-  const isQuestionProvided = typeof question !== "undefined"
+  const { isLoading: isLoading1, addSubQuestion } = useAddSubQuestion();
+  const { isLoading: isLoading2, updateSubQuestion } = useUpdateSubQuestion();
+  const isLoading = isLoading1 || isLoading2;
+  const isQuestionProvided = typeof question !== "undefined";
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const questionText = (formData.get("questionText") || "") as string
-    const description = (formData.get("description") || "") as string
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const questionText = (formData.get("questionText") || "") as string;
+    const description = (formData.get("description") || "") as string;
     const descriptionDetails = (formData.get("descriptionDetails") ||
-      "") as string
-    const textArea = (formData.get("textArea") || "") as string
-    const valueType = (formData.get("valueType") || "") as string
+      "") as string;
+    const textArea = (formData.get("textArea") || "") as string;
+    const valueType = (formData.get("valueType") || "") as string;
     // check if texte is a valid html
-    console.log("texte = ", textArea)
+    console.log("texte = ", textArea);
     if (onAdd) {
       addSubQuestion({
         questionText,
@@ -57,7 +48,7 @@ const AddEditSubQuestion = ({
         descriptionDetails,
         valueType,
         textArea,
-      })
+      });
     }
     if (!onAdd && question)
       updateSubQuestion({
@@ -67,8 +58,9 @@ const AddEditSubQuestion = ({
         descriptionDetails,
         valueType,
         textArea,
-      })
-  }
+      });
+  };
+
   return (
     <Container>
       <Row as="form" direction="column" gap="3rem" onSubmit={onSubmit}>
@@ -98,8 +90,7 @@ const AddEditSubQuestion = ({
             <Form.Label htmlFor="details">Details</Form.Label>
             <Form.Textarea
               defaultValue={
-                isQuestionProvided ? question.description_details
-                : ""
+                isQuestionProvided ? question.description_details : ""
               }
               name="descriptionDetails"
               disabled={isLoading}
@@ -108,7 +99,10 @@ const AddEditSubQuestion = ({
           </Form.Row>
           <Form.Row>
             <Form.Label>Content</Form.Label>
-            <Editor defaultValue={isQuestionProvided ? question.text_area : ""} name="textArea" />
+            <Editor
+              defaultValue={isQuestionProvided ? question.text_area : ""}
+              name="textArea"
+            />
           </Form.Row>
           <Form.Row>
             <Form.Label>Type</Form.Label>
@@ -143,7 +137,7 @@ const AddEditSubQuestion = ({
         </Row>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
-export default AddEditSubQuestion
+export default AddEditSubQuestion;

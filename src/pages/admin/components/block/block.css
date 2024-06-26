@@ -1,0 +1,32 @@
+.block {
+  background-color: #fffdf0;
+  border-radius: 10px;
+  border: 1px solid #9e977e;
+  max-width: 25rem;
+  height: 25rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  z-index: 100;
+  cursor: pointer;
+  position: relative;
+}
+
+.block h1 {
+  color: #ebe5d0;
+}
+
+.block button {
+  color: black;
+  background-color: transparent;
+  z-index: 200;
+}
+
+.block .block-controlers {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}

@@ -18,14 +18,14 @@ const Container = styled.div`
   @media screen and (max-width: 25em) {
     padding: 2rem 1rem 5rem;
   }
-`
+`;
 
 const AddEditQuestion = ({
   onAdd,
-  question
+  question,
 }: {
-  onAdd: boolean
-  question?: Question
+  onAdd: boolean;
+  question?: Question;
 }) => {
   const { isLoading: isLoading1, addQuestion } = useAddQuestion()
   const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion()
@@ -33,24 +33,24 @@ const AddEditQuestion = ({
   const isQuestionProvided = typeof question !== "undefined"
   const [editorContent, setEditorContent] = useState(isQuestionProvided ? question.texte : "");
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const questionText = (formData.get("questionText") || "") as string
-    const description = (formData.get("description") || "") as string
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const questionText = (formData.get("questionText") || "") as string;
+    const description = (formData.get("description") || "") as string;
     const descriptionDetails = (formData.get("descriptionDetails") ||
-      "") as string
-    const texte = (formData.get("texte") || "") as string
-    const valueType = (formData.get("valueType") || "") as string
+      "") as string;
+    const texte = (formData.get("texte") || "") as string;
+    const valueType = (formData.get("valueType") || "") as string;
     // check if texte is a valid html
-    console.log("texte = ", texte)
+    console.log("texte = ", texte);
     if (onAdd) {
       addQuestion({
         questionText,
         description,
         descriptionDetails,
         texte,
-        valueType
-      })
+        valueType,
+      });
     }
     if (!onAdd && question)
       updateQuestion({
@@ -59,9 +59,9 @@ const AddEditQuestion = ({
         description,
         descriptionDetails,
         texte,
-        valueType
-      })
-  }
+        valueType,
+      });
+  };
   return (
     <Container>
       <Row as="form" direction="column" gap="3rem" onSubmit={onSubmit}>
@@ -137,7 +137,7 @@ const AddEditQuestion = ({
         </Row>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
-export default AddEditQuestion
+export default AddEditQuestion;

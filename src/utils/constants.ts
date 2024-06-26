@@ -1,132 +1,132 @@
-import { getToken } from "./helpers"
+import { getToken } from "./helpers";
 
-export const MaxItemsPerPage = 10
-export const API = import.meta.env.VITE_API
+export const MaxItemsPerPage = 10;
+export const API = import.meta.env.VITE_API;
 // Auth
-export const registerURL = `${API}/auth/register`
-export const loginURL = `${API}/auth/login`
-export const forgotPasswordURL = `${API}/auth/forgot-password`
+export const registerURL = `${API}/auth/register`;
+export const loginURL = `${API}/auth/login`;
+export const forgotPasswordURL = `${API}/auth/forgot-password`;
 
 // Template
-export const getTemplatesURL = `${API}/public/all_templates`
-export const getTemplateUrl = (id: number) => `${API}/public/template/${id}`
+export const getTemplatesURL = `${API}/public/all_templates`;
+export const getTemplateUrl = (id: number) => `${API}/public/template/${id}`;
 export const deleteTemplateUrl = (id: number) =>
-  `${API}/admin/delete_template/${id}`
+  `${API}/admin/delete_template/${id}`;
 export const updateTemplateUrl = (id: number) =>
-  `${API}/admin/update_template/${id}`
+  `${API}/admin/update_template/${id}`;
 export const createTemplateUrl = () => {
-  const token = getToken()
-  return `${API}/admin/create_template/${token}`
-}
+  const token = getToken();
+  return `${API}/admin/create_template/${token}`;
+};
 export const updateTemplateCategoryUrl = ({
   templateId,
-  categoryId
+  categoryId,
 }: {
-  categoryId: number
-  templateId: number
-}) => `${API}/admin/update_category/${templateId}/${categoryId}`
+  categoryId: number;
+  templateId: number;
+}) => `${API}/admin/update_category/${templateId}/${categoryId}`;
 // Category
-export const getCategoryUrl = (id: number) => `${API}/admin/category/${id}`
+export const getCategoryUrl = (id: number) => `${API}/admin/category/${id}`;
 export const updateCategoryUrl = (id: number) =>
-  `${API}/admin/updateSubcategory/${id}`
-export const getCategoriesUrl = `${API}/public/all_subcategories`
-export const createCategoryUrl = `${API}/admin/addSubCategory`
+  `${API}/admin/updateSubcategory/${id}`;
+export const getCategoriesUrl = `${API}/public/all_subcategories`;
+export const createCategoryUrl = `${API}/admin/addSubCategory`;
 export const deleteCategoryUrl = (id: number) =>
-  `${API}/admin/DeleteSubcategory/${id}`
+  `${API}/admin/DeleteSubcategory/${id}`;
 export const assignCategoryUrl = ({
   templateId,
-  categoryId
+  categoryId,
 }: {
-  categoryId: number
-  templateId: number
-}) => `${API}/admin/assignSubcategory/${templateId}/${categoryId}`
+  categoryId: number;
+  templateId: number;
+}) => `${API}/admin/assignSubcategory/${templateId}/${categoryId}`;
 //Question
 export const createQuestionUrl = (id: number) =>
-  `${API}/admin/create_question/${id}`
+  `${API}/admin/create_question/${id}`;
 
 export const deleteQuestionUrl = (id: number) =>
-  `${API}/admin/delete_question/${id}`
+  `${API}/admin/delete_question/${id}`;
 
 export const updateQuestionUrl = (id: number) =>
-  `${API}/admin/update_question/${id}`
-export const getQuestionUrl = (id: number) => `${API}/admin/question/${id}`
+  `${API}/admin/update_question/${id}`;
+export const getQuestionUrl = (id: number) => `${API}/admin/question/${id}`;
 
-export const QuestionReorder = ()=> `${API}/admin/question/reorder`
+export const QuestionReorder = () => `${API}/admin/question/reorder`;
 // SubQuestion
 export const AddsubQuestionUrl = (id: number) =>
-  `${API}/admin/questions/subquestions/${id}`
-export const deleteSubQuestionUrl = (idq : number , idsq : number) => 
-  `${API}/admin/questions/subquestions/${idq}/${idsq}`
+  `${API}/admin/questions/subquestions/${id}`;
+export const deleteSubQuestionUrl = (idq: number, idsq: number) =>
+  `${API}/admin/questions/subquestions/${idq}/${idsq}`;
 
-
-export const getSubQuestionUrl = (idq: number ,idsq:number ) => `${API}/admin/questions/subquestions/${idq}/${idsq}`
-export const updateSubQuestionUrl = (idq: number , idsq:number) =>
-  `${API}/admin/questions/subquestions/${idsq}/${idq}`
+export const getSubQuestionUrl = (idq: number, idsq: number) =>
+  `${API}/admin/questions/subquestions/${idq}/${idsq}`;
+export const updateSubQuestionUrl = (idq: number, idsq: number) =>
+  `${API}/admin/questions/subquestions/${idsq}/${idq}`;
 
 // Choice
 export const deleteChoiceUrl = ({
   questionId,
-  choiceId
+  choiceId,
 }: {
-  questionId: number
-  choiceId: number
-}) => `${API}/admin/delete-choice/${questionId}/${choiceId}`
+  questionId: number;
+  choiceId: number;
+}) => `${API}/admin/delete-choice/${questionId}/${choiceId}`;
 export const updateChoiceUrl = ({
   questionId,
-  choiceId
+  choiceId,
 }: {
-  questionId: number
-  choiceId: number
-}) => `${API}/admin/update-choice/${questionId}/${choiceId}`
+  questionId: number;
+  choiceId: number;
+}) => `${API}/admin/update-choice/${questionId}/${choiceId}`;
 export const addChoiceUrl = (id: number) =>
-  `${API}/admin/add-choice-question/${id}`
+  `${API}/admin/add-choice-question/${id}`;
 //
 // Auth
 export const updateEmailUrl = () => {
-  const token = getToken()
-  return `${API}/public/updateEMailOrPassword/${token}`
-}
+  const token = getToken();
+  return `${API}/public/updateEMailOrPassword/${token}`;
+};
 
 export const getMeUrl = () => {
-  const token = getToken()
-  return `${API}/public/getMe/${token}`
-}
+  const token = getToken();
+  return `${API}/public/getMe/${token}`;
+};
 
-export const resetPasswordUrl = `${API}/auth/reset`
+export const resetPasswordUrl = `${API}/auth/reset`;
 export const updatePersonalDataUrl = () => {
-  const token = getToken()
-  return `${API}/public/update_user/${token}`
-}
-export const getUsersUrl = `${API}/admin/all_users`
+  const token = getToken();
+  return `${API}/public/update_user/${token}`;
+};
+export const getUsersUrl = `${API}/admin/all_users`;
 // Document
 export const getDocumentsUrl = () => {
-  const token = getToken()
-  return `${API}/suser/get_documents/${token}`
-}
+  const token = getToken();
+  return `${API}/suser/get_documents/${token}`;
+};
 //
 export const generateDocumentUrl = ({
   documentId,
-  templateId
+  templateId,
 }: {
-  documentId: number
-  templateId: number
-}) => `${API}/suser/generate-pdf/${documentId}/${templateId}`
+  documentId: number;
+  templateId: number;
+}) => `${API}/suser/generate-pdf/${documentId}/${templateId}`;
 
 export const createDocumentUrl = (templateId: number) =>
-  `${API}/suser/createDocument/${templateId}`
+  `${API}/suser/createDocument/${templateId}`;
 // export const createDocumentUrl = (templateId: number) =>
 //   `${API}/suser/createDocument/${templateId}`
-export const addUpdateDocumentQuestionUrl = `${API}/suser/addValues`
-export const addDocumentQuestionUrl = `${API}/suser/addValues`
+export const addUpdateDocumentQuestionUrl = `${API}/suser/addValues`;
+export const addDocumentQuestionUrl = `${API}/suser/addValues`;
 export const initiatePaymentUrl = (templateId: number) =>
-  `${API}/suser/initiate-payment/${templateId}`
+  `${API}/suser/initiate-payment/${templateId}`;
 
 export const deleteDocumentUrl = (documentId: number) =>
-  `${API}/suser/deleteDocument/${documentId}`
-export const chargePaymentUrl = `${API}/suser/charge-payment`
+  `${API}/suser/deleteDocument/${documentId}`;
+export const chargePaymentUrl = `${API}/suser/charge-payment`;
 //
 export const getDocumentQuestionsValuesUrl = (documentId: number) =>
-  `${API}/suser/values/${documentId}`
+  `${API}/suser/values/${documentId}`;
 
 // export const getApiConfig = {
 //   headers: {
@@ -136,26 +136,27 @@ export const getDocumentQuestionsValuesUrl = (documentId: number) =>
 // }
 export const getApiConfig = (includeToken: boolean = true) => {
   if (includeToken) {
-    const token = getToken()
+    const token = getToken();
     return {
       headers: {
         Authorization: "Bearer " + token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      withCredentials: true
-    }
+      withCredentials: true,
+    };
   }
   return {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    withCredentials: true
-  }
-}
+    withCredentials: true,
+  };
+};
 export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Number", value: "number" },
   { label: "Short Text", value: "input" },
   { label: "Long Text", value: "textarea" },
-  { label: "Multiple Choice", value: "checkbox" }
+  { label: "Multiple Choice", value: "checkbox" },
+  { label: "form", value: "form" },
   // { label: "True/False", value: "boolean" }
-]
+];
