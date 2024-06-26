@@ -34,8 +34,7 @@ public class Question {
     @NotNull
     private String valueType;
 
-
-    @Column(name= "text_area")
+    @Column(length = 1000000000, name= "text_area")
 //    @JsonProperty("text_area")
     private String texte;
 

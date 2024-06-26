@@ -73,8 +73,8 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
-    @GetMapping("/{id}/details")
-    public ResponseEntity<QuestionDTO> getQuestionWithDetails(@PathVariable Long id) {
+    @GetMapping("/getQuestionWithFormDetails/{id}")
+    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long id) {
         QuestionDTO questionDTO = questionService.getQuestionWithDetails(id);
         return ResponseEntity.ok(questionDTO);
     }
@@ -181,7 +181,21 @@ public class suserController {
         SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
         return ResponseEntity.ok(subQuestion);
     }
-
+    @GetMapping("lastQuestion/{documentId}")
+    public ResponseEntity<Long> getLastQuestionOrSubquestionId(@PathVariable Long documentId) {
+        try {
+            Long lastQuestionId = documentsService.getLastQuestionOrSubquestionId(documentId);
+            if (lastQuestionId != null) {
+                return ResponseEntity.ok(lastQuestionId);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {

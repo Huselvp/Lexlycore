@@ -26,6 +26,10 @@ public class Documents {
     private Template template;
     @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
     private List<DocumentQuestionValue> documentQuestionValues;
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
+    private List<DocumentSubQuestionValue> documentSubQuestionValues;
+
     public Long getId() {
         return id;
     }
@@ -67,6 +71,14 @@ public class Documents {
     }
     public void setPaymentStatus(boolean paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public List<DocumentSubQuestionValue> getDocumentSubQuestionValues() {
+        return documentSubQuestionValues;
+    }
+
+    public void setDocumentSubQuestionValues(List<DocumentSubQuestionValue> documentSubQuestionValues) {
+        this.documentSubQuestionValues = documentSubQuestionValues;
     }
 
     public List<Integer> getQuestionOrder() {

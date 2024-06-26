@@ -18,7 +18,6 @@ public class FormTransformer extends Transformer<Form, FormDTO> {
             form.setId(dto.getId());
             form.setTitle(dto.getTitle());
 
-            // Note: SubQuestion handling as needed
             return form;
         }
     }
@@ -32,7 +31,6 @@ public class FormTransformer extends Transformer<Form, FormDTO> {
             dto.setId(entity.getId());
             dto.setTitle(entity.getTitle());
 
-            // Note: SubQuestion handling as needed
             return dto;
         }
     }

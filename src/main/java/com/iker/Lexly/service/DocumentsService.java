@@ -12,6 +12,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,7 +207,7 @@ public class DocumentsService {
         }
         Template template = templateService.getTemplateById(templateId);
         questions.sort(Comparator.comparingInt(Question::getPosition));
-        Document mainDocument = Jsoup.parse("<div></div>");
+        Document mainDocument = Jsoup.parse("<p></p>");
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/img/docura-short.png").toUriString();        // Create the header div
 //        String headerHtml = "<div style='width: 100%; height: 26%; display: flex; align-items: center; justify-content: space-between;'>" +
 //                "<span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span>" +
@@ -481,15 +484,48 @@ public class DocumentsService {
 //        }
 //        return text;
 //    }
+    private String toXhtml(Document document) {
+        document.outputSettings()
+                .syntax(Document.OutputSettings.Syntax.xml)
+                .escapeMode(org.jsoup.nodes.Entities.EscapeMode.xhtml)
+                .prettyPrint(false);
 
+        // Handle table structure while preserving styles
+        Elements tables = document.select("table");
+        for (Element table : tables) {
+            // Preserve table style
+            String tableStyle = table.attr("style");
+
+            if (!table.select("tbody").isEmpty()) continue;
+            Elements rows = table.select("tr");
+            Element tbody = table.appendElement("tbody");
+            tbody.insertChildren(0, rows);
+            // Re-apply table style
+            table.attr("style", tableStyle);
+        }
+
+        // Ensure all void elements are properly closed
+        Elements voidElements = document.select("img, br, hr, input, col, meta, link");
+        for (Element element : voidElements) {
+            if (!element.toString().endsWith("/>")) {
+                element.after("/>");
+                element.removeAttr("/"); // Remove any standalone "/" attributes
+            }
+        }
+
+        return document.html();
+    }
     public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
         try {
-            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0")
-                    .replaceAll("<img([^>]*)>", "<img$1 />")
-                    .replaceAll("<br([^>]*)>", "<br$1 />")
-                    .replaceAll("<hr([^>]*)>", "<hr$1 />");
+            // Parse HTML to a jsoup Document
+            Document doc = Jsoup.parse(html, "", Parser.xmlParser());
 
-            String wellFormedXml = wrapHtmlContent(sanitizedHtml);
+            // Custom XHTML serialization
+            String xhtml = toXhtml(doc);
+
+            // Wrap in proper HTML structure if needed
+            String wellFormedXml = wrapHtmlContent(xhtml);
+
             ITextRenderer renderer = new ITextRenderer();
             renderer.setDocumentFromString(wellFormedXml);
             renderer.layout();
@@ -503,6 +539,28 @@ public class DocumentsService {
             return new byte[0];
         }
     }
+//    public byte[] generatePdfFromHtml(String html, ByteArrayOutputStream outputStream) {
+//        try {
+//            String sanitizedHtml = html.replaceAll("&nbsp;", "\u00A0")
+//                    .replaceAll("<img([^>]*)>", "<img$1 />")
+//                    .replaceAll("<br([^>]*)>", "<br$1 />")
+//                    .replaceAll("<hr([^>]*)>", "<hr$1 />");
+//
+//
+//            String wellFormedXml = wrapHtmlContent(sanitizedHtml);
+//            ITextRenderer renderer = new ITextRenderer();
+//            renderer.setDocumentFromString(wellFormedXml);
+//            renderer.layout();
+//            renderer.createPDF(outputStream);
+//            renderer.finishPDF();
+//
+//            return outputStream.toByteArray();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("Error generating PDF from XML: ", e);
+//            return new byte[0];
+//        }
+//    }
 
     private String wrapHtmlContent(String html) {
         if (!html.toLowerCase().contains("<html")) {
@@ -541,6 +599,39 @@ public class DocumentsService {
         } else {
             throw new EntityNotFoundException("Document not found with ID: " + documentId);
         }
+    }
+
+    public Long getLastQuestionOrSubquestionId(Long documentId) {
+        Documents document = documentsRepository.findById(documentId)
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        Question maxPositionQuestion = findMaxPositionQuestion(document);
+
+        if (maxPositionQuestion == null) {
+            return null;
+        }
+
+        return findMaxSubquestionIdOrDefault(document, maxPositionQuestion);
+    }
+
+    private Question findMaxPositionQuestion(Documents document) {
+        return document.getDocumentQuestionValues().stream()
+                .map(DocumentQuestionValue::getQuestion)
+                .max(Comparator.comparingInt(Question::getPosition))
+                .orElse(null);
+    }
+
+    private Long findMaxSubquestionIdOrDefault(Documents document, Question maxPositionQuestion) {
+        if (maxPositionQuestion.getSubQuestions().isEmpty()) {
+            return maxPositionQuestion.getId();
+        }
+
+        return document.getDocumentSubQuestionValues().stream()
+                .filter(dsqv -> dsqv.getSubQuestion().getParentQuestion().getId().equals(maxPositionQuestion.getId()))
+                .map(DocumentSubQuestionValue::getSubQuestion)
+                .max(Comparator.comparingInt(SubQuestion::getPosition))
+                .map(SubQuestion::getId)
+                .orElse(maxPositionQuestion.getId());
     }
 
 
