@@ -73,7 +73,7 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
-    @GetMapping("/getQuestionWithFormDetails/{id}")
+    @GetMapping("/{id}/details")
     public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long id) {
         QuestionDTO questionDTO = questionService.getQuestionWithDetails(id);
         return ResponseEntity.ok(questionDTO);
@@ -169,7 +169,21 @@ public class suserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+    @PostMapping("/save-progress/{documentId}")
+    public ResponseEntity<ApiResponse> saveProgress(@PathVariable Long documentId, @RequestBody SaveProgressRequest request) {
+        request.setDocumentId(documentId); // Ensure the document ID in the path matches the request body
+        ApiResponse response = documentQuestionValueService.saveProgress(request);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/resume-progress/{documentId}")
+    public ResponseEntity<ApiResponse> resumeProgress(@PathVariable Long documentId) {
+        ApiResponse response = documentQuestionValueService.resumeProgress(documentId);
 
+        if (response.getData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/questions/subquestions/{questionId}")
     public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
         List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);

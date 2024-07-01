@@ -18,6 +18,10 @@ public class Documents {
     private boolean isDraft=true;
     @Column(name = "payment_status")
     private Boolean paymentStatus=false;
+
+    @Column(name="last_answered_question_id")
+    private Long lastAnsweredQuestionId;
+
     @ElementCollection
     private List<Integer> questionOrder;
     @ManyToOne
@@ -79,6 +83,14 @@ public class Documents {
 
     public void setDocumentSubQuestionValues(List<DocumentSubQuestionValue> documentSubQuestionValues) {
         this.documentSubQuestionValues = documentSubQuestionValues;
+    }
+
+    public Long getLastAnsweredQuestionId() {
+        return lastAnsweredQuestionId;
+    }
+
+    public void setLastAnsweredQuestionId(Long lastAnsweredQuestionId) {
+        this.lastAnsweredQuestionId = lastAnsweredQuestionId;
     }
 
     public List<Integer> getQuestionOrder() {

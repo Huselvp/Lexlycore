@@ -44,7 +44,7 @@ public class FilterController {
             return ResponseEntity.status(500).body("Unexpected error occurred while adding filter.");
         }
     }
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Filter> getFilter(@PathVariable Long id) {
         try {
             Filter filter = filterService.getFilter(id);

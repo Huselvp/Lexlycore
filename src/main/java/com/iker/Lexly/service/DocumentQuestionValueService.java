@@ -1,9 +1,8 @@
 package com.iker.Lexly.service;
 
-import com.iker.Lexly.Entity.DocumentQuestionValue;
-import com.iker.Lexly.Entity.Documents;
-import com.iker.Lexly.Entity.Question;
-import com.iker.Lexly.Entity.SubQuestion;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.repository.*;
 import com.iker.Lexly.request.*;
 import com.iker.Lexly.responses.ApiResponse;
@@ -11,28 +10,114 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class DocumentQuestionValueService {
 
     private final DocumentsRepository documentsRepository;
-
+    private final TemporaryDocumentValueRepository temporaryDocumentValueRepository;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final QuestionService questionService;
     private final DocumentSubQuestionValueService documentSubQuestionValueService;
 
     @Autowired
-    public DocumentQuestionValueService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, DocumentsRepository documentsRepository, QuestionService questionService, DocumentSubQuestionValueService documentSubQuestionValueService) {
+    public DocumentQuestionValueService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, DocumentsRepository documentsRepository, TemporaryDocumentValueRepository temporaryDocumentValueRepository, QuestionService questionService, DocumentSubQuestionValueService documentSubQuestionValueService) {
         this.questionRepository = questionRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
+        this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
         this.questionService = questionService;
         this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
+    @Autowired
+    private ObjectMapper objectMapper; // Jackson ObjectMapper for JSON conversion
+
+    @Transactional
+    public ApiResponse saveProgress(SaveProgressRequest request) {
+        Documents document = documentsRepository.findById(request.getDocumentId()).orElse(null);
+
+        if (document == null) {
+            return new ApiResponse("Document not found.", null);
+        }
+
+        document.setDraft(true);
+        document.setLastAnsweredQuestionId(request.getLastAnsweredQuestionId());
+
+        // Fetch existing temporary values for this document
+        List<TemporaryDocumentValue> existingValues = temporaryDocumentValueRepository.findByDocument(document);
+        Map<Long, TemporaryDocumentValue> existingValueMap = existingValues.stream()
+                .collect(Collectors.toMap(TemporaryDocumentValue::getQuestionId, Function.identity()));
+
+        List<TemporaryDocumentValue> valuesToSave = new ArrayList<>();
+
+        for (UserInputs valueDto : request.getValues()) {
+            processUserInput(document, valueDto, valuesToSave, existingValueMap);
+        }
+
+        temporaryDocumentValueRepository.saveAll(valuesToSave);
+        documentsRepository.save(document);
+
+        return new ApiResponse("Progress saved successfully.", null);
+    }
+
+    private void processUserInput(Documents document, UserInputs valueDto, List<TemporaryDocumentValue> valuesToSave,
+                                  Map<Long, TemporaryDocumentValue> existingValueMap) {
+        try {
+            String userInputJson = objectMapper.writeValueAsString(valueDto);
+
+            TemporaryDocumentValue tempValue = existingValueMap.get(valueDto.getQuestionId());
+            if (tempValue == null) {
+                tempValue = new TemporaryDocumentValue();
+                tempValue.setDocument(document);
+                tempValue.setQuestionId(valueDto.getQuestionId());
+            }
+
+            tempValue.setUserInputJson(userInputJson);
+            tempValue.setLastUpdated(LocalDateTime.now());
+
+            valuesToSave.add(tempValue);
+
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error processing user input", e);
+        }
+    }
+
+    @Transactional
+    public ApiResponse resumeProgress(Long documentId) {
+        Documents document = documentsRepository.findById(documentId).orElse(null);
+
+        if (document == null) {
+            return new ApiResponse("Document not found.", null);
+        }
+
+        List<TemporaryDocumentValue> savedValues = temporaryDocumentValueRepository.findByDocument(document);
+        List<UserInputs> userInputs = new ArrayList<>();
+
+        for (TemporaryDocumentValue savedValue : savedValues) {
+            try {
+                UserInputs userInput = objectMapper.readValue(savedValue.getUserInputJson(), UserInputs.class);
+                userInputs.add(userInput);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Error parsing saved user input", e);
+            }
+        }
+
+        ResumeProgressResponse response = new ResumeProgressResponse(
+                document.getLastAnsweredQuestionId(),
+                userInputs,
+                document.getDraft()
+        );
+
+        return new ApiResponse("Progress retrieved successfully.", response);
+    }
+
 
         @Transactional
         public ApiResponse addValues(AddValuesRequest request) {
