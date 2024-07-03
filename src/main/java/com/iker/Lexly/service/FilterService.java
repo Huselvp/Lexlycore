@@ -125,6 +125,11 @@ public class FilterService {
                 .orElseThrow(() -> new IllegalArgumentException("question not found with id: " + questionId));
     }
 
+    public Filter getFilterBySubQuestionId(Long questionId) {
+        return filterRepository.findBySubQuestionId(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Subquestion not found with id: " + questionId));
+    }
+
 
     public void deleteFiltersByQuestionId(Long questionId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionId);

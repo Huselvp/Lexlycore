@@ -81,6 +81,11 @@ public class FormService {
                 .orElseThrow(() -> new NoSuchElementException("Form not found for questionId: " + questionId));
         return form.getId();
     }
+    public Long getFormsBySubQuestionId(Long subQuestionId) {
+        Form form = formRepository.findBySubQuestionId(subQuestionId)
+                .orElseThrow(() -> new NoSuchElementException("Form not found for subQuestionId: " + subQuestionId));
+        return form.getId();
+    }
 
     @Transactional
     public Form createForm(Long questionId,Form form ) {

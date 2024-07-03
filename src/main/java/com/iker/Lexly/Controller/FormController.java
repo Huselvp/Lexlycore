@@ -56,10 +56,19 @@ public class FormController {
         return formService.getAllForms();
     }
 
-    @GetMapping("get/{questionId}")
+    @GetMapping("get-by-question-id/{questionId}")
     public ResponseEntity<?> getFormIdByQuestionId(@PathVariable Long questionId) {
         try {
             Long formId = formService.getFormsByQuestionId(questionId);
+            return ResponseEntity.ok(formId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    @GetMapping("get-by-sub-question-id/{subQestionId}")
+    public ResponseEntity<?> getFormIdBySubQuestionId(@PathVariable Long subQestionId) {
+        try {
+            Long formId = formService.getFormsBySubQuestionId(subQestionId);
             return ResponseEntity.ok(formId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
