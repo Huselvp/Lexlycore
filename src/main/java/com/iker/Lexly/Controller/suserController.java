@@ -47,9 +47,9 @@ public class suserController {
     private final UserRepository userRepository;
     private final SubQuestionService subQuestionService;
     private final TemporaryDocumentValueRepository temporaryDocumentValueRepository;
-
+    private final CompanySearchService companySearchService ;
     @Autowired
-    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService) {
         this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
@@ -66,6 +66,7 @@ public class suserController {
         this.documentsRepository = documentsRepository;
         this.subQuestionService=subQuestionService;
         this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
+        this.companySearchService = companySearchService;
     }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
@@ -120,6 +121,11 @@ public class suserController {
     public List<Question> findQuestionsByTemplateId(@PathVariable Long templateId) {
         List<Question> questionDTOs = questionRepository.findByTemplateId(templateId);
         return questionDTOs;
+    }
+
+    @GetMapping("/details/{cvr}")
+    public ResponseEntity<CompanyDetails> getCompanyDetails(@PathVariable String cvr) {
+        return companySearchService.getCompanyDetails(cvr);
     }
 
     @PostMapping("/addValues")
