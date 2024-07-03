@@ -14,7 +14,6 @@ import java.util.function.Function;
 public class JwtService {
     private  static final String SECRET_KEY= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
     private static final long EXPIRATION_TIME= 24*60*60*1000;
-
     private static final long INACTIVITY_TIMEOUT = 5 * 60 * 1000;
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();

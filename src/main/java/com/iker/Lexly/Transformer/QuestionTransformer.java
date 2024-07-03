@@ -55,6 +55,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
                     .collect(Collectors.toList());
             dto.setSubQuestions(subQuestionDTOList);
 
+
             return dto;
         }
     }
@@ -69,6 +70,7 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
             Optional<Form> formOptional = formRepository.findByQuestionId(subQuestion.getId());
             formOptional.ifPresent(form -> subQuestionDTO.setForm(formTransformer.toDTO(form)));
         }
+
         return subQuestionDTO;
     }
 }

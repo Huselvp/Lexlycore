@@ -9,4 +9,6 @@ public interface FilterRepository  extends JpaRepository<Filter, Long> {
     void deleteByQuestionId(Long questionId);
 
     Optional<Filter> findByQuestionId(Long questionId);
+    Optional<Filter> findBySubQuestionId(Long questionId);
+
 }

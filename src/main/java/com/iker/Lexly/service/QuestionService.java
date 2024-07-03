@@ -40,11 +40,10 @@ public class QuestionService {
     private EntityManager entityManager;
 
     private final QuestionRepository questionRepository;
-    private final TemplateService templateService;
-    private final TemplateRepository templateRepository;
-    private final DocumentQuestionValueRepository documentQuestionValueRepository;
+
+
     private final QuestionTransformer questionTransformer;
-    private final DocumentsRepository documentsRepository;
+
     private final FilterService filterService;
     private final FormService formService;
     private final FormRepository formRepository;
@@ -52,8 +51,7 @@ public class QuestionService {
     private final LabelRepository labelRepository;
     private final FormTransformer formTransformer;
     private final BlockTransformer blockTransformer;
-    private final LabelTransformer labelTransformer;
-
+    private final FilterRepository filterRepository;
     Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
     @Autowired
@@ -71,14 +69,10 @@ public class QuestionService {
             LabelRepository labelRepository,
             FormTransformer formTransformer,
             BlockTransformer blockTransformer,
-            LabelTransformer labelTransformer
+            LabelTransformer labelTransformer, FilterRepository filterRepository
     ) {
         this.questionRepository = questionRepository;
-        this.templateService = templateService;
         this.questionTransformer = questionTransformer;
-        this.templateRepository = templateRepository;
-        this.documentsRepository = documentsRepository;
-        this.documentQuestionValueRepository = documentQuestionValueRepository;
         this.filterService = filterService;
         this.formService = formService;
         this.formRepository = formRepository;
@@ -86,7 +80,7 @@ public class QuestionService {
         this.labelRepository = labelRepository;
         this.formTransformer = formTransformer;
         this.blockTransformer = blockTransformer;
-        this.labelTransformer = labelTransformer;
+        this.filterRepository = filterRepository;
     }
 
     public List<Question> getAllQuestions() {
@@ -163,31 +157,48 @@ public class QuestionService {
         }
 
 
-    @Transactional()
+    @Transactional
     public QuestionDTO getQuestionWithDetails(Long questionId) {
         // Fetch the Question
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NoSuchElementException("Question not found for id: " + questionId));
 
+        // Fetch the Filter
+        Filter filter = filterRepository.findByQuestionId(questionId)
+                .orElse(null);
+
         // Fetch the Form
         Form form = formRepository.findByQuestionId(questionId)
-                .orElseThrow(() -> new NoSuchElementException("Form not found for questionId: " + questionId));
-
-        // Fetch the Blocks
-        List<Block> blocks = blockRepository.findByFormId(form.getId());
-
-        // Fetch the Labels for each Block
-        Map<Long, List<Label>> labelsByBlockId = blocks.stream()
-                .collect(Collectors.toMap(Block::getId, block -> labelRepository.findByBlockId(block.getId())));
+                .orElse(null);
 
         // Assemble the DTO
         QuestionDTO questionDTO = questionTransformer.toDTO(question);
-        FormDTO formDTO = formTransformer.toDTO(form);
-        List<BlockDTO> blockDTOs = blocks.stream()
-                .map(block -> blockTransformer.toDTO(block, labelsByBlockId.get(block.getId())))
-                .collect(Collectors.toList());
-        formDTO.setBlocks(blockDTOs);
-        questionDTO.setForm(formDTO);
+
+        if (form != null) {
+            FormDTO formDTO = formTransformer.toDTO(form);
+
+            // Fetch the Blocks
+            List<Block> blocks = blockRepository.findByFormId(form.getId());
+
+            if (!blocks.isEmpty()) {
+                // Fetch the Labels for each Block
+                Map<Long, List<Label>> labelsByBlockId = blocks.stream()
+                        .collect(Collectors.toMap(Block::getId, block -> labelRepository.findByBlockId(block.getId())));
+
+                List<BlockDTO> blockDTOs = blocks.stream()
+                        .map(block -> blockTransformer.toDTO(block, labelsByBlockId.get(block.getId())))
+                        .collect(Collectors.toList());
+
+                formDTO.setBlocks(blockDTOs);
+            }
+
+            questionDTO.setForm(formDTO);
+        }
+
+        if (filter != null) {
+
+            questionDTO.setFilter(filter);
+        }
 
         return questionDTO;
     }

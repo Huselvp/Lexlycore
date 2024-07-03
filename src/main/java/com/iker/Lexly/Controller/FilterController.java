@@ -44,15 +44,13 @@ public class FilterController {
             return ResponseEntity.status(500).body("Unexpected error occurred while adding filter.");
         }
     }
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Filter> getFilter(@PathVariable Long id) {
+    @GetMapping("/get/{questionId}")
+    public ResponseEntity<Filter> getFilterByQuestionId(@PathVariable Long questionId) {
         try {
-            Filter filter = filterService.getFilter(id);
-            return new ResponseEntity<>(filter, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>( HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>( HttpStatus.INTERNAL_SERVER_ERROR);
+            Filter filter = filterService.getFilterByQuestionId(questionId);
+            return ResponseEntity.ok(filter);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

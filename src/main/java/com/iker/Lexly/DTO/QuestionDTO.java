@@ -3,6 +3,7 @@ package com.iker.Lexly.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iker.Lexly.Entity.Filter;
 import lombok.Data;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class QuestionDTO {
     private List<SubQuestionDTO> subQuestions;
     private String informations;
     private FormDTO form;
+    private Filter filter;
 
 
 

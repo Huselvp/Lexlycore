@@ -124,6 +124,8 @@ public class FilterService {
          return filterRepository.findByQuestionId(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("question not found with id: " + questionId));
     }
+
+
     public void deleteFiltersByQuestionId(Long questionId) {
         Optional<Question> optionalQuestion = questionRepository.findById(questionId);
         if (optionalQuestion.isEmpty()) {

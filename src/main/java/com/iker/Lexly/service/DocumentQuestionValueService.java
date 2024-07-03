@@ -41,28 +41,22 @@ public class DocumentQuestionValueService {
     @Transactional
     public ApiResponse saveProgress(SaveProgressRequest request) {
         Documents document = documentsRepository.findById(request.getDocumentId()).orElse(null);
-
         if (document == null) {
             return new ApiResponse("Document not found.", null);
         }
-
         document.setDraft(true);
         document.setLastAnsweredQuestionId(request.getLastAnsweredQuestionId());
-
         // Fetch existing temporary values for this document
         List<TemporaryDocumentValue> existingValues = temporaryDocumentValueRepository.findByDocument(document);
         Map<Long, TemporaryDocumentValue> existingValueMap = existingValues.stream()
                 .collect(Collectors.toMap(TemporaryDocumentValue::getQuestionId, Function.identity()));
-
         List<TemporaryDocumentValue> valuesToSave = new ArrayList<>();
 
         for (UserInputs valueDto : request.getValues()) {
             processUserInput(document, valueDto, valuesToSave, existingValueMap);
         }
-
         temporaryDocumentValueRepository.saveAll(valuesToSave);
         documentsRepository.save(document);
-
         return new ApiResponse("Progress saved successfully.", null);
     }
 
@@ -82,8 +76,6 @@ public class DocumentQuestionValueService {
             tempValue.setLastUpdated(LocalDateTime.now());
 
             valuesToSave.add(tempValue);
-
-
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error processing user input", e);
         }
@@ -108,13 +100,11 @@ public class DocumentQuestionValueService {
                 throw new RuntimeException("Error parsing saved user input", e);
             }
         }
-
         ResumeProgressResponse response = new ResumeProgressResponse(
                 document.getLastAnsweredQuestionId(),
                 userInputs,
                 document.getDraft()
         );
-
         return new ApiResponse("Progress retrieved successfully.", response);
     }
 
@@ -134,6 +124,8 @@ public class DocumentQuestionValueService {
                     return new ApiResponse("Failed to add some values.", null);
                 }
             }
+
+            temporaryDocumentValueRepository.deleteByDocumentId(document);
 
             return new ApiResponse("Values added successfully.", null);
         }

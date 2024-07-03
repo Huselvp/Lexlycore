@@ -1,5 +1,6 @@
 package com.iker.Lexly.Controller;
 import com.iker.Lexly.DTO.QuestionDTO;
+import com.iker.Lexly.DTO.SubQuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
@@ -45,9 +46,10 @@ public class suserController {
     private final PDFGenerationService pdfGenerationService;
     private final UserRepository userRepository;
     private final SubQuestionService subQuestionService;
+    private final TemporaryDocumentValueRepository temporaryDocumentValueRepository;
 
     @Autowired
-    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository) {
         this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
@@ -63,6 +65,7 @@ public class suserController {
         this.templateService = templateService;
         this.documentsRepository = documentsRepository;
         this.subQuestionService=subQuestionService;
+        this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
     }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
@@ -73,10 +76,15 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
-    @GetMapping("/{id}/details")
-    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long id) {
-        QuestionDTO questionDTO = questionService.getQuestionWithDetails(id);
+    @GetMapping("/question-details/{idQuestion}")
+    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
+        QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
         return ResponseEntity.ok(questionDTO);
+    }
+    @GetMapping("/sub-question-details/{idSubQuestion}")
+    public ResponseEntity<SubQuestionDTO> getSubQuestionWithDetails(@PathVariable Long idSubQuestion) {
+        SubQuestionDTO subQuestionDTO = subQuestionService.getSubQuestionWithDetails(idSubQuestion);
+        return ResponseEntity.ok(subQuestionDTO);
     }
 
     @GetMapping("/user_template/{templateId}")
@@ -117,6 +125,9 @@ public class suserController {
     @PostMapping("/addValues")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
         ApiResponse response = documentQuestionValueService.addValues(request);
+
+
+
         return response;
     }
 
