@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -10,6 +10,7 @@ import DocumentQuestionsOverview from "../../Documents/DocumentQuestionsOverview
 import QuestiontsSlider from "../../../ui/QuestiontsSlider";
 import DocumentHeader from "../../Documents/DocumentHeader";
 import DocumentSubQuestion from "./DocumentSubQuestion";
+import { colors } from "@mui/material";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -75,6 +76,11 @@ const DocumentQuestions = ({
   const [display, setdisplay] = useState(false);
   const [values, setValues] = useState({});
 
+  // this is the form data
+
+  const [isFormDataFull, setIsFormDataFull] = useState(false);
+
+  // this is the state where he saves the data
   const [overviewData, setOverviewData] = useState<
     {
       questionText: string;
@@ -133,11 +139,14 @@ const DocumentQuestions = ({
   );
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
-  console.log("test active subq", activeSubQuestions);
-  const doesActiveQuestionHaveValue =
-    activeQuestion?.value.toString().trim() !== "";
-  console.log("activeQuestion = ", activeQuestion);
+  // console.log("test active subq", activeSubQuestions);
+  const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
+
+  // console.log("activeQuestion = ", activeQuestion);
+
   const handleSetValue = (id: number, newValue: string) => {
+    // here he saves the input data
+
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -149,6 +158,11 @@ const DocumentQuestions = ({
       }))
     );
   };
+
+  const isTherFormDataHandler = (value) => {
+    setIsFormDataFull(value);
+  };
+
   return (
     <>
       <DocumentHeader isDraft={isDraft} overviewData={overviewData} />
@@ -173,6 +187,9 @@ const DocumentQuestions = ({
                         )
                       )
                     }
+                    isTherData={(value) => {
+                      isTherFormDataHandler(value);
+                    }}
                   >
                     {question.subQuestions &&
                     question.subQuestions.length > 0 &&
@@ -185,9 +202,7 @@ const DocumentQuestions = ({
                               overviewData[index]?.subQuestions[ind]
                                 ?.subQuestionValue as string | number
                             }
-                            setValue={(value: string) =>
-                              handleSetValue(sq.id, value)
-                            }
+                            setValue={(value) => handleSetValue(sq.id, value)}
                           >
                             {" "}
                           </DocumentSubQuestion>
@@ -212,29 +227,146 @@ const DocumentQuestions = ({
                           <span>Back</span>
                         </button>
                       )}
-                      <button
-                        disabled={!doesActiveQuestionHaveValue}
-                        onClick={
-                          activeSubQuestions && !display
-                            ? (e) => {
-                                e.preventDefault();
-                                setdisplay(true);
-                              }
-                            : () => {
-                                setdisplay(false);
-                                setOverviewData((data) =>
-                                  data.map((item, i) => {
-                                    if (i === index + 1)
-                                      return { ...item, active: true };
-                                    else return { ...item, active: false };
-                                  })
-                                );
-                              }
-                        }
-                      >
-                        <span>Next</span>
-                        <ArrowRightIcon />
-                      </button>
+
+                      {/* {question.valueType !== "form" && (
+                        <button
+                           disabled={!doesActiveQuestionHaveValue}
+                          onClick={
+                            activeSubQuestions && !display
+                              ? (e) => {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                }
+                              : () => {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1)
+                                        return { ...item, active: true };
+                                      else return { ...item, active: false };
+                                    })
+                                  );
+                                }
+                            // () => {
+                            //   if (question.valueType === "form") {
+                            //     // console.log("fuck you");
+                            //     // handle_form_block_data
+                            //     activeSubQuestions && !display
+                            //       ? (e) => {
+                            //           e.preventDefault();
+                            //           setdisplay(true);
+                            //         }
+                            //       : () => {
+                            //           setdisplay(false);
+                            //           handle_form_block_data((data) =>
+                            //             data.map((item, i) => {
+                            //               if (i === index + 1)
+                            //                 return { ...item, active: true };
+                            //               else return { ...item, active: false };
+                            //             })
+                            //           );
+                            //         };
+                            //   } else {
+                            //     activeSubQuestions && !display
+                            //       ? (e) => {
+                            //           e.preventDefault();
+                            //           setdisplay(true);
+                            //         }
+                            //       : () => {
+                            //           setdisplay(false);
+                            //           setOverviewData((data) =>
+                            //             data.map((item, i) => {
+                            //               if (i === index + 1)
+                            //                 return { ...item, active: true };
+                            //               else return { ...item, active: false };
+                            //             })
+                            //           );
+                            //         };
+                            //   }
+                            // }
+                          }
+                          // onClick={(e) => {
+                          //   if (activeSubQuestions && !display) {
+                          //     e.preventDefault();
+                          //     setdisplay(true);
+                          //   } else {
+                          //     setdisplay(false);
+                          //     setOverviewData((data) =>
+                          //       data.map((item, i) => {
+                          //         if (i === index + 1) {
+                          //           return { ...item, active: true };
+                          //         } else {
+                          //           return { ...item, active: false };
+                          //         }
+                          //       })
+                          //     );
+                          //   }
+
+                          //   if (question.valueType === "FORM") {
+                          //     console.log("Fuck you");
+                          //   }
+                          // }}
+                        >
+                          <span>Next</span>
+                          <ArrowRightIcon />
+                        </button>
+                      )}
+
+                      {question.valueType === "form" && (
+                        <button>This form</button>
+                      )} */}
+
+                      {question.valueType === "form" && (
+                        <button
+                          disabled={!isFormDataFull}
+                          onClick={
+                            activeSubQuestions && !display
+                              ? (e) => {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                }
+                              : () => {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1)
+                                        return { ...item, active: true };
+                                      else return { ...item, active: false };
+                                    })
+                                  );
+                                }
+                          }
+                        >
+                          <span>Next</span>
+                          <ArrowRightIcon />
+                        </button>
+                      )}
+
+                      {question.valueType !== "form" && (
+                        <button
+                          disabled={!doesActiveQuestionHaveValue}
+                          onClick={
+                            activeSubQuestions && !display
+                              ? (e) => {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                }
+                              : () => {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1)
+                                        return { ...item, active: true };
+                                      else return { ...item, active: false };
+                                    })
+                                  );
+                                }
+                          }
+                        >
+                          <span>Next</span>
+                          <ArrowRightIcon />
+                        </button>
+                      )}
                     </BtnsContainer>
                   </DocumentQuestion>
                 )

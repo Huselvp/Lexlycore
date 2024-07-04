@@ -157,6 +157,7 @@ export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Short Text", value: "input" },
   { label: "Long Text", value: "textarea" },
   { label: "Multiple Choice", value: "checkbox" },
-  { label: "form", value: "form" },
+  { label: "Form", value: "form" },
+  { label: "Filter", value: "filter" },
   // { label: "True/False", value: "boolean" }
 ];

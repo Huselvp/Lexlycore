@@ -1,15 +1,23 @@
 import { ReactNode } from "react";
 import "./popUpContantContainer.css";
 import { IoIosClose } from "react-icons/io";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 
 interface PopUpProps {
   children: ReactNode;
 }
 
-function PopUpContentContainer({ children, onClose }: PopUpProps) {
+function PopUpContentContainer({
+  children,
+  onClose,
+  onSeeAllBlocks,
+}: PopUpProps) {
   return (
     <div className="pop-up-content-container">
-      <IoIosClose size={40} className="close" onClick={onClose} />
+      <div className="close">
+        <MdOutlineRemoveRedEye size={30} onClick={onSeeAllBlocks} />
+        <IoIosClose size={30} onClick={onClose} />
+      </div>
 
       {children}
     </div>

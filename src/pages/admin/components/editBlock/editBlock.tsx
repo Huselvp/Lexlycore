@@ -391,6 +391,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               <option value="NUMBER">Number</option>
               <option value="DATE">Date</option>
               <option value="SELECT">Select</option>
+              <option value="filter">Filter</option>
             </select>
             <div className="add-new-input">
               <button

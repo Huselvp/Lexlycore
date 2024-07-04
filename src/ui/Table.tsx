@@ -97,30 +97,36 @@ const Row = ({
 }) => {
   const { columns } = useContext(TableContext);
 
-  useEffect(() => {
-    const get_form_blocks_handler = async () => {
-      console.log("from the table row");
+  // useEffect(() => {
+  //   localStorage.setItem("subId", mainId);
+  // }, [mainId]);
 
-      try {
-        console.log(id);
+  // useEffect(() => {
+  //   const get_form_blocks_handler = async () => {
+  //     console.log("from the table row");
 
-        await axios
-          .get(
-            `http://localhost:8081/api/form/blocks/${mainId}`,
-            getApiConfig()
-          )
-          .then((result) => {
-            // setFormBlocs(result.data);
-            console.log(id), "mee";
-            console.log(result.data);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
+  //     try {
+  //       console.log(id);
 
-    get_form_blocks_handler();
-  }, [id]);
+  //       await axios
+  //         .get(
+  //           `http://localhost:8081/api/form/blocks/${mainId}`,
+  //           getApiConfig()
+  //         )
+  //         .then((result) => {
+  //           // setFormBlocs(result.data);
+  //           console.log(id), "mee";
+  //           console.log(result.data);
+  //           console.log(mainId);
+  //         });
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   get_form_blocks_handler();
+  // }, [id]);
+
   return (
     <StyledRow columns={columns} id={id}>
       {children}

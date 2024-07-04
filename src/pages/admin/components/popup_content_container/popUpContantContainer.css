@@ -9,11 +9,17 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 92%;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
 }
 
 .pop-up-content-container .close {
-  position: absolute;
+  /* position: absolute;
   top: 2rem;
-  right: 2rem;
+  right: 2rem; */
   cursor: pointer;
+  display: flex;
+  gap: 2rem;
+  justify-content: right;
 }
