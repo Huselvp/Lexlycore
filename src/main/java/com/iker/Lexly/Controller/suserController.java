@@ -77,11 +77,15 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/question-details/{idQuestion}")
     public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
         QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
         return ResponseEntity.ok(questionDTO);
     }
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/sub-question-details/{idSubQuestion}")
     public ResponseEntity<SubQuestionDTO> getSubQuestionWithDetails(@PathVariable Long idSubQuestion) {
         SubQuestionDTO subQuestionDTO = subQuestionService.getSubQuestionWithDetails(idSubQuestion);

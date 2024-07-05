@@ -13,8 +13,5 @@ public class CompanyDetails {
     private String address;
     private String postalCode;
     private String city;
-    private String startDate;
-    private String companyForm;
-    private String advertisingProtection;
-    private String status;
+
 }

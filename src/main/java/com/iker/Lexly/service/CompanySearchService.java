@@ -61,11 +61,6 @@ public class CompanySearchService {
             details.setPostalCode(addressNode.path("postnummer").asText());
             details.setCity(addressNode.path("postdistrikt").asText());
 
-            details.setStartDate(companyInfo.path("livsforloeb").get(0).path("periode").path("gyldigFra").asText());
-            details.setCompanyForm(companyInfo.path("virksomhedsform").get(0).path("langBeskrivelse").asText());
-            details.setAdvertisingProtection(companyInfo.path("reklamebeskyttet").asBoolean() ? "Ja" : "Nej");
-            details.setStatus(companyInfo.path("virksomhedsstatus").get(0).path("status").asText());
-
             return ResponseEntity.ok(details);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

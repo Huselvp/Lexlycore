@@ -3,8 +3,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iker.Lexly.Entity.Form.Form;
-import com.iker.Lexly.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ public class Question {
     private String texte;
 
     private int position;
+
 
     @ElementCollection
     @CollectionTable(name = "list", joinColumns = @JoinColumn(name = "question_id"))
