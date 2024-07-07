@@ -435,7 +435,7 @@
 
 //         <button
 //           onClick={() => {
-//             console.log(isAllDataIntered, "fuck you");
+//
 //           }}
 //         >
 //           test

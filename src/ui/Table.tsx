@@ -86,46 +86,8 @@ const Header = ({ children }: { children: React.ReactNode }) => {
   const { columns } = useContext(TableContext);
   return <StyledHeader columns={columns}>{children}</StyledHeader>;
 };
-const Row = ({
-  children,
-  id,
-  mainId,
-}: {
-  children: React.ReactNode;
-  id: string;
-  mainId: string;
-}) => {
+const Row = ({ children, id }: { children: React.ReactNode; id: string }) => {
   const { columns } = useContext(TableContext);
-
-  // useEffect(() => {
-  //   localStorage.setItem("subId", mainId);
-  // }, [mainId]);
-
-  // useEffect(() => {
-  //   const get_form_blocks_handler = async () => {
-  //     console.log("from the table row");
-
-  //     try {
-  //       console.log(id);
-
-  //       await axios
-  //         .get(
-  //           `http://localhost:8081/api/form/blocks/${mainId}`,
-  //           getApiConfig()
-  //         )
-  //         .then((result) => {
-  //           // setFormBlocs(result.data);
-  //           console.log(id), "mee";
-  //           console.log(result.data);
-  //           console.log(mainId);
-  //         });
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-
-  //   get_form_blocks_handler();
-  // }, [id]);
 
   return (
     <StyledRow columns={columns} id={id}>

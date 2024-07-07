@@ -249,7 +249,7 @@ const DocumentQuestions = ({
                                 }
                             // () => {
                             //   if (question.valueType === "form") {
-                            //     // console.log("fuck you");
+                            //    
                             //     // handle_form_block_data
                             //     activeSubQuestions && !display
                             //       ? (e) => {
@@ -303,7 +303,7 @@ const DocumentQuestions = ({
                           //   }
 
                           //   if (question.valueType === "FORM") {
-                          //     console.log("Fuck you");
+                          //     
                           //   }
                           // }}
                         >

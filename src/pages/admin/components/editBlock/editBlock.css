@@ -78,11 +78,17 @@
 .frm {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
+}
+
+.admin_inputs_controlers {
+  display: flex;
 }
 
 .frm .icon {
   cursor: pointer;
+  color: #ada587;
 }
 
 .frm input,

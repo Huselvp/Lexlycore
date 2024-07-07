@@ -250,22 +250,27 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                         <div className="frm">
                           {/* <input type={input.type}></input> */}
                           <p>Type :{input.type}</p>
-                          <CiEdit
-                            size={30}
-                            className="icon"
-                            style={{ marginRight: "1rem" }}
-                            onClick={() => {
-                              get_input_by_id(input.id);
-                              localStorage.setItem("selectedInputId", input.id);
-                            }}
-                          />
-                          <MdDeleteOutline
-                            className="icon delete"
-                            size={30}
-                            onClick={() => {
-                              delete_input_handler(input.id);
-                            }}
-                          />
+                          <div className="admin_inputs_controlers">
+                            <CiEdit
+                              size={30}
+                              className="icon"
+                              style={{ marginRight: "1rem" }}
+                              onClick={() => {
+                                get_input_by_id(input.id);
+                                localStorage.setItem(
+                                  "selectedInputId",
+                                  input.id
+                                );
+                              }}
+                            />
+                            <MdDeleteOutline
+                              className="icon delete"
+                              size={30}
+                              onClick={() => {
+                                delete_input_handler(input.id);
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
                     </React.Fragment>
@@ -293,7 +298,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                             }}
                           />
                           <MdDeleteOutline
-                            className="delete"
+                            className="icon delete"
                             size={30}
                             onClick={() => {
                               delete_input_handler(input.id);

@@ -5,13 +5,15 @@ import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
-import ConfirmDeleteSubQuestion from "./ConfirmDeleteSubQuestion";
-import { Reorder, color } from "framer-motion";
-import { useTemplate } from "../useTemplate";
+
+import { Reorder } from "framer-motion";
+
 import axios from "axios";
 import { API, getApiConfig } from "../../../utils/constants";
+
+import SubQuestionRow from "../../../pages/admin/components/SubQuestionRow/SubQuestionRow";
 
 import PopUp from "../../../pages/admin/components/popUp/PopUp";
 import PopUpContentContainer from "../../../pages/admin/components/popup_content_container/PopUpContantContainer";
@@ -22,7 +24,7 @@ import AddNewBlock from "../../../pages/admin/components/addNewBlock/AddNewBlock
 import BlocksContainer from "../../../pages/admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../pages/admin/components/editBlock/editBlock";
 
-import { IoIosAdd, IoIosClose } from "react-icons/io";
+import { IoIosClose } from "react-icons/io";
 import { HiOutlineDuplicate } from "react-icons/hi";
 
 import { FaRegEdit } from "react-icons/fa";
@@ -30,8 +32,6 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 
 import { MdDone } from "react-icons/md";
-
-import SubQuestionForm from "../../../pages/admin/components/subQuestionFormPopUp/subQuestionForm";
 
 const QuestionsRow = ({ question }: { question: Question }) => {
   const [formTitle, setFormTitle] = useState("");
@@ -53,8 +53,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const navigate = useNavigate();
 
-  const { templateId } = useParams<{ templateId: string }>();
-
   const [formBlocs, setFormBlocs] = useState([]);
   // const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
   const [isSubQuestionHaveForm, setIsSubQuestionHaveForm] = useState(false);
@@ -69,10 +67,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   const [formBlocksData, setFormBblocksData] = useState([]);
-
-  // const [subQuestionFormBlocksData, setSubQuestionFormBlocksData] = useState(
-  //   []
-  // );
 
   useEffect(() => {
     console.log(question.subQuestions, "this is the subquestion");
@@ -337,147 +331,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
   };
 
-  // ===================================================
-
-  // popups controllers
-  const [isAddSubQuestionFormNameOpen, setIsAddSubQuestionFormNameOpen] =
-    useState(false);
-
-  const [isSeeSubQuestionFormBlocksOpen, setIsSeeSubQuestionBlocks] =
-    useState(false);
-
-  const [isEditSubQuestionBlocksOpen, setIsEditSubQuestionBlocksOpen] =
-    useState(false);
-
-  const [isSeeAlSubQuestionBlocksOpen, setIsSeeAllSubQuestionBlocksOpen] =
-    useState(false);
-
-  // SubQuestion data
-
-  const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
-
-  const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
-
-  const [subQuestionFormId, setSubQuestionFormId] = useState("");
-
-  const [subQuestionBlockId, setSubQuestionBlockId] = useState("");
-
-  const [subQuestionId, setSubQuestionId] = useState("8");
-
-  const getSubQuestionId = (id) => {
-    setSubQuestionId(id);
-    console.log(id);
-  };
-
-  // subQuestion controllers
-
-  const createSubQuestionFormHandler = async () => {
-    try {
-      if (subQuestionFormTitle !== "") {
-        await axios
-          .post(
-            `${API}/form/create-sub/${subQuestionId}`,
-            { title: subQuestionFormTitle },
-            getApiConfig()
-          )
-          .then((result) => {
-            setIsAddSubQuestionFormNameOpen(false);
-            setIsSeeSubQuestionBlocks(true);
-            getSubQuestionFormBlocksHandler(subQuestionFormId);
-          });
-      } else {
-        console.log("form title should not be empty");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getSubQuestionFormBlocksHandler = async (id) => {
-    try {
-      await axios
-        .get(`${API}/form/blocks/${id}`, getApiConfig())
-        .then((result) => {
-          if (result.data.length !== 0) {
-            setSubQuestionFormBlocks(result.data);
-          }
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getSubQuestionFormId = async (id) => {
-    try {
-      await axios
-        .get(`${API}/form/get-by-sub-question-id/${id}`, getApiConfig())
-        .then((result) => {
-          if (typeof result.data === "number") {
-            setSubQuestionFormId(`${result.data}`);
-            getSubQuestionFormBlocksHandler(result.data);
-          } else {
-            setSubQuestionFormId("");
-            return;
-          }
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    getSubQuestionFormId(subQuestionId);
-  }, [subQuestionId]);
-
-  useEffect(() => {
-    getSubQuestionFormBlocksHandler(subQuestionFormId);
-  }, [subQuestionFormId]);
-
-  const create_subQuestion_new_block_handler = async () => {
-    try {
-      await axios
-        .post(`${API}/form/block/${subQuestionFormId}`, {}, getApiConfig())
-        .then((result) => {
-          getSubQuestionFormBlocksHandler(subQuestionFormId);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const delete_subQuestion_block_handler = async (id) => {
-    try {
-      await axios
-        .delete(
-          `${API}/form/block/${subQuestionFormId}/${subQuestionId}`,
-          getApiConfig()
-        )
-        .then((result) => {
-          getSubQuestionFormBlocksHandler(subQuestionFormId);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const duplicate_subQuestion_block_handler = async (id) => {
-    try {
-      await axios
-        .post(
-          `${API}/form/block/duplicate/${subQuestionFormId}/${id}`,
-          {},
-          getApiConfig()
-        )
-        .then((result) => {
-          getSubQuestionFormBlocksHandler(subQuestionFormId);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const [isSubQuestionFormOpen, setIsSubQuestionFormOpen] = useState(false);
-
   return (
     <>
       <PopUp isOpen={isPopUpOpen}>
@@ -685,132 +538,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
               </div>
             )}
           </div>
-
-          {isSeeAllBlocksInpusOpen && (
-            <div>
-              {isAddSubQuestionFormNameOpen && (
-                <Form>
-                  <label>Add form name</label>
-                  <input
-                    placeholder="Enter form name"
-                    onChange={(e) => {
-                      setSubQuestionFormTitle(e.target.value);
-                    }}
-                  ></input>
-                  <div className="controllers">
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        createSubQuestionFormHandler();
-                      }}
-                    >
-                      <MdDone />
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setIsAddSubQuestionFormNameOpen(false);
-                        setIsSeeAllSubQuestionBlocksOpen(false);
-                      }}
-                    >
-                      <IoIosClose />
-                    </Button>
-                  </div>
-                </Form>
-              )}
-
-              {isSeeSubQuestionFormBlocksOpen && (
-                <BlocksContainer>
-                  {subQuestionFormBlocks.map((block, index) => (
-                    <Block key={index}>
-                      <div className="block-controlers">
-                        <button>
-                          <FaRegEdit
-                            size={20}
-                            onClick={() => {
-                              setIsEditSubQuestionBlocksOpen(true);
-                              setIsAddSubQuestionFormNameOpen(false);
-                              setIsSeeAllSubQuestionBlocksOpen(false);
-                              setSubQuestionBlockId(block.id);
-                            }}
-                          />
-                        </button>
-                        <button>
-                          <HiOutlineDuplicate
-                            size={20}
-                            onClick={() => {
-                              duplicate_subQuestion_block_handler(block.id);
-                            }}
-                          />
-                        </button>
-                        <button>
-                          <MdDeleteOutline
-                            size={20}
-                            onClick={() => {
-                              delete_subQuestion_block_handler(block.id);
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </Block>
-                  ))}
-                  <AddNewBlock
-                    onCreateNewBlock={create_subQuestion_new_block_handler}
-                  />
-                </BlocksContainer>
-              )}
-
-              {isEditSubQuestionBlocksOpen && (
-                <EditBlock
-                  onSeeBlocksOpen={() => {
-                    setIsSeeSubQuestionBlocks(true);
-                    setIsEditSubQuestionBlocksOpen(false);
-                    setIsAddSubQuestionFormNameOpen(false);
-                  }}
-                  isBlocksOpen={isSeeSubQuestionFormBlocksOpen}
-                  id={subQuestionBlockId}
-                />
-              )}
-
-              {isSeeAlSubQuestionBlocksOpen && (
-                <div className="form_type">
-                  {subQuestionFormBlocks.map((block, blockIndex) => {
-                    return (
-                      <div className="form-block-user" key={block.id}>
-                        <IoIosClose
-                          className="form_type_controllers"
-                          size={20}
-                        />
-
-                        {block.labels.map((label, labelIndex) => {
-                          return (
-                            <div key={label.id} className="block-input">
-                              <label>{label.name}</label>
-                              {label.type === "SELECT" ? (
-                                <select name={label.name}>
-                                  {Object.keys(label.options).map((key) => (
-                                    <option key={key} value={key}>
-                                      {label.options[key]}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <input
-                                  type={label.type}
-                                  name={label.name}
-                                  placeholder={label.name}
-                                />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
         </PopUpContentContainer>
       </PopUp>
       <Reorder.Item value={question} key={question.id}>
@@ -831,59 +558,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
               {question.questionText}
             </div>
             <div className="hideOverflow questions">{question.description}</div>
-
-            {/* <Menus.Toggle id={String(question.id)} /> */}
-            {/* <Menus.List id={String(question.id)}>
-              {question.valueType.startsWith("checkbox") && (
-                <Menus.Button
-                  icon={<HiEye />}
-                  onClick={() => navigate(`${question.id}`)}
-                >
-                  See Choices
-                </Menus.Button>
-              )}
-
-              {question.valueType.startsWith("form") &&
-                (formBlocs.length === 0 ? (
-                  <Menus.Button
-                    icon={<HiEye />}
-                    onClick={() => {
-                      setIsPopUpOpen(true);
-                      setIsAddFormNameOpen(true);
-                      console.log(question.id);
-                    }}
-                  >
-                    Add form
-                  </Menus.Button>
-                ) : (
-                  <Menus.Button
-                    icon={<HiEye />}
-                    onClick={() => {
-                      setIsPopUpOpen(true);
-                      setIsSeeBlocksOpen(true);
-                      localStorage.setItem("isSeeBlockOpen", "true");
-                    }}
-                  >
-                    See Blocs
-                  </Menus.Button>
-                ))}
-              <Menus.Button
-                icon={<HiEye />}
-                onClick={() => navigate(`addSubQuestion/${question.id}`)}
-              >
-                Add SubQuestions
-              </Menus.Button>
-              <Menus.Button
-                icon={<HiPencil />}
-                onClick={() => navigate(`editQuestion/${question.id}`)}
-              >
-                Edit
-              </Menus.Button>
-
-              <Modal.Open opens={`delete-question-${question.id}`}>
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-              </Modal.Open>
-            </Menus.List> */}
 
             {caret_icon_active === false && (
               <Menus.Toggle id={String(question.id)} />
@@ -926,29 +600,29 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ))}
 
                 {question.valueType.startsWith("filter") &&
-                !isFilterHaveValue ? (
-                  <Menus.Button
-                    icon={<HiEye />}
-                    onClick={() => {
-                      setIsAddMaxMinValuesOpen(true);
-                      setIsPopUpOpen(true);
-                      console.log("this is working");
-                    }}
-                  >
-                    Add min max values
-                  </Menus.Button>
-                ) : (
-                  <Menus.Button
-                    icon={<HiEye />}
-                    onClick={() => {
-                      setIsUpdatedMaxMinValuesOpen(true);
-                      setIsPopUpOpen(true);
-                      console.log("this is working");
-                    }}
-                  >
-                    Edit Min Max Values
-                  </Menus.Button>
-                )}
+                  (isFilterHaveValue ? (
+                    <Menus.Button
+                      icon={<HiEye />}
+                      onClick={() => {
+                        setIsAddMaxMinValuesOpen(true);
+                        setIsPopUpOpen(true);
+                        console.log("this is working");
+                      }}
+                    >
+                      Add min max values
+                    </Menus.Button>
+                  ) : (
+                    <Menus.Button
+                      icon={<HiEye />}
+                      onClick={() => {
+                        setIsUpdatedMaxMinValuesOpen(true);
+                        setIsPopUpOpen(true);
+                        console.log("this is working");
+                      }}
+                    >
+                      Edit Min Max Values
+                    </Menus.Button>
+                  ))}
 
                 <Menus.Button
                   icon={<HiEye />}
@@ -980,71 +654,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             {squestionOrderTest?.map((sq, i) => {
               return (
                 <Reorder.Item value={sq} key={sq.id}>
-                  <Table.Row id={`menus-row--sq--${sq.id}`} mainId={sq.id}>
-                    <div></div>
-                    <div
-                      className="hideOverflow questionColor"
-                      style={{ marginLeft: "35px", color: "#646464" }}
-                    >
-                      {sq.questionText}
-                    </div>
-                    <div
-                      className="hideOverflow questionColor"
-                      style={{ marginLeft: "35px", color: "#646464" }}
-                    >
-                      {sq.Description}
-                    </div>
-                    <Menus.Toggle id={String(sq.id)} />
-                    {/* this is the button who open the subList*/}
-                    <Menus.ListSub id={String(sq.id)}>
-                      <Menus.Button
-                        icon={<HiPencil />}
-                        onClick={() => {
-                          navigate(`editSubQuestion/${question.id}/${sq.id}`);
-                        }}
-                      >
-                        Edit SubQuestion
-                      </Menus.Button>
-
-                      {sq.valueType === "form" &&
-                        (subQuestionFormBlocks.length === 0 ? (
-                          <Menus.Button
-                            icon={<HiPencil />}
-                            onClick={() => {
-                              setIsPopUpOpen(true);
-                              setIsSeeSubQuestionBlocks(true);
-                            }}
-                          >
-                            Add form
-                          </Menus.Button>
-                        ) : (
-                          <Menus.Button
-                            icon={<HiPencil />}
-                            onClick={() => {
-                              setIsPopUpOpen(true);
-                              setIsSeeSubQuestionBlocks(true);
-                            }}
-                          >
-                            See blocks
-                          </Menus.Button>
-                        ))}
-                      <Modal.Open
-                        opens={`delete-subquestion-${sq.id}-${question.id}`}
-                      >
-                        <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                      </Modal.Open>
-                    </Menus.ListSub>
-
-                    {/* {this is the window to confirm the delete} */}
-                    <Modal.Window
-                      name={`delete-subquestion-${sq.id}-${question.id}`}
-                    >
-                      <ConfirmDeleteSubQuestion
-                        questionParentId={Number(question.id)}
-                        questionId={Number(sq.id)}
-                      />
-                    </Modal.Window>
-                  </Table.Row>
+                  <SubQuestionRow subQuestion={sq} questionId={question.id} />
                 </Reorder.Item>
               );
             })}

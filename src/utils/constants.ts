@@ -159,5 +159,8 @@ export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Multiple Choice", value: "checkbox" },
   { label: "Form", value: "form" },
   { label: "Filter", value: "filter" },
+  { label: "Day", value: "day" },
+  { label: "Time", value: "time" },
+  { label: "Date", value: "date" },
   // { label: "True/False", value: "boolean" }
 ];
