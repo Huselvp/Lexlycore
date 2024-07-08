@@ -81,6 +81,12 @@ public class adminController {
 
     }
 
+    @GetMapping("/question-details/{idQuestion}")
+    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
+        QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
+        return ResponseEntity.ok(questionDTO);
+    }
+
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
