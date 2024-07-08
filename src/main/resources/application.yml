@@ -10,15 +10,15 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:postgresql://localhost:5432/lexly_database
+    url: jdbc:postgresql://localhost:8000/lexly_database
     username: postgres
-    password: password
+    password: IKER1234
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
 server:
-  port: 8082
+  port: 8081
   servlet:
     encoding:
       charset: UTF-8
