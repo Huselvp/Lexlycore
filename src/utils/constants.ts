@@ -162,5 +162,6 @@ export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Day", value: "day" },
   { label: "Time", value: "time" },
   { label: "Date", value: "date" },
+  { label: "Map", value: "map" },
   // { label: "True/False", value: "boolean" }
 ];

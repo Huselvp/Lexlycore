@@ -600,7 +600,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ))}
 
                 {question.valueType.startsWith("filter") &&
-                  (isFilterHaveValue ? (
+                  (!isFilterHaveValue ? (
                     <Menus.Button
                       icon={<HiEye />}
                       onClick={() => {
