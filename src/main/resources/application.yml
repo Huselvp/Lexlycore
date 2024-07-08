@@ -10,9 +10,9 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:postgresql://localhost:8000/lexly_database
+    url: jdbc:postgresql://localhost:5432/lexly_database
     username: postgres
-    password: IKER1234
+    password: password
     driver-class-name: org.postgresql.Driver
   sql:
     init:
