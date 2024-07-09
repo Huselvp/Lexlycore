@@ -48,8 +48,9 @@ public class suserController {
     private final SubQuestionService subQuestionService;
     private final TemporaryDocumentValueRepository temporaryDocumentValueRepository;
     private final CompanySearchService companySearchService ;
+    private final DocumentSubQuestionValueService documentSubQuestionValueService;
     @Autowired
-    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService, DocumentSubQuestionValueService documentSubQuestionValueService) {
         this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
@@ -67,6 +68,7 @@ public class suserController {
         this.subQuestionService=subQuestionService;
         this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
         this.companySearchService = companySearchService;
+        this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
@@ -78,14 +80,14 @@ public class suserController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/question-details/{idQuestion}")
     public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
         QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
         return ResponseEntity.ok(questionDTO);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/sub-question-details/{idSubQuestion}")
     public ResponseEntity<SubQuestionDTO> getSubQuestionWithDetails(@PathVariable Long idSubQuestion) {
         SubQuestionDTO subQuestionDTO = subQuestionService.getSubQuestionWithDetails(idSubQuestion);
@@ -131,15 +133,15 @@ public class suserController {
     public ResponseEntity<CompanyDetails> getCompanyDetails(@PathVariable String cvr) {
         return companySearchService.getCompanyDetails(cvr);
     }
-
-    @PostMapping("/addValues")
-    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-        ApiResponse response = documentQuestionValueService.addValues(request);
-
-
-
-        return response;
-    }
+//
+//    @PostMapping("/addValues")
+//    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
+//        ApiResponse response = documentQuestionValueService.addValues(request);
+//
+//
+//
+//        return response;
+//    }
 
 
 
@@ -231,6 +233,19 @@ public class suserController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @PostMapping("/add-values")
+    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
+
+        return documentQuestionValueService.addValues(request);
+    }
+    @PutMapping("/update-values/{valueId}")
+    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody UserInputs request) {
+        return documentQuestionValueService.updateValues(valueId ,request);
+    }
+    @PutMapping("/update-sub-values/{valueId}")
+    public ApiResponse updateSubQuestionValues(@PathVariable Long valueId ,@RequestBody UserInputsSubQuestion request) {
+        return documentSubQuestionValueService.updateSubQuestionValues(valueId ,request);
+    }
 
     @GetMapping("/test")
     public ResponseEntity<String> testDocumentProcess(@RequestBody RequestData requestData) {
@@ -243,7 +258,7 @@ public class suserController {
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
-
+    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,

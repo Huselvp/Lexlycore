@@ -397,19 +397,7 @@ public class FormController {
 //                                                 @RequestBody List<FormValues> formValues) {
 //        return documentsService.updateFormValuesToQuestion(questionId, documentId, formValues);
 //    }
-    @PostMapping("/add")
-    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
 
-        return documentQuestionValueService.addValues(request);
-    }
-    @PutMapping("/up/{valueId}")
-    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody UserInputs request) {
-        return documentQuestionValueService.updateValues(valueId ,request);
-    }
-    @PutMapping("/up-sub/{valueId}")
-    public ApiResponse updateSubQuestionValues(@PathVariable Long valueId ,@RequestBody UserInputsSubQuestion request) {
-        return documentSubQuestionValueService.updateSubQuestionValues(valueId ,request);
-    }
 
 //    @PostMapping("/test/replaceValues/{questionId}/{DocumentQuestionValue}")
 //    public String testReplaceValues(

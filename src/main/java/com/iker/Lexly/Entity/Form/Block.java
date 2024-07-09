@@ -16,7 +16,7 @@ public class Block {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int numberOfBloc;
-
+//    private String name;
 
     @ManyToOne
     @JsonBackReference

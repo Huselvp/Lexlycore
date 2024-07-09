@@ -40,7 +40,7 @@ public class BlockService {
     }
 
     @Transactional
-    public Block createBlock(Long formId) {
+    public Block createBlock(Long formId ) {
         Form form = formRepository.findById(formId).orElseThrow(() -> new IllegalArgumentException("form not found with ID"+formId));
         Block block = new Block();
         block.setForm(form);

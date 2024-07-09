@@ -125,7 +125,7 @@ public class DocumentQuestionValueService {
                 }
             }
 
-            temporaryDocumentValueRepository.deleteByDocumentId(document);
+//            temporaryDocumentValueRepository.deleteByDocumentId(document);
 
             return new ApiResponse("Values added successfully.", null);
         }

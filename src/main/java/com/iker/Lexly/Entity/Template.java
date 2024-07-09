@@ -25,13 +25,12 @@ public class Template {
 
     @Column(name = "template_name")
     private String templateName;
-
-    @Column(name = "template_description")
+    @Column(length = 1000000000,name = "template_description")
     private String templateDescription;
 
     @Column(name = "template_cost")
     private float cost;
-    @Column(name="template_content")
+    @Column(length = 1000000000,name="template_content")
     private String content;
     @ManyToOne
     @JoinColumn(name = "subcategory_id")
