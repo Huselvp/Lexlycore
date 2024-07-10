@@ -23,7 +23,7 @@ public class Filter {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JsonIgnore
     @JoinColumn(name = "subQuestion_id")
     private SubQuestion subQuestion;
