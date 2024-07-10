@@ -181,7 +181,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
         .then((result) => {
           setIsPopUpOpen(false);
           setIsAddMaxMinValuesOpen(false);
-          getFilterInformation(question?.id, question?.valueType);
+          getFilterInformation(subQuestion?.id, subQuestion?.valueType);
         });
     } catch (err) {
       console.error(err);
@@ -494,6 +494,15 @@ function SubQuestionRow({ subQuestion, questionId }) {
                 See blocks
               </Menus.Button>
             ))}
+
+          {subQuestion.valueType.startsWith("checkbox") && (
+            <Menus.Button
+              icon={<HiEye />}
+              onClick={() => navigate(`${subQuestion.id}`)}
+            >
+              See Choices
+            </Menus.Button>
+          )}
 
           {subQuestion.valueType.startsWith("filter") &&
             (!isFilterHaveValue ? (

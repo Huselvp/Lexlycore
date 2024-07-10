@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -78,6 +78,10 @@ const DocumentQuestions = ({
 
   const [isFormDataFull, setIsFormDataFull] = useState(false);
   const [isDaysFull, setIsDaysFull] = useState(false);
+  const [isTimesFull, setIsTimesFull] = useState(false);
+  const [isTheSubQuestionOpen, setIsTheSubQuestionOpen] = useState(false);
+  const [isAllSubQuestionDataFull, setIsAllSubQuestionDataFull] =
+    useState(false);
 
   // this is the state where he saves the data
   const [overviewData, setOverviewData] = useState<
@@ -166,6 +170,18 @@ const DocumentQuestions = ({
     setIsDaysFull(value);
   };
 
+  const isTherTimes = (value) => {
+    setIsTimesFull(value);
+  };
+
+  const isSubOpen = (value) => {
+    setIsTheSubQuestionOpen(value);
+  };
+
+  const isSubDataFull = (value) => {
+    setIsAllSubQuestionDataFull(value);
+  };
+
   return (
     <>
       <DocumentHeader isDraft={isDraft} overviewData={overviewData} />
@@ -196,6 +212,9 @@ const DocumentQuestions = ({
                     isTherDays={(value) => {
                       isTherIsDays(value);
                     }}
+                    isTherTimes={(value) => {
+                      isTherTimes(value);
+                    }}
                   >
                     {question.subQuestions &&
                     question.subQuestions.length > 0 &&
@@ -204,14 +223,21 @@ const DocumentQuestions = ({
                           <DocumentSubQuestion
                             key={sq.subQuestionId}
                             question={sq}
+                            data={overviewData}
+                            subQuestions={question.subQuestions}
+                            mainQuestionId={question.id}
                             value={
                               overviewData[index]?.subQuestions[ind]
                                 ?.subQuestionValue as string | number
                             }
                             setValue={(value) => handleSetValue(sq.id, value)}
-                          >
-                            {" "}
-                          </DocumentSubQuestion>
+                            subOpen={(value) => {
+                              isSubOpen(value);
+                            }}
+                            isSDataFull={(value) => {
+                              isSubDataFull(value);
+                            }}
+                          ></DocumentSubQuestion>
                         ))
                       : null}
 
@@ -234,7 +260,7 @@ const DocumentQuestions = ({
                         </button>
                       )}
 
-                      {question.valueType === "form" && (
+                      {/* {question.valueType === "form" && (
                         <button
                           disabled={!isFormDataFull}
                           onClick={
@@ -286,8 +312,36 @@ const DocumentQuestions = ({
                         </button>
                       )}
 
+                      {question.valueType === "time" && (
+                        <button
+                          disabled={!isTimesFull}
+                          onClick={
+                            activeSubQuestions && !display
+                              ? (e) => {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                }
+                              : () => {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1)
+                                        return { ...item, active: true };
+                                      else return { ...item, active: false };
+                                    })
+                                  );
+                                }
+                          }
+                        >
+                          <span>Next time</span>
+                          <ArrowRightIcon />
+                        </button>
+                      )}
+
                       {question.valueType !== "form" &&
-                        question.valueType !== "day" && (
+                        question.valueType !== "day" &&
+                        question.valueType !== "time" &&
+                        isTheSubQuestionOpen === false && (
                           <button
                             disabled={!doesActiveQuestionHaveValue}
                             onClick={
@@ -312,24 +366,195 @@ const DocumentQuestions = ({
                             <ArrowRightIcon />
                           </button>
                         )}
+
+                      {isTheSubQuestionOpen && (
+                        <button
+                          disabled={!isAllSubQuestionDataFull}
+                          onClick={(e) => {
+                            if (activeSubQuestions && !display) {
+                              e.preventDefault();
+                              setdisplay(true);
+                            } else {
+                              setdisplay(false);
+                              setOverviewData((data) =>
+                                data.map((item, i) => {
+                                  if (i === index + 1) {
+                                    return { ...item, active: true };
+                                  } else {
+                                    return { ...item, active: false };
+                                  }
+                                })
+                              );
+                            }
+                            setIsAllSubQuestionDataFull(false);
+                          }}
+                        >
+                          <span>Next Sub</span>
+                          <ArrowRightIcon />
+                        </button>
+                      )} */}
+
+                      {isTheSubQuestionOpen ? (
+                        <button
+                          disabled={!isAllSubQuestionDataFull}
+                          onClick={(e) => {
+                            if (activeSubQuestions && !display) {
+                              e.preventDefault();
+                              setdisplay(true);
+                            } else {
+                              setdisplay(false);
+                              setOverviewData((data) =>
+                                data.map((item, i) => {
+                                  if (i === index + 1) {
+                                    return { ...item, active: true };
+                                  } else {
+                                    return { ...item, active: false };
+                                  }
+                                })
+                              );
+                            }
+                            setIsTheSubQuestionOpen(false);
+                            setIsAllSubQuestionDataFull(false);
+                          }}
+                        >
+                          <span>Next Sub</span>
+                          <ArrowRightIcon />
+                        </button>
+                      ) : (
+                        <>
+                          {question.valueType === "form" && (
+                            <button
+                              disabled={!isFormDataFull}
+                              onClick={(e) => {
+                                if (activeSubQuestions && !display) {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                } else {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1) {
+                                        return { ...item, active: true };
+                                      } else {
+                                        return { ...item, active: false };
+                                      }
+                                    })
+                                  );
+                                }
+                              }}
+                            >
+                              <span>Next</span>
+                              <ArrowRightIcon />
+                            </button>
+                          )}
+
+                          {question.valueType === "day" && (
+                            <button
+                              disabled={!isDaysFull}
+                              onClick={(e) => {
+                                if (activeSubQuestions && !display) {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                } else {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1) {
+                                        return { ...item, active: true };
+                                      } else {
+                                        return { ...item, active: false };
+                                      }
+                                    })
+                                  );
+                                }
+                              }}
+                            >
+                              <span>Next day</span>
+                              <ArrowRightIcon />
+                            </button>
+                          )}
+
+                          {question.valueType === "time" && (
+                            <button
+                              disabled={!isTimesFull}
+                              onClick={(e) => {
+                                if (activeSubQuestions && !display) {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                } else {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1) {
+                                        return { ...item, active: true };
+                                      } else {
+                                        return { ...item, active: false };
+                                      }
+                                    })
+                                  );
+                                }
+                              }}
+                            >
+                              <span>Next time</span>
+                              <ArrowRightIcon />
+                            </button>
+                          )}
+
+                          {question.valueType !== "form" &&
+                            question.valueType !== "day" &&
+                            question.valueType !== "time" && (
+                              <button
+                                disabled={!doesActiveQuestionHaveValue}
+                                onClick={(e) => {
+                                  if (activeSubQuestions && !display) {
+                                    e.preventDefault();
+                                    setdisplay(true);
+                                  } else {
+                                    setdisplay(false);
+                                    setOverviewData((data) =>
+                                      data.map((item, i) => {
+                                        if (i === index + 1) {
+                                          return { ...item, active: true };
+                                        } else {
+                                          return { ...item, active: false };
+                                        }
+                                      })
+                                    );
+                                  }
+                                }}
+                              >
+                                <span>Next</span>
+                                <ArrowRightIcon />
+                              </button>
+                            )}
+                        </>
+                      )}
                     </BtnsContainer>
                   </DocumentQuestion>
                 )
             )
           ) : (
-            <DocumentQuestionsOverview
-              isDraft={isDraft}
-              data={overviewData}
-              onClick={(index: number) => {
-                setOverviewData((data) =>
-                  data.map((q, i) =>
-                    i === index
-                      ? { ...q, active: true }
-                      : { ...q, active: false }
-                  )
-                );
+            // <DocumentQuestionsOverview
+            //   isDraft={isDraft}
+            //   data={overviewData}
+            //   onClick={(index: number) => {
+            //     setOverviewData((data) =>
+            //       data.map((q, i) =>
+            //         i === index
+            //           ? { ...q, active: true }
+            //           : { ...q, active: false }
+            //       )
+            //     );
+            //   }}
+            // />
+
+            <button
+              onClick={() => {
+                console.log(overviewData);
               }}
-            />
+            >
+              Get all the entered data
+            </button>
           )}
         </Content>
       </Container>
@@ -338,24 +563,3 @@ const DocumentQuestions = ({
 };
 
 export default DocumentQuestions;
-{
-  /*
-                          {(value: string) =>
-                              setOverviewData((current) =>
-                                current.map((q, i) => {
-                                  if (i === index && q.subQuestions) {
-                                    return {
-                                      ...q,
-                                      subQuestions: q.subQuestions.map((subQ) =>
-                                        subQ.subQuestionId === sq.subQuestionId
-                                          ? { ...subQ, subQuestionValue: value }
-                                          : subQ
-                                      ),
-                                    };
-                                  }
-                                  return q;
-                                })
-                              )
-                            }
-                          */
-}

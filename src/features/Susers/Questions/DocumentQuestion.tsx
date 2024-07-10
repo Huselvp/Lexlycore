@@ -10,6 +10,8 @@ import { getApiConfig } from "../../../utils/constants";
 import "./styles/form.css";
 import { IoMdRemove } from "react-icons/io";
 
+import MapContainer from "../../../ui/map/MapContainer";
+
 const Checkbox = styled.input`
   /* accent-color: var(--color-stone-300); */
   /* border: none; */
@@ -152,11 +154,11 @@ const DocumentQuestion = ({
   value,
   setValue,
   isTherData,
+  isTherDays,
+  isTherTimes,
 }: {
   question: Question;
   children: ReactNode;
-  // setValue: (value: string) => void;
-  // value: string | number;
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   if (typeof question === "undefined") return null;
@@ -238,20 +240,6 @@ const DocumentQuestion = ({
       }
 
       setFormData(updatedFormData);
-      setFormErrors(
-        formBlocks.flatMap((block) =>
-          block.labels.map((label) =>
-            updatedFormData.some(
-              (item) =>
-                item.blockId === block.id &&
-                item.labelId === label.id &&
-                item.LabelValue.trim() !== ""
-            )
-              ? ""
-              : `${label.name} is required`
-          )
-        )
-      );
 
       const allInputsFilled = updatedFormData.length === totalInputs;
       setIsAllDataIntered(allInputsFilled);
@@ -304,6 +292,8 @@ const DocumentQuestion = ({
     outline: "none",
   };
 
+  const [isDaysFull, setIsDaysFull] = useState(false);
+
   const [days, setDays] = useState([
     { index: 0, day: "" },
     { index: 1, day: "" },
@@ -315,6 +305,12 @@ const DocumentQuestion = ({
     );
     setDays(newDays);
   };
+
+  useEffect(() => {
+    const allDaysFilled = days.every((day) => day.day !== "");
+    setIsDaysFull(allDaysFilled);
+    isTherDays(allDaysFilled);
+  }, [days]);
 
   //=======================
 
@@ -330,9 +326,14 @@ const DocumentQuestion = ({
     setTimes(newTimes);
   };
 
+  const isSecondTimeDisabled = times[0].time === "";
+
+  const isSecondDayDisabled = days[0].day === "";
+
   useEffect(() => {
-    console.log(value, "this is the old value");
-  }, [value]);
+    const allTimesFilled = times.every((time) => time.time !== "");
+    isTherTimes(allTimesFilled);
+  }, [times]);
 
   return (
     <>
@@ -559,6 +560,7 @@ const DocumentQuestion = ({
                 id="daysOfWeek2"
                 value={days[1].day}
                 onChange={(e) => handleSelectChange(1, e)}
+                disabled={isSecondDayDisabled}
               >
                 <option value="">Select a day</option>
                 <option value="Mandag">Mandag</option>
@@ -597,18 +599,14 @@ const DocumentQuestion = ({
                 type="time"
                 value={times[1].time} // Bind the value from state
                 onChange={(e) => handleTimeChange(1, e)} // Update state on change
+                disabled={isSecondTimeDisabled}
               />
             </div>
           </div>
         )}
 
         {question.valueType.startsWith("date") && (
-          <div
-            className="daysofwork_container"
-            onChange={() => {
-              setValue(times);
-            }}
-          >
+          <div className="daysofwork_container">
             <div className="select_input">
               <input
                 type="date"
@@ -619,6 +617,8 @@ const DocumentQuestion = ({
             </div>
           </div>
         )}
+
+        {question.valueType.startsWith("map") && <MapContainer />}
 
         {children}
       </InputContainer>

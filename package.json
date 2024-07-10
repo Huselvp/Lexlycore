@@ -37,7 +37,10 @@
     "suneditor": "^2.45.1",
     "suneditor-react": "^3.6.1",
     "validator": "^13.11.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "@googlemaps/markerclusterer": "^2.5.1",
+    "@react-google-maps/api": "^2.19.3",
+    "@vis.gl/react-google-maps": "latest"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
