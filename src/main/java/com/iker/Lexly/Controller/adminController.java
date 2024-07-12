@@ -193,12 +193,6 @@ public class adminController {
         return questionDTOs;
     }
 
-//    @GetMapping("/find_questions_by_questionsOrder/{templateId}")
-//    public List<Question> getAllQuestionsByQuestionsOrder(@PathVariable Long templateId) {
-//        return questionService.getAllQuestionsByTemplateIdOrderByOrder(templateId);
-//
-//    }
-
 
     @PutMapping("/update_question/{id}") //valide
     public ResponseEntity<QuestionDTO> updateQuestion(
@@ -262,16 +256,6 @@ public class adminController {
         return ResponseEntity.ok(options);
     }
 
-//    @PutMapping("/update_question_order/{templateId}")
-//    public ResponseEntity<Void> updateQuestionOrder(
-//            @PathVariable Long templateId,
-//            @RequestBody List<Long> questionOrder
-//    ) {
-//        questionService.updateQuestionOrder(templateId, questionOrder);
-//        return ResponseEntity.ok().build();
-//    }
-
-
 
     @DeleteMapping("delete_question/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
@@ -323,23 +307,6 @@ public class adminController {
         }
     }
 
-
-
-
-//    @PutMapping("/questions/subquestions/{questionId}/order")
-//    public ResponseEntity<Void> updateSubQuestionOrder(
-//            @PathVariable Long questionId,
-//            @RequestBody List<Long> subQuestionOrder) {
-//        subQuestionService.updateSubQuestionOrder(questionId, subQuestionOrder);
-//        return ResponseEntity.ok().build();
-//    }
-
-
-//    @GetMapping("/questions/subquestions/{questionId}/order")
-//    public List<SubQuestion> getAll(@PathVariable Long questionId) {
-//        return subQuestionService.getAllSubQuestionsBySubquestionOrder(questionId);
-//
-//    }
 
 
     @PostMapping("add-choice-question/{questionId}")

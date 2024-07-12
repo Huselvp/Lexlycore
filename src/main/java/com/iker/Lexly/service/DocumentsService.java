@@ -208,20 +208,7 @@ public class DocumentsService {
         Template template = templateService.getTemplateById(templateId);
         questions.sort(Comparator.comparingInt(Question::getPosition));
         Document mainDocument = Jsoup.parse("<p></p>");
-        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/img/docura-short.png").toUriString();        // Create the header div
-//        String headerHtml = "<div style='width: 100%; height: 26%; display: flex; align-items: center; justify-content: space-between;'>" +
-//                "<span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span>" +
-//                "<img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' />" +
-//                "</div>";
-        String headerHtml = "<div style='width: 100%; height: 26%;'>" +
-                "<table style='width: 100%;'><tr>" +
-                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
-                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
-                "</tr></table>" +
-                "</div>";
-        // Parse the header div and add it to the main document
-        Document headerDocument = Jsoup.parseBodyFragment(headerHtml);
-        mainDocument.body().appendChild(headerDocument.body().child(0));
+        addHeaderToDocument(mainDocument, template);
 
         for (Question question : questions) {
             if (question != null && question.getTemplate().getId().equals(templateId)) {
@@ -237,6 +224,18 @@ public class DocumentsService {
             }
         }
         return mainDocument.html().trim();
+    }
+
+    private void addHeaderToDocument(Document mainDocument, Template template) {
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/img/docura-short.png").toUriString();
+        String headerHtml = "<div style='width: 100%; height: 26%;'>" +
+                "<table style='width: 100%;'><tr>" +
+                "<td style='width: 50%;'><span style='font-size: 45px; font-weight: bold;'>" + template.getTemplateName() + "</span></td>" +
+                "<td style='width: 50%; text-align: right;'><img src='" + imageUrl + "' alt='Logo' style='height: 100px; width: 100px;' /></td>" +
+                "</tr></table>" +
+                "</div>";
+        Document headerDocument = Jsoup.parseBodyFragment(headerHtml);
+        mainDocument.body().appendChild(headerDocument.body().child(0));
     }
 
     private void prossesSubQuestion(List<SubQuestion> subQuestions, List<DocumentSubQuestionValue> documentSubQuestionValues,Document mainDocument) {
@@ -377,23 +376,6 @@ public class DocumentsService {
         }
     }
 
-//    private String processCheckboxValue(Long questionId, DocumentQuestionValue documentQuestionValue) {
-//        StringBuilder textBuilder = new StringBuilder();
-//        String[] values = extractValues(documentQuestionValue, questionId);
-//
-//        for (int i = 0; i < values.length; i += 2) {
-//            String value = values[i]; // value part
-//            String text = values[i+ 1]; // text part
-//            text = text.replaceFirst("\\[value\\]", value);
-//            textBuilder.append(text).append(", ");
-//        }
-//
-//        if (textBuilder.length() > 0) {
-//            textBuilder.setLength(textBuilder.length() - 2);
-//        }
-//
-//        return textBuilder.toString();
-//    }
     private String processCheckboxValue(String text, DocumentQuestionValue documentQuestionValue) {
         String blockText = text;
         String[] values = extractValues(documentQuestionValue,documentQuestionValue.getQuestion().getId());
@@ -601,18 +583,7 @@ public class DocumentsService {
         }
     }
 
-    public Long getLastQuestionOrSubquestionId(Long documentId) {
-        Documents document = documentsRepository.findById(documentId)
-                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
-        Question maxPositionQuestion = findMaxPositionQuestion(document);
-
-        if (maxPositionQuestion == null) {
-            return null;
-        }
-
-        return findMaxSubquestionIdOrDefault(document, maxPositionQuestion);
-    }
 
     private Question findMaxPositionQuestion(Documents document) {
         return document.getDocumentQuestionValues().stream()
@@ -635,242 +606,6 @@ public class DocumentsService {
     }
 
 
-
-//    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-//        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-//            if (documentQuestionValue != null && documentQuestionValue.getQuestion().getId().equals(questionId)) {
-//                if (documentQuestionValue.getValue() != null) {
-//                    if (documentQuestionValue.getQuestion().getValueType().equals("form")) {
-//                        Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
-//                        if (formOptional.isPresent()) {
-//                            Form form = formOptional.get();
-//
-//                            List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
-//                            boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
-//
-//                            // If there are multiple blocks and they are equal we're going to duplicate the text for each block and replace the values
-//                            if (blocksOfForm.size() > 1 && areBlocksEqual) {
-//                                StringBuilder textBuilder = new StringBuilder();
-//                                for (Block block : blocksOfForm) {
-//                                    String blockText = text;
-//                                    String concatenatedValues = documentQuestionValue.getValue();
-//                                    String formPrefix = "form/";
-//                                    String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
-//                                    String[] values = valueTypeWithoutForm.split("/");
-//
-//                                    for (int i = 0; i < values.length; i += 3) {
-//                                        int blockId = Integer.parseInt(values[i]);
-//                                        String value = values[i + 2];
-//                                        if (blockId == block.getId()) {
-//                                            blockText = blockText.replaceFirst("\\[value\\]", value);
-//                                        }
-//                                    }
-//                                    textBuilder.append(blockText).append(", ");
-//                                }
-//
-//                                if (textBuilder.length() > 2) {
-//                                    textBuilder.setLength(textBuilder.length() - 2);
-//                                }
-//                                text = textBuilder.toString();
-//
-//                            } else {
-//                                StringBuilder textBuilder = new StringBuilder();
-//                                String blockText = text;
-//                                String values = documentQuestionValue.getValue();
-//                                String formPrefix = "form/";
-//                                String valueTypeWithoutForm = values.substring(formPrefix.length());
-//                                String[] choices = valueTypeWithoutForm.split("/");
-//                                for (int i = 0; i < choices.length; i += 3) {
-//                                    String value = choices[i + 2];
-//                                    blockText = blockText.replaceFirst("\\[value\\]", value);
-//                                }
-//
-//                                textBuilder.append(blockText);
-//                                text = textBuilder.toString();
-//                            }
-//                        }
-//                    } else {
-//                        text = text.replace("[value]", documentQuestionValue.getValue());
-//                    }
-//                } else {
-//                    text = text.replace("[value]", "null");
-//                }
-//            }
-//
-//        }
-//        return text;
-//    }
-
-//
-//    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-//        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-//            if (documentQuestionValue.getValue() == null) {
-//                text = text.replace("[value]", "null");
-//            } else if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
-//                text = processDocumentQuestionValue(text, questionId, documentQuestionValue);
-//            }
-//        }
-//        return text;
-//    }
-//
-//    private String processDocumentQuestionValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
-//        if ("form".equals(documentQuestionValue.getQuestion().getValueType())) {
-//            return processFormValue(text, questionId, documentQuestionValue);
-//        } else {
-//            return text.replace("[value]", documentQuestionValue.getValue());
-//        }
-//    }
-//
-//    private String processFormValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
-//        Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
-//        if (!formOptional.isPresent()) {
-//            return text;
-//        }
-//        Form form = formOptional.get();
-//        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
-//        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
-//
-//        if (blocksOfForm.size() > 1 && areBlocksEqual) {
-//            return processEqualBlocks(text, blocksOfForm, documentQuestionValue);
-//        } else {
-//            return processNonEqualBlocks(text, documentQuestionValue);
-//        }
-//    }
-//
-//    private String processEqualBlocks(String text, List<Block> blocksOfForm, DocumentQuestionValue documentQuestionValue) {
-//        StringBuilder textBuilder = new StringBuilder();
-//        String[] values = extractValues(documentQuestionValue);
-//        for (Block block : blocksOfForm) {
-//            String blockText = text;
-//            for (int i = 0; i < values.length; i += 3) {
-//                int blockId = Integer.parseInt(values[i]);
-//                String value = values[i + 2];
-//                if (blockId == block.getId()) {
-//                    blockText = blockText.replaceFirst("\\[value\\]", value);
-//                }
-//            }
-//            textBuilder.append(blockText).append(", ");
-//        }
-//        if (textBuilder.length() > 2) {
-//            textBuilder.setLength(textBuilder.length() - 2);
-//        }
-//        return textBuilder.toString();
-//    }
-//
-//    private String processNonEqualBlocks(String text, DocumentQuestionValue documentQuestionValue) {
-//        String blockText = text;
-//        String[] values = extractValues(documentQuestionValue);
-//
-//        for (int i = 0; i < values.length; i += 3) {
-//            String value = values[i + 2];
-//            blockText = blockText.replaceFirst("\\[value\\]", value);
-//        }
-//        return blockText;
-//    }
-//
-//    private String[] extractValues(DocumentQuestionValue documentQuestionValue) {
-//
-//        String concatenatedValues = documentQuestionValue.getValue();
-//        String formPrefix = "form/";
-//        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
-//        return valueTypeWithoutForm.split("/");
-//    }
-
-
-//    private Question findQuestionById(List<Question> questions, Integer questionId) {
-//        for (Question question : questions) {
-//            if (question.getId().equals(questionId)) {
-//                return question;
-//            }
-//        }
-//        return null;
-//    }
-
-//
-//    public String replaceValues(String text, Long questionId, List<DocumentQuestionValue> documentQuestionValues) {
-//        for (DocumentQuestionValue documentQuestionValue : documentQuestionValues) {
-//            if (documentQuestionValue.getValue() == null) {
-//                text = text.replace("[value]", "null");
-//            } else if (documentQuestionValue.getQuestion().getId().equals(questionId)) {
-//                text = processDocumentQuestionValue(text, questionId, documentQuestionValue);
-//            }
-//        }
-//        return text;
-//    }
-//
-//    private String processDocumentQuestionValue(String text, Long questionId, DocumentQuestionValue documentQuestionValue) {
-//        String [] value = extractValues(documentQuestionValue, questionId);
-//        if ("form".equals(documentQuestionValue.getQuestion().getValueType())) {
-//            return processFormValue(text, questionId, value);
-//        } else {
-//            return processDefaultValue(text, value);
-//        }
-//    }
-//
-//    private String processFormValue(String text, Long questionId,String [] value) {
-//        Optional<Form> formOptional = formRepository.findByQuestionId(questionId);
-//        if (!formOptional.isPresent()) {
-//            return text;
-//        }
-//        Form form = formOptional.get();
-//        List<Block> blocksOfForm = blockRepository.findByFormId(form.getId());
-//        boolean areBlocksEqual = blockService.areBlocksEqual(form.getId());
-//
-//        if (blocksOfForm.size() > 1 && areBlocksEqual) {
-//            return processEqualBlocks(text, blocksOfForm,value);
-//        } else {
-//            return processNonEqualBlocks(text, value);
-//        }
-//    }
-//
-//    private String processEqualBlocks(String text, List<Block> blocksOfForm, String [] value) {
-//        StringBuilder textBuilder = new StringBuilder();
-////        String[] values = extractValues(documentQuestionValue);
-//        String[] values =value ;
-//        for (Block block : blocksOfForm) {
-//            String blockText = text;
-//            for (int i = 0; i < values.length; i += 3) {
-//                int blockId = Integer.parseInt(values[i]);
-//                String extractedValue = values[i + 2];
-//                if (blockId == block.getId()) {
-//                    blockText = blockText.replaceFirst("\\[value\\]", extractedValue);
-//                }
-//            }
-//            textBuilder.append(blockText).append(", ");
-//        }
-//        if (textBuilder.length() > 2) {
-//            textBuilder.setLength(textBuilder.length() - 2);
-//        }
-//        return textBuilder.toString();
-//    }
-//
-//    private String processNonEqualBlocks(String text, String [] value) {
-//        String blockText = text;
-////        String[] values = extractValues(documentQuestionValue);
-//
-//        String[] values =value;
-//        for (int i = 0; i < values.length; i += 3) {
-//            String extractedValue = values[i + 2];
-//            blockText = blockText.replaceFirst("\\[value\\]", extractedValue);
-//        }
-//        return blockText;
-//    }
-//    private String processDefaultValue(String text, String [] value) {
-//        String blockText = text;
-//        String[] values =value;
-//        for (int i = 0; i < values.length; i ++) {
-//            blockText = blockText.replaceFirst("\\[value\\]",values[i]);
-//        }
-//        return blockText;
-//    }
-//
-//    private String[] extractValues(DocumentQuestionValue documentQuestionValue , Long questionId) {
-//        Question question = questionRepository.findById(questionId).orElseThrow();
-//        String concatenatedValues = documentQuestionValue.getValue();
-//        String formPrefix = question.getValueType().split("/")[0] +"/";
-//        String valueTypeWithoutForm = concatenatedValues.substring(formPrefix.length());
-//        return valueTypeWithoutForm.split("/");
-//    }
 
 }
 

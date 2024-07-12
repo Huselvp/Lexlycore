@@ -218,21 +218,7 @@ public class suserController {
         SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
         return ResponseEntity.ok(subQuestion);
     }
-    @GetMapping("lastQuestion/{documentId}")
-    public ResponseEntity<Long> getLastQuestionOrSubquestionId(@PathVariable Long documentId) {
-        try {
-            Long lastQuestionId = documentsService.getLastQuestionOrSubquestionId(documentId);
-            if (lastQuestionId != null) {
-                return ResponseEntity.ok(lastQuestionId);
-            } else {
-                return ResponseEntity.noContent().build();
-            }
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+
     @PostMapping("/add-values")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
 
@@ -258,7 +244,6 @@ public class suserController {
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
-    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,

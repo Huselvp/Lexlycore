@@ -22,6 +22,7 @@ import com.iker.Lexly.repository.SubcategoryRepository;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.repository.form.LabelRepository;
+import com.iker.Lexly.service.form.FormService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +46,11 @@ public class SubQuestionService {
     private final FormTransformer formTransformer;
     private final BlockTransformer blockTransformer;
     private final LabelTransformer labelTransformer;
+    private final FilterService filterService;
+    private final FormService formService;
     private static final Logger logger = LoggerFactory.getLogger(SubQuestionService.class);
     @Autowired
-    public SubQuestionService(SubQuestionRepository subQuestionRepository, QuestionRepository questionRepository, FormRepository formRepository, FilterRepository filterRepository, SubQuestionTransformer subQuestionTransformer, SubcategoryRepository subcategoryRepository, BlockRepository blockRepository, LabelRepository labelRepository, FormTransformer formTransformer, BlockTransformer blockTransformer, LabelTransformer labelTransformer) {
+    public SubQuestionService(SubQuestionRepository subQuestionRepository, QuestionRepository questionRepository, FormRepository formRepository, FilterRepository filterRepository, SubQuestionTransformer subQuestionTransformer, SubcategoryRepository subcategoryRepository, BlockRepository blockRepository, LabelRepository labelRepository, FormTransformer formTransformer, BlockTransformer blockTransformer, LabelTransformer labelTransformer, FilterService filterService, FormService formService) {
         this.subQuestionRepository = subQuestionRepository;
         this.questionRepository= questionRepository;
         this.formRepository = formRepository;
@@ -59,33 +62,14 @@ public class SubQuestionService {
         this.formTransformer = formTransformer;
         this.blockTransformer = blockTransformer;
         this.labelTransformer = labelTransformer;
+        this.filterService = filterService;
+        this.formService = formService;
     }
 
     @Transactional(readOnly = true)
     public List<SubQuestion> getAllSubQuestionsByQuestionId(Long questionId) {
         return subQuestionRepository.findByParentQuestionId(questionId);
     }
-
-//    public List<SubQuestion> getAllSubQuestionsBySubquestionOrder(Long questionId ) {
-//        Question question = questionRepository.findById(questionId)
-//                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
-//        List<Long> orderSubquestions=question.getSubquestionOrder();
-//        if (orderSubquestions == null || orderSubquestions.isEmpty()) {
-//            return subQuestionRepository.findByParentQuestionId(questionId);
-//        }
-//        return orderSubquestions.stream()
-//                .map(orderId -> subQuestionRepository.findById(orderId).orElse(null))
-//                .filter(subQuestion -> subQuestion != null)
-//                .collect(Collectors.toList());
-//    }
-
-//    @Transactional
-//    public void updateSubQuestionOrder(Long questionId, List<Long> subQuestionOrder) {
-//        Question parentQuestion = questionRepository.findById(questionId)
-//                .orElseThrow(() -> new IllegalArgumentException("Parent question not found"));
-//        parentQuestion.setSubquestionOrder(subQuestionOrder);
-//        questionRepository.save(parentQuestion);
-//    }
 
     @Transactional
     public SubQuestion createSubQuestion(Long questionId, SubQuestionDTO subQuestionDTO) {
@@ -156,8 +140,18 @@ public class SubQuestionService {
 
     @Transactional
     public void deleteSubQuestion(Long subQuestionId) {
+
         if (subQuestionRepository.existsById(subQuestionId)) {
+            SubQuestion subQuestion = subQuestionRepository.findById(subQuestionId).orElse(null) ;
+
+            if (subQuestion.getValueType().equals("filter")){
+                filterRepository.deleteFiltersBySubQuestionId(subQuestionId);
+            }
+            if (subQuestion.getValueType().equals("form")){
+                formRepository.deleteFormBySubQuestionId(subQuestionId);
+            }
             subQuestionRepository.deleteById(subQuestionId);
+
         } else {
             throw new IllegalArgumentException("Subquestion not found");
         }

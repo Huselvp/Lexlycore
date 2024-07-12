@@ -125,7 +125,7 @@ public class DocumentQuestionValueService {
                 }
             }
 
-//            temporaryDocumentValueRepository.deleteByDocumentId(document);
+            temporaryDocumentValueRepository.deleteByDocumentId(request.getDocumentId());
 
             return new ApiResponse("Values added successfully.", null);
         }
@@ -205,18 +205,7 @@ public class DocumentQuestionValueService {
             saveDocumentQuestionValue(question, document, value);
             return true;
         }
-//        private boolean processCheckboxQuestionValue(Question question, Documents document, UserInputs valueDto) {
-//            if (valueDto.getCheckboxValue() == null || valueDto.getCheckboxValue().isEmpty()) {
-//                return false;
-//            }
-//
-//            String value = "checkbox" + valueDto.getCheckboxValue().stream()
-//                    .flatMap(val -> List.of("/" + val.getValue(), "/" + val.getRelatedText()).stream())
-//                    .collect(Collectors.joining());
-//
-//            saveDocumentQuestionValue(question, document, value);
-//            return true;
-//        }
+
 
         private boolean processDayQuestionValue(Question question, Documents document, UserInputs valueDto) {
             List<DayRequest> days = Optional.ofNullable(valueDto.getDays()).orElse(Collections.emptyList());
@@ -324,21 +313,7 @@ public class DocumentQuestionValueService {
             documentQuestionValueRepository.save(existingValue);
             return new ApiResponse("Checkbox values updated successfully.", null);
         }
-//        public ApiResponse updateCheckboxQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {
-//            List<CheckboxValue> checkboxValues = newValue.getCheckboxValue();
-//
-//            if (checkboxValues == null || checkboxValues.isEmpty()) {
-//                return new ApiResponse("Checkbox values are missing.", null);
-//            }
-//
-//            String updatedValue = "checkbox" + checkboxValues.stream()
-//                    .map(val -> "/" + val.getValue() + " " + val.getRelatedText())
-//                    .collect(Collectors.joining("/"));
-//
-//            existingValue.setValue(updatedValue);
-//            documentQuestionValueRepository.save(existingValue);
-//            return new ApiResponse("Checkbox values updated successfully.", null);
-//        }
+
 
         private ApiResponse updateDayQuestionValue(DocumentQuestionValue existingValue, UserInputs newValue) {
             List<DayRequest> days = Optional.ofNullable(newValue.getDays()).orElse(Collections.emptyList());
@@ -385,72 +360,4 @@ public class DocumentQuestionValueService {
         }
     }
 
-
-//    private boolean processDateQuestionValue(Question currentQuestion, Documents document, DocumentQuestionValueDTO valueDto) {
-//        String dateValue = valueDto.getDateValue().toString();
-//
-//        if (dateValue == null) {
-//            return false;
-//        }
-//        dateValue= currentQuestion.getValueType() + "/" +  dateValue;
-//        DocumentQuestionValue newDateValue = new DocumentQuestionValue(currentQuestion, document,dateValue);
-//        documentQuestionValueRepository.save(newDateValue);
-//        return true;
-//    }
-//
-//    private boolean processFilterQuestionValue(Question currentQuestion, Documents document, DocumentQuestionValueDTO valueDto) {
-//        Filter filter = filterService.getFilterByQuestionId(currentQuestion.getId());
-//
-//        if (filter == null) {
-//            return false;
-//        }
-//
-//        Object filterValue = switch (filter.getFilterType()) {
-//            case INTEGER -> valueDto.getIntFilterValue();
-//            case DOUBLE -> valueDto.getDoubleFilterValue();
-//
-//        };
-//
-//        if (filterValue != null) {
-//            DocumentQuestionValue newFilterValue = new DocumentQuestionValue(currentQuestion, document, filterValue);
-//            documentQuestionValueRepository.save(newFilterValue);
-//            return true;
-//        }
-//
-//        return false;
-//    }
-
-//    private ApiResponse updateDateQuestionValue(DocumentQuestionValue existingValue, DocumentQuestionValueDTO newValue) {
-//        LocalDate dateValue = newValue.getDateValue();
-//
-//        if (dateValue == null) {
-//            return new ApiResponse("Date value is missing.", null);
-//        }
-//
-//        existingValue.setDateValue(dateValue);
-//        documentQuestionValueRepository.save(existingValue);
-//        return new ApiResponse("Date value updated successfully.", null);
-//    }
-//
-//    private ApiResponse updateFilterQuestionValue(DocumentQuestionValue existingValue, DocumentQuestionValueDTO newValue) {
-//        Filter filter = filterService.getFilterByQuestionId(existingValue.getQuestion().getId());
-//        if (filter == null) {
-//            return new ApiResponse("Filter not found.", null);
-//        }
-//        if (filter.getFilterType() == FilterType.INTEGER) {
-//            Integer intFilterValue = newValue.getIntFilterValue();
-//            if (intFilterValue == null) {
-//                return new ApiResponse("Integer filter value is missing.", null);
-//            }
-//            existingValue.setIntFilterValue(intFilterValue);
-//        } else {
-//            Double doubleFilterValue = newValue.getDoubleFilterValue();
-//            if (doubleFilterValue == null) {
-//                return new ApiResponse("Double filter value is missing.", null);
-//            }
-//            existingValue.setDoubleFilterValue(doubleFilterValue);
-//        }
-//        documentQuestionValueRepository.save(existingValue);
-//        return new ApiResponse("Filter values updated successfully.", null);
-//    }
 
