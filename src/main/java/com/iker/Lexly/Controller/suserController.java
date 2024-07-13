@@ -129,7 +129,7 @@ public class suserController {
         return questionDTOs;
     }
 
-    @GetMapping("/details/{cvr}")
+    @GetMapping("/company-details/{cvr}")
     public ResponseEntity<CompanyDetails> getCompanyDetails(@PathVariable String cvr) {
         return companySearchService.getCompanyDetails(cvr);
     }
@@ -150,6 +150,7 @@ public class suserController {
         List<DocumentQuestionValue> values =documentsService.getValuesByDocumentId(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
+
     @DeleteMapping("/deleteDocument/{documentId}")
     public ResponseEntity<String> deleteDocument(@PathVariable Long documentId) {
         try {
