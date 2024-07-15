@@ -62,7 +62,8 @@ export default function EditorText({ defaultValue, name = "texte", onChange }: {
         init={{
           height: 600,
         //   menubar: false,
-          plugins:"markdown inlinecss typography autocorrect mergetags footnotes tableofcontents mentions powerpaste permanentpen tinymcespellchecker linkchecker formatpainter autolink charmap emoticons link lists searchreplace table wordcount mediaembed casechange export",
+          // plugins:"markdown inlinecss typography autocorrect mergetags footnotes tableofcontents mentions powerpaste permanentpen tinymcespellchecker linkchecker formatpainter autolink charmap emoticons link lists searchreplace table wordcount mediaembed casechange export",
+          plugins:"linkchecker autolink charmap emoticons link lists searchreplace table wordcount",
           toolbar:
             "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat",
           tinycomments_mode: "embedded",
