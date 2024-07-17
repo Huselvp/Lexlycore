@@ -78,25 +78,25 @@ public class suserController {
         this.companySearchService = companySearchService;
         this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
-    @PreAuthorize("permitAll()")
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response
-    ) {
-        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
-        return ResponseEntity.ok(authenticationResponse);
-    }
-    @PreAuthorize("permitAll()")
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request,
-            HttpServletResponse response
-    ) {
-        request.setRole(Role.SUSER);
-        AuthenticationResponse authenticationResponse = service.register(request, response);
-        return ResponseEntity.ok(authenticationResponse);
-    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request,
+//            HttpServletResponse response
+//    ) {
+//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthenticationResponse> register(
+//            @RequestBody RegisterRequest request,
+//            HttpServletResponse response
+//    ) {
+//        request.setRole(Role.SUSER);
+//        AuthenticationResponse authenticationResponse = service.register(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
 
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {

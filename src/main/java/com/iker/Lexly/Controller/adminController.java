@@ -85,25 +85,25 @@ public class adminController {
 
         this.service = service;
     }
-    @PreAuthorize("permitAll()")
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response
-    ) {
-        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
-        return ResponseEntity.ok(authenticationResponse);
-    }
-    @PreAuthorize("permitAll()")
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request,
-            HttpServletResponse response
-    ) {
-        request.setRole(Role.ADMIN);
-        AuthenticationResponse authenticationResponse = service.register(request, response);
-        return ResponseEntity.ok(authenticationResponse);
-    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request,
+//            HttpServletResponse response
+//    ) {
+//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthenticationResponse> register(
+//            @RequestBody RegisterRequest request,
+//            HttpServletResponse response
+//    ) {
+//        request.setRole(Role.ADMIN);
+//        AuthenticationResponse authenticationResponse = service.register(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
