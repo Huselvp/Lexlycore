@@ -13,4 +13,5 @@ public interface FormRepository extends JpaRepository<Form, Long> {
 
     Optional<Form> findBySubQuestionId(Long subQuestionId);
 
+    void deleteFormBySubQuestionId(Long subQuestionId);
 }

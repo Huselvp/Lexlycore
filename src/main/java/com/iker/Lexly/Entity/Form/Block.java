@@ -17,6 +17,8 @@ public class Block {
     private Long id;
     private int numberOfBloc;
 
+    @Enumerated(EnumType.STRING)
+    private BlockType type;
 
     @ManyToOne
     @JsonBackReference

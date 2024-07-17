@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface TemporaryDocumentValueRepository extends JpaRepository<TemporaryDocumentValue, Long> {
     List<TemporaryDocumentValue> findByDocument(Documents document);
-    void deleteByDocumentId(Documents document);
+    void deleteByDocumentId(Long documentId);
 }

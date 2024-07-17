@@ -130,7 +130,7 @@ public class FormController {
             return ResponseEntity.status(404).body("Form not found with ID: " + idForm);
         }
     }
-//    @PostMapping("/duplicate_form/{formId}")
+    //    @PostMapping("/duplicate_form/{formId}")
 //    public ResponseEntity<Form> duplicateForm(@PathVariable Long formId) {
 //        Form duplicatedForm = formService.duplicateForm(formId);
 //        return ResponseEntity.ok().body(duplicatedForm);
@@ -162,7 +162,7 @@ public class FormController {
     @PostMapping("/block/{idForm}")
     public ResponseEntity<Object> createBlock(@PathVariable Long idForm,@RequestBody Block block) {
         try {
-            Block newBlock = blockService.createBlock(idForm);
+            Block newBlock = blockService.createBlock(idForm,block);
             return ResponseEntity.status(HttpStatus.CREATED).body(newBlock);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -324,18 +324,6 @@ public class FormController {
         }
     }
 
-//    @PostMapping("/block/label/option/{labelId}")
-//    public ResponseEntity<?> addOption(@PathVariable Long labelId,
-//                                       @RequestBody AddLabelOption request) {
-//        try {
-//            Label label = labelService.addOption(labelId, request);
-//            return new ResponseEntity<>(label, HttpStatus.CREATED);
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error occurred");
-//        }
-//    }
 
     @PatchMapping("/block/label/option/{labelId}/{optionKey}")
     public ResponseEntity<Label> updateOption(@PathVariable Long labelId, @PathVariable Long optionKey, @RequestParam String newValue) {
@@ -384,19 +372,7 @@ public class FormController {
         }
     }
 
-//    @PostMapping("/add-form-values/{questionId}/{documentId}")
-//    public ResponseEntity<Void> addFormValuesToQuestion(
-//            @PathVariable Long questionId,
-//            @PathVariable Long documentId,
-//            @RequestBody List<FormValues> formValues) {
-//        return documentsService.addFormValuesToQuestion(questionId, documentId, formValues);
-//    }
-//    @PutMapping("/{questionId}/{documentId}")
-//    public ResponseEntity<Void> updateFormValues(@PathVariable Long questionId,
-//                                                 @PathVariable Long documentId,
-//                                                 @RequestBody List<FormValues> formValues) {
-//        return documentsService.updateFormValuesToQuestion(questionId, documentId, formValues);
-//    }
+
     @PostMapping("/add")
     public ApiResponse addValues(@RequestBody AddValuesRequest request) {
 
@@ -410,22 +386,6 @@ public class FormController {
     public ApiResponse updateSubQuestionValues(@PathVariable Long valueId ,@RequestBody UserInputsSubQuestion request) {
         return documentSubQuestionValueService.updateSubQuestionValues(valueId ,request);
     }
-
-//    @PostMapping("/test/replaceValues/{questionId}/{DocumentQuestionValue}")
-//    public String testReplaceValues(
-//            @PathVariable Long questionId,
-//            @PathVariable Long DocumentQuestionValue,
-//            @RequestBody String text) {
-//        return documentsService.replaceValues(text, questionId, DocumentQuestionValue);
-//    }
-//    @GetMapping("/processDocument")
-//    public String processDocument(
-//            @RequestParam Long questions,
-//            @RequestParam Long documentId,
-//            @RequestParam Long templateId,
-//            @RequestParam Long documentQuestionValues) {
-//        return documentsService.documentProcess(questions, documentId, templateId, documentQuestionValues);
-//    }
 
     @GetMapping("/duration")
     public ResponseEntity<Long> calculateDuration(@RequestParam Long startDay, @RequestParam Long endDay) {

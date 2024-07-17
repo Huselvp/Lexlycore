@@ -44,14 +44,14 @@ public class AuthController {
         AuthenticationResponse authenticationResponse = service.register(request, response);
         return ResponseEntity.ok(authenticationResponse);
     }
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response
-    ) {
-        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
-        return ResponseEntity.ok(authenticationResponse);
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request,
+//            HttpServletResponse response
+//    ) {
+//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
     @PostMapping("/forgot-password")
     public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> request) {
             String email = request.get("email");

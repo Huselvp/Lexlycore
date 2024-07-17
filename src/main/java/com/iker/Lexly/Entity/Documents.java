@@ -34,6 +34,9 @@ public class Documents {
     @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
     private List<DocumentSubQuestionValue> documentSubQuestionValues;
 
+    @OneToMany(mappedBy = "document", cascade = CascadeType.REMOVE)
+    private List<TemporaryDocumentValue> temporaryDocumentValues;
+
     public Long getId() {
         return id;
     }
@@ -91,6 +94,14 @@ public class Documents {
 
     public void setLastAnsweredQuestionId(Long lastAnsweredQuestionId) {
         this.lastAnsweredQuestionId = lastAnsweredQuestionId;
+    }
+
+    public List<TemporaryDocumentValue> getTemporaryDocumentValues() {
+        return temporaryDocumentValues;
+    }
+
+    public void setTemporaryDocumentValues(List<TemporaryDocumentValue> temporaryDocumentValues) {
+        this.temporaryDocumentValues = temporaryDocumentValues;
     }
 
     public List<Integer> getQuestionOrder() {

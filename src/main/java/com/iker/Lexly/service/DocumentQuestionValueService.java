@@ -25,15 +25,17 @@ public class DocumentQuestionValueService {
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
     private final QuestionService questionService;
     private final DocumentSubQuestionValueService documentSubQuestionValueService;
+    private final SubQuestionRepository subQuestionRepository;
 
     @Autowired
-    public DocumentQuestionValueService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, DocumentsRepository documentsRepository, TemporaryDocumentValueRepository temporaryDocumentValueRepository, QuestionService questionService, DocumentSubQuestionValueService documentSubQuestionValueService) {
+    public DocumentQuestionValueService(DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, DocumentsRepository documentsRepository, TemporaryDocumentValueRepository temporaryDocumentValueRepository, QuestionService questionService, DocumentSubQuestionValueService documentSubQuestionValueService, SubQuestionRepository subQuestionRepository) {
         this.questionRepository = questionRepository;
         this.documentsRepository = documentsRepository;
         this.documentQuestionValueRepository = documentQuestionValueRepository;
         this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
         this.questionService = questionService;
         this.documentSubQuestionValueService = documentSubQuestionValueService;
+        this.subQuestionRepository = subQuestionRepository;
     }
     @Autowired
     private ObjectMapper objectMapper; // Jackson ObjectMapper for JSON conversion
@@ -81,34 +83,188 @@ public class DocumentQuestionValueService {
         }
     }
 
-    @Transactional
-    public ApiResponse resumeProgress(Long documentId) {
-        Documents document = documentsRepository.findById(documentId).orElse(null);
+//    @Transactional
+//    public ApiResponse resumeProgress(Long documentId) {
+//        Documents document = documentsRepository.findById(documentId).orElse(null);
+//
+//        if (document == null) {
+//            return new ApiResponse("Document not found.", null);
+//        }
+//
+//        List<TemporaryDocumentValue> savedValues = temporaryDocumentValueRepository.findByDocument(document);
+//        List<Map<String, Object>> filteredUserInputs = new ArrayList<>();
+//
+//        for (TemporaryDocumentValue savedValue : savedValues) {
+//            try {
+//                UserInputs userInput = objectMapper.readValue(savedValue.getUserInputJson(), UserInputs.class);
+//                String questionType = getQuestionType(userInput.getQuestionId());
+//                Map<String, Object> filteredInput = filterUserInputByQuestionType(userInput, questionType);
+//                filteredUserInputs.add(filteredInput);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException("Error parsing saved user input", e);
+//            }
+//        }
+//
+//        Map<String, Object> responseData = new HashMap<>();
+//        responseData.put("lastAnsweredQuestionId", document.getLastAnsweredQuestionId());
+//        responseData.put("userInputs", filteredUserInputs);
+//        responseData.put("status", document.getDraft());
+//
+//        return new ApiResponse("Progress retrieved successfully.", responseData);
+//    }
+//
+//    private Map<String, Object> filterUserInputByQuestionType(UserInputs userInput, String questionType) {
+//        Map<String, Object> filteredInput = new HashMap<>();
+//
+//        // Always include these fields
+//        filteredInput.put("documentId", userInput.getDocumentId());
+//        filteredInput.put("questionId", userInput.getQuestionId());
+//
+//        switch (questionType.toLowerCase()) {
+//            case "form":
+//                filteredInput.put("formValues", userInput.getFormValues());
+//                break;
+//            case "time":
+//                filteredInput.put("firstTimeValues", userInput.getFirstTimeValues());
+//                filteredInput.put("secondTimeValue", userInput.getSecondTimeValue());
+//                break;
+//            case "checkbox":
+//                filteredInput.put("checkboxValue", userInput.getCheckboxValue());
+//                break;
+//            case "day":
+//                filteredInput.put("days", userInput.getDays());
+//                break;
+//            case "map":
+//                filteredInput.put("mapValues", userInput.getMapValues());
+//                break;
+//            default:
+//                filteredInput.put("value", userInput.getValue());
+//                if (userInput.getDateValue() != null) {
+//                    filteredInput.put("dateValue", userInput.getDateValue());
+//                }
+//                break;
+//        }
+//
+//        return filteredInput;
+//    }
+    private String getQuestionType(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        return question.getValueType();
+    }
+    private String getSubQuestionType(Long questionId) {
+        SubQuestion subQuestion = subQuestionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        return subQuestion.getValueType();
+    }
+@Transactional
+public ApiResponse resumeProgress(Long documentId) {
+    Documents document = documentsRepository.findById(documentId).orElse(null);
 
-        if (document == null) {
-            return new ApiResponse("Document not found.", null);
-        }
-
-        List<TemporaryDocumentValue> savedValues = temporaryDocumentValueRepository.findByDocument(document);
-        List<UserInputs> userInputs = new ArrayList<>();
-
-        for (TemporaryDocumentValue savedValue : savedValues) {
-            try {
-                UserInputs userInput = objectMapper.readValue(savedValue.getUserInputJson(), UserInputs.class);
-                userInputs.add(userInput);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Error parsing saved user input", e);
-            }
-        }
-        ResumeProgressResponse response = new ResumeProgressResponse(
-                document.getLastAnsweredQuestionId(),
-                userInputs,
-                document.getDraft()
-        );
-        return new ApiResponse("Progress retrieved successfully.", response);
+    if (document == null) {
+        return new ApiResponse("Document not found.", null);
     }
 
+    List<TemporaryDocumentValue> savedValues = temporaryDocumentValueRepository.findByDocument(document);
+    List<Map<String, Object>> filteredUserInputs = new ArrayList<>();
 
+    for (TemporaryDocumentValue savedValue : savedValues) {
+        try {
+            UserInputs userInput = objectMapper.readValue(savedValue.getUserInputJson(), UserInputs.class);
+            String questionType = getQuestionType(userInput.getQuestionId());
+            Map<String, Object> filteredInput = filterUserInputByQuestionType(userInput, questionType);
+            filteredUserInputs.add(filteredInput);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error parsing saved user input", e);
+        }
+    }
+
+    Map<String, Object> responseData = new HashMap<>();
+    responseData.put("lastAnsweredQuestionId", document.getLastAnsweredQuestionId());
+    responseData.put("userInputs", filteredUserInputs);
+    responseData.put("status", document.getDraft());
+
+    return new ApiResponse("Progress retrieved successfully.", responseData);
+}
+
+    private Map<String, Object> filterUserInputByQuestionType(UserInputs userInput, String questionType) {
+        Map<String, Object> filteredInput = new HashMap<>();
+
+        // Always include these fields
+        filteredInput.put("documentId", userInput.getDocumentId());
+        filteredInput.put("questionId", userInput.getQuestionId());
+
+        switch (questionType.toLowerCase()) {
+            case "form":
+                filteredInput.put("formValues", userInput.getFormValues());
+                break;
+            case "time":
+                filteredInput.put("firstTimeValues", userInput.getFirstTimeValues());
+                filteredInput.put("secondTimeValue", userInput.getSecondTimeValue());
+                break;
+            case "checkbox":
+                filteredInput.put("checkboxValue", userInput.getCheckboxValue());
+                break;
+            case "day":
+                filteredInput.put("days", userInput.getDays());
+                break;
+            case "map":
+                filteredInput.put("mapValues", userInput.getMapValues());
+                break;
+            default:
+                filteredInput.put("value", userInput.getValue());
+                if (userInput.getDateValue() != null) {
+                    filteredInput.put("dateValue", userInput.getDateValue());
+                }
+                break;
+        }
+
+        // Handle subquestions
+        if (userInput.getSubquestionsValues() != null && !userInput.getSubquestionsValues().isEmpty()) {
+            List<Map<String, Object>> filteredSubquestions = new ArrayList<>();
+            for (UserInputsSubQuestion subQuestion : userInput.getSubquestionsValues()) {
+                String subQuestionType = getSubQuestionType(subQuestion.getSubQuestionId());
+                Map<String, Object> filteredSubQuestion = filterSubQuestionByType(subQuestion, subQuestionType);
+                filteredSubquestions.add(filteredSubQuestion);
+            }
+            filteredInput.put("subquestionsValues", filteredSubquestions);
+        }
+
+        return filteredInput;
+    }
+
+    private Map<String, Object> filterSubQuestionByType(UserInputsSubQuestion subQuestion, String questionType) {
+        Map<String, Object> filteredSubQuestion = new HashMap<>();
+
+        filteredSubQuestion.put("questionId", subQuestion.getSubQuestionId());
+
+        switch (questionType.toLowerCase()) {
+            case "form":
+                filteredSubQuestion.put("formValues", subQuestion.getFormValues());
+                break;
+            case "time":
+                filteredSubQuestion.put("firstTimeValues", subQuestion.getFirstTimeValues());
+                filteredSubQuestion.put("secondTimeValue", subQuestion.getSecondTimeValue());
+                break;
+            case "checkbox":
+                filteredSubQuestion.put("checkboxValue", subQuestion.getCheckboxValue());
+                break;
+            case "day":
+                filteredSubQuestion.put("days", subQuestion.getDays());
+                break;
+            case "map":
+                filteredSubQuestion.put("mapValues", subQuestion.getMapValues());
+                break;
+            default:
+                filteredSubQuestion.put("value", subQuestion.getValue());
+                if (subQuestion.getDateValue() != null) {
+                    filteredSubQuestion.put("dateValue", subQuestion.getDateValue());
+                }
+                break;
+        }
+
+        return filteredSubQuestion;
+    }
         @Transactional
         public ApiResponse addValues(AddValuesRequest request) {
             Documents document = documentsRepository.findById(request.getDocumentId()).orElse(null);
@@ -125,7 +281,7 @@ public class DocumentQuestionValueService {
                 }
             }
 
-            temporaryDocumentValueRepository.deleteByDocumentId(document);
+            temporaryDocumentValueRepository.deleteByDocumentId(request.getDocumentId());
 
             return new ApiResponse("Values added successfully.", null);
         }

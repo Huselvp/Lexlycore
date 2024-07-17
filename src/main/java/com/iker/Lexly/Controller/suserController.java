@@ -1,4 +1,7 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.Auth.AuthenticationRequest;
+import com.iker.Lexly.Auth.AuthenticationResponse;
+import com.iker.Lexly.Auth.AuthenticationService;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.SubQuestionDTO;
 import com.iker.Lexly.Transformer.QuestionTransformer;
@@ -13,6 +16,7 @@ import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,6 +39,7 @@ public class suserController {
 
     @Autowired
     private final PaymentService paymentService;
+    private  final AuthenticationService service;
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
@@ -47,9 +52,10 @@ public class suserController {
     private final UserRepository userRepository;
     private final SubQuestionService subQuestionService;
     private final TemporaryDocumentValueRepository temporaryDocumentValueRepository;
-
+    private final CompanySearchService companySearchService ;
+    private final DocumentSubQuestionValueService documentSubQuestionValueService;
     @Autowired
-    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, AuthenticationService service, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService, DocumentSubQuestionValueService documentSubQuestionValueService) {
         this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
@@ -63,10 +69,23 @@ public class suserController {
         this.paymentService=paymentService;
         this.questionService = questionService;
         this.templateService = templateService;
+        this.service = service;
         this.documentsRepository = documentsRepository;
         this.subQuestionService=subQuestionService;
         this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
+        this.companySearchService = companySearchService;
+        this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
+    @PreAuthorize("permitAll()")
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response
+    ) {
+        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+        return ResponseEntity.ok(authenticationResponse);
+    }
+//
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
@@ -76,11 +95,15 @@ public class suserController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
+
+    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/question-details/{idQuestion}")
     public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
         QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
         return ResponseEntity.ok(questionDTO);
     }
+
+    @PreAuthorize("hasRole('ROLE_SUSER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/sub-question-details/{idSubQuestion}")
     public ResponseEntity<SubQuestionDTO> getSubQuestionWithDetails(@PathVariable Long idSubQuestion) {
         SubQuestionDTO subQuestionDTO = subQuestionService.getSubQuestionWithDetails(idSubQuestion);
@@ -122,14 +145,19 @@ public class suserController {
         return questionDTOs;
     }
 
-    @PostMapping("/addValues")
-    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-        ApiResponse response = documentQuestionValueService.addValues(request);
-
-
-
-        return response;
+    @GetMapping("/company-details/{cvr}")
+    public ResponseEntity<CompanyDetails> getCompanyDetails(@PathVariable String cvr) {
+        return companySearchService.getCompanyDetails(cvr);
     }
+//
+//    @PostMapping("/addValues")
+//    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
+//        ApiResponse response = documentQuestionValueService.addValues(request);
+//
+//
+//
+//        return response;
+//    }
 
 
 
@@ -138,6 +166,7 @@ public class suserController {
         List<DocumentQuestionValue> values =documentsService.getValuesByDocumentId(documentId);
         return new ResponseEntity<>(values, HttpStatus.OK);
     }
+
     @DeleteMapping("/deleteDocument/{documentId}")
     public ResponseEntity<String> deleteDocument(@PathVariable Long documentId) {
         try {
@@ -206,20 +235,19 @@ public class suserController {
         SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
         return ResponseEntity.ok(subQuestion);
     }
-    @GetMapping("lastQuestion/{documentId}")
-    public ResponseEntity<Long> getLastQuestionOrSubquestionId(@PathVariable Long documentId) {
-        try {
-            Long lastQuestionId = documentsService.getLastQuestionOrSubquestionId(documentId);
-            if (lastQuestionId != null) {
-                return ResponseEntity.ok(lastQuestionId);
-            } else {
-                return ResponseEntity.noContent().build();
-            }
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+
+    @PostMapping("/add-values")
+    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
+
+        return documentQuestionValueService.addValues(request);
+    }
+    @PutMapping("/update-values/{valueId}")
+    public ApiResponse updateValues(@PathVariable Long valueId ,@RequestBody UserInputs request) {
+        return documentQuestionValueService.updateValues(valueId ,request);
+    }
+    @PutMapping("/update-sub-values/{valueId}")
+    public ApiResponse updateSubQuestionValues(@PathVariable Long valueId ,@RequestBody UserInputsSubQuestion request) {
+        return documentSubQuestionValueService.updateSubQuestionValues(valueId ,request);
     }
 
     @GetMapping("/test")
@@ -233,7 +261,6 @@ public class suserController {
         System.out.println("Concatenated Text: " + concatenatedText);
         return ResponseEntity.ok(concatenatedText);
     }
-
     @GetMapping("/generate-pdf/{documentId}/{templateId}")
     public ResponseEntity<byte[]> generatePdf(
             @PathVariable Long documentId,
