@@ -8,6 +8,7 @@ import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -93,7 +94,16 @@ public class adminController {
         AuthenticationResponse authenticationResponse = service.authenticate(request, response);
         return ResponseEntity.ok(authenticationResponse);
     }
-
+    @PreAuthorize("permitAll()")
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> register(
+            @RequestBody RegisterRequest request,
+            HttpServletResponse response
+    ) {
+        request.setRole(Role.ADMIN);
+        AuthenticationResponse authenticationResponse = service.register(request, response);
+        return ResponseEntity.ok(authenticationResponse);
+    }
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
