@@ -162,7 +162,7 @@ public class FormController {
     @PostMapping("/block/{idForm}")
     public ResponseEntity<Object> createBlock(@PathVariable Long idForm,@RequestBody Block block) {
         try {
-            Block newBlock = blockService.createBlock(idForm);
+            Block newBlock = blockService.createBlock(idForm,block);
             return ResponseEntity.status(HttpStatus.CREATED).body(newBlock);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

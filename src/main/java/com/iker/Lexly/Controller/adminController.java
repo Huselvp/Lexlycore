@@ -1,5 +1,7 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.Auth.AuthenticationRequest;
 import com.iker.Lexly.Auth.AuthenticationResponse;
+import com.iker.Lexly.Auth.AuthenticationService;
 import com.iker.Lexly.Auth.RegisterRequest;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
@@ -56,13 +58,14 @@ public class adminController {
 
     @Autowired
     private final TemplateService templateService;
+    private  final AuthenticationService service;
     @Autowired
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final JwtService jwtService;
 
     @Autowired
-    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository) {
+    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository, AuthenticationService service) {
         this.subQuestionService = subQuestionService;
         this.templateService = templateService;
         this.jwtService=jwtService;
@@ -79,6 +82,16 @@ public class adminController {
         this.userService = userService;
 
 
+        this.service = service;
+    }
+    @PreAuthorize("permitAll()")
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response
+    ) {
+        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+        return ResponseEntity.ok(authenticationResponse);
     }
 
     @PostMapping("/addSubCategory")

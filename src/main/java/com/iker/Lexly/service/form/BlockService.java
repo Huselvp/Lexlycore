@@ -40,10 +40,11 @@ public class BlockService {
     }
 
     @Transactional
-    public Block createBlock(Long formId ) {
+    public Block createBlock(Long formId ,Block newBlock) {
         Form form = formRepository.findById(formId).orElseThrow(() -> new IllegalArgumentException("form not found with ID"+formId));
         Block block = new Block();
         block.setForm(form);
+        block.setType(newBlock.getType());
         Block savedBlock =  blockRepository.save(block);
         savedBlock.setNumberOfBloc(savedBlock.getId().intValue());
         logger.info("Created Block :{}",savedBlock);
@@ -74,7 +75,7 @@ public class BlockService {
         Optional<Block> blockOptional = blockRepository.findById(blockId);
         if (blockOptional.isPresent()) {
             Block existingBlock = blockOptional.get();
-            existingBlock.setNumberOfBloc(block.getNumberOfBloc());
+            existingBlock.setType(block.getType());
             logger.info("updated block successfully {}",existingBlock);
             return blockRepository.save(existingBlock);
         } else {

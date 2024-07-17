@@ -94,7 +94,7 @@ public class FormService {
         // Associate the form with the question
         form.setQuestion(question);
         Form savedForm = formRepository.save(form);
-        blockService.createBlock(savedForm.getId());
+        blockService.createBlock(savedForm.getId(),null);
         logger.info("Created form successfully :{}",savedForm);
         return savedForm;
     }
@@ -106,7 +106,7 @@ public class FormService {
         // Associate the form with the question
         form.setSubQuestion(subQuestion);
         Form savedForm = formRepository.save(form);
-        blockService.createBlock(savedForm.getId());
+        blockService.createBlock(savedForm.getId(),null);
         logger.info("Created form successfully :{}",savedForm);
         return savedForm;
     }
