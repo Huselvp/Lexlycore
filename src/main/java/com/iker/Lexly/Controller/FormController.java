@@ -48,8 +48,6 @@ public class FormController {
     private DocumentSubQuestionValueService documentSubQuestionValueService;
 
 
-
-
     @GetMapping("/all_forms")
     public List<Form> getAllForms() {
 
@@ -65,6 +63,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+    
     @GetMapping("get-by-sub-question-id/{subQestionId}")
     public ResponseEntity<?> getFormIdBySubQuestionId(@PathVariable Long subQestionId) {
         try {
@@ -74,6 +73,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
     @GetMapping("/{idForm}")
     public ResponseEntity<Form> getFormById(@PathVariable Long idForm) {
         Form form = formService.getFormById(idForm);
