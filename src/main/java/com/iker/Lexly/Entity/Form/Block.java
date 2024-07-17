@@ -16,7 +16,9 @@ public class Block {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int numberOfBloc;
-//    private String name;
+
+    @Enumerated(EnumType.STRING)
+    private BlockType type;
 
     @ManyToOne
     @JsonBackReference

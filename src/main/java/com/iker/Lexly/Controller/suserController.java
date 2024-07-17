@@ -97,6 +97,7 @@ public class suserController {
 //        AuthenticationResponse authenticationResponse = service.register(request, response);
 //        return ResponseEntity.ok(authenticationResponse);
 //    }
+
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
