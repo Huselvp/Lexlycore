@@ -1,11 +1,14 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.Auth.AuthenticationRequest;
 import com.iker.Lexly.Auth.AuthenticationResponse;
+import com.iker.Lexly.Auth.AuthenticationService;
 import com.iker.Lexly.Auth.RegisterRequest;
 import com.iker.Lexly.DTO.*;
 import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.QuestionRepository;
@@ -56,13 +59,14 @@ public class adminController {
 
     @Autowired
     private final TemplateService templateService;
+    private  final AuthenticationService service;
     @Autowired
     private final QuestionService questionService;
     private final TemplateTransformer templateTransformer;
     private final JwtService jwtService;
 
     @Autowired
-    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository) {
+    public adminController(SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService , TemplateRepository templateRepository, QuestionRepository questionRepository, DocumentsService documentsService, UserService userService, SubQuestionService subQuestionService, UserTransformer userTransformer, QuestionTransformer questionTransformer1, TemplateService templateService, QuestionService questionService, TemplateTransformer templateTransformer, FormRepository formRepository, AuthenticationService service) {
         this.subQuestionService = subQuestionService;
         this.templateService = templateService;
         this.jwtService=jwtService;
@@ -79,6 +83,31 @@ public class adminController {
         this.userService = userService;
 
 
+        this.service = service;
+    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request,
+//            HttpServletResponse response
+//    ) {
+//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthenticationResponse> register(
+//            @RequestBody RegisterRequest request,
+//            HttpServletResponse response
+//    ) {
+//        request.setRole(Role.ADMIN);
+//        AuthenticationResponse authenticationResponse = service.register(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
+    @GetMapping("/question-details/{idQuestion}")
+    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
+        QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
+        return ResponseEntity.ok(questionDTO);
     }
 
     @PostMapping("/addSubCategory")

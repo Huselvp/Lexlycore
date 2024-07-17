@@ -1,6 +1,11 @@
 package com.iker.Lexly.Controller;
+import com.iker.Lexly.Auth.AuthenticationRequest;
+import com.iker.Lexly.Auth.AuthenticationResponse;
+import com.iker.Lexly.Auth.AuthenticationService;
+import com.iker.Lexly.Auth.RegisterRequest;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.SubQuestionDTO;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
@@ -13,6 +18,7 @@ import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,6 +41,7 @@ public class suserController {
 
     @Autowired
     private final PaymentService paymentService;
+    private  final AuthenticationService service;
     private final TemplateTransformer templateTransformer;
     private final QuestionRepository questionRepository;
     private final DocumentQuestionValueRepository documentQuestionValueRepository;
@@ -50,7 +57,7 @@ public class suserController {
     private final CompanySearchService companySearchService ;
     private final DocumentSubQuestionValueService documentSubQuestionValueService;
     @Autowired
-    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService, DocumentSubQuestionValueService documentSubQuestionValueService) {
+    public suserController(PaymentService paymentService, DocumentSubQuestionValueRepository documentSubQuestionValueRepository, UserRepository userRepository, JwtService jwtService, DocumentQuestionValueService documentQuestionValueService, DocumentQuestionValueRepository documentQuestionValueRepository, QuestionRepository questionRepository, PDFGenerationService pdfGenerationService, QuestionTransformer questionTransformer, DocumentsService documentsService, TemplateTransformer templateTransformer, TemplateService templateService, QuestionService questionService, AuthenticationService service, DocumentsRepository documentsRepository, SubQuestionService subQuestionService, TemporaryDocumentValueRepository temporaryDocumentValueRepository, CompanySearchService companySearchService, DocumentSubQuestionValueService documentSubQuestionValueService) {
         this.documentSubQuestionValueRepository = documentSubQuestionValueRepository;
         this.templateTransformer = templateTransformer;
         this.documentQuestionValueService = documentQuestionValueService;
@@ -64,12 +71,32 @@ public class suserController {
         this.paymentService=paymentService;
         this.questionService = questionService;
         this.templateService = templateService;
+        this.service = service;
         this.documentsRepository = documentsRepository;
         this.subQuestionService=subQuestionService;
         this.temporaryDocumentValueRepository = temporaryDocumentValueRepository;
         this.companySearchService = companySearchService;
         this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request,
+//            HttpServletResponse response
+//    ) {
+//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
+//    @PreAuthorize("permitAll()")
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthenticationResponse> register(
+//            @RequestBody RegisterRequest request,
+//            HttpServletResponse response
+//    ) {
+//        request.setRole(Role.SUSER);
+//        AuthenticationResponse authenticationResponse = service.register(request, response);
+//        return ResponseEntity.ok(authenticationResponse);
+//    }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
