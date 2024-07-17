@@ -2,8 +2,10 @@ package com.iker.Lexly.Controller;
 import com.iker.Lexly.Auth.AuthenticationRequest;
 import com.iker.Lexly.Auth.AuthenticationResponse;
 import com.iker.Lexly.Auth.AuthenticationService;
+import com.iker.Lexly.Auth.RegisterRequest;
 import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.SubQuestionDTO;
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.Transformer.QuestionTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.*;
@@ -85,7 +87,16 @@ public class suserController {
         AuthenticationResponse authenticationResponse = service.authenticate(request, response);
         return ResponseEntity.ok(authenticationResponse);
     }
-//
+    @PreAuthorize("permitAll()")
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> register(
+            @RequestBody RegisterRequest request,
+            HttpServletResponse response
+    ) {
+        request.setRole(Role.SUSER);
+        AuthenticationResponse authenticationResponse = service.register(request, response);
+        return ResponseEntity.ok(authenticationResponse);
+    }
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
