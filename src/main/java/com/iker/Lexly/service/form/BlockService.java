@@ -145,14 +145,12 @@ public void reorderBlocks(List<Long> blocksIds) {
 }
     @Transactional
     public Block duplicateBlock(Long formId, Long blockId) {
-        Form form = formRepository.findById(formId)
-                .orElseThrow(() -> new IllegalArgumentException("Form not found"));
+//        Form form = formRepository.findById(formId)
+//                .orElseThrow(() -> new IllegalArgumentException("Form not found"));
         Block originalBlock = blockRepository.findById(blockId)
                 .orElseThrow(() -> new IllegalArgumentException("Block not found"));
 
-        Block newBlock = new Block();
-        newBlock.setNumberOfBloc(originalBlock.getNumberOfBloc());
-        newBlock.setForm(form);
+        Block newBlock = createBlock(formId,originalBlock );
 
         List<Label> originalBlockLabels = labelRepository.findByBlockId(blockId);
         for (Label label : originalBlockLabels) {
