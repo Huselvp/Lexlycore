@@ -121,8 +121,6 @@ function List({ id, children }: { id: string; children: ReactNode }) {
   const { openId, close } = useContext(MenusContext);
   const ref = useClickOutside(close, false);
 
-  console.log("i am the list");
-
   if (openId !== id) return null;
 
   return createPortal(
@@ -136,8 +134,6 @@ function ListSub({ id, children }: { id: string; children: ReactNode }) {
   const ref = useClickOutside(close, false);
 
   if (openId !== id) return null;
-
-  console.log("I am the listsub");
 
   return createPortal(
     <StyledList ref={ref}>{children}</StyledList>,

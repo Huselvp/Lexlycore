@@ -43,6 +43,10 @@ function SubQuestionRow({ subQuestion, questionId }) {
   const [isSeeAlSubQuestionBlocksOpen, setIsSeeAllSubQuestionBlocksOpen] =
     useState(false);
 
+  const [isSeeAllBlocksInpusOpen, setIsSeeAllBlocksInputOpen] = useState(false);
+
+  const [isAddBlockTypeOpen, setIsAddBlockTypeOpen] = useState(false);
+
   // SubQuestion data
 
   const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
@@ -52,6 +56,8 @@ function SubQuestionRow({ subQuestion, questionId }) {
   const [subQuestionFormId, setSubQuestionFormId] = useState("");
 
   const [subQuestionBlockId, setSubQuestionBlockId] = useState("");
+
+  const [formBlocksData, setFormBblocksData] = useState([]);
 
   const createSubQuestionFormHandler = async () => {
     try {
@@ -115,12 +121,22 @@ function SubQuestionRow({ subQuestion, questionId }) {
     getSubQuestionFormBlocksHandler(subQuestionFormId);
   }, [subQuestionFormId]);
 
+  const [blockType, setBlockType] = useState("");
+
   const create_subQuestion_new_block_handler = async () => {
     try {
       await axios
-        .post(`${API}/form/block/${subQuestionFormId}`, {}, getApiConfig())
+        .post(
+          `${API}/form/block/${subQuestionFormId}`,
+          {
+            type: blockType === "null" ? null : blockType,
+          },
+          getApiConfig()
+        )
         .then((result) => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
+          setIsAddBlockTypeOpen(false);
+          setIsSeeSubQuestionBlocks(true);
         });
     } catch (err) {
       console.log(err);
@@ -154,6 +170,29 @@ function SubQuestionRow({ subQuestion, questionId }) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    const get_form_blocks = async () => {
+      try {
+        await axios
+          .get(
+            `${API}/suser/sub-question-details/${subQuestion.id}`,
+            getApiConfig()
+          )
+          .then((result) => {
+            console.log(
+              result.data.form.blocks,
+              "###################################################"
+            );
+            setFormBblocksData(result.data.form.blocks);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    get_form_blocks();
+  }, [subQuestion.id]);
 
   // ==============================
 
@@ -243,6 +282,21 @@ function SubQuestionRow({ subQuestion, questionId }) {
     }
   };
 
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+
+    if (checked) {
+      setBlockType(value);
+    } else {
+      setBlockType("");
+    }
+  };
+
+  const openBlockTypeHandler = () => {
+    setIsAddBlockTypeOpen(true);
+    setIsSeeSubQuestionBlocks(false);
+  };
+
   return (
     <React.Fragment>
       <PopUp isOpen={isPopUpOpen}>
@@ -254,6 +308,13 @@ function SubQuestionRow({ subQuestion, questionId }) {
             setIsSeeAllSubQuestionBlocksOpen(false);
             setIsSeeSubQuestionBlocks(false);
           }}
+          onSeeAllBlocks={() => {
+            setIsSeeAllBlocksInputOpen(true);
+            setIsAddSubQuestionFormNameOpen(false);
+            setIsSeeSubQuestionBlocks(false);
+            setIsEditSubQuestionBlocksOpen(false);
+          }}
+          isBlocksOpen={isSeeSubQuestionFormBlocksOpen}
         >
           <div>
             {isAddSubQuestionFormNameOpen && (
@@ -326,10 +387,187 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   );
                 })}
 
-                <AddNewBlock
-                  onCreateNewBlock={create_subQuestion_new_block_handler}
-                />
+                <AddNewBlock openBlockType={openBlockTypeHandler} />
               </BlocksContainer>
+            )}
+
+            {isAddBlockTypeOpen && (
+              <div className="block-type">
+                <form>
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="normal"
+                      name="Normal"
+                      value="null"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "null"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="normal" style={{ cursor: "pointer" }}>
+                      Normal
+                    </label>
+                  </div>
+
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="persone"
+                      name="persone"
+                      value="PERSON"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "PERSON"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="persone" style={{ cursor: "pointer" }}>
+                      {" "}
+                      Persone
+                    </label>
+                  </div>
+
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="company"
+                      name="company"
+                      value="COMPANY"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "COMPANY"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="company" style={{ cursor: "pointer" }}>
+                      Company
+                    </label>
+                  </div>
+                </form>
+
+                <div
+                  className="controllers"
+                  style={{
+                    display: "flex",
+                    justifyContent: "right",
+                    gap: "2rem",
+                  }}
+                >
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      create_subQuestion_new_block_handler();
+                    }}
+                  >
+                    <MdDone />
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setIsAddBlockTypeOpen(false);
+                      setIsSeeSubQuestionBlocks(true);
+                    }}
+                  >
+                    <IoIosClose />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {isSeeAllBlocksInpusOpen && (
+              <div className="form_type">
+                {formBlocksData.map((block, blockIndex) => {
+                  if (!block.labels || block.labels.length === 0) {
+                    return null;
+                  }
+
+                  return (
+                    <div className="form-block-user" key={block.id}>
+                      <IoIosClose className="form_type_controllers" size={20} />
+                      {block.labels.map((label, labelIndex) => {
+                        if (!label.name) {
+                          return null;
+                        }
+                        return (
+                          <div key={label.id} className="block-input">
+                            <label>{label.name}</label>
+                            {label.type === "SELECT" ? (
+                              <select name={label.name}>
+                                <option value="">Select an option</option>
+                                {Object.keys(label.options).map((key) => (
+                                  <option key={key} value={key}>
+                                    {label.options[key]}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={label.type}
+                                name={label.name}
+                                placeholder={label.name}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSeeSubQuestionBlocks(true);
+                      setIsSeeAllBlocksInputOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
+                </div>
+              </div>
             )}
 
             {isEditSubQuestionBlocksOpen && (

@@ -7,6 +7,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 
 import { MdOutlineDone } from "react-icons/md";
+import { MdDone } from "react-icons/md";
 
 import "./editBlock.css";
 
@@ -21,6 +22,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const [options, setOptions] = useState([]);
   const [option, setOption] = useState("");
   const [isEditOptionsOpen, setIsEditOptionsOpen] = useState(false);
+  const [isAddMinMaxValueOpen, setIsAddMinMaxValuesOpen] = useState(false);
 
   const [upDatedInputName, setUpdatedInputName] = useState(
     inputToUpdateData.name
@@ -33,6 +35,9 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const [updatedOptions, setUpdatedOptions] = useState({});
 
   const [newOption, setNewOption] = useState("");
+
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
 
   const getBlockData = async () => {
     try {
@@ -244,12 +249,14 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                     <React.Fragment>
                       <div className="labels-container changed">
                         <div className="text">
-                          <p>Name:</p> <p>{input.name}</p>
+                          <p>Name: {input.name}</p>
+                        </div>
+
+                        <div>
+                          <p>Type :{input.type}</p>
                         </div>
 
                         <div className="frm">
-                          {/* <input type={input.type}></input> */}
-                          <p>Type :{input.type}</p>
                           <div className="admin_inputs_controlers">
                             <CiEdit
                               size={30}
@@ -351,6 +358,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               <option value="NUMBER">Number</option>
               <option value="DATE">Date</option>
               <option value="SELECT">Select</option>
+              <option value="FILTER">Filter</option>
             </select>
             <div className="add-new-input">
               <button
@@ -396,7 +404,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               <option value="NUMBER">Number</option>
               <option value="DATE">Date</option>
               <option value="SELECT">Select</option>
-              <option value="filter">Filter</option>
+              <option value="FILTER">Filter</option>
             </select>
             <div className="add-new-input">
               <button
@@ -516,6 +524,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                 <option value="NUMBER">Number</option>
                 <option value="DATE">Date</option>
                 <option value="SELECT">Select</option>
+                <option value="FILTER">Filter</option>
               </select>
             </div>
           </form>
@@ -569,6 +578,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                 <option value="NUMBER">Number</option>
                 <option value="DATE">Date</option>
                 <option value="SELECT">Select</option>
+                <option value="FILTER">Filter</option>
               </select>
             </div>
 
@@ -643,6 +653,38 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           </div>
         </div>
       )}
+
+      {/* {isAddMinMaxValueOpen && (
+        <div>
+          <form>
+            <input
+              type="number"
+              placeholder="Enter min value"
+              onChange={(e) => {
+                setMinValue(e.target.value);
+              }}
+            ></input>
+            <input
+              type="number"
+              placeholder="Enter max value"
+              onChange={(e) => {
+                setMaxValue(e.target.value);
+              }}
+            ></input>
+          </form>
+
+          <div className="controllers">
+            <button
+              type="button"
+              onClick={() => {
+                // add_min_max_value_handler(question.id);
+              }}
+            >
+              <MdDone />
+            </button>
+          </div>
+        </div>
+      )} */}
     </div>
   );
 }

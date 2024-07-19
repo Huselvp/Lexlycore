@@ -1,29 +1,30 @@
-import { FormEventHandler, useState } from "react"
-import { useRegister } from "../features/Authentication/useRegister"
-import isEmail from "validator/lib/isEmail"
-import Form from "../ui/AuthForm"
-import { Link } from "react-router-dom"
-import SpinnerMini from "../ui/SpinnerMini"
-import toast from "react-hot-toast"
-import InputPassword from "../ui/InputPassword"
+import { FormEventHandler, useState } from "react";
+import { useRegister } from "../features/Authentication/useRegister";
+import isEmail from "validator/lib/isEmail";
+import Form from "../ui/AuthForm";
+import { Link } from "react-router-dom";
+import SpinnerMini from "../ui/SpinnerMini";
+import toast from "react-hot-toast";
+import InputPassword from "../ui/InputPassword";
 const Register = () => {
-  const { isLoading, register } = useRegister()
-  const [firstname, setfirstname] = useState("")
-  const [lastname, setlastname] = useState("")
-  const [username, setusername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setpassword] = useState("")
-  const [passwordConfirm, setpasswordConfirm] = useState("")
+  const { isLoading, register } = useRegister();
+  const [firstname, setfirstname] = useState("");
+  const [lastname, setlastname] = useState("");
+  const [username, setusername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setpassword] = useState("");
+  const [passwordConfirm, setpasswordConfirm] = useState("");
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     // check if email is valid
-    if (!isEmail(email)) return toast.error("Email is not valid")
+    if (!isEmail(email)) return toast.error("Email is not valid");
     // check if passwords match
-    if (password !== passwordConfirm) return toast.error("Passwords must match")
-    register({ firstname, lastname, username, email, password, role: "ADMIN" })
-  
-  }
+    if (password !== passwordConfirm)
+      return toast.error("Passwords must match");
+    register({ firstname, lastname, username, email, password, role: "SUSER" });
+  };
+
   return (
     <>
       <Form onSubmit={onFormSubmit}>
@@ -111,12 +112,12 @@ const Register = () => {
           </Form.Row>
           <Form.Row addborder={true}>
             <p>Have an account ?</p>
-            <Link to="/login">Sign in</Link>
+            <Link to="/login/user">Sign in</Link>
           </Form.Row>
         </Form.Rows>
       </Form>
     </>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

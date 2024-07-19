@@ -11,11 +11,14 @@ function PopUpContentContainer({
   children,
   onClose,
   onSeeAllBlocks,
+  isBlocksOpen,
 }: PopUpProps) {
   return (
     <div className="pop-up-content-container">
       <div className="close">
-        <MdOutlineRemoveRedEye size={30} onClick={onSeeAllBlocks} />
+        {isBlocksOpen && (
+          <MdOutlineRemoveRedEye size={30} onClick={onSeeAllBlocks} />
+        )}
         <IoIosClose size={30} onClick={onClose} />
       </div>
 

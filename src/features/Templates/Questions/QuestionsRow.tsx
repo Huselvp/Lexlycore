@@ -1,12 +1,14 @@
 import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
-// import { FaCaretDown, FaCaretUp  } from "react-icons/fa";
 import Menus from "../../../ui/Menus";
 import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
+
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { Reorder } from "framer-motion";
 
@@ -16,6 +18,7 @@ import { API, getApiConfig } from "../../../utils/constants";
 import SubQuestionRow from "../../../pages/admin/components/SubQuestionRow/SubQuestionRow";
 
 import PopUp from "../../../pages/admin/components/popUp/PopUp";
+
 import PopUpContentContainer from "../../../pages/admin/components/popup_content_container/PopUpContantContainer";
 import Form from "../../../pages/admin/components/UI/form/Form";
 import Button from "../../../pages/admin/components/UI/btns/Button";
@@ -47,11 +50,15 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const [isSeeAllBlocksInpusOpen, setIsSeeAllBlocksInputOpen] = useState(false);
 
+  const [isAddBlockTypeOpen, setIsAddBlockTypeOpen] = useState(false);
+
   const [blockId, setBlockId] = useState(0);
 
   const [caret_icon_active, setcaret] = useState(false);
 
   const navigate = useNavigate();
+
+  const [blockType, setBlockType] = useState("");
 
   const [formBlocs, setFormBlocs] = useState([]);
   // const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
@@ -67,10 +74,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   const [formBlocksData, setFormBblocksData] = useState([]);
-
-  useEffect(() => {
-    console.log(question.subQuestions, "this is the subquestion");
-  }, [question]);
 
   useEffect(() => {
     const reorderQuestions = async (squestionids: number[]) => {
@@ -134,7 +137,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     };
 
     fetchFormIds();
-  }, []);
+  }, [get_formId, question.id]);
 
   useEffect(() => {
     squestionOrderTest?.forEach((sq) => {
@@ -191,10 +194,18 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   const create_new_block_handler = async () => {
     try {
       await axios
-        .post(`${API}/form/block/${formBlocksId}`, {}, getApiConfig())
+        .post(
+          `${API}/form/block/${formBlocksId}`,
+          {
+            type: blockType === "null" ? null : blockType,
+          },
+          getApiConfig()
+        )
         .then((result) => {
           console.log(result.data, "from add new block");
           get_form_blocks_handler(formBlocksId);
+          setIsAddBlockTypeOpen(false);
+          setIsSeeBlocksOpen(true);
         });
     } catch (err) {
       console.log(err);
@@ -235,9 +246,12 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     const get_form_blocks = async () => {
       try {
         await axios
-          .get(`${API}/suser/${question.id}/details`, getApiConfig())
+          .get(`${API}/suser/question-details/${question.id}`, getApiConfig())
           .then((result) => {
-            console.log(result.data.form.blocks);
+            console.log(
+              result.data.form.blocks,
+              "###################################################"
+            );
             setFormBblocksData(result.data.form.blocks);
           });
       } catch (err) {
@@ -331,6 +345,165 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
   };
 
+  // ====================
+
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+
+    if (checked) {
+      setBlockType(value);
+    } else {
+      setBlockType("");
+    }
+  };
+
+  const openBlockTypeHandler = () => {
+    setIsAddBlockTypeOpen(true);
+    setIsSeeBlocksOpen(false);
+  };
+
+  // ####################################
+
+  // const DraggableItem = ({
+  //   item,
+  //   index,
+  //   moveItem,
+  //   setIsEditBlockOpen,
+  //   setIsAddFormNameOpen,
+  //   setIsSeeBlocksOpen,
+  //   setBlockId,
+  //   duplicate_block_handler,
+  //   delete_block_handler,
+  // }) => {
+  //   const ref = useRef(null);
+
+  //   const [, drop] = useDrop({
+  //     accept: "BLOCK",
+  //     hover: (draggedItem) => {
+  //       if (!ref.current) return;
+  //       const dragIndex = draggedItem.index;
+  //       const hoverIndex = index;
+  //       if (dragIndex === hoverIndex) return;
+
+  //       moveItem(dragIndex, hoverIndex);
+  //       draggedItem.index = hoverIndex;
+  //     },
+  //   });
+
+  //   const [{ isDragging }, drag] = useDrag({
+  //     type: "BLOCK",
+  //     item: { index },
+  //     collect: (monitor) => ({
+  //       isDragging: monitor.isDragging(),
+  //     }),
+  //   });
+
+  //   drag(drop(ref));
+
+  //   return (
+  //     <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
+  //       <div className={`item ${isDragging ? "dragging" : ""}`} key={item.id}>
+  //         <h1>Block</h1>
+  //         <div className="item-controlers">
+  //           <button>
+  //             <FaRegEdit
+  //               size={20}
+  //               onClick={() => {
+  //                 setIsEditBlockOpen(true);
+  //                 setIsAddFormNameOpen(false);
+  //                 setIsSeeBlocksOpen(false);
+  //                 setBlockId(item.id);
+  //               }}
+  //             />
+  //           </button>
+  //           <button>
+  //             <HiOutlineDuplicate
+  //               size={20}
+  //               onClick={() => {
+  //                 duplicate_block_handler(item.id);
+  //               }}
+  //             />
+  //           </button>
+  //           <button>
+  //             <MdDeleteOutline
+  //               size={20}
+  //               onClick={() => {
+  //                 delete_block_handler(item.id);
+  //               }}
+  //             />
+  //           </button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
+  const DraggableItem = ({ item, index, moveItem, children }) => {
+    const ref = useRef(null);
+
+    const [, drop] = useDrop({
+      accept: "BLOCK",
+      hover: (draggedItem) => {
+        if (!ref.current) return;
+        const dragIndex = draggedItem.index;
+        const hoverIndex = index;
+        if (dragIndex === hoverIndex) return;
+
+        moveItem(dragIndex, hoverIndex);
+        draggedItem.index = hoverIndex;
+      },
+    });
+
+    const [{ isDragging }, drag] = useDrag({
+      type: "BLOCK",
+      item: { index },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    });
+
+    drag(drop(ref));
+
+    return (
+      <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <div className={`item ${isDragging ? "dragging" : ""}`} key={item.id}>
+          <h1>Block</h1>
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+  const [blockPositions, setBlockPositions] = useState([]);
+
+  useEffect(() => {
+    setBlockPositions(formBlocs.map((bloc) => bloc.id));
+  }, [formBlocs]);
+
+  const moveItem = (fromIndex, toIndex) => {
+    const updatedItems = [...formBlocs];
+    const [movedItem] = updatedItems.splice(fromIndex, 1);
+    updatedItems.splice(toIndex, 0, movedItem);
+
+    setFormBlocs(updatedItems); // Update the state with the new order of items
+
+    // Update block positions to match the new order
+    const updatedBlockPositions = updatedItems.map((item) => item.id);
+    setBlockPositions(updatedBlockPositions);
+
+    // Submit the new block positions
+    submitBlockPositions(updatedBlockPositions);
+  };
+
+  const submitBlockPositions = async (positions) => {
+    try {
+      await axios.put(`${API}/form/blocks/reorder`, positions, getApiConfig());
+      console.log("Block positions submitted successfully");
+    } catch (error) {
+      console.error("Error submitting block positions:", error);
+    }
+  };
+
   return (
     <>
       <PopUp isOpen={isPopUpOpen}>
@@ -348,6 +521,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             setIsEditBlockOpen(false);
             console.log(formBlocksData);
           }}
+          isBlocksOpen={isSeeBlocksOpen}
         >
           <div>
             {isAddFormNameOpen && (
@@ -384,41 +558,205 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
             {isSeeBlocksOpen && (
               <BlocksContainer>
-                {formBlocs.map((block, index) => (
-                  <Block key={index}>
-                    <div className="block-controlers">
-                      <button>
-                        <FaRegEdit
-                          size={20}
+                <DndProvider backend={HTML5Backend}>
+                  {formBlocs.map((item, index) => (
+                    <DraggableItem
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      moveItem={moveItem}
+                    >
+                      <div className="item-controlers">
+                        <button
                           onClick={() => {
                             setIsEditBlockOpen(true);
                             setIsAddFormNameOpen(false);
                             setIsSeeBlocksOpen(false);
-                            setBlockId(block.id);
+                            setBlockId(item.id);
                           }}
-                        />
-                      </button>
-                      <button>
-                        <HiOutlineDuplicate
-                          size={20}
-                          onClick={() => {
-                            duplicate_block_handler(block.id);
-                          }}
-                        />
-                      </button>
-                      <button>
-                        <MdDeleteOutline
-                          size={20}
-                          onClick={() => {
-                            delete_block_handler(block.id);
-                          }}
-                        />
-                      </button>
-                    </div>
-                  </Block>
-                ))}
-                <AddNewBlock onCreateNewBlock={create_new_block_handler} />
+                        >
+                          <FaRegEdit size={20} />
+                        </button>
+                        <button>
+                          <HiOutlineDuplicate
+                            size={20}
+                            onClick={() => {
+                              duplicate_block_handler(item.id);
+                            }}
+                          />
+                        </button>
+                        <button>
+                          <MdDeleteOutline
+                            size={20}
+                            onClick={() => {
+                              delete_block_handler(item.id);
+                            }}
+                          />
+                        </button>
+                      </div>
+                    </DraggableItem>
+                  ))}
+                  <style jsx>{`
+                    .item {
+                      background-color: #fffdf0;
+                      border-radius: 10px;
+                      border: 1px solid #9e977e;
+                      height: 25rem;
+                      width: 25rem;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 0.5rem;
+                      padding: 2rem;
+                      z-index: 100;
+                      cursor: pointer;
+                      position: relative;
+                      transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+
+                    .item-controlers {
+                      position: absolute;
+                      top: 1rem;
+                      right: 1rem;
+                    }
+
+                    .item h1 {
+                      color: #ebe5d0;
+                    }
+
+                    .item button {
+                      color: black;
+                      background-color: transparent;
+                      z-index: 200;
+                    }
+
+                    .item.dragging {
+                      opacity: 0.5;
+                      transform: scale(0.9);
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    }
+                  `}</style>
+                </DndProvider>
+                <AddNewBlock openBlockType={openBlockTypeHandler} />
               </BlocksContainer>
+            )}
+
+            {isAddBlockTypeOpen && (
+              <div className="block-type">
+                <form>
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="normal"
+                      name="Normal"
+                      value="null"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "null"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="normal" style={{ cursor: "pointer" }}>
+                      Normal
+                    </label>
+                  </div>
+
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="persone"
+                      name="persone"
+                      value="PERSON"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "PERSON"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="persone" style={{ cursor: "pointer" }}>
+                      {" "}
+                      Persone
+                    </label>
+                  </div>
+
+                  <div
+                    className="type"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "2rem",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="company"
+                      name="company"
+                      value="COMPANY"
+                      onChange={handleCheckboxChange}
+                      checked={blockType === "COMPANY"}
+                      style={{
+                        width: "fit-content",
+                        accentColor: "#9a9278",
+                        outline: "none",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <label htmlFor="company" style={{ cursor: "pointer" }}>
+                      Company
+                    </label>
+                  </div>
+                </form>
+
+                <div
+                  className="controllers"
+                  style={{
+                    display: "flex",
+                    justifyContent: "right",
+                    gap: "2rem",
+                  }}
+                >
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      create_new_block_handler();
+                    }}
+                  >
+                    <MdDone />
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setIsAddBlockTypeOpen(false);
+                      setIsSeeBlocksOpen(true);
+                    }}
+                  >
+                    <IoIosClose />
+                  </Button>
+                </div>
+              </div>
             )}
 
             {isEditBlockOpen && (
@@ -437,16 +775,25 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
                 {formBlocksData.map((block, blockIndex) => {
+                  // Check if the block has data (e.g., labels) before rendering
+                  if (!block.labels || block.labels.length === 0) {
+                    return null;
+                  }
+
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
-
                       {block.labels.map((label, labelIndex) => {
+                        // Check if the label name is empty before rendering
+                        if (!label.name) {
+                          return null;
+                        }
                         return (
                           <div key={label.id} className="block-input">
                             <label>{label.name}</label>
                             {label.type === "SELECT" ? (
                               <select name={label.name}>
+                                <option value="">Select an option</option>
                                 {Object.keys(label.options).map((key) => (
                                   <option key={key} value={key}>
                                     {label.options[key]}
@@ -460,15 +807,31 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                                 placeholder={label.name}
                               />
                             )}
-                            {/* {formErrors[index] && (
-                          <p className="error-message">{formErrors[index]}</p>
-                        )} */}
                           </div>
                         );
                       })}
                     </div>
                   );
                 })}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSeeBlocksOpen(true);
+                      setIsSeeAllBlocksInputOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
+                </div>
               </div>
             )}
 
@@ -592,6 +955,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       onClick={() => {
                         setIsPopUpOpen(true);
                         setIsSeeBlocksOpen(true);
+                        setIsSeeAllBlocksInputOpen(false);
                         localStorage.setItem("isSeeBlockOpen", "true");
                       }}
                     >

@@ -5,6 +5,7 @@ export const API = import.meta.env.VITE_API;
 // Auth
 export const registerURL = `${API}/auth/register`;
 export const loginURL = `${API}/auth/login`;
+export const adminLoginURL = `${API}/auth/login`;
 export const forgotPasswordURL = `${API}/auth/forgot-password`;
 
 // Template
@@ -18,6 +19,7 @@ export const createTemplateUrl = () => {
   const token = getToken();
   return `${API}/admin/create_template/${token}`;
 };
+
 export const updateTemplateCategoryUrl = ({
   templateId,
   categoryId,

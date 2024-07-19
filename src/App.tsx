@@ -37,18 +37,16 @@ import News from "./pages/News";
 import ProtectedRoute from "./ui/protectedRoute";
 import AddSubQuestion from "./pages/admin/AddSubQuestion";
 import EditSubQuestion from "./pages/admin/EditSubQuestion";
-import QuestionnaireWizard from "./ui/Testing/Wizard";
+// import QuestionnaireWizard from "./ui/Testing/Wizard";
 // import AddNewForm from "./pages/admin/addNewForm";
 // import FormBlocs from "./pages/admin/formBlocs";
+
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* test */}
-
-        <Route index path="/test" element={<QuestionnaireWizard />} />
-
         {/* Public */}
         <Route index path="/" element={<Home />} />
 
@@ -145,7 +143,8 @@ function App() {
         </Route>
         {/* Auth */}
         <Route element={<AuthRoute />}>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login/user" element={<Login />} />
+          <Route path="/login/admin" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/resetPassword/:token" element={<ResetPassword />} />

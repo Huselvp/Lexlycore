@@ -18,17 +18,62 @@ import {
 
 const MAP_API_KEY = "AIzaSyB8HxTy1ONHp4EbqDUcHgbjZcQQ9aGLvqM";
 
-const AddressLocal = ({ addressDetails }) => {
+const AddressLocal = ({ addressDetails, getMapData }) => {
+  const [apartment, setApartment] = useState("");
+  const [formattedAddress, setFormattedAddress] = useState("");
+
+  const handleApartmentChange = (e) => {
+    setApartment(e.target.value);
+  };
+
+  useEffect(() => {
+    const { address, postal_code, city, country } = addressDetails;
+    let newFormattedAddress = "";
+
+    if (address && apartment && postal_code && city && country) {
+      newFormattedAddress = `${address}, ${apartment}, ${postal_code}, ${city}, ${country}`;
+    }
+
+    setFormattedAddress(newFormattedAddress);
+    if (newFormattedAddress !== "") {
+      getMapData(newFormattedAddress);
+    }
+  }, [addressDetails, apartment]);
+
   return (
     <div className="inputDiv">
       <div className="one">
-        <input type="text" value={addressDetails.address} readOnly />
-        <input type="text" value={addressDetails.city} readOnly />
+        <input
+          type="text"
+          value={addressDetails.address}
+          readOnly
+          placeholder="Addres"
+        />
+        <input
+          type="text"
+          placeholder="Appartment"
+          onChange={handleApartmentChange}
+        />
       </div>
       <div className="two">
-        <input type="text" value={addressDetails.province} readOnly />
-        <input type="text" value={addressDetails.country} readOnly />
-        <input type="text" value={addressDetails.postal_code} readOnly />
+        <input
+          type="text"
+          value={addressDetails.postal_code}
+          readOnly
+          placeholder="Post number"
+        />
+        <input
+          type="text"
+          value={addressDetails.city}
+          readOnly
+          placeholder="City"
+        />
+        <input
+          type="text"
+          value={addressDetails.country}
+          readOnly
+          placeholder="Country"
+        />
       </div>
     </div>
   );
@@ -171,7 +216,7 @@ export const PlaceAutocompleteClassic = ({ onPlaceSelect }: Props) => {
   );
 };
 
-const MapContainer = () => {
+const MapContainer = ({ getTheMapData }) => {
   const map = useMap();
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
@@ -305,7 +350,12 @@ const MapContainer = () => {
             marker={marker}
             setAddressDetails={setAddressDetails}
           />
-          <AddressLocal addressDetails={addressDetails} />
+          <AddressLocal
+            addressDetails={addressDetails}
+            getMapData={(value) => {
+              getTheMapData(value);
+            }}
+          />
         </div>
       </APIProvider>
     </>

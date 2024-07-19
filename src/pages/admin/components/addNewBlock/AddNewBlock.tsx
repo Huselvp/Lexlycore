@@ -1,10 +1,9 @@
-import React from "react";
 import "./addNewBlock.css";
 import { IoIosAdd } from "react-icons/io";
 
-function AddNewBlock({ onCreateNewBlock }) {
+function AddNewBlock({ openBlockType }) {
   return (
-    <div className="add-new-block" onClick={onCreateNewBlock}>
+    <div className="add-new-block" onClick={openBlockType}>
       <IoIosAdd size={70} className="icon" />
     </div>
   );

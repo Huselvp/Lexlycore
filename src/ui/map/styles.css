@@ -79,6 +79,7 @@ input {
 
 .autocomplete-container input {
   /* background-color: red; */
+  height: 40px;
   width: 48vw;
 }
 
