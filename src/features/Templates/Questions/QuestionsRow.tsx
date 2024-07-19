@@ -4,7 +4,7 @@ import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
 import { useNavigate, useParams } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -95,41 +95,42 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     setSQuestionOrderTest(question?.subQuestions);
   }, [question?.subQuestions]);
 
-  const get_form_blocks_handler = async (id) => {
+  const get_form_blocks_handler = useCallback(async (id) => {
     try {
-      await axios
-        .get(`http://localhost:8081/api/form/blocks/${id}`, getApiConfig())
-        .then((result) => {
-          if (result.data.length !== 0) {
-            setFormBlocs(result.data);
-            setIsTherBlocks(true);
-          } else {
-            setIsTherBlocks(false);
-          }
-        });
+      const result = await axios.get(
+        `http://localhost:8081/api/form/blocks/${id}`,
+        getApiConfig()
+      );
+      if (result.data.length !== 0) {
+        setFormBlocs(result.data);
+        setIsTherBlocks(true);
+      } else {
+        setIsTherBlocks(false);
+      }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
-  };
+  }, []);
 
-  const get_formId = async (id) => {
-    try {
-      await axios
-        .get(`${API}/form/get-by-question-id/${id}`, getApiConfig())
-        .then((result) => {
-          if (typeof result.data === "number") {
-            setFormBlocksId(result.data);
-            get_form_blocks_handler(result.data);
-          } else {
-            setFormBlocksId("");
-
-            return;
-          }
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const get_formId = useCallback(
+    async (id) => {
+      try {
+        const result = await axios.get(
+          `${API}/form/get-by-question-id/${id}`,
+          getApiConfig()
+        );
+        if (typeof result.data === "number") {
+          setFormBlocksId(result.data);
+          await get_form_blocks_handler(result.data);
+        } else {
+          setFormBlocksId("");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [get_form_blocks_handler]
+  );
 
   useEffect(() => {
     const fetchFormIds = async () => {
@@ -139,34 +140,34 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     fetchFormIds();
   }, [get_formId, question.id]);
 
-  useEffect(() => {
-    squestionOrderTest?.forEach((sq) => {
-      // get_sub_q_blocks(sq.id);
-      const get_sub_q_blocks = async (id) => {
-        try {
-          await axios
-            .get(`http://localhost:8081/api/form/blocks/${id}`, getApiConfig())
-            .then((result) => {
-              // setFormBlocs(result.data);
+  // useEffect(() => {
+  //   squestionOrderTest?.forEach((sq) => {
+  //     // get_sub_q_blocks(sq.id);
+  //     const get_sub_q_blocks = async (id) => {
+  //       try {
+  //         await axios
+  //           .get(`http://localhost:8081/api/form/blocks/${id}`, getApiConfig())
+  //           .then((result) => {
+  //             // setFormBlocs(result.data);
 
-              if (result.data.length !== 0) {
-                setIsSubQuestionHaveForm(true);
-                setSubQuestionFormBlocks(result.data);
-                console.log(
-                  result.data,
-                  "this is the qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
-                );
-              } else {
-                setIsSubQuestionHaveForm(false);
-              }
-            });
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      get_sub_q_blocks(sq.id);
-    });
-  }, [squestionOrderTest]);
+  //             if (result.data.length !== 0) {
+  //               setIsSubQuestionHaveForm(true);
+  //               setSubQuestionFormBlocks(result.data);
+  //               console.log(
+  //                 result.data,
+  //                 "this is the qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+  //               );
+  //             } else {
+  //               setIsSubQuestionHaveForm(false);
+  //             }
+  //           });
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //     };
+  //     get_sub_q_blocks(sq.id);
+  //   });
+  // }, [squestionOrderTest]);
 
   const submit_form_name_handler = async () => {
     try {
@@ -362,81 +363,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     setIsSeeBlocksOpen(false);
   };
 
-  // ####################################
-
-  // const DraggableItem = ({
-  //   item,
-  //   index,
-  //   moveItem,
-  //   setIsEditBlockOpen,
-  //   setIsAddFormNameOpen,
-  //   setIsSeeBlocksOpen,
-  //   setBlockId,
-  //   duplicate_block_handler,
-  //   delete_block_handler,
-  // }) => {
-  //   const ref = useRef(null);
-
-  //   const [, drop] = useDrop({
-  //     accept: "BLOCK",
-  //     hover: (draggedItem) => {
-  //       if (!ref.current) return;
-  //       const dragIndex = draggedItem.index;
-  //       const hoverIndex = index;
-  //       if (dragIndex === hoverIndex) return;
-
-  //       moveItem(dragIndex, hoverIndex);
-  //       draggedItem.index = hoverIndex;
-  //     },
-  //   });
-
-  //   const [{ isDragging }, drag] = useDrag({
-  //     type: "BLOCK",
-  //     item: { index },
-  //     collect: (monitor) => ({
-  //       isDragging: monitor.isDragging(),
-  //     }),
-  //   });
-
-  //   drag(drop(ref));
-
-  //   return (
-  //     <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
-  //       <div className={`item ${isDragging ? "dragging" : ""}`} key={item.id}>
-  //         <h1>Block</h1>
-  //         <div className="item-controlers">
-  //           <button>
-  //             <FaRegEdit
-  //               size={20}
-  //               onClick={() => {
-  //                 setIsEditBlockOpen(true);
-  //                 setIsAddFormNameOpen(false);
-  //                 setIsSeeBlocksOpen(false);
-  //                 setBlockId(item.id);
-  //               }}
-  //             />
-  //           </button>
-  //           <button>
-  //             <HiOutlineDuplicate
-  //               size={20}
-  //               onClick={() => {
-  //                 duplicate_block_handler(item.id);
-  //               }}
-  //             />
-  //           </button>
-  //           <button>
-  //             <MdDeleteOutline
-  //               size={20}
-  //               onClick={() => {
-  //                 delete_block_handler(item.id);
-  //               }}
-  //             />
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
+  const [blockPositions, setBlockPositions] = useState([]);
 
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
@@ -473,8 +400,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       </div>
     );
   };
-
-  const [blockPositions, setBlockPositions] = useState([]);
 
   useEffect(() => {
     setBlockPositions(formBlocs.map((bloc) => bloc.id));
