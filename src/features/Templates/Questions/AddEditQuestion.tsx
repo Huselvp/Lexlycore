@@ -1,12 +1,13 @@
-import styled from "styled-components";
-import Form from "../../../ui/AuthForm";
-import Button from "../../../ui/Button";
-import Editor from "../../../ui/Editor";
-import { FormEventHandler } from "react";
-import { useAddQuestion } from "./useAddQuestion";
-import { useUpdateQuestion } from "./useUpdateQuestion";
-import Row from "../../../ui/Row";
-import { questionsAnsewersTypes } from "../../../utils/constants";
+import styled from "styled-components"
+import Form from "../../../ui/AuthForm"
+import Button from "../../../ui/Button"
+import Editor from "../../../ui/Editor"
+import { FormEventHandler } from "react"
+import { useAddQuestion } from "./useAddQuestion"
+import { useUpdateQuestion } from "./useUpdateQuestion"
+import Row from "../../../ui/Row"
+import { questionsAnsewersTypes } from "../../../utils/constants"
+import React, { useState } from "react";
 
 const Container = styled.div`
   border-radius: var(--rounded-lg);
@@ -26,10 +27,11 @@ const AddEditQuestion = ({
   onAdd: boolean;
   question?: Question;
 }) => {
-  const { isLoading: isLoading1, addQuestion } = useAddQuestion();
-  const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion();
-  const isLoading = isLoading1 || isLoading2;
-  const isQuestionProvided = typeof question !== "undefined";
+  const { isLoading: isLoading1, addQuestion } = useAddQuestion()
+  const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion()
+  const isLoading = isLoading1 || isLoading2
+  const isQuestionProvided = typeof question !== "undefined"
+  const [editorContent, setEditorContent] = useState(isQuestionProvided ? question.texte : "");
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -98,10 +100,9 @@ const AddEditQuestion = ({
           </Form.Row>
           <Form.Row>
             <Form.Label>Content</Form.Label>
-            <Editor
-              defaultValue={isQuestionProvided ? question.texte : ""}
-              name="texte"
-            />
+            <Editor defaultValue={isQuestionProvided ? question.texte : ""} name="texte" onChange={
+              setEditorContent
+            }/>
           </Form.Row>
           <Form.Row>
             <Form.Label>Type</Form.Label>
