@@ -2,7 +2,7 @@ import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
 import Menus from "../../../ui/Menus";
 import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
@@ -22,7 +22,7 @@ import PopUp from "../../../pages/admin/components/popUp/PopUp";
 import PopUpContentContainer from "../../../pages/admin/components/popup_content_container/PopUpContantContainer";
 import Form from "../../../pages/admin/components/UI/form/Form";
 import Button from "../../../pages/admin/components/UI/btns/Button";
-import Block from "../../../pages/admin/components/block/block";
+// import Block from "../../../pages/admin/components/block/block";
 import AddNewBlock from "../../../pages/admin/components/addNewBlock/AddNewBlock";
 import BlocksContainer from "../../../pages/admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../pages/admin/components/editBlock/editBlock";
@@ -61,8 +61,31 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   const [blockType, setBlockType] = useState("");
 
   const [formBlocs, setFormBlocs] = useState([]);
-  // const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
-  const [isSubQuestionHaveForm, setIsSubQuestionHaveForm] = useState(false);
+
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+
+  const [blockPositions, setBlockPositions] = useState([]);
+
+  const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
+    useState(false);
+  const [updatedMinValue, setUpdatedMinValue] = useState(0);
+  const [updatedMaxValue, setUpdatedMaxValue] = useState(0);
+
+  const openBlockTypeHandler = () => {
+    setIsAddBlockTypeOpen(true);
+    setIsSeeBlocksOpen(false);
+  };
+
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+
+    if (checked) {
+      setBlockType(value);
+    } else {
+      setBlockType("");
+    }
+  };
 
   const [squestionOrderTest, setSQuestionOrderTest] = useState(
     question?.subQuestions.sort((a, b) => a.position - b.position)
@@ -95,22 +118,22 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     setSQuestionOrderTest(question?.subQuestions);
   }, [question?.subQuestions]);
 
-  const get_form_blocks_handler = useCallback(async (id) => {
-    try {
-      const result = await axios.get(
-        `http://localhost:8081/api/form/blocks/${id}`,
-        getApiConfig()
-      );
-      if (result.data.length !== 0) {
-        setFormBlocs(result.data);
-        setIsTherBlocks(true);
-      } else {
-        setIsTherBlocks(false);
+  const get_form_blocks_handler = useCallback(
+    async (id) => {
+      try {
+        const result = await axios.get(
+          `http://localhost:8081/api/form/blocks/${id}`,
+          getApiConfig()
+        );
+        const blocks = result.data;
+        setFormBlocs(blocks);
+        setIsTherBlocks(blocks.length > 0);
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+    },
+    [getApiConfig]
+  );
 
   const get_formId = useCallback(
     async (id) => {
@@ -119,9 +142,10 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           `${API}/form/get-by-question-id/${id}`,
           getApiConfig()
         );
-        if (typeof result.data === "number") {
-          setFormBlocksId(result.data);
-          await get_form_blocks_handler(result.data);
+        const formId = result.data;
+        if (typeof formId === "number") {
+          setFormBlocksId(formId);
+          await get_form_blocks_handler(formId);
         } else {
           setFormBlocksId("");
         }
@@ -129,142 +153,99 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         console.error(err);
       }
     },
-    [get_form_blocks_handler]
+    [get_form_blocks_handler, API, getApiConfig]
   );
 
   useEffect(() => {
-    const fetchFormIds = async () => {
-      await get_formId(question.id);
-    };
-
-    fetchFormIds();
+    if (question.id) {
+      get_formId(question.id);
+    }
   }, [get_formId, question.id]);
 
-  // useEffect(() => {
-  //   squestionOrderTest?.forEach((sq) => {
-  //     // get_sub_q_blocks(sq.id);
-  //     const get_sub_q_blocks = async (id) => {
-  //       try {
-  //         await axios
-  //           .get(`http://localhost:8081/api/form/blocks/${id}`, getApiConfig())
-  //           .then((result) => {
-  //             // setFormBlocs(result.data);
-
-  //             if (result.data.length !== 0) {
-  //               setIsSubQuestionHaveForm(true);
-  //               setSubQuestionFormBlocks(result.data);
-  //               console.log(
-  //                 result.data,
-  //                 "this is the qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
-  //               );
-  //             } else {
-  //               setIsSubQuestionHaveForm(false);
-  //             }
-  //           });
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
-  //     };
-  //     get_sub_q_blocks(sq.id);
-  //   });
-  // }, [squestionOrderTest]);
-
   const submit_form_name_handler = async () => {
+    if (!formTitle) {
+      console.log("form title should not be empty");
+      return;
+    }
     try {
-      if (formTitle !== "") {
-        console.log(question.id);
-        await axios
-          .post(
-            `${import.meta.env.VITE_API}/form/create/${question.id}`,
-            { title: formTitle },
-            getApiConfig()
-          )
-          .then((result) => {
-            setIsAddFormNameOpen(false);
-            setIsSeeBlocksOpen(true);
-            get_form_blocks_handler(result.data.question.id);
-          });
-      } else {
-        console.log("form title should not be empty");
-      }
+      const result = await axios.post(
+        `${import.meta.env.VITE_API}/form/create/${question.id}`,
+        { title: formTitle },
+        getApiConfig()
+      );
+      setIsAddFormNameOpen(false);
+      setIsSeeBlocksOpen(true);
+      get_form_blocks_handler(result.data.question.id);
+      setFormBlocksId(result.data.id);
+      console.log(result.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
   const create_new_block_handler = async () => {
     try {
-      await axios
-        .post(
-          `${API}/form/block/${formBlocksId}`,
-          {
-            type: blockType === "null" ? null : blockType,
-          },
+      const result = await axios.post(
+        `${API}/form/block/${formBlocksId}`,
+        { type: blockType === "null" ? null : blockType },
+        getApiConfig()
+      );
+      get_form_blocks_handler(formBlocksId);
+      setIsAddBlockTypeOpen(false);
+      setIsSeeBlocksOpen(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const delete_block_handler = useCallback(
+    async (id) => {
+      try {
+        await axios.delete(
+          `${API}/form/block/${formBlocksId}/${id}`,
           getApiConfig()
-        )
-        .then((result) => {
-          console.log(result.data, "from add new block");
-          get_form_blocks_handler(formBlocksId);
-          setIsAddBlockTypeOpen(false);
-          setIsSeeBlocksOpen(true);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        );
+        get_form_blocks_handler(formBlocksId);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [formBlocksId, get_form_blocks_handler, API, getApiConfig]
+  );
 
-  const delete_block_handler = async (id) => {
-    try {
-      await axios
-        .delete(`${API}/form/block/${formBlocksId}/${id}`, getApiConfig())
-        .then((result) => {
-          console.log(result.data);
-          get_form_blocks_handler(formBlocksId);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const duplicate_block_handler = async (id) => {
-    try {
-      await axios
-        .post(
+  const duplicate_block_handler = useCallback(
+    async (id) => {
+      try {
+        await axios.post(
           `${API}/form/block/duplicate/${formBlocksId}/${id}`,
           {},
           getApiConfig()
-        )
-        .then((result) => {
-          console.log(result.data);
-          get_form_blocks_handler(formBlocksId);
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        );
+        get_form_blocks_handler(formBlocksId);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [formBlocksId, get_form_blocks_handler, API, getApiConfig]
+  );
 
   useEffect(() => {
     const get_form_blocks = async () => {
       try {
-        await axios
-          .get(`${API}/suser/question-details/${question.id}`, getApiConfig())
-          .then((result) => {
-            console.log(
-              result.data.form.blocks,
-              "###################################################"
-            );
-            setFormBblocksData(result.data.form.blocks);
-          });
+        const result = await axios.get(
+          `${API}/suser/question-details/${question.id}`,
+          getApiConfig()
+        );
+        setFormBblocksData(result.data.form.blocks);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     };
 
     get_form_blocks();
-  }, [question.id]);
+  }, [question.id, API, getApiConfig]);
 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(0);
+  // ++++++++++++++++++++
 
   const add_min_max_value_handler = async (id) => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
@@ -315,11 +296,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     getFilterInformation(question?.id, question?.valueType);
   }, [question?.id, question?.valueType]);
 
-  const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
-    useState(false);
-  const [updatedMinValue, setUpdatedMinValue] = useState(0);
-  const [updatedMaxValue, setUpdatedMaxValue] = useState(0);
-
   const updateMinMaxValuesHandler = async (id) => {
     try {
       if (
@@ -348,22 +324,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   // ====================
 
-  const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target;
-
-    if (checked) {
-      setBlockType(value);
-    } else {
-      setBlockType("");
-    }
-  };
-
-  const openBlockTypeHandler = () => {
-    setIsAddBlockTypeOpen(true);
-    setIsSeeBlocksOpen(false);
-  };
-
-  const [blockPositions, setBlockPositions] = useState([]);
+  // ====================
 
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
@@ -484,7 +445,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             {isSeeBlocksOpen && (
               <BlocksContainer>
                 <DndProvider backend={HTML5Backend}>
-                  {formBlocs.map((item, index) => (
+                  {formBlocs?.map((item, index) => (
                     <DraggableItem
                       key={item.id}
                       item={item}
@@ -699,7 +660,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
-                {formBlocksData.map((block, blockIndex) => {
+                {formBlocksData?.map((block, blockIndex) => {
                   // Check if the block has data (e.g., labels) before rendering
                   if (!block.labels || block.labels.length === 0) {
                     return null;
@@ -779,16 +740,52 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ></input>
                 </form>
 
-                <div className="controllers">
-                  <Button
+                {/* <div className="controllers">
+                  <button
                     type="button"
                     onClick={() => {
                       add_min_max_value_handler(question.id);
-                      console.log(question);
                     }}
                   >
                     <MdDone />
-                  </Button>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // setIsSeeBlocksOpen(true);
+                      // setIsSeeAllBlocksInputOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
+                </div> */}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      add_min_max_value_handler(question.id);
+                    }}
+                  >
+                    <MdDone />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPopUpOpen(false);
+                      setIsAddMaxMinValuesOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
                 </div>
               </div>
             )}
@@ -812,7 +809,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ></input>
                 </form>
 
-                <div className="controllers">
+                {/* <div className="controllers">
                   <Button
                     type="button"
                     onClick={() => {
@@ -822,6 +819,43 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   >
                     <MdDone />
                   </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // setIsSeeBlocksOpen(true);
+                      // setIsSeeAllBlocksInputOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
+                </div> */}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateMinMaxValuesHandler(question.id);
+                    }}
+                  >
+                    <MdDone />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPopUpOpen(false);
+                      setIsUpdatedMaxMinValuesOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
                 </div>
               </div>
             )}
@@ -863,7 +897,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 )}
 
                 {question.valueType.startsWith("form") &&
-                  (formBlocs.length === 0 ? (
+                  (formBlocksId === "" ? (
                     <Menus.Button
                       icon={<HiEye />}
                       onClick={() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getApiConfig } from "../../../../utils/constants";
 import { API } from "../../../../utils/constants";
@@ -13,13 +13,13 @@ import { IoIosClose } from "react-icons/io";
 import { HiOutlineDuplicate } from "react-icons/hi";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import { IoMdRemove } from "react-icons/io";
-
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import PopUp from "../../../admin/components/popUp/PopUp";
 import PopUpContentContainer from "../../../admin/components/popup_content_container/PopUpContantContainer";
 import Form from "../../../admin/components/UI/form/Form";
 import Button from "../../../admin/components/UI/btns/Button";
-import Block from "../../../admin/components/block/block";
+// import Block from "../../../admin/components/block/block";
 import AddNewBlock from "../../../admin/components/addNewBlock/AddNewBlock";
 import BlocksContainer from "../../../admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../admin/components/editBlock/editBlock";
@@ -72,6 +72,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
             setIsAddSubQuestionFormNameOpen(false);
             setIsSeeSubQuestionBlocks(true);
             getSubQuestionFormBlocksHandler(subQuestionFormId);
+            setSubQuestionFormId(result.data.id);
           });
       } else {
         console.log("form title should not be empty");
@@ -137,6 +138,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
           setIsAddBlockTypeOpen(false);
           setIsSeeSubQuestionBlocks(true);
+          get_form_blocks(subQuestion.id);
         });
     } catch (err) {
       console.log(err);
@@ -171,27 +173,20 @@ function SubQuestionRow({ subQuestion, questionId }) {
     }
   };
 
-  useEffect(() => {
-    const get_form_blocks = async () => {
-      try {
-        await axios
-          .get(
-            `${API}/suser/sub-question-details/${subQuestion.id}`,
-            getApiConfig()
-          )
-          .then((result) => {
-            console.log(
-              result.data.form.blocks,
-              "###################################################"
-            );
-            setFormBblocksData(result.data.form.blocks);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
+  const get_form_blocks = async (id) => {
+    try {
+      const result = await axios.get(
+        `${API}/suser/sub-question-details/${id}`,
+        getApiConfig()
+      );
+      setFormBblocksData(result.data.form.blocks);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    get_form_blocks();
+  useEffect(() => {
+    get_form_blocks(subQuestion.id);
   }, [subQuestion.id]);
 
   // ==============================
@@ -297,6 +292,74 @@ function SubQuestionRow({ subQuestion, questionId }) {
     setIsSeeSubQuestionBlocks(false);
   };
 
+  // +++++++++++++++++++++++++++
+
+  const [blockPositions, setBlockPositions] = useState([]);
+
+  const DraggableItem = ({ item, index, moveItem, children }) => {
+    const ref = useRef(null);
+
+    const [, drop] = useDrop({
+      accept: "BLOCK",
+      hover: (draggedItem) => {
+        if (!ref.current) return;
+        const dragIndex = draggedItem.index;
+        const hoverIndex = index;
+        if (dragIndex === hoverIndex) return;
+
+        moveItem(dragIndex, hoverIndex);
+        draggedItem.index = hoverIndex;
+      },
+    });
+
+    const [{ isDragging }, drag] = useDrag({
+      type: "BLOCK",
+      item: { index },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    });
+
+    drag(drop(ref));
+
+    return (
+      <div ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }}>
+        <div className={`item ${isDragging ? "dragging" : ""}`} key={item.id}>
+          <h1>Block</h1>
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    setBlockPositions(subQuestionFormBlocks.map((bloc) => bloc.id));
+  }, [subQuestionFormBlocks]);
+
+  const moveItem = (fromIndex, toIndex) => {
+    const updatedItems = [...subQuestionFormBlocks];
+    const [movedItem] = updatedItems.splice(fromIndex, 1);
+    updatedItems.splice(toIndex, 0, movedItem);
+
+    setSubQuestionFormBlocks(updatedItems); // Update the state with the new order of items
+
+    // Update block positions to match the new order
+    const updatedBlockPositions = updatedItems.map((item) => item.id);
+    setBlockPositions(updatedBlockPositions);
+
+    // Submit the new block positions
+    submitBlockPositions(updatedBlockPositions);
+  };
+
+  const submitBlockPositions = async (positions) => {
+    try {
+      await axios.put(`${API}/form/blocks/reorder`, positions, getApiConfig());
+      console.log("Block positions submitted successfully");
+    } catch (error) {
+      console.error("Error submitting block positions:", error);
+    }
+  };
+
   return (
     <React.Fragment>
       <PopUp isOpen={isPopUpOpen}>
@@ -350,7 +413,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
 
             {isSeeSubQuestionFormBlocksOpen && (
               <BlocksContainer>
-                {subQuestionFormBlocks.map((block, index) => {
+                {/* {subQuestionFormBlocks?.map((block, index) => {
                   return (
                     <Block key={index}>
                       <div className="block-controlers">
@@ -385,7 +448,91 @@ function SubQuestionRow({ subQuestion, questionId }) {
                       </div>
                     </Block>
                   );
-                })}
+                })} */}
+
+                <DndProvider backend={HTML5Backend}>
+                  {subQuestionFormBlocks?.map((item, index) => (
+                    <DraggableItem
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      moveItem={moveItem}
+                    >
+                      <div className="item-controlers">
+                        <button>
+                          <FaRegEdit
+                            size={20}
+                            onClick={() => {
+                              setIsEditSubQuestionBlocksOpen(true);
+                              setIsAddSubQuestionFormNameOpen(false);
+                              setIsSeeAllSubQuestionBlocksOpen(false);
+                              setIsSeeSubQuestionBlocks(false);
+                              setSubQuestionBlockId(item.id);
+                              get_form_blocks(subQuestion.id);
+                            }}
+                          />
+                        </button>
+                        <button>
+                          <HiOutlineDuplicate
+                            size={20}
+                            onClick={() => {
+                              duplicate_subQuestion_block_handler(item.id);
+                            }}
+                          />
+                        </button>
+                        <button>
+                          <MdDeleteOutline
+                            size={20}
+                            onClick={() => {
+                              delete_subQuestion_block_handler(item.id);
+                            }}
+                          />
+                        </button>
+                      </div>
+                    </DraggableItem>
+                  ))}
+                  <style jsx>{`
+                    .item {
+                      background-color: #fffdf0;
+                      border-radius: 10px;
+                      border: 1px solid #9e977e;
+                      height: 25rem;
+                      width: 25rem;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 0.5rem;
+                      padding: 2rem;
+                      z-index: 100;
+                      cursor: pointer;
+                      position: relative;
+                      transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+
+                    .item-controlers {
+                      position: absolute;
+                      top: 1rem;
+                      right: 1rem;
+                      display: flex;
+                    }
+
+                    .item h1 {
+                      color: #ebe5d0;
+                    }
+
+                    .item button {
+                      color: black;
+                      background-color: transparent;
+                      z-index: 200;
+                    }
+
+                    .item.dragging {
+                      opacity: 0.5;
+                      transform: scale(0.9);
+                      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    }
+                  `}</style>
+                </DndProvider>
 
                 <AddNewBlock openBlockType={openBlockTypeHandler} />
               </BlocksContainer>
@@ -511,7 +658,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
 
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
-                {formBlocksData.map((block, blockIndex) => {
+                {formBlocksData?.map((block, blockIndex) => {
                   if (!block.labels || block.labels.length === 0) {
                     return null;
                   }
@@ -636,7 +783,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   ></input>
                 </form>
 
-                <div className="controllers">
+                {/* <div className="controllers">
                   <Button
                     type="button"
                     onClick={() => {
@@ -645,6 +792,33 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   >
                     <MdDone />
                   </Button>
+                </div> */}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      add_min_max_value_handler(subQuestion.id);
+                    }}
+                  >
+                    <MdDone />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPopUpOpen(false);
+                      setIsAddMaxMinValuesOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
                 </div>
               </div>
             )}
@@ -668,7 +842,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   ></input>
                 </form>
 
-                <div className="controllers">
+                {/* <div className="controllers">
                   <Button
                     type="button"
                     onClick={() => {
@@ -677,6 +851,33 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   >
                     <MdDone />
                   </Button>
+                </div> */}
+
+                <div
+                  className="see_blocs_controller add-new-input"
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateMinMaxValuesHandler(subQuestion.id);
+                    }}
+                  >
+                    <MdDone />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPopUpOpen(false);
+                      setIsUpdatedMaxMinValuesOpen(false);
+                    }}
+                  >
+                    Back
+                  </button>
                 </div>
               </div>
             )}
@@ -711,7 +912,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
           </Menus.Button>
 
           {subQuestion.valueType === "form" &&
-            (subQuestionFormBlocks.length === 0 ? (
+            (subQuestionFormId === "" ? (
               <Menus.Button
                 icon={<HiPencil />}
                 onClick={() => {
