@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
+    private final SubQuestionRepository subQuestionRepository;
+    private final SubQuestionService subQuestionService;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -69,8 +71,8 @@ public class QuestionService {
             LabelRepository labelRepository,
             FormTransformer formTransformer,
             BlockTransformer blockTransformer,
-            LabelTransformer labelTransformer, FilterRepository filterRepository
-    ) {
+            LabelTransformer labelTransformer, FilterRepository filterRepository,
+            SubQuestionRepository subQuestionRepository, SubQuestionService subQuestionService) {
         this.questionRepository = questionRepository;
         this.questionTransformer = questionTransformer;
         this.filterService = filterService;
@@ -81,6 +83,8 @@ public class QuestionService {
         this.formTransformer = formTransformer;
         this.blockTransformer = blockTransformer;
         this.filterRepository = filterRepository;
+        this.subQuestionRepository = subQuestionRepository;
+        this.subQuestionService = subQuestionService;
     }
 
     public List<Question> getAllQuestions() {
@@ -130,6 +134,11 @@ public class QuestionService {
             }
             if (question.getValueType().equals("form")){
                 formService.deleteFormByQuestionId(questionId);
+            }
+
+            List <SubQuestion> subQuestions = subQuestionRepository.findByParentQuestionId(questionId);
+            for(SubQuestion subQuestion : subQuestions){
+                subQuestionService.deleteSubQuestion(subQuestion.getId());
             }
             entityManager.remove(question);
         }
