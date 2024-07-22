@@ -358,7 +358,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               <option value="NUMBER">Number</option>
               <option value="DATE">Date</option>
               <option value="SELECT">Select</option>
-              <option value="FILTER">Filter</option>
             </select>
             <div className="add-new-input">
               <button
@@ -404,7 +403,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               <option value="NUMBER">Number</option>
               <option value="DATE">Date</option>
               <option value="SELECT">Select</option>
-              <option value="FILTER">Filter</option>
             </select>
             <div className="add-new-input">
               <button
@@ -524,7 +522,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                 <option value="NUMBER">Number</option>
                 <option value="DATE">Date</option>
                 <option value="SELECT">Select</option>
-                <option value="FILTER">Filter</option>
               </select>
             </div>
           </form>
@@ -578,7 +575,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                 <option value="NUMBER">Number</option>
                 <option value="DATE">Date</option>
                 <option value="SELECT">Select</option>
-                <option value="FILTER">Filter</option>
               </select>
             </div>
 
