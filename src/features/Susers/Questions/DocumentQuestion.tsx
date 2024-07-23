@@ -580,8 +580,6 @@
 
 // export default DocumentQuestion;
 
-
-
 import { ReactNode, useMemo, useState, useEffect, useCallback } from "react";
 import Form from "../../../ui/AuthForm";
 import { extractChoicesFromString } from "../../../utils/helpers";
@@ -759,13 +757,13 @@ const DocumentQuestion = ({
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question.valueType === "form") {
+      if (question?.valueType === "form") {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
             getApiConfig()
           );
-          setFormBlocks(result.data.form.blocks);
+          setFormBlocks(result?.data.form.blocks);
         } catch (err) {
           console.log(err);
         }
@@ -773,13 +771,13 @@ const DocumentQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question.valueType === "filter") {
+      if (question?.valueType === "filter") {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
             getApiConfig()
           );
-          setFilterData(result.data.filter);
+          setFilterData(result?.data.filter);
         } catch (err) {
           console.log(err);
         }
@@ -788,7 +786,7 @@ const DocumentQuestion = ({
 
     getFormBlocks();
     getFilterData();
-  }, [question.id, question.valueType]);
+  }, [question.id, question?.valueType]);
 
   // Initialize form data with props value
   useEffect(() => {
@@ -799,7 +797,7 @@ const DocumentQuestion = ({
 
   // Count total inputs
   const countTotalInputs = (blocks) => {
-    return blocks.reduce((total, block) => total + block.labels.length, 0);
+    return blocks.reduce((total, block) => total + block?.labels.length, 0);
   };
 
   // Calculate total inputs
@@ -808,7 +806,7 @@ const DocumentQuestion = ({
   // Update form errors when form blocks change
   useEffect(() => {
     const initialFormErrors = formBlocks.flatMap((block) =>
-      block.labels.map(() => "")
+      block.labels?.map(() => "")
     );
     setFormErrors(initialFormErrors);
   }, [formBlocks]);
@@ -818,7 +816,7 @@ const DocumentQuestion = ({
     (blockId, labelId, value) => {
       setFormData((prevFormData) => {
         const updatedFormData = prevFormData.filter(
-          (item) => !(item.blockId === blockId && item.labelId === labelId)
+          (item) => !(item?.blockId === blockId && item?.labelId === labelId)
         );
 
         if (value.trim() !== "") {
@@ -826,7 +824,7 @@ const DocumentQuestion = ({
         }
 
         // Update form data and check if all data is entered
-        const allInputsFilled = updatedFormData.length === totalInputs;
+        const allInputsFilled = updatedFormData?.length === totalInputs;
         setIsAllDataEntered(allInputsFilled);
         isTherData(allInputsFilled);
         setValue(updatedFormData); // Pass updated data to setValue
@@ -848,10 +846,10 @@ const DocumentQuestion = ({
       return Number(value);
     } else if (
       filterData &&
-      filterData.filterStartInt !== undefined &&
-      filterData.filterEndInt !== undefined
+      filterData?.filterStartInt !== undefined &&
+      filterData?.filterEndInt !== undefined
     ) {
-      return (+filterData.filterStartInt + filterData.filterEndInt) / 2;
+      return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
     } else {
       return 0;
     }
@@ -892,7 +890,7 @@ const DocumentQuestion = ({
 
   // Handle time changes
   const handleTimeChange = (index, event) => {
-    const newTimes = times.map((time) =>
+    const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
@@ -901,28 +899,31 @@ const DocumentQuestion = ({
 
   // Use useEffect without conditional calls
   useEffect(() => {
-    if (times[0].time !== "" && times[1].time !== "") {
+    if (times[0]?.time !== "" && times[1]?.time !== "") {
       isTherTimes(true);
     } else {
       isTherTimes(false);
     }
   }, [times, isTherTimes]);
 
-  const isSecondTimeDisabled = times[0].time === "";
+  const isSecondTimeDisabled = times[0]?.time === "";
 
   // ========================
 
   const isDaysHaveValues = () => {
     return (
-      Array.isArray(value) && value.length >= 2 && value[0].day && value[1].day
+      Array.isArray(value) &&
+      value.length >= 2 &&
+      value[0]?.day &&
+      value[1]?.day
     );
   };
 
   const [days, setDays] = useState(() => {
     if (isDaysHaveValues()) {
       return [
-        { index: 0, day: value[0].day },
-        { index: 1, day: value[1].day },
+        { index: 0, day: value[0]?.day },
+        { index: 1, day: value[1]?.day },
       ];
     } else {
       return [
@@ -939,20 +940,20 @@ const DocumentQuestion = ({
     setDays(newDays);
     setValue(newDays);
 
-    if (days[0].day !== "" && days[1].day !== "") {
+    if (days[0]?.day !== "" && days[1]?.day !== "") {
       isTherDays(true);
     }
   };
 
   useEffect(() => {
-    if (days[0].day !== "" && days[1].day !== "") {
+    if (days[0]?.day !== "" && days[1]?.day !== "") {
       isTherDays(true);
     } else {
       isTherDays(false);
     }
   }, [days, isTherDays]);
 
-  const isSecondDayDisabled = days[0].day === "";
+  const isSecondDayDisabled = days[0]?.day === "";
 
   return (
     <>
@@ -1012,7 +1013,7 @@ const DocumentQuestion = ({
           </Choices>
         )}
 
-        {question.valueType.startsWith("form") && (
+        {/* {question.valueType.startsWith("form") && (
           <div className="form_type">
             {formBlocks.map((block) => (
               <div className="form-block-user" key={block.id}>
@@ -1062,6 +1063,66 @@ const DocumentQuestion = ({
               </div>
             ))}
           </div>
+        )} */}
+
+        {question.valueType.startsWith("form") && (
+          <div className="form_type">
+            {formBlocks?.map((block) => {
+              // Check if the block has any labels
+              if (!block?.labels || block?.labels.length === 0) {
+                return null; // Skip rendering this block if it has no labels
+              }
+
+              return (
+                <div className="form-block-user" key={block?.id}>
+                  <IoIosClose className="form_type_controllers" size={20} />
+                  {block.labels?.map((label) => {
+                    const existingData = formData.find(
+                      (data) =>
+                        data?.blockId === block?.id &&
+                        data?.labelId === label?.id
+                    );
+                    const fieldValue = existingData
+                      ? existingData.LabelValue
+                      : "";
+
+                    const handleInputChange = (e) => {
+                      const { value } = e.target;
+                      handleChange(block?.id, label?.id, value);
+                    };
+
+                    return (
+                      <div key={label.id} className="block-input">
+                        <label>{label.name}</label>
+                        {label.type === "SELECT" ? (
+                          <select
+                            name={label.name}
+                            value={fieldValue}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select an option</option>
+                            {Object.keys(label.options)?.map((key) => (
+                              <option key={key} value={key}>
+                                {label.options[key]}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={label.type}
+                            name={label.name}
+                            value={fieldValue}
+                            placeholder={label.name}
+                            onChange={handleInputChange}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         )}
 
         {question.valueType.startsWith("filter") && (
@@ -1083,7 +1144,7 @@ const DocumentQuestion = ({
             <div className="select_input">
               <select
                 id="daysOfWeek1"
-                value={days[0].day}
+                value={days[0]?.day}
                 onChange={(e) => handleSelectChange(0, e)}
               >
                 <option value="">Select a day</option>
@@ -1102,7 +1163,7 @@ const DocumentQuestion = ({
             <div className="select_input">
               <select
                 id="daysOfWeek2"
-                value={days[1].day}
+                value={days[1]?.day}
                 onChange={(e) => handleSelectChange(1, e)}
                 disabled={isSecondDayDisabled}
               >
@@ -1124,7 +1185,7 @@ const DocumentQuestion = ({
             <div className="select_input">
               <input
                 type="time"
-                value={times[0].time}
+                value={times[0]?.time}
                 onChange={(event) => handleTimeChange(0, event)}
               />
             </div>
@@ -1134,7 +1195,7 @@ const DocumentQuestion = ({
             <div className="select_input">
               <input
                 type="time"
-                value={times[1].time}
+                value={times[1]?.time}
                 onChange={(event) => handleTimeChange(1, event)}
                 disabled={isSecondTimeDisabled}
               />
@@ -1156,13 +1217,13 @@ const DocumentQuestion = ({
           </div>
         )}
 
-        {/* {question.valueType.startsWith("map") && (
+        {question.valueType.startsWith("map") && (
           <MapContainer
             getTheMapData={(value) => {
               setValue(value);
             }}
           />
-        )} */}
+        )}
 
         {children}
       </InputContainer>

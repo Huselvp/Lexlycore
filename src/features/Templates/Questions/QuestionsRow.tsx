@@ -118,22 +118,19 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     setSQuestionOrderTest(question?.subQuestions);
   }, [question?.subQuestions]);
 
-  const get_form_blocks_handler = useCallback(
-    async (id) => {
-      try {
-        const result = await axios.get(
-          `http://localhost:8081/api/form/blocks/${id}`,
-          getApiConfig()
-        );
-        const blocks = result.data;
-        setFormBlocs(blocks);
-        setIsTherBlocks(blocks.length > 0);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [getApiConfig]
-  );
+  const get_form_blocks_handler = useCallback(async (id) => {
+    try {
+      const result = await axios.get(
+        `${API}/form/blocks/${id}`,
+        getApiConfig()
+      );
+      const blocks = result?.data;
+      setFormBlocs(blocks);
+      setIsTherBlocks(blocks.length > 0);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   const get_formId = useCallback(
     async (id) => {
@@ -142,7 +139,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           `${API}/form/get-by-question-id/${id}`,
           getApiConfig()
         );
-        const formId = result.data;
+        const formId = result?.data;
         if (typeof formId === "number") {
           setFormBlocksId(formId);
           await get_form_blocks_handler(formId);
@@ -157,7 +154,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   );
 
   useEffect(() => {
-    if (question.id) {
+    if (question?.id) {
       get_formId(question.id);
     }
   }, [get_formId, question.id]);
@@ -169,15 +166,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
     try {
       const result = await axios.post(
-        `${import.meta.env.VITE_API}/form/create/${question.id}`,
+        `${API}/form/create/${question.id}`,
         { title: formTitle },
         getApiConfig()
       );
       setIsAddFormNameOpen(false);
       setIsSeeBlocksOpen(true);
-      get_form_blocks_handler(result.data.question.id);
-      setFormBlocksId(result.data.id);
-      console.log(result.data);
+      get_form_blocks_handler(result?.data.question.id);
+      setFormBlocksId(result?.data.id);
     } catch (err) {
       console.error(err);
     }
@@ -229,21 +225,21 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     [formBlocksId, get_form_blocks_handler, API, getApiConfig]
   );
 
-  useEffect(() => {
-    const get_form_blocks = async () => {
-      try {
-        const result = await axios.get(
-          `${API}/suser/question-details/${question.id}`,
-          getApiConfig()
-        );
-        setFormBblocksData(result.data.form.blocks);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  const get_form_blocks = async (id) => {
+    try {
+      const result = await axios.get(
+        `${API}/suser/question-details/${id}`,
+        getApiConfig()
+      );
+      setFormBblocksData(result?.data.form.blocks);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    get_form_blocks();
-  }, [question.id, API, getApiConfig]);
+  useEffect(() => {
+    get_form_blocks(question.id);
+  }, [question.id]);
 
   // ++++++++++++++++++++
 
@@ -283,7 +279,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           .get(`${API}/filter/get-by-question-id/${id}`, getApiConfig())
           .then((result) => {
             setIsFilterHaveValue(true);
-            setFilterData(result.data);
+            setFilterData(result?.data);
           });
       } catch (err) {
         console.error(err);
@@ -324,8 +320,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   // ====================
 
-  // ====================
-
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
 
@@ -363,7 +357,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   useEffect(() => {
-    setBlockPositions(formBlocs.map((bloc) => bloc.id));
+    setBlockPositions(formBlocs?.map((bloc) => bloc.id));
   }, [formBlocs]);
 
   const moveItem = (fromIndex, toIndex) => {
@@ -406,6 +400,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             setIsSeeBlocksOpen(false);
             setIsEditBlockOpen(false);
             console.log(formBlocksData);
+            get_form_blocks(question.id);
           }}
           isBlocksOpen={isSeeBlocksOpen}
         >
@@ -419,7 +414,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     setFormTitle(e.target.value);
                   }}
                 ></input>
-                <div className="controllers">
+                <div className="see_blocs_controller add-new-input">
                   <Button
                     type="button"
                     onClick={() => {
@@ -582,7 +577,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       }}
                     />
                     <label htmlFor="persone" style={{ cursor: "pointer" }}>
-                      {" "}
                       Persone
                     </label>
                   </div>
@@ -617,7 +611,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 </form>
 
                 <div
-                  className="controllers"
+                  className="see_blocs_controller add-new-input"
                   style={{
                     display: "flex",
                     justifyContent: "right",
@@ -669,7 +663,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
-                      {block.labels.map((label, labelIndex) => {
+                      {block.labels?.map((label, labelIndex) => {
                         // Check if the label name is empty before rendering
                         if (!label.name) {
                           return null;
@@ -680,7 +674,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                             {label.type === "SELECT" ? (
                               <select name={label.name}>
                                 <option value="">Select an option</option>
-                                {Object.keys(label.options).map((key) => (
+                                {Object.keys(label.options)?.map((key) => (
                                   <option key={key} value={key}>
                                     {label.options[key]}
                                   </option>

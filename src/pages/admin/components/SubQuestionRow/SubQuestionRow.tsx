@@ -19,7 +19,6 @@ import PopUp from "../../../admin/components/popUp/PopUp";
 import PopUpContentContainer from "../../../admin/components/popup_content_container/PopUpContantContainer";
 import Form from "../../../admin/components/UI/form/Form";
 import Button from "../../../admin/components/UI/btns/Button";
-// import Block from "../../../admin/components/block/block";
 import AddNewBlock from "../../../admin/components/addNewBlock/AddNewBlock";
 import BlocksContainer from "../../../admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../admin/components/editBlock/editBlock";
@@ -72,7 +71,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
             setIsAddSubQuestionFormNameOpen(false);
             setIsSeeSubQuestionBlocks(true);
             getSubQuestionFormBlocksHandler(subQuestionFormId);
-            setSubQuestionFormId(result.data.id);
+            setSubQuestionFormId(result?.data.id);
           });
       } else {
         console.log("form title should not be empty");
@@ -88,8 +87,8 @@ function SubQuestionRow({ subQuestion, questionId }) {
         .get(`${API}/form/get-by-sub-question-id/${id}`, getApiConfig())
         .then((result) => {
           if (typeof result.data === "number") {
-            setSubQuestionFormId(`${result.data}`);
-            getSubQuestionFormBlocksHandler(result.data);
+            setSubQuestionFormId(`${result?.data}`);
+            getSubQuestionFormBlocksHandler(result?.data);
           } else {
             setSubQuestionFormId("");
             return;
@@ -110,7 +109,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
         .get(`${API}/form/blocks/${id}`, getApiConfig())
         .then((result) => {
           if (result.data.length !== 0) {
-            setSubQuestionFormBlocks(result.data);
+            setSubQuestionFormBlocks(result?.data);
           }
         });
     } catch (err) {
@@ -179,7 +178,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
         `${API}/suser/sub-question-details/${id}`,
         getApiConfig()
       );
-      setFormBblocksData(result.data.form.blocks);
+      setFormBblocksData(result?.data.form.blocks);
     } catch (err) {
       console.error(err);
     }
@@ -232,7 +231,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
           .get(`${API}/filter/get-by-sub-question-id/${id}`, getApiConfig())
           .then((result) => {
             setIsFilterHaveValue(true);
-            setFilterData(result.data);
+            setFilterData(result?.data);
           });
       } catch (err) {
         console.error(err);
@@ -333,7 +332,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
   };
 
   useEffect(() => {
-    setBlockPositions(subQuestionFormBlocks.map((bloc) => bloc.id));
+    setBlockPositions(subQuestionFormBlocks?.map((bloc) => bloc.id));
   }, [subQuestionFormBlocks]);
 
   const moveItem = (fromIndex, toIndex) => {
@@ -376,6 +375,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
             setIsAddSubQuestionFormNameOpen(false);
             setIsSeeSubQuestionBlocks(false);
             setIsEditSubQuestionBlocksOpen(false);
+            get_form_blocks(subQuestion.id);
           }}
           isBlocksOpen={isSeeSubQuestionFormBlocksOpen}
         >
@@ -389,7 +389,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                     setSubQuestionFormTitle(e.target.value);
                   }}
                 ></input>
-                <div className="controllers">
+                <div className="see_blocs_controller add-new-input">
                   <Button
                     type="button"
                     onClick={() => {
@@ -593,7 +593,6 @@ function SubQuestionRow({ subQuestion, questionId }) {
                       }}
                     />
                     <label htmlFor="persone" style={{ cursor: "pointer" }}>
-                      {" "}
                       Persone
                     </label>
                   </div>
@@ -628,7 +627,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                 </form>
 
                 <div
-                  className="controllers"
+                  className="see_blocs_controller add-new-input"
                   style={{
                     display: "flex",
                     justifyContent: "right",
@@ -666,7 +665,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
-                      {block.labels.map((label, labelIndex) => {
+                      {block.labels?.map((label, labelIndex) => {
                         if (!label.name) {
                           return null;
                         }
@@ -676,7 +675,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                             {label.type === "SELECT" ? (
                               <select name={label.name}>
                                 <option value="">Select an option</option>
-                                {Object.keys(label.options).map((key) => (
+                                {Object.keys(label.options)?.map((key) => (
                                   <option key={key} value={key}>
                                     {label.options[key]}
                                   </option>
@@ -731,18 +730,18 @@ function SubQuestionRow({ subQuestion, questionId }) {
 
             {isSeeAlSubQuestionBlocksOpen && (
               <div className="form_type">
-                {subQuestionFormBlocks.map((block, blockIndex) => {
+                {subQuestionFormBlocks?.map((block, blockIndex) => {
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
 
-                      {block.labels.map((label, labelIndex) => {
+                      {block.labels?.map((label, labelIndex) => {
                         return (
                           <div key={label.id} className="block-input">
                             <label>{label.name}</label>
                             {label.type === "SELECT" ? (
                               <select name={label.name}>
-                                {Object.keys(label.options).map((key) => (
+                                {Object.keys(label.options)?.map((key) => (
                                   <option key={key} value={key}>
                                     {label.options[key]}
                                   </option>
@@ -782,17 +781,6 @@ function SubQuestionRow({ subQuestion, questionId }) {
                     }}
                   ></input>
                 </form>
-
-                {/* <div className="controllers">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      add_min_max_value_handler(subQuestion.id);
-                    }}
-                  >
-                    <MdDone />
-                  </Button>
-                </div> */}
 
                 <div
                   className="see_blocs_controller add-new-input"
@@ -841,17 +829,6 @@ function SubQuestionRow({ subQuestion, questionId }) {
                     }}
                   ></input>
                 </form>
-
-                {/* <div className="controllers">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      updateMinMaxValuesHandler(subQuestion.id);
-                    }}
-                  >
-                    <MdDone />
-                  </Button>
-                </div> */}
 
                 <div
                   className="see_blocs_controller add-new-input"
