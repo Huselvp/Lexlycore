@@ -674,16 +674,6 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {/* <button
-          onClick={() => {
-            console.log(data);
-            console.log(mainQuestionId);
-            console.log(getSubQuesytionValues());
-          }}
-        >
-          I am in the sub
-        </button> */}
-
         {children}
       </InputContainer>
     </>

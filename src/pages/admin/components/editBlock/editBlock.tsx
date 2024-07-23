@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { API } from "../../../../utils/constants";
 import { getApiConfig } from "../../../../utils/constants";
 import axios from "axios";
-import { IoIosAdd, IoIosClose } from "react-icons/io";
+import { IoIosAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 
 import { MdOutlineDone } from "react-icons/md";
-import { MdDone } from "react-icons/md";
 
 import "./editBlock.css";
 
@@ -22,7 +21,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const [options, setOptions] = useState([]);
   const [option, setOption] = useState("");
   const [isEditOptionsOpen, setIsEditOptionsOpen] = useState(false);
-  const [isAddMinMaxValueOpen, setIsAddMinMaxValuesOpen] = useState(false);
 
   const [upDatedInputName, setUpdatedInputName] = useState(
     inputToUpdateData.name
@@ -36,25 +34,21 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
 
   const [newOption, setNewOption] = useState("");
 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(0);
-
-  const getBlockData = async () => {
+  const getBlockData = useCallback(async () => {
     try {
       await axios
         .get(`${API}/form/block/label/${id}`, getApiConfig())
         .then((result) => {
-          setBlockData(result.data);
-          console.log(result.data);
+          setBlockData(result?.data);
         });
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     getBlockData();
-  }, []);
+  }, [getBlockData]);
 
   const add_new_input_handler = async () => {
     try {
@@ -66,7 +60,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
             getApiConfig()
           )
           .then((result) => {
-            localStorage.setItem("selectedInputId", result.data.id);
+            localStorage.setItem("selectedInputId", result?.data.id);
           })
           .then(() => {
             getBlockData();
@@ -76,7 +70,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
               when_add_options_open();
             } else {
               setIsAddNewInputOpen(false);
-
               setNewInputName("");
             }
           });
@@ -120,7 +113,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
       await axios
         .delete(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
         .then((result) => {
-          console.log(result.data);
+          console.log(result?.data);
           getBlockData();
         });
     } catch (err) {
@@ -134,8 +127,8 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
         .get(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
         .then((result) => {
           console.log(inputId);
-          setInputToUpdateData(result.data);
-          setUpdatedOptions(result.data.options);
+          setInputToUpdateData(result?.data);
+          setUpdatedOptions(result?.data.options);
           if (result.data.type === "SELECT") {
             setIsEditOptionsOpen(true);
           } else {
@@ -156,8 +149,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           getApiConfig()
         )
         .then((result) => {
-          console.log(result.data);
-
           if (upDatedInputType === "SELECT") {
             setIsAddOptionsOpen(true);
             setIsEditInputOpen(false);
@@ -184,8 +175,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           getApiConfig()
         )
         .then((result) => {
-          console.log(result.data);
-
           getBlockData();
           setIsAddNewInputOpen(false);
           setIsAddOptionsOpen(false);
@@ -204,7 +193,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
       axios
         .delete(`${API}/form/block/label/option/${id}/${key}`, getApiConfig())
         .then((result) => {
-          console.log(result.data);
           get_input_by_id(id);
         });
     } catch (err) {
@@ -223,7 +211,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           )
           .then((result) => {
             setOptions([]);
-            console.log(result.data);
+
             get_input_by_id(id);
             setNewOption("");
           });
@@ -243,7 +231,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
         isEditOptionsOpen === false && (
           <div className="form-container">
             {blockData.length !== 0 &&
-              blockData.map((input, index) => (
+              blockData?.map((input, index) => (
                 <form key={index}>
                   {input.type !== "SELECT" ? (
                     <React.Fragment>
@@ -287,7 +275,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                       {Object.keys(input.options).length !== 0 && (
                         <div className="frm">
                           <select>
-                            {Object.entries(input.options).map(
+                            {Object.entries(input.options)?.map(
                               ([key, value]) => (
                                 <option key={key} value={value}>
                                   {value}
@@ -447,7 +435,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
 
           <div className="options">
             {options.length !== 0 &&
-              options.map((option) => {
+              options?.map((option) => {
                 return (
                   <p>
                     {option}
@@ -607,7 +595,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                   Object.keys(updatedOptions).length !== 0 &&
                   Object.entries(updatedOptions).map(([key, value]) => (
                     <div key={key} value={value} className="edit-option">
-                      {value}{" "}
+                      {value}
                       <MdDeleteOutline
                         className="icon"
                         onClick={() => {
