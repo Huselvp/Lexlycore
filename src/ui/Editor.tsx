@@ -69,7 +69,7 @@ export default function EditorText({
           height: 600,
           //   menubar: false,
           plugins:
-            "linkchecker autolink charmap emoticons link lists searchreplace table wordcount",
+            "linkchecker autolink charmap emoticons link lists searchreplace table wordcount",
           toolbar:
             "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat",
           tinycomments_mode: "embedded",
