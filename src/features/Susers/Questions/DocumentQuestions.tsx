@@ -253,6 +253,8 @@ const DocumentQuestions = ({
                                 else return { ...item, active: false };
                               })
                             );
+
+                            isSubOpen(false);
                           }}
                         >
                           <ArrowLeftIcon />
@@ -413,11 +415,12 @@ const DocumentQuestions = ({
                                 })
                               );
                             }
+
                             setIsTheSubQuestionOpen(false);
                             setIsAllSubQuestionDataFull(false);
                           }}
                         >
-                          <span>Next Sub</span>
+                          <span>Next</span>
                           <ArrowRightIcon />
                         </button>
                       ) : (
@@ -441,6 +444,7 @@ const DocumentQuestions = ({
                                     })
                                   );
                                 }
+                                isSubOpen(false);
                               }}
                             >
                               <span>Next</span>
@@ -467,9 +471,10 @@ const DocumentQuestions = ({
                                     })
                                   );
                                 }
+                                isSubOpen(false);
                               }}
                             >
-                              <span>Next day</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -493,9 +498,10 @@ const DocumentQuestions = ({
                                     })
                                   );
                                 }
+                                isSubOpen(false);
                               }}
                             >
-                              <span>Next time</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -521,6 +527,8 @@ const DocumentQuestions = ({
                                       })
                                     );
                                   }
+
+                                  isSubOpen(false);
                                 }}
                               >
                                 <span>Next</span>
@@ -534,27 +542,27 @@ const DocumentQuestions = ({
                 )
             )
           ) : (
-            // <DocumentQuestionsOverview
-            //   isDraft={isDraft}
-            //   data={overviewData}
-            //   onClick={(index: number) => {
-            //     setOverviewData((data) =>
-            //       data.map((q, i) =>
-            //         i === index
-            //           ? { ...q, active: true }
-            //           : { ...q, active: false }
-            //       )
-            //     );
-            //   }}
-            // />
-
-            <button
-              onClick={() => {
-                console.log(overviewData);
+            <DocumentQuestionsOverview
+              isDraft={isDraft}
+              data={overviewData}
+              onClick={(index: number) => {
+                setOverviewData((data) =>
+                  data.map((q, i) =>
+                    i === index
+                      ? { ...q, active: true }
+                      : { ...q, active: false }
+                  )
+                );
               }}
-            >
-              Get all the entered data
-            </button>
+            />
+
+            // <button
+            //   onClick={() => {
+            //     console.log(overviewData);
+            //   }}
+            // >
+            //   Get all the entered data
+            // </button>
           )}
         </Content>
       </Container>

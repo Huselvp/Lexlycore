@@ -162,233 +162,282 @@ const DocumentSubQuestion = ({
     [question!.valueType]
   );
 
+  // get the subquestions data
+
+  const getSubQuestionData = useCallback(() => {
+    // Find the sub-question data for the current main question
+    const subQuestionData = data?.find((q) => q.questionId === mainQuestionId);
+
+    // Return the sub-questions
+    return subQuestionData ? subQuestionData.subQuestions : [];
+  }, [data, mainQuestionId]); // Dependencies: data and mainQuestionId
+
+  // get the subquestion data
+
+  const getSubquestion = () => {
+    const subQuestionData = getSubQuestionData()?.find(
+      (e) => e.subQuestionId === question.id
+    );
+
+    return subQuestionData.subQuestionValue;
+  };
+
+  const [formBlocks, setFormBlocks] = useState([]);
+  const [formData, setFormData] = useState([]);
+  const [filterData, setFilterData] = useState({});
+  const [formErrors, setFormErrors] = useState([]);
+  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
+
+  // Fetch form blocks and filter data
+  useEffect(() => {
+    const getFormBlocks = async () => {
+      if (question?.valueType === "form") {
+        try {
+          const result = await axios.get(
+            `${API}/suser/sub-question-details/${question.id}`,
+            getApiConfig()
+          );
+          setFormBlocks(result?.data.form.blocks);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    };
+
+    const getFilterData = async () => {
+      if (question?.valueType === "filter") {
+        try {
+          const result = await axios.get(
+            `${API}/suser/sub-question-details/${question.id}`,
+            getApiConfig()
+          );
+          setFilterData(result?.data.filter);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    };
+
+    getFormBlocks();
+    getFilterData();
+  }, [question.id, question?.valueType]);
+
   useEffect(() => {
     subOpen(true);
   }, [subOpen]);
 
-  const sub_count = subQuestions.length;
+  // =============  day ===========
 
-  useEffect(() => {
-    console.log(sub_count);
-  }, [sub_count]);
-
-  const [formBlocks, setFormBlocks] = useState([]);
-  const [isAllDataIntered, setIsAllDataIntered] = useState(false);
-
-  const [filterData, setFilterData] = useState({});
-
-  useEffect(() => {
-    if (question.valueType === "form") {
-      const get_form_blocks = async () => {
-        try {
-          const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
-            getApiConfig()
-          );
-
-          setFormBlocks(result.data.form.blocks);
-        } catch (err) {
-          console.log(err);
-        }
-      };
-
-      get_form_blocks();
-    }
-
-    if (question.valueType === "filter") {
-      const get_filter_data = async () => {
-        try {
-          const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
-            getApiConfig()
-          );
-          console.log(result.data, "this is the filter data");
-          setFilterData(result.data.filter);
-        } catch (err) {
-          console.log(err);
-        }
-      };
-
-      get_filter_data();
-    }
-
-    console.log(question, "this is the question");
-  }, [question.id, question.valueType]);
-
-  const [formData, setFormData] = useState([]);
-  const [formErrors, setFormErrors] = useState([]);
-
-  const countTotalInputs = (formBlocks) => {
-    return formBlocks.reduce((total, block) => {
-      return total + block.labels.length;
-    }, 0);
-  };
-
-  const totalInputs = countTotalInputs(formBlocks);
-
-  useEffect(() => {
-    const initialFormErrors = formBlocks.flatMap((block) =>
-      block.labels.map((label) => "")
+  const isDaysHaveValues = () => {
+    return (
+      Array.isArray(getSubquestion()) &&
+      getSubquestion().length >= 2 &&
+      getSubquestion()[0]?.day &&
+      getSubquestion()[1]?.day
     );
+  };
 
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
-
-  const handleChange = useCallback(
-    (blockId, labelId, labelName, value) => {
-      const updatedFormData = formData.filter(
-        (item) => !(item.blockId === blockId && item.labelId === labelId)
-      );
-
-      if (value.trim() !== "") {
-        updatedFormData.push({ blockId, labelId, LabelValue: value });
-      }
-
-      setFormData(updatedFormData);
-      setFormErrors(
-        formBlocks.flatMap((block) =>
-          block.labels.map((label) =>
-            updatedFormData.some(
-              (item) =>
-                item.blockId === block.id &&
-                item.labelId === label.id &&
-                item.LabelValue.trim() !== ""
-            )
-              ? ""
-              : `${label.name} is required`
-          )
-        )
-      );
-
-      const allInputsFilled = updatedFormData.length === totalInputs;
-      setIsAllDataIntered(allInputsFilled);
-    },
-    [formData, formBlocks, totalInputs]
-  );
-
-  useEffect(() => {
-    console.log(formData.length, "i am the form data");
-    console.log(totalInputs, "i am the total inputs");
-    console.log(formData, "i am the form data");
-  }, [formData]);
-
-  let minV = 0;
-  let maxV = 100;
-
-  const [Fvalue, setFValue] = useState((minV + maxV) / 2);
-
-  useEffect(() => {
-    if (question.valueType === "filter") {
-      const range = document.getElementById("range");
-
-      const handleInput = (e) => {
-        const value = +e.target.value;
-        setFValue(value); // Update state with the slider value
-      };
-
-      range.addEventListener("input", handleInput);
-
-      // Clean up event listener on component unmount
-      return () => {
-        range.removeEventListener("input", handleInput);
-      };
+  const [days, setDays] = useState(() => {
+    if (isDaysHaveValues()) {
+      return [
+        { index: 0, day: getSubquestion()[0]?.day },
+        { index: 1, day: getSubquestion()[1]?.day },
+      ];
+    } else {
+      return [
+        { index: 0, day: "" },
+        { index: 1, day: "" },
+      ];
     }
-  }, [question.valueType, minV, maxV]);
-
-  const containerStyle = {
-    position: "relative",
-  };
-
-  const inputStyle = {
-    width: "300px",
-    margin: "18px 0",
-    WebkitAppearance: "none",
-    width: "100%",
-  };
-
-  const inputFocusStyle = {
-    outline: "none",
-  };
-
-  const [isDaysFull, setIsDaysFull] = useState(false);
-
-  const [days, setDays] = useState([
-    { index: 0, day: "" },
-    { index: 1, day: "" },
-  ]);
+  });
 
   const handleSelectChange = (index, event) => {
     const newDays = days.map((day) =>
       day.index === index ? { ...day, day: event.target.value } : day
     );
     setDays(newDays);
+    setValue(newDays);
   };
 
-  useEffect(() => {
-    const allDaysFilled = days.every((day) => day.day !== "");
-    setIsDaysFull(allDaysFilled);
-  }, [days]);
+  const isSecondDayDisabled = days[0]?.day === "";
 
-  //=======================
+  // ============ time ==========
 
-  const [times, setTimes] = useState([
-    { index: 0, time: "" },
-    { index: 1, time: "" },
-  ]);
+  const isTimesHaveValues = () => {
+    return (
+      Array.isArray(getSubquestion()) &&
+      getSubquestion().length >= 2 &&
+      getSubquestion()[0]?.time &&
+      getSubquestion()[1]?.time
+    );
+  };
 
+  // Initialize state based on a condition
+  const [times, setTimes] = useState(() => {
+    if (isTimesHaveValues()) {
+      return [
+        { index: 0, time: getSubquestion()[0].time },
+        { index: 1, time: getSubquestion()[1].time },
+      ];
+    } else {
+      return [
+        { index: 0, time: "" },
+        { index: 1, time: "" },
+      ];
+    }
+  });
+
+  // Handle time changes
   const handleTimeChange = (index, event) => {
-    const newTimes = times.map((time) =>
+    const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
+    setValue(newTimes); // Assuming setValue is defined elsewhere
   };
 
+  const isSecondTimeDisabled = times[0]?.time === "";
+
+  // ===============  filter =============
+
+  const isTheFilterHavAvalue = useCallback(() => {
+    return getSubquestion() !== "";
+  }, [getSubquestion()]);
+
+  const [Fvalue, setFValue] = useState(() => {
+    if (isTheFilterHavAvalue()) {
+      return Number(getSubquestion());
+    } else if (
+      filterData &&
+      filterData?.filterStartInt !== undefined &&
+      filterData?.filterEndInt !== undefined
+    ) {
+      return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+    } else {
+      return 0;
+    }
+  });
+
+  const handleSliderChange = (event) => {
+    const newValue = Number(event.target.value);
+
+    setFValue(newValue);
+    setValue(newValue);
+  };
+
+  // ================ form ================
+
+  // Fetch form blocks and filter data
   useEffect(() => {
-    const allTimesFilled = times.every((time) => time.time !== "");
-  }, [times]);
-
-  const getSubQuesytionValues = () => {
-    const values = data.find(
-      (question) => question.questionId == mainQuestionId
-    );
-    return values.subQuestions;
-  };
-
-  // useEffect(()=>{
-  //   data.forEach(obj => {
-  //     for (const key in obj) {
-  //       if (obj[key] === "") {
-  //         allFilled = false;
-  //         break;
-  //       }
-  //     }
-  //   });
-  // },[data])
-
-  const areAllValuesFilled = (data) => {
-    for (const obj of data) {
-      for (const subQuestionValue in obj) {
-        if (obj[subQuestionValue] == "") {
-          return false;
+    const getFormBlocks = async () => {
+      if (question?.valueType === "form") {
+        try {
+          const result = await axios.get(
+            `${API}/suser/question-details/${question.id}`,
+            getApiConfig()
+          );
+          setFormBlocks(result?.data.form.blocks);
+        } catch (err) {
+          console.log(err);
         }
       }
+    };
+
+    const getFilterData = async () => {
+      if (question?.valueType === "filter") {
+        try {
+          const result = await axios.get(
+            `${API}/suser/question-details/${question.id}`,
+            getApiConfig()
+          );
+          setFilterData(result?.data.filter);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    };
+
+    getFormBlocks();
+    getFilterData();
+  }, [question.id, question?.valueType]);
+
+  // Initialize form data with props value
+  useEffect(() => {
+    if (getSubquestion()) {
+      setFormData(getSubquestion());
     }
-    return true;
+  }, [getSubquestion()]);
+
+  // Count total inputs
+  const countTotalInputs = (blocks) => {
+    return blocks.reduce((total, block) => total + block?.labels.length, 0);
   };
 
-  useEffect(() => {
-    const data = getSubQuesytionValues();
-    const allFilled = areAllValuesFilled(data);
+  // Calculate total inputs
+  const totalInputs = countTotalInputs(formBlocks);
 
-    console.log(allFilled);
-    isSDataFull(allFilled);
-  }, [data, getSubQuesytionValues]);
+  // Update form errors when form blocks change
+  useEffect(() => {
+    const initialFormErrors = formBlocks?.flatMap((block) =>
+      block?.labels?.map(() => "")
+    );
+    setFormErrors(initialFormErrors);
+  }, [formBlocks]);
+
+  // Handle input change
+  const handleChange = useCallback(
+    (blockId, labelId, value) => {
+      setFormData((prevFormData) => {
+        const updatedFormData = prevFormData?.filter(
+          (item) => !(item?.blockId === blockId && item?.labelId === labelId)
+        );
+
+        if (value.trim() !== "") {
+          updatedFormData.push({ blockId, labelId, LabelValue: value });
+        }
+
+        setValue(updatedFormData); // Pass updated data to setValue
+
+        return updatedFormData;
+      });
+    },
+    [totalInputs, setValue]
+  );
+
+  // ===========  checking is all subquestions values is not null =======
+
+  const idAllSubQuestionsValuesIsNotNull = useCallback(() => {
+    // Get sub-question data
+    const subQuestionData = getSubQuestionData();
+
+    // Check if all sub-question values are not empty
+    const allValuesNotEmpty = subQuestionData?.every(
+      (e) => e.subQuestionValue !== ""
+    );
+
+    return allValuesNotEmpty;
+  }, [getSubQuestionData]); // Include getSubQuestionData as a dependency
+
+  useEffect(() => {
+    const isDataFull = idAllSubQuestionsValuesIsNotNull();
+    isSDataFull(isDataFull);
+  }, [idAllSubQuestionsValuesIsNotNull, isSDataFull]);
 
   return (
     <>
-      <div>
-        <h2>{question.questionText}</h2>
-        <Description>{question.Description}</Description>
+      <div
+        style={{
+          marginTop: "2rem",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "23px",
+          }}
+        >
+          {question.questionText}
+        </h2>
+        <Description>{question?.Description}</Description>
       </div>
       <DetailsContainer>
         <button
@@ -448,157 +497,27 @@ const DocumentSubQuestion = ({
           </Choices>
         )}
 
-        {question.valueType.startsWith("form") && (
-          <div className="form_type">
-            {formBlocks.map((block, blockIndex) => {
-              return (
-                <div className="form-block-user" key={block.id}>
-                  <IoIosClose className="form_type_controllers" size={20} />
-                  {block.labels.map((label, labelIndex) => {
-                    const fieldName = label.name;
-                    const index = blockIndex * block.labels.length + labelIndex;
-
-                    const handleInputChange = (e) => {
-                      const { value } = e.target;
-                      handleChange(block.id, label.id, fieldName, value);
-                    };
-
-                    return (
-                      <div
-                        key={label.id}
-                        className="block-input"
-                        onChange={() => {
-                          setValue(formData);
-                        }}
-                      >
-                        <label>{label.name}</label>
-                        {label.type === "SELECT" ? (
-                          <select
-                            name={label.name}
-                            onChange={handleInputChange}
-                          >
-                            <option value="">Select an option</option>
-                            {Object.keys(label.options).map((key) => (
-                              <option key={key} value={key}>
-                                {label.options[key]}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type={label.type}
-                            name={label.name}
-                            placeholder={label.name}
-                            onChange={handleInputChange}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {question.valueType.startsWith("filter") && (
-          <div>
-            <div style={containerStyle} className="range-container">
-              <h3>{Fvalue}</h3>
+        {question.valueType.startsWith("date") && (
+          <div className="daysofwork_container">
+            <div className="select_input">
               <input
-                type="range"
-                name="range"
-                id="range"
-                min={filterData.filterStartInt}
-                max={filterData.filterEndInt}
-                value={Fvalue}
-                onChange={(e) => setValue(e.target.value)}
-                style={{ ...inputStyle, ...inputFocusStyle }}
+                type="date"
+                onChange={(e) => {
+                  setValue(e.target.value);
+                }}
+                value={value}
               />
             </div>
-
-            <style>
-              {`
-          .range-container {
-            position: relative;
-          }
-          input[type="range"] {
-            width: 300px;
-            margin: 18px 0;
-            -webkit-appearance: none;
-            width: 100%;
-          }
-          input[type="range"]:focus {
-            outline: none;
-          }
-          input[type="range"]::-webkit-slider-runnable-track {
-            background: #b6ae92;
-            border-radius: 4px;
-            width: 100%;
-            height: 10px;
-            cursor: pointer;
-          }
-          input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            background: #fff;
-            border-radius: 50%;
-            border: 1px solid #b6ae92;
-            margin-top: -7px;
-            cursor: pointer;
-          }
-          input[type="range"]::-moz-range-track {
-            background: purple;
-            border-radius: 4px;
-            width: 100%;
-            height: 14px;
-            cursor: pointer;
-          }
-          input[type="range"]::-moz-range-thumb {
-            height: 24px;
-            width: 24px;
-            background: #fff;
-            border-radius: 50%;
-            border: 1px solid purple;
-            margin-top: -7px;
-            cursor: pointer;
-          }
-          input[type="range"]::-ms-track {
-            background: purple;
-            border-radius: 4px;
-            width: 100%;
-            height: 14px;
-            cursor: pointer;
-          }
-          input[type="range"]::-ms-thumb {
-            height: 24px;
-            width: 24px;
-            background: #fff;
-            border-radius: 50%;
-            border: 1px solid purple;
-            margin-top: -7px;
-            cursor: pointer;
-          }
-        `}
-            </style>
           </div>
         )}
 
         {question.valueType.startsWith("day") && (
           <div className="daysofwork_container">
-            <div
-              className="select_input"
-              onChange={() => {
-                setValue(days);
-              }}
-            >
+            <div className="select_input">
               <select
                 id="daysOfWeek1"
-                value={days[0].day}
-                onChange={(e) => {
-                  handleSelectChange(0, e);
-                }}
+                value={days[0]?.day}
+                onChange={(e) => handleSelectChange(0, e)}
               >
                 <option value="">Select a day</option>
                 <option value="Mandag">Mandag</option>
@@ -616,8 +535,9 @@ const DocumentSubQuestion = ({
             <div className="select_input">
               <select
                 id="daysOfWeek2"
-                value={days[1].day}
+                value={days[1]?.day}
                 onChange={(e) => handleSelectChange(1, e)}
+                disabled={isSecondDayDisabled}
               >
                 <option value="">Select a day</option>
                 <option value="Mandag">Mandag</option>
@@ -629,23 +549,16 @@ const DocumentSubQuestion = ({
                 <option value="Søndag">Søndag</option>
               </select>
             </div>
-            {/* Log the selected days to the console for debugging */}
-            {/* <pre>{JSON.stringify(days, null, 2)}</pre> */}
           </div>
         )}
 
         {question.valueType.startsWith("time") && (
-          <div
-            className="daysofwork_container"
-            onChange={() => {
-              setValue(times);
-            }}
-          >
+          <div className="daysofwork_container">
             <div className="select_input">
               <input
                 type="time"
-                value={times[0].time} // Bind the value from state
-                onChange={(e) => handleTimeChange(0, e)} // Update state on change
+                value={times[0]?.time}
+                onChange={(event) => handleTimeChange(0, event)}
               />
             </div>
             <div className="separator">
@@ -654,24 +567,94 @@ const DocumentSubQuestion = ({
             <div className="select_input">
               <input
                 type="time"
-                value={times[1].time} // Bind the value from state
-                onChange={(e) => handleTimeChange(1, e)} // Update state on change
+                value={times[1]?.time}
+                onChange={(event) => handleTimeChange(1, event)}
+                disabled={isSecondTimeDisabled}
               />
             </div>
           </div>
         )}
 
-        {question.valueType.startsWith("date") && (
-          <div className="daysofwork_container">
-            <div className="select_input">
-              <input
-                type="date"
-                onChange={(e) => {
-                  setValue(e.target.value);
-                }}
-              />
-            </div>
+        {question.valueType.startsWith("filter") && (
+          <div>
+            <h3>{Fvalue}</h3>
+            <input
+              type="range"
+              min={filterData.filterStartInt}
+              max={filterData.filterEndInt}
+              value={Fvalue}
+              onChange={handleSliderChange}
+              style={{ outline: "none" }}
+            />
           </div>
+        )}
+
+        {question.valueType.startsWith("form") && (
+          <div className="form_type">
+            {formBlocks?.map((block) => {
+              // Check if the block has any labels
+              if (!block?.labels || block?.labels.length === 0) {
+                return null; // Skip rendering this block if it has no labels
+              }
+
+              return (
+                <div className="form-block-user" key={block?.id}>
+                  <IoIosClose className="form_type_controllers" size={20} />
+                  {block.labels?.map((label) => {
+                    const existingData = formData?.find(
+                      (data) =>
+                        data?.blockId === block?.id &&
+                        data?.labelId === label?.id
+                    );
+                    const fieldValue = existingData
+                      ? existingData.LabelValue
+                      : "";
+
+                    const handleInputChange = (e) => {
+                      const { value } = e.target;
+                      handleChange(block?.id, label?.id, value);
+                    };
+
+                    return (
+                      <div key={label.id} className="block-input">
+                        <label>{label.name}</label>
+                        {label.type === "SELECT" ? (
+                          <select
+                            name={label.name}
+                            value={fieldValue}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select an option</option>
+                            {Object.keys(label.options)?.map((key) => (
+                              <option key={key} value={label.options[key]}>
+                                {label.options[key]}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={label.type}
+                            name={label.name}
+                            value={fieldValue}
+                            placeholder={label.name}
+                            onChange={handleInputChange}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {question.valueType.startsWith("map") && (
+          <MapContainer
+            getTheMapData={(value) => {
+              setValue(value);
+            }}
+          />
         )}
 
         {children}

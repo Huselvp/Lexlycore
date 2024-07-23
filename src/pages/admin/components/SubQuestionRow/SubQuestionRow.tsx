@@ -733,7 +733,7 @@ function SubQuestionRow({ subQuestion, questionId }) {
                 {subQuestionFormBlocks?.map((block, blockIndex) => {
                   return (
                     <div className="form-block-user" key={block.id}>
-                      <IoIosClose className="form_type_controllers" size={20} />
+                      {/* <IoIosClose className="form_type_controllers" size={20} /> */}
 
                       {block.labels?.map((label, labelIndex) => {
                         return (

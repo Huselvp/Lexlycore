@@ -748,6 +748,7 @@ const DocumentQuestion = ({
     () => extractChoicesFromString(question!.valueType),
     [question!.valueType]
   );
+
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
@@ -805,7 +806,7 @@ const DocumentQuestion = ({
 
   // Update form errors when form blocks change
   useEffect(() => {
-    const initialFormErrors = formBlocks.flatMap((block) =>
+    const initialFormErrors = formBlocks?.flatMap((block) =>
       block.labels?.map(() => "")
     );
     setFormErrors(initialFormErrors);
@@ -857,7 +858,7 @@ const DocumentQuestion = ({
 
   const handleSliderChange = (event) => {
     const newValue = Number(event.target.value);
-    console.log(filterData);
+
     setFValue(newValue);
     setValue(newValue);
   };
@@ -868,8 +869,8 @@ const DocumentQuestion = ({
     return (
       Array.isArray(value) &&
       value.length >= 2 &&
-      value[0].time &&
-      value[1].time
+      value[0]?.time &&
+      value[1]?.time
     );
   };
 
@@ -877,8 +878,8 @@ const DocumentQuestion = ({
   const [times, setTimes] = useState(() => {
     if (isTimesHaveValues()) {
       return [
-        { index: 0, time: value[0].time },
-        { index: 1, time: value[1].time },
+        { index: 0, time: value[0]?.time },
+        { index: 1, time: value[1]?.time },
       ];
     } else {
       return [
@@ -1075,9 +1076,9 @@ const DocumentQuestion = ({
 
               return (
                 <div className="form-block-user" key={block?.id}>
-                  <IoIosClose className="form_type_controllers" size={20} />
+                  {/* <IoIosClose className="form_type_controllers" size={20} /> */}
                   {block.labels?.map((label) => {
-                    const existingData = formData.find(
+                    const existingData = formData?.find(
                       (data) =>
                         data?.blockId === block?.id &&
                         data?.labelId === label?.id
@@ -1102,7 +1103,7 @@ const DocumentQuestion = ({
                           >
                             <option value="">Select an option</option>
                             {Object.keys(label.options)?.map((key) => (
-                              <option key={key} value={key}>
+                              <option key={key} value={label.options[key]}>
                                 {label.options[key]}
                               </option>
                             ))}
@@ -1130,8 +1131,8 @@ const DocumentQuestion = ({
             <h3>{Fvalue}</h3>
             <input
               type="range"
-              min={filterData.filterStartInt}
-              max={filterData.filterEndInt}
+              min={filterData?.filterStartInt}
+              max={filterData?.filterEndInt}
               value={Fvalue}
               onChange={handleSliderChange}
               style={{ outline: "none" }}
