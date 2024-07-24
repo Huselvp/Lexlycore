@@ -592,6 +592,10 @@ import { getApiConfig } from "../../../utils/constants";
 import "./styles/form.css";
 import { IoMdRemove } from "react-icons/io";
 
+import { FiUser } from "react-icons/fi";
+
+import { BsBuildings } from "react-icons/bs";
+
 import MapContainer from "../../../ui/map/MapContainer";
 
 const Checkbox = styled.input`
@@ -765,6 +769,7 @@ const DocumentQuestion = ({
             getApiConfig()
           );
           setFormBlocks(result?.data.form.blocks);
+          console.log(result?.data.form.blocks);
         } catch (err) {
           console.log(err);
         }
@@ -813,22 +818,49 @@ const DocumentQuestion = ({
   }, [formBlocks]);
 
   // Handle input change
+  // const handleChange = useCallback(
+  //   (blockId, labelId, value) => {
+  //     setFormData((prevFormData) => {
+  //       const updatedFormData = prevFormData.filter(
+  //         (item) => !(item?.blockId === blockId && item?.labelId === labelId)
+  //       );
+
+  //       if (value.trim() !== "") {
+  //         updatedFormData.push({ blockId, labelId, LabelValue: value });
+  //       }
+
+  //       // Update form data and check if all data is entered
+  //       const allInputsFilled = updatedFormData?.length === totalInputs;
+  //       setIsAllDataEntered(allInputsFilled);
+  //       isTherData(allInputsFilled);
+  //       setValue(updatedFormData); // Pass updated data to setValue
+
+  //       return updatedFormData;
+  //     });
+  //   },
+  //   [totalInputs, isTherData, setValue]
+  // );
+
   const handleChange = useCallback(
-    (blockId, labelId, value) => {
+    (blockId, labelId, value, questionText) => {
       setFormData((prevFormData) => {
         const updatedFormData = prevFormData.filter(
           (item) => !(item?.blockId === blockId && item?.labelId === labelId)
         );
 
         if (value.trim() !== "") {
-          updatedFormData.push({ blockId, labelId, LabelValue: value });
+          updatedFormData.push({
+            blockId,
+            labelId,
+            LabelValue: value,
+            questionText,
+          });
         }
 
-        // Update form data and check if all data is entered
         const allInputsFilled = updatedFormData?.length === totalInputs;
         setIsAllDataEntered(allInputsFilled);
         isTherData(allInputsFilled);
-        setValue(updatedFormData); // Pass updated data to setValue
+        setValue(updatedFormData, question.valueType);
 
         return updatedFormData;
       });
@@ -860,7 +892,7 @@ const DocumentQuestion = ({
     const newValue = Number(event.target.value);
 
     setFValue(newValue);
-    setValue(newValue);
+    setValue(newValue, question.valueType);
   };
 
   // ++++++++++++++++++++++++++++++++++++++++++
@@ -895,7 +927,7 @@ const DocumentQuestion = ({
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
-    setValue(newTimes); // Assuming setValue is defined elsewhere
+    setValue(newTimes, question.valueType); // Assuming setValue is defined elsewhere
   };
 
   // Use useEffect without conditional calls
@@ -939,7 +971,7 @@ const DocumentQuestion = ({
       day.index === index ? { ...day, day: event.target.value } : day
     );
     setDays(newDays);
-    setValue(newDays);
+    setValue(newDays, question.valueType);
 
     if (days[0]?.day !== "" && days[1]?.day !== "") {
       isTherDays(true);
@@ -974,7 +1006,7 @@ const DocumentQuestion = ({
           <Input
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
             type="number"
           />
         )}
@@ -983,7 +1015,7 @@ const DocumentQuestion = ({
           <Input
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
             type="text"
           />
         )}
@@ -992,7 +1024,7 @@ const DocumentQuestion = ({
           <Textarea
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
           />
         )}
 
@@ -1005,7 +1037,7 @@ const DocumentQuestion = ({
                   id={choice.choice}
                   value={choice.newRelatedText}
                   type="radio"
-                  onChange={() => setValue(choice.newRelatedText)}
+                  onChange={() => setValue(choice.newRelatedText, "checkbox")}
                   checked={value === choice.newRelatedText}
                 />
                 <label htmlFor={choice.choice}>{choice.choice}</label>
@@ -1066,6 +1098,66 @@ const DocumentQuestion = ({
           </div>
         )} */}
 
+        {/* {question.valueType.startsWith("form") && (
+          <div className="form_type">
+            {formBlocks?.map((block) => {
+              
+              if (!block?.labels || block?.labels.length === 0) {
+                return null; 
+              }
+
+              return (
+                <div className="form-block-user" key={block?.id}>
+                 
+                  {block.labels?.map((label) => {
+                    const existingData = formData?.find(
+                      (data) =>
+                        data?.blockId === block?.id &&
+                        data?.labelId === label?.id
+                    );
+                    const fieldValue = existingData
+                      ? existingData.LabelValue
+                      : "";
+
+                    const handleInputChange = (e) => {
+                      const { value } = e.target;
+                      handleChange(block?.id, label?.id, value);
+                    };
+
+                    return (
+                      <div key={label.id} className="block-input">
+                        <label>{label.name}</label>
+                        {label.type === "SELECT" ? (
+                          <select
+                            name={label.name}
+                            value={fieldValue}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select an option</option>
+                            {Object.keys(label.options)?.map((key) => (
+                              <option key={key} value={label.options[key]}>
+                                {label.options[key]}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={label.type}
+                            name={label.name}
+                            value={fieldValue}
+                            placeholder={label.name}
+                            onChange={handleInputChange}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )} */}
+
         {question.valueType.startsWith("form") && (
           <div className="form_type">
             {formBlocks?.map((block) => {
@@ -1086,10 +1178,11 @@ const DocumentQuestion = ({
                     const fieldValue = existingData
                       ? existingData.LabelValue
                       : "";
+                    const questionText = label.name;
 
                     const handleInputChange = (e) => {
                       const { value } = e.target;
-                      handleChange(block?.id, label?.id, value);
+                      handleChange(block?.id, label?.id, value, questionText);
                     };
 
                     return (
@@ -1210,7 +1303,7 @@ const DocumentQuestion = ({
               <input
                 type="date"
                 onChange={(e) => {
-                  setValue(e.target.value);
+                  setValue(e.target.value, question.valueType);
                 }}
                 value={value}
               />
@@ -1221,10 +1314,422 @@ const DocumentQuestion = ({
         {question.valueType.startsWith("map") && (
           <MapContainer
             getTheMapData={(value) => {
-              setValue(value);
+              setValue(value, question.valueType);
             }}
           />
         )}
+
+        {/* <div className="person">
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "2rem",
+            }}
+          >
+            <div
+              style={{
+                width: "5rem",
+                height: "5rem",
+                backgroundColor: "#9a9278",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "50px",
+              }}
+            >
+              <span>
+                <FiUser color="white" />
+              </span>
+            </div>
+            <p style={{ fontSize: "15px", fontWeight: "bold" }}>Person</p>
+          </div>
+
+          <div>
+            <form>
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="name"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Navn
+                  </label>
+                  <input
+                    id="nmae"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="adresse"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Adresse
+                  </label>
+                  <input
+                    id="adresse"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="cpr"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    CPR nr
+                  </label>
+                  <input id="cpr" type="text" style={{ width: "100%" }}></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "40%",
+                  }}
+                >
+                  <label
+                    htmlFor="postnr"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Postnr
+                  </label>
+                  <input
+                    id="postnr"
+                    type="number"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "55%",
+                  }}
+                >
+                  <label
+                    htmlFor="by"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    By
+                  </label>
+                  <input id="by" type="text" style={{ width: "100%" }}></input>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="name"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Herefter otalt som
+                  </label>
+
+                  <input
+                    id="nmae"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="adresse"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Land
+                  </label>
+                  <select
+                    name="land"
+                    id="land"
+                    style={{
+                      width: "100%",
+                      padding: "0.8rem 1.2rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: " 4px",
+                      backgroundColor: " #fff",
+                      boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                      paddingRight: "30px",
+                    }}
+                  >
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div> */}
+
+        {/* <div className="company">
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "2rem",
+            }}
+          >
+            <div
+              style={{
+                width: "5rem",
+                height: "5rem",
+                backgroundColor: "#9a9278",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "50px",
+              }}
+            >
+              <span>
+                <BsBuildings color="white" />
+              </span>
+            </div>
+            <p style={{ fontSize: "15px", fontWeight: "bold" }}>Person</p>
+          </div>
+
+          <div>
+            <form>
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="Virksomhedsnavn"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Virksomhedsnavn
+                  </label>
+                  <input
+                    id="Virksomhedsnavn"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="adresse"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Adresse
+                  </label>
+                  <input
+                    id="adresse"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="cpr"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    CPR nr
+                  </label>
+                  <input id="cpr" type="text" style={{ width: "100%" }}></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "40%",
+                  }}
+                >
+                  <label
+                    htmlFor="postnr"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Postnr
+                  </label>
+                  <input
+                    id="postnr"
+                    type="number"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "55%",
+                  }}
+                >
+                  <label
+                    htmlFor="by"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    By
+                  </label>
+                  <input id="by" type="text" style={{ width: "100%" }}></input>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "2rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="name"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Herefter otalt som
+                  </label>
+
+                  <input
+                    id="nmae"
+                    type="text"
+                    style={{ width: "100%" }}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
+                  <label
+                    htmlFor="adresse"
+                    style={{ marginBottom: "1rem", fontWeight: "700" }}
+                  >
+                    Land
+                  </label>
+                  <select
+                    name="land"
+                    id="land"
+                    style={{
+                      width: "100%",
+                      padding: "0.8rem 1.2rem",
+                      border: "1px solid #d1d5db",
+                      borderRadius: " 4px",
+                      backgroundColor: " #fff",
+                      boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                      paddingRight: "30px",
+                    }}
+                  >
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                    <option value="land">Land</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div> */}
 
         {children}
       </InputContainer>

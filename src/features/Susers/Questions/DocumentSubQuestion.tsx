@@ -256,7 +256,7 @@ const DocumentSubQuestion = ({
       day.index === index ? { ...day, day: event.target.value } : day
     );
     setDays(newDays);
-    setValue(newDays);
+    setValue(newDays, question.valueType);
   };
 
   const isSecondDayDisabled = days[0]?.day === "";
@@ -293,7 +293,7 @@ const DocumentSubQuestion = ({
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
-    setValue(newTimes); // Assuming setValue is defined elsewhere
+    setValue(newTimes, question.valueType); // Assuming setValue is defined elsewhere
   };
 
   const isSecondTimeDisabled = times[0]?.time === "";
@@ -322,7 +322,7 @@ const DocumentSubQuestion = ({
     const newValue = Number(event.target.value);
 
     setFValue(newValue);
-    setValue(newValue);
+    setValue(newValue, question.valueType);
   };
 
   // ================ form ================
@@ -385,18 +385,46 @@ const DocumentSubQuestion = ({
   }, [formBlocks]);
 
   // Handle input change
+  // const handleChange = useCallback(
+  //   (blockId, labelId, value) => {
+  //     setFormData((prevFormData) => {
+  //       const updatedFormData = prevFormData?.filter(
+  //         (item) => !(item?.blockId === blockId && item?.labelId === labelId)
+  //       );
+
+  //       if (value.trim() !== "") {
+  //         updatedFormData.push({ blockId, labelId, LabelValue: value });
+  //       }
+
+  //       setValue(updatedFormData); // Pass updated data to setValue
+
+  //       return updatedFormData;
+  //     });
+  //   },
+  //   [totalInputs, setValue]
+  // );
+
   const handleChange = useCallback(
-    (blockId, labelId, value) => {
+    (blockId, labelId, value, questionText) => {
       setFormData((prevFormData) => {
-        const updatedFormData = prevFormData?.filter(
+        const updatedFormData = prevFormData.filter(
           (item) => !(item?.blockId === blockId && item?.labelId === labelId)
         );
 
         if (value.trim() !== "") {
-          updatedFormData.push({ blockId, labelId, LabelValue: value });
+          updatedFormData.push({
+            blockId,
+            labelId,
+            LabelValue: value,
+            questionText,
+          });
         }
 
-        setValue(updatedFormData); // Pass updated data to setValue
+        // Update form data and check if all data is entered
+        const allInputsFilled = updatedFormData?.length === totalInputs;
+        setIsAllDataEntered(allInputsFilled);
+
+        setValue(updatedFormData, question.valueType); // Pass updated data to setValue
 
         return updatedFormData;
       });
@@ -455,7 +483,7 @@ const DocumentSubQuestion = ({
             // disabled={disabled}
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
             type="number"
           />
         )}
@@ -465,7 +493,7 @@ const DocumentSubQuestion = ({
             // disabled={disabled}
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
             type="text"
           />
         )}
@@ -475,7 +503,7 @@ const DocumentSubQuestion = ({
             // disabled={disabled}
             placeholder={question.questionText}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => setValue(e.target.value, question.valueType)}
           />
         )}
 
@@ -488,7 +516,7 @@ const DocumentSubQuestion = ({
                   id={choice.choice}
                   value={choice.newRelatedText}
                   type="radio"
-                  onChange={() => setValue(choice.newRelatedText)}
+                  onChange={() => setValue(choice.newRelatedText, "checkbox")}
                   checked={value === choice.newRelatedText}
                 />
                 <label htmlFor={choice.choice}>{choice.choice}</label>
@@ -503,7 +531,7 @@ const DocumentSubQuestion = ({
               <input
                 type="date"
                 onChange={(e) => {
-                  setValue(e.target.value);
+                  setValue(e.target.value, question.valueType);
                 }}
                 value={value}
               />
@@ -580,8 +608,8 @@ const DocumentSubQuestion = ({
             <h3>{Fvalue}</h3>
             <input
               type="range"
-              min={filterData.filterStartInt}
-              max={filterData.filterEndInt}
+              min={filterData?.filterStartInt}
+              max={filterData?.filterEndInt}
               value={Fvalue}
               onChange={handleSliderChange}
               style={{ outline: "none" }}
@@ -589,12 +617,12 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {question.valueType.startsWith("form") && (
+        {/* {question.valueType.startsWith("form") && (
           <div className="form_type">
             {formBlocks?.map((block) => {
-              // Check if the block has any labels
+              
               if (!block?.labels || block?.labels.length === 0) {
-                return null; // Skip rendering this block if it has no labels
+                return null; 
               }
 
               return (
@@ -613,6 +641,67 @@ const DocumentSubQuestion = ({
                     const handleInputChange = (e) => {
                       const { value } = e.target;
                       handleChange(block?.id, label?.id, value);
+                    };
+
+                    return (
+                      <div key={label.id} className="block-input">
+                        <label>{label.name}</label>
+                        {label.type === "SELECT" ? (
+                          <select
+                            name={label.name}
+                            value={fieldValue}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select an option</option>
+                            {Object.keys(label.options)?.map((key) => (
+                              <option key={key} value={label.options[key]}>
+                                {label.options[key]}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={label.type}
+                            name={label.name}
+                            value={fieldValue}
+                            placeholder={label.name}
+                            onChange={handleInputChange}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )} */}
+
+        {question.valueType.startsWith("form") && (
+          <div className="form_type">
+            {formBlocks?.map((block) => {
+              // Check if the block has any labels
+              if (!block?.labels || block?.labels.length === 0) {
+                return null; // Skip rendering this block if it has no labels
+              }
+
+              return (
+                <div className="form-block-user" key={block?.id}>
+                  {/* <IoIosClose className="form_type_controllers" size={20} /> */}
+                  {block.labels?.map((label) => {
+                    const existingData = formData?.find(
+                      (data) =>
+                        data?.blockId === block?.id &&
+                        data?.labelId === label?.id
+                    );
+                    const fieldValue = existingData
+                      ? existingData.LabelValue
+                      : "";
+                    const questionText = label.name;
+
+                    const handleInputChange = (e) => {
+                      const { value } = e.target;
+                      handleChange(block?.id, label?.id, value, questionText);
                     };
 
                     return (

@@ -88,11 +88,13 @@ const DocumentQuestions = ({
     {
       questionText: string;
       questionId: number;
-      value: string | number;
+      value: any;
+      type: string;
       subQuestions?: {
         subQuestionId: number;
         subQuestionText: string;
-        subQuestionValue: string | number;
+        subQuestionValue: any;
+        type: string;
       }[];
       active: boolean;
     }[]
@@ -127,6 +129,7 @@ const DocumentQuestions = ({
             subQuestionId: subQ.id,
             subQuestionText: subQ.questionText,
             subQuestionValue: subQuestionValue ? subQuestionValue.value : "",
+            type: subQ.type,
           };
         }),
         // active: i == 0
@@ -147,7 +150,7 @@ const DocumentQuestions = ({
 
   // console.log("activeQuestion = ", activeQuestion);
 
-  const handleSetValue = (id: number, newValue: string) => {
+  const handleSetValue = (id: number, newValue: any, type: string) => {
     // here he saves the input data
 
     setOverviewData((current) =>
@@ -155,7 +158,7 @@ const DocumentQuestions = ({
         ...q,
         subQuestions: q.subQuestions?.map((subQ) =>
           subQ.subQuestionId === id
-            ? { ...subQ, subQuestionValue: newValue }
+            ? { ...subQ, subQuestionValue: newValue, type }
             : subQ
         ),
       }))
@@ -199,10 +202,10 @@ const DocumentQuestions = ({
                     key={question.id}
                     question={question}
                     value={overviewData.at(index)?.value || ""}
-                    setValue={(value: string) =>
+                    setValue={(value: any, type: string) =>
                       setOverviewData((current) =>
                         current.map((q, i) =>
-                          i === index ? { ...q, value } : q
+                          i === index ? { ...q, value, type } : q
                         )
                       )
                     }
@@ -228,9 +231,11 @@ const DocumentQuestions = ({
                             mainQuestionId={question.id}
                             value={
                               overviewData[index]?.subQuestions[ind]
-                                ?.subQuestionValue as string | number
+                                ?.subQuestionValue as any
                             }
-                            setValue={(value) => handleSetValue(sq.id, value)}
+                            setValue={(value, type: string) =>
+                              handleSetValue(sq.id, value, type)
+                            }
                             subOpen={(value) => {
                               isSubOpen(value);
                             }}

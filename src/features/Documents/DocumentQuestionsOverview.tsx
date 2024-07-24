@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { FaEdit as EditIcon } from "react-icons/fa";
 import { useAddUpdateDocumentQuestion } from "./useAddUpdateDocumentQuestion";
 import { useInitiatePayment } from "../Payment/useInitiatePayment";
-import { useState } from "react";
+import React, { useState } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
 const SubHeader = styled.p`
@@ -54,9 +54,10 @@ const Content = styled.div`
         }
       }
     }
-    li.sub-question {  /* Add class for subquestions */
-      padding-left: 2rem;  /* Indent subquestions */
-      border-bottom: none;  /* Remove bottom border for subquestions */
+    li.sub-question {
+      /* Add class for subquestions */
+      padding-left: 2rem; /* Indent subquestions */
+      border-bottom: none; /* Remove bottom border for subquestions */
     }
   }
 `;
@@ -96,11 +97,11 @@ const DocumentQuestionsOverview = ({
   data: {
     questionText: string;
     questionId: number;
-    value: string | number;
+    value: any;
     subQuestions?: {
       subQuestionId: number;
       subQuestionText: string;
-      subQuestionValue: string | number;
+      subQuestionValue: any;
     }[];
     active: boolean;
   }[];
@@ -148,8 +149,93 @@ const DocumentQuestionsOverview = ({
         <ul>
           {data.map((item, i) => (
             <>
-              <li key={i}>
-                <p>
+              {item.type !== "form" &&
+                item.type !== "day" &&
+                item.type !== "time" && (
+                  <li key={i}>
+                    <p>
+                      {item?.subQuestions?.length > 0 ? (
+                        <button
+                          style={{ background: "none", border: "none" }}
+                          onClick={() => toggleSubQuestions(i)}
+                        >
+                          {!caret_icon_active[i] ? (
+                            <RxCaretDown />
+                          ) : (
+                            <RxCaretUp />
+                          )}
+                        </button>
+                      ) : null}
+                      {item.questionText}
+                    </p>
+                    <button onClick={() => onClick(i)}>
+                      <EditIcon />
+                    </button>
+                    <p>{item.value}</p>
+                  </li>
+                )}
+
+              {item.type === "form" && (
+                <li
+                  key={i}
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      {item?.subQuestions?.length > 0 ? (
+                        <button
+                          style={{ background: "none", border: "none" }}
+                          onClick={() => toggleSubQuestions(i)}
+                        >
+                          {!caret_icon_active[i] ? (
+                            <RxCaretDown />
+                          ) : (
+                            <RxCaretUp />
+                          )}
+                        </button>
+                      ) : null}
+                      <p
+                        style={{
+                          color: "var(--color-stone-500)",
+                          fontSize: "1.7rem",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.questionText}
+                      </p>
+                    </div>
+                    <button onClick={() => onClick(i)}>
+                      <EditIcon />
+                    </button>
+                  </div>
+                  <div>
+                    {item.value?.map((q) => {
+                      return (
+                        <div key={q.questionText}>
+                          <p>{q.questionText}</p>
+                          <p>{q.LabelValue}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </li>
+              )}
+
+              {item.type === "day" && (
+                <li key={i}>
                   {item?.subQuestions?.length > 0 ? (
                     <button
                       style={{ background: "none", border: "none" }}
@@ -158,28 +244,222 @@ const DocumentQuestionsOverview = ({
                       {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
                     </button>
                   ) : null}
-                  {item.questionText}
-                </p>
-                <button onClick={() => onClick(i)}>
-                  <EditIcon />
-                </button>
-                <p>{item.value}</p>
-              </li>
+                  <p>{item.questionText}</p>
+                  <button onClick={() => onClick(i)}>
+                    <EditIcon />
+                  </button>
+                  <p>
+                    {item.value[0].day}
+                    {"-"}
+                    {item.value[1].day}
+                  </p>
+                </li>
+              )}
+
+              {item.type === "time" && (
+                <li key={i}>
+                  {item?.subQuestions?.length > 0 ? (
+                    <button
+                      style={{ background: "none", border: "none" }}
+                      onClick={() => toggleSubQuestions(i)}
+                    >
+                      {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
+                    </button>
+                  ) : null}
+                  <p>{item.questionText}</p>
+                  <button onClick={() => onClick(i)}>
+                    <EditIcon />
+                  </button>
+                  <p>
+                    {item.value[0].time}
+                    {"-"}
+                    {item.value[1].time}
+                  </p>
+                </li>
+              )}
+
+              {/* {caret_icon_active[i] && (
+                <div>
+                  {item?.subQuestions?.map((sq, ind) => (
+                    <React.Fragment key={ind}>
+                      <li>
+                        <p>{sq.subQuestionText}</p>
+                        <button onClick={() => onClick(i)}>
+                          <EditIcon />
+                        </button>
+                        <p>{sq.subQuestionValue}</p>
+                      </li>
+
+                      {sq.type === "day" && (
+                        <li>
+                          <p>{sq.subQuestionText}</p>
+                          <button onClick={() => onClick(i)}>
+                            <EditIcon />
+                          </button>
+                          <p>
+                            {sq.subQuestionValue[0].day}
+                            {"-"}
+                            {sq.subQuestionValue[1].day}
+                          </p>
+                        </li>
+                      )}
+
+                      {sq.type === "day" && (
+                        <li>
+                          <p>{sq.questionText}</p>
+                          <button onClick={() => onClick(i)}>
+                            <EditIcon />
+                          </button>
+                          <p>
+                            {sq.value[0].day}
+                            {"-"}
+                            {sq.value[1].day}
+                          </p>
+                        </li>
+                      )}
+
+                      {sq.type === "form" && (
+                        <li
+                          key={i}
+                          style={{ display: "flex", flexDirection: "column" }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              width: "100%",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <p
+                                style={{
+                                  color: "var(--color-stone-500)",
+                                  fontSize: "1.7rem",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                {sq.questionText}
+                              </p>
+                            </div>
+                            <button onClick={() => onClick(i)}>
+                              <EditIcon />
+                            </button>
+                          </div>
+                          <div>
+                            {item.value?.map((q) => {
+                              return (
+                                <div key={q.questionText}>
+                                  <p>{q.questionText}</p>
+                                  <p>{q.LabelValue}</p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </li>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )} */}
 
               {caret_icon_active[i] && (
-  <div>
-    {item?.subQuestions?.map((sq, ind) => (
-      <li key={ind}>
-        <p>{sq.subQuestionText}</p>
-        <button onClick={() => onClick(i)}>
-          <EditIcon />
-        </button>
-        <p>{sq.subQuestionValue}</p>
-      </li>
-    ))}
-  </div>
-)}
+                <div>
+                  {item?.subQuestions?.map((sq, ind) => (
+                    <React.Fragment key={ind}>
+                      {sq.type !== "day" &&
+                        sq.type !== "time" &&
+                        sq.type !== "form" && (
+                          <li>
+                            <p>{sq.subQuestionText}</p>
+                            <button onClick={() => onClick(i)}>
+                              <EditIcon />
+                            </button>
+                            <p>{sq.subQuestionValue}</p>
+                          </li>
+                        )}
 
+                      {sq.type === "day" && (
+                        <li>
+                          <p>{sq.subQuestionText}</p>
+                          <button onClick={() => onClick(i)}>
+                            <EditIcon />
+                          </button>
+                          <p>
+                            {sq.subQuestionValue[0]?.day}
+                            {"-"}
+                            {sq.subQuestionValue[1]?.day}
+                          </p>
+                        </li>
+                      )}
+
+                      {sq.type === "time" && (
+                        <li>
+                          <p>{sq.subQuestionText}</p>
+                          <button onClick={() => onClick(i)}>
+                            <EditIcon />
+                          </button>
+                          <p>
+                            {sq.subQuestionValue[0]?.time}
+                            {"-"}
+                            {sq.subQuestionValue[1]?.time}
+                          </p>
+                        </li>
+                      )}
+
+                      {sq.type === "form" && (
+                        <li
+                          style={{ display: "flex", flexDirection: "column" }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              width: "100%",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <p
+                                style={{
+                                  color: "var(--color-stone-500)",
+                                  fontSize: "1.7rem",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                {sq.questionText}
+                              </p>
+                            </div>
+                            <button onClick={() => onClick(i)}>
+                              <EditIcon />
+                            </button>
+                          </div>
+                          <div>
+                            {sq.subQuestionValue?.map((q, qIdx) => (
+                              <div key={qIdx}>
+                                <p>{q.questionText}</p>
+                                <p>{q.LabelValue}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </li>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </>
           ))}
         </ul>
