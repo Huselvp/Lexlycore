@@ -769,7 +769,10 @@ const DocumentQuestion = ({
             getApiConfig()
           );
           setFormBlocks(result?.data.form.blocks);
-          console.log(result?.data.form.blocks);
+          console.log(
+            result?.data.form.blocks,
+            "this is the blogs hdyuhefyuefyufryurf"
+          );
         } catch (err) {
           console.log(err);
         }
