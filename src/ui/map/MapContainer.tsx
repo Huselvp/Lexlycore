@@ -148,9 +148,11 @@ const MapHandler = ({ place, marker, setAddressDetails }: MapHandlerProps) => {
 
 interface PlaceAutocompleteProps {
   onPlaceSelect: (place: google.maps.places.PlaceResult | null) => void;
+  countries: string[];
+
 }
 
-const PlaceAutocomplete = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
+const PlaceAutocomplete = ({ onPlaceSelect, countries  }: PlaceAutocompleteProps) => {
   const [placeAutocomplete, setPlaceAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -161,6 +163,8 @@ const PlaceAutocomplete = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
 
     const options = {
       fields: ["geometry", "name", "formatted_address"],
+      componentRestrictions: { country: countries },
+
     };
 
     setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
@@ -183,9 +187,10 @@ const PlaceAutocomplete = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
 
 interface Props {
   onPlaceSelect: (place: google.maps.places.PlaceResult | null) => void;
+  countries: string[];
 }
 
-export const PlaceAutocompleteClassic = ({ onPlaceSelect }: Props) => {
+export const PlaceAutocompleteClassic = ({ onPlaceSelect, countries }: Props) => {
   const [placeAutocomplete, setPlaceAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -196,6 +201,8 @@ export const PlaceAutocompleteClassic = ({ onPlaceSelect }: Props) => {
 
     const options = {
       fields: ["geometry", "name", "formatted_address"],
+      componentRestrictions: { country: countries },
+
     };
 
     setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
@@ -341,7 +348,9 @@ const MapContainer = ({ getTheMapData }) => {
           <div className="map-wrapper">
             <MapControl position={ControlPosition.TOP_CENTER}>
               <div className="autocomplete-control">
-                <PlaceAutocompleteClassic onPlaceSelect={setSelectedPlace} />
+                <PlaceAutocompleteClassic 
+                onPlaceSelect={setSelectedPlace}
+                countries={["DK", "DE", "PL", "SE", "NO"]} />
               </div>
             </MapControl>
           </div>
