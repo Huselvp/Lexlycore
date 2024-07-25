@@ -2,10 +2,7 @@ package com.iker.Lexly.service;
 
 import com.iker.Lexly.DTO.SubcategoryDTO;
 import com.iker.Lexly.DTO.TemplateDTO;
-import com.iker.Lexly.Entity.Documents;
-import com.iker.Lexly.Entity.Subcategory;
-import com.iker.Lexly.Entity.Template;
-import com.iker.Lexly.Entity.User;
+import com.iker.Lexly.Entity.*;
 import com.iker.Lexly.Transformer.SubCategoryTransformer;
 import com.iker.Lexly.Transformer.TemplateTransformer;
 import com.iker.Lexly.config.jwt.JwtService;
@@ -19,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.context.annotation.Lazy;
 @Service
 public class TemplateService {
     private final TemplateRepository templateRepository;
@@ -33,8 +30,10 @@ public class TemplateService {
     private final JwtService jwtService;
     private final TemplateTransformer templateTransformer;
     private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
+    private final QuestionService questionService;
+
     @Autowired
-    public TemplateService(SubcategoryRepository subcategoryRepository,SubCategoryTransformer subCategoryTransformer,SubcategoryService subcategoryService,JwtService jwtService,UserRepository userRepository,DocumentsRepository documentsRepository,DocumentQuestionValueRepository documentQuestionValueRepository,TemplateTransformer templateTransformer,QuestionRepository questionRepository, TemplateRepository templateRepository) {
+    public TemplateService(SubcategoryRepository subcategoryRepository, SubCategoryTransformer subCategoryTransformer, SubcategoryService subcategoryService, JwtService jwtService, UserRepository userRepository, DocumentsRepository documentsRepository, DocumentQuestionValueRepository documentQuestionValueRepository, TemplateTransformer templateTransformer, QuestionRepository questionRepository, TemplateRepository templateRepository, @Lazy QuestionService questionService) {
         this.templateRepository = templateRepository;
         this.templateTransformer=templateTransformer;
         this.documentsRepository=documentsRepository;
@@ -45,6 +44,7 @@ public class TemplateService {
         this.userRepository=userRepository;
         this.questionRepository=questionRepository;
         this.documentQuestionValueRepository=documentQuestionValueRepository;
+        this.questionService = questionService;
     }
 
 
@@ -119,6 +119,10 @@ public ApiResponse assignSubcategoryToTemplate(Long templateId, Long subcategory
         if (templateOptional.isPresent()) {
             Template template = templateOptional.get();
             List<Documents> documents = template.getDocuments();
+            List<Question> questions = questionRepository.findByTemplateId(id);
+            for(Question question : questions){
+                questionService.deleteQuestion(question.getId());
+            }
             documentsRepository.deleteAll(documents);
             templateRepository.deleteById(id);
         }
