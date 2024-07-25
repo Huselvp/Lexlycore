@@ -24,6 +24,7 @@ public class BlockTransformer extends Transformer<Block, BlockDTO> {
             Block block = new Block();
             block.setId(dto.getId());
             block.setNumberOfBloc(dto.getNumberOfBloc());
+            block.setType(dto.getType());
             return block;
         }
     }
@@ -35,6 +36,7 @@ public class BlockTransformer extends Transformer<Block, BlockDTO> {
             BlockDTO dto = new BlockDTO();
             dto.setId(entity.getId());
             dto.setNumberOfBloc(entity.getNumberOfBloc());
+            dto.setType(entity.getType());
             List<LabelDTO> labelDTOs = labels.stream()
                     .map(labelTransformer::toDTO)
                     .collect(Collectors.toList());
