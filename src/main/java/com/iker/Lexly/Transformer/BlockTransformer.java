@@ -45,6 +45,7 @@ public class BlockTransformer extends Transformer<Block, BlockDTO> {
         }
     }
 
+
     @Override
     public BlockDTO toDTO(Block entity) {
         throw new UnsupportedOperationException("Use toDTO(Block entity, List<Label> labels) instead.");

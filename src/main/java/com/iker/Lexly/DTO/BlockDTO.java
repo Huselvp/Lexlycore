@@ -14,5 +14,6 @@ public class BlockDTO {
     private Long id;
     private int numberOfBloc;
     private BlockType type;
+
     private List<LabelDTO> labels;
 }
