@@ -435,5 +435,93 @@ public class adminController {
         }
     }
 
+
+    @PostMapping("add-choice-to-question/{questionId}")
+    public ResponseEntity<Void> addCheckboxChoiceToQuestion(@PathVariable Long questionId, @RequestBody ChoiceUpdate choiceUpdate) {
+        try {
+            Question question = questionService.getQuestionById(questionId);
+            questionService.addChoice(question, choiceUpdate);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @PutMapping("update-choice-question/{questionId}/{choiceId}")
+    public ResponseEntity<Void> updateChoiceQuestion(@PathVariable Long questionId, @PathVariable Integer choiceId, @RequestBody ChoiceUpdate choiceUpdate) {
+        try {
+            Question question = questionService.getQuestionById(questionId);
+            questionService.updateChoice(question, choiceId, choiceUpdate);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @DeleteMapping("delete-choice-question/{questionId}/{choiceId}")
+    public ResponseEntity<Void> deleteChoiceQuestion(@PathVariable Long questionId, @PathVariable Integer choiceId) {
+        try {
+            Question question = questionService.getQuestionById(questionId);
+            questionService.deleteChoice(question, choiceId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("add-choice-subquestion/{subQuestionId}")
+    public ResponseEntity<Void> addChoiceToSubQuestion(@PathVariable Long subQuestionId, @RequestBody ChoiceUpdate choiceUpdate) {
+        try {
+            SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+            questionService.addChoice(subQuestion, choiceUpdate);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("update-choice-subquestion/{subQuestionId}/{choiceId}")
+    public ResponseEntity<Void> updateChoiceSubQuestion(@PathVariable Long subQuestionId, @PathVariable Integer choiceId, @RequestBody ChoiceUpdate choiceUpdate) {
+        try {
+            SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+            questionService.updateChoice(subQuestion, choiceId, choiceUpdate);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @DeleteMapping("delete-choice-subquestion/{subQuestionId}/{choiceId}")
+    public ResponseEntity<Void> deleteChoiceSubQuestion(@PathVariable Long subQuestionId, @PathVariable Integer choiceId) {
+        try {
+            SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
+            questionService.deleteChoice(subQuestion, choiceId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
 

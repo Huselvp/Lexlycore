@@ -1,4 +1,5 @@
 package com.iker.Lexly.service;
+import com.google.api.gax.rpc.NotFoundException;
 import com.iker.Lexly.DTO.BlockDTO;
 import com.iker.Lexly.DTO.FormDTO;
 import com.iker.Lexly.DTO.QuestionDTO;
@@ -14,6 +15,7 @@ import com.iker.Lexly.repository.*;
 import com.iker.Lexly.repository.form.BlockRepository;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.repository.form.LabelRepository;
+import com.iker.Lexly.request.ChoiceUpdate;
 import com.iker.Lexly.service.form.FormService;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
@@ -31,6 +33,8 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -175,20 +179,15 @@ public class QuestionService {
         // Fetch the Filter
         Filter filter = filterRepository.findByQuestionId(questionId)
                 .orElse(null);
-
         // Fetch the Form
         Form form = formRepository.findByQuestionId(questionId)
                 .orElse(null);
-
         // Assemble the DTO
         QuestionDTO questionDTO = questionTransformer.toDTO(question);
-
         if (form != null) {
             FormDTO formDTO = formTransformer.toDTO(form);
-
             // Fetch the Blocks
             List<Block> blocks = blockRepository.findByFormId(form.getId());
-
             if (!blocks.isEmpty()) {
                 // Fetch the Labels for each Block
                 Map<Long, List<Label>> labelsByBlockId = blocks.stream()
@@ -317,7 +316,115 @@ public class QuestionService {
         return daysBetween;
     }
 
+    public <T> void addChoice(T item, ChoiceUpdate choiceUpdate) {
+        String valueType = getValueType(item);
+        if (valueType == null || !valueType.startsWith("checkbox")) {
+            throw new IllegalArgumentException("Invalid value type");
+        }
+        Pattern pattern = Pattern.compile("(\\d+)/[^/]+/[^/]+");
+        Matcher matcher = pattern.matcher(valueType);
 
+        List<Integer> choiceIds = new ArrayList<>();
+        while (matcher.find()) {
+            choiceIds.add(Integer.parseInt(matcher.group(1)));
+        }
+        int maxChoiceId = choiceIds.stream().max(Integer::compare).orElse(0);
+        int newChoiceId = maxChoiceId + 1;
+        String newChoice = newChoiceId + "/" + choiceUpdate.getNewRelatedText() + "/" + choiceUpdate.getChoice();
+        setValueType(item, valueType + "/" + newChoice);
+        saveItem(item);
+    }
+
+    public <T> void updateChoice(T item, Integer choiceId, ChoiceUpdate choiceUpdate) {
+        String valueType = getValueType(item);
+        if (valueType == null || !valueType.startsWith("checkbox/")) {
+            throw new IllegalArgumentException("Invalid value type");
+        }
+        String checkboxPrefix = "checkbox/";
+        String valueTypeWithoutCheckbox = valueType.substring(checkboxPrefix.length());
+        String[] choices = valueTypeWithoutCheckbox.split("/");
+
+        boolean choiceFound = false;
+        for (int i = 0; i < choices.length; i += 3) {
+            int currentChoiceId = Integer.parseInt(choices[i]);
+            if (currentChoiceId == choiceId) {
+                choices[i + 1] = choiceUpdate.getNewRelatedText();
+                choices[i + 2] = choiceUpdate.getChoice();
+                choiceFound = true;
+                break;
+            }
+        }
+        if (!choiceFound) {
+            throw new NoSuchElementException("Choice not found");
+        }
+        String updatedValueType = checkboxPrefix + String.join("/", choices);
+        setValueType(item, updatedValueType);
+        saveItem(item);
+    }
+
+    public <T> void deleteChoice(T item, Integer choiceId) {
+        String valueType = getValueType(item);
+        if (valueType == null || !valueType.startsWith("checkbox/")) {
+            throw new IllegalArgumentException("Invalid value type");
+        }
+        String checkboxPrefix = "checkbox/";
+        String valueTypeWithoutCheckbox = valueType.substring(checkboxPrefix.length());
+        String[] choices = valueTypeWithoutCheckbox.split("/");
+        boolean choiceFound = false;
+
+        for (int i = 0; i < choices.length; i += 3) {
+            int currentChoiceId = Integer.parseInt(choices[i]);
+            if (currentChoiceId == choiceId) {
+                String[] updatedChoices;
+                if (choices.length == 3) {
+                    updatedChoices = new String[0];
+                } else {
+                    updatedChoices = new String[choices.length - 3];
+                    System.arraycopy(choices, 0, updatedChoices, 0, i);
+                    System.arraycopy(choices, i + 3, updatedChoices, i, choices.length - (i + 3));
+                }
+                String updatedValueType = updatedChoices.length == 0 ?
+                        checkboxPrefix.substring(0, checkboxPrefix.length() - 1) :
+                        checkboxPrefix + String.join("/", updatedChoices);
+                setValueType(item, updatedValueType);
+                saveItem(item);
+                choiceFound = true;
+                break;
+            }
+        }
+        if (!choiceFound) {
+            throw new NoSuchElementException("Choice not found");
+        }
+    }
+
+    private <T> String getValueType(T item) {
+        if (item instanceof Question) {
+            return ((Question) item).getValueType();
+        } else if (item instanceof SubQuestion) {
+            return ((SubQuestion) item).getValueType();
+        }
+        throw new IllegalArgumentException("Unsupported item type");
+    }
+
+    private <T> void setValueType(T item, String valueType) {
+        if (item instanceof Question) {
+            ((Question) item).setValueType(valueType);
+        } else if (item instanceof SubQuestion) {
+            ((SubQuestion) item).setValueType(valueType);
+        } else {
+            throw new IllegalArgumentException("Unsupported item type");
+        }
+    }
+
+    private <T> void saveItem(T item) {
+        if (item instanceof Question) {
+            questionRepository.save((Question) item);
+        } else if (item instanceof SubQuestion) {
+            subQuestionRepository.save((SubQuestion) item);
+        } else {
+            throw new IllegalArgumentException("Unsupported item type");
+        }
+    }
 
 
 
