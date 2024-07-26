@@ -1,0 +1,65 @@
+.custom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%; /* Ensure this is set to your desired width */
+  height: 8px; /* Adjust height if needed */
+  background: white; /* Track color */
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.custom-slider::-webkit-slider-runnable-track {
+  background: white;
+  border-radius: 5px;
+  height: 8px;
+}
+
+.custom-slider::-moz-range-track {
+  background: white;
+  border-radius: 5px;
+  height: 8px;
+}
+
+.custom-slider::-ms-track {
+  background: white;
+  border-radius: 5px;
+  height: 8px;
+  border: transparent;
+  color: transparent;
+}
+
+.custom-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #ada587 0%,
+    #ada587 $
+      {(
+        (Fvalue - filterData?.filterStartInt) /
+          (filterData?.filterEndInt - filterData?.filterStartInt)
+      ) * 100}%,
+    white $
+      {(
+        (Fvalue - filterData?.filterStartInt) /
+          (filterData?.filterEndInt - filterData?.filterStartInt)
+      ) * 100}%,
+    white 100%
+  );
+}
+
+.custom-slider::-moz-range-track {
+  background: linear-gradient(
+    to right,
+    #ada587 0%,
+    #ada587 $
+      {(
+        (Fvalue - filterData?.filterStartInt) /
+          (filterData?.filterEndInt - filterData?.filterStartInt)
+      ) * 100}%,
+    white $
+      {(
+        (Fvalue - filterData?.filterStartInt) /
+          (filterData?.filterEndInt - filterData?.filterStartInt)
+      ) * 100}%,
+    white 100%
+  );
+}

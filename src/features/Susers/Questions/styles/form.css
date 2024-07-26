@@ -6,13 +6,14 @@
   gap: 10px;
   justify-content: space-between;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .form-block-user {
   background-color: rgb(255, 255, 255);
   padding: 2rem;
   border-radius: 10px;
-  width: 49%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;

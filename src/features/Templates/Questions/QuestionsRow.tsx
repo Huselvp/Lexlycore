@@ -22,10 +22,13 @@ import PopUp from "../../../pages/admin/components/popUp/PopUp";
 import PopUpContentContainer from "../../../pages/admin/components/popup_content_container/PopUpContantContainer";
 import Form from "../../../pages/admin/components/UI/form/Form";
 import Button from "../../../pages/admin/components/UI/btns/Button";
-// import Block from "../../../pages/admin/components/block/block";
 import AddNewBlock from "../../../pages/admin/components/addNewBlock/AddNewBlock";
 import BlocksContainer from "../../../pages/admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../pages/admin/components/editBlock/editBlock";
+
+import { FiUser } from "react-icons/fi";
+
+import { BsBuildings } from "react-icons/bs";
 
 import { IoIosClose } from "react-icons/io";
 import { HiOutlineDuplicate } from "react-icons/hi";
@@ -232,6 +235,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         getApiConfig()
       );
       setFormBblocksData(result?.data.form.blocks);
+      console.log(result?.data.form.blocks);
     } catch (err) {
       console.error(err);
     }
@@ -384,6 +388,30 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
   };
 
+  // ============
+
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+
+  // ======
+
+  const [countriesList, setCounriesList] = useState([]);
+
+  const getCountriesList = async () => {
+    try {
+      await axios
+        .get("https://restcountries.com/v3.1/all?fields=name")
+        .then((result) => {
+          setCounriesList(result.data);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getCountriesList();
+  }, []);
+
   return (
     <>
       <PopUp isOpen={isPopUpOpen}>
@@ -448,16 +476,18 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       moveItem={moveItem}
                     >
                       <div className="item-controlers">
-                        <button
-                          onClick={() => {
-                            setIsEditBlockOpen(true);
-                            setIsAddFormNameOpen(false);
-                            setIsSeeBlocksOpen(false);
-                            setBlockId(item.id);
-                          }}
-                        >
-                          <FaRegEdit size={20} />
-                        </button>
+                        {item.type !== "COMPANY" && item.type !== "PERSON" && (
+                          <button
+                            onClick={() => {
+                              setIsEditBlockOpen(true);
+                              setIsAddFormNameOpen(false);
+                              setIsSeeBlocksOpen(false);
+                              setBlockId(item.id);
+                            }}
+                          >
+                            <FaRegEdit size={20} />
+                          </button>
+                        )}
                         <button>
                           <HiOutlineDuplicate
                             size={20}
@@ -655,6 +685,508 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
                 {formBlocksData?.map((block, blockIndex) => {
+                  if (block.type === "COMPANY") {
+                    return (
+                      <div
+                        className="company"
+                        style={{
+                          backgroundColor: "rgb(255, 255, 255)",
+                          padding: "2rem",
+                          borderRadius: "10px",
+                          width: "100%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginBottom: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "5rem",
+                              height: "5rem",
+                              backgroundColor: "#9a9278",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "50px",
+                            }}
+                          >
+                            <span>
+                              <BsBuildings color="white" />
+                            </span>
+                          </div>
+                          <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                            Virksomhed
+                          </p>
+                        </div>
+
+                        <div>
+                          <form>
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="Virksomhedsnavn"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Virksomhedsnavn
+                                </label>
+                                <input
+                                  id="Virksomhedsnavn"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="adresse"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Adresse
+                                </label>
+                                <input
+                                  id="adresse"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="cpr"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  CVR nr
+                                </label>
+                                <input
+                                  id="cpr"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "40%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="postnr"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Postnr
+                                </label>
+                                <input
+                                  id="postnr"
+                                  type="number"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "55%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="by"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  By
+                                </label>
+                                <input
+                                  id="by"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="name"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Herefter otalt som
+                                </label>
+
+                                <input
+                                  id="nmae"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="adresse"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Land
+                                </label>
+                                <select
+                                  name="land"
+                                  id="land"
+                                  style={{
+                                    width: "100%",
+                                    padding: "0.8rem 1.2rem",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: " 4px",
+                                    backgroundColor: " #fff",
+                                    boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                    paddingRight: "30px",
+                                  }}
+                                >
+                                  {countriesList.map((country) => {
+                                    return (
+                                      <option value={country.name.common}>
+                                        {country.name.common}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    );
+                  } else if (block.type === "PERSON") {
+                    return (
+                      <div
+                        className="person"
+                        style={{
+                          backgroundColor: "rgb(255, 255, 255)",
+                          padding: "2rem",
+                          borderRadius: "10px",
+                          width: "100%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginBottom: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "5rem",
+                              height: "5rem",
+                              backgroundColor: "#9a9278",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "50px",
+                            }}
+                          >
+                            <span>
+                              <FiUser color="white" />
+                            </span>
+                          </div>
+                          <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                            Person
+                          </p>
+                        </div>
+
+                        <div>
+                          <form>
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="name"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Navn
+                                </label>
+                                <input
+                                  id="nmae"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="adresse"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Adresse
+                                </label>
+                                <input
+                                  id="adresse"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="cpr"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  CPR nr
+                                </label>
+                                <input
+                                  id="cpr"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "40%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="postnr"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Postnr
+                                </label>
+                                <input
+                                  id="postnr"
+                                  type="number"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "55%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="by"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  By
+                                </label>
+                                <input
+                                  id="by"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                            </div>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                gap: "2rem",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="name"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Herefter otalt som
+                                </label>
+
+                                <input
+                                  id="nmae"
+                                  type="text"
+                                  style={{ width: "100%" }}
+                                ></input>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "start",
+                                  width: "100%",
+                                }}
+                              >
+                                <label
+                                  htmlFor="adresse"
+                                  style={{
+                                    marginBottom: "1rem",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  Land
+                                </label>
+                                <select
+                                  name="land"
+                                  id="land"
+                                  style={{
+                                    width: "100%",
+                                    padding: "0.8rem 1.2rem",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: " 4px",
+                                    backgroundColor: " #fff",
+                                    boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                    paddingRight: "30px",
+                                  }}
+                                >
+                                  {countriesList.map((country) => {
+                                    return (
+                                      <option value={country.name.common}>
+                                        {country.name.common}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   // Check if the block has data (e.g., labels) before rendering
                   if (!block.labels || block.labels.length === 0) {
                     return null;
@@ -856,6 +1388,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           </div>
         </PopUpContentContainer>
       </PopUp>
+
       <Reorder.Item value={question} key={question.id}>
         <div>
           <Table.Row id={`menus-row--${question.id}`}>
@@ -864,7 +1397,10 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 <button
                   style={{ background: "none", border: "none" }}
                   // here were i activate and desactivate the toggle
-                  onClick={() => setcaret((caret) => !caret)}
+                  onClick={() => {
+                    setcaret((prevCaret) => !prevCaret);
+                    setIsSubMenuOpen(true);
+                  }}
                 >
                   {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
                 </button>
@@ -889,6 +1425,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     See Choices
                   </Menus.Button>
                 )}
+
+                <Menus.Button icon={<HiEye />}>{question.id}</Menus.Button>
 
                 {question.valueType.startsWith("form") &&
                   (formBlocksId === "" ? (
@@ -947,6 +1485,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 >
                   Add SubQuestions
                 </Menus.Button>
+
+                <Menus.Button icon={<HiEye />}>I am the question</Menus.Button>
+
                 <Menus.Button
                   icon={<HiPencil />}
                   onClick={() => navigate(`editQuestion/${question.id}`)}

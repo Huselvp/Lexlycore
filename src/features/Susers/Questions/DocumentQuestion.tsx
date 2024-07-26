@@ -585,7 +585,6 @@ import Form from "../../../ui/AuthForm";
 import { extractChoicesFromString } from "../../../utils/helpers";
 import styled from "styled-components";
 import { HiMiniChevronDown, HiMiniChevronUp } from "react-icons/hi2";
-import { IoIosClose } from "react-icons/io";
 import axios from "axios";
 import { API } from "../../../utils/constants";
 import { getApiConfig } from "../../../utils/constants";
@@ -877,17 +876,27 @@ const DocumentQuestion = ({
     return value !== "";
   }, [value]);
 
+  // const [Fvalue, setFValue] = useState(() => {
+  //   if (isTheFilterHavAvalue()) {
+  //     return Number(value);
+  //   } else if (
+  //     filterData &&
+  //     filterData?.filterStartInt !== undefined &&
+  //     filterData?.filterEndInt !== undefined
+  //   ) {
+  //     return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+  //   }
+  // });
+
   const [Fvalue, setFValue] = useState(() => {
     if (isTheFilterHavAvalue()) {
-      return Number(value);
+      return value;
     } else if (
       filterData &&
-      filterData?.filterStartInt !== undefined &&
-      filterData?.filterEndInt !== undefined
+      filterData?.filterStartInt &&
+      filterData?.filterEndInt
     ) {
       return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
-    } else {
-      return 0;
     }
   });
 
@@ -990,6 +999,26 @@ const DocumentQuestion = ({
   }, [days, isTherDays]);
 
   const isSecondDayDisabled = days[0]?.day === "";
+
+  // ========================
+
+  const [countriesList, setCounriesList] = useState([]);
+
+  const getCountriesList = async () => {
+    try {
+      await axios
+        .get("https://restcountries.com/v3.1/all?fields=name")
+        .then((result) => {
+          setCounriesList(result.data);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getCountriesList();
+  }, []);
 
   return (
     <>
@@ -1165,6 +1194,509 @@ const DocumentQuestion = ({
           <div className="form_type">
             {formBlocks?.map((block) => {
               // Check if the block has any labels
+
+              if (block.type === "COMPANY") {
+                return (
+                  <div
+                    className="company"
+                    style={{
+                      backgroundColor: "rgb(255, 255, 255)",
+                      padding: "2rem",
+                      borderRadius: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        marginBottom: "2rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "5rem",
+                          height: "5rem",
+                          backgroundColor: "#9a9278",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "50px",
+                        }}
+                      >
+                        <span>
+                          <BsBuildings color="white" />
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                        Virksomhed
+                      </p>
+                    </div>
+
+                    <div>
+                      <form>
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="Virksomhedsnavn"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Virksomhedsnavn
+                            </label>
+                            <input
+                              id="Virksomhedsnavn"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Adresse
+                            </label>
+                            <input
+                              id="adresse"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="cpr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              CVR nr
+                            </label>
+                            <input
+                              id="cpr"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "40%",
+                            }}
+                          >
+                            <label
+                              htmlFor="postnr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Postnr
+                            </label>
+                            <input
+                              id="postnr"
+                              type="number"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "55%",
+                            }}
+                          >
+                            <label
+                              htmlFor="by"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              By
+                            </label>
+                            <input
+                              id="by"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="name"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Herefter otalt som
+                            </label>
+
+                            <input
+                              id="nmae"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Land
+                            </label>
+                            <select
+                              name="land"
+                              id="land"
+                              style={{
+                                width: "100%",
+                                padding: "0.8rem 1.2rem",
+                                border: "1px solid #d1d5db",
+                                borderRadius: " 4px",
+                                backgroundColor: " #fff",
+                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                paddingRight: "30px",
+                              }}
+                            >
+                              {countriesList.map((country) => {
+                                return (
+                                  <option value={country.name.common}>
+                                    {country.name.common}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                );
+              } else if (block.type === "PERSON") {
+                return (
+                  <div
+                    className="person"
+                    style={{
+                      backgroundColor: "rgb(255, 255, 255)",
+                      padding: "2rem",
+                      borderRadius: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        marginBottom: "2rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "5rem",
+                          height: "5rem",
+                          backgroundColor: "#9a9278",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "50px",
+                        }}
+                      >
+                        <span>
+                          <FiUser color="white" />
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                        Person
+                      </p>
+                    </div>
+
+                    <div>
+                      <form>
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="name"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Navn
+                            </label>
+                            <input
+                              id="nmae"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Adresse
+                            </label>
+                            <input
+                              id="adresse"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="cpr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              CPR nr
+                            </label>
+                            <input
+                              id="cpr"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "40%",
+                            }}
+                          >
+                            <label
+                              htmlFor="postnr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Postnr
+                            </label>
+                            <input
+                              id="postnr"
+                              type="number"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "55%",
+                            }}
+                          >
+                            <label
+                              htmlFor="by"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              By
+                            </label>
+                            <input
+                              id="by"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="name"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Herefter otalt som
+                            </label>
+
+                            <input
+                              id="nmae"
+                              type="text"
+                              style={{ width: "100%" }}
+                            ></input>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Land
+                            </label>
+                            <select
+                              name="land"
+                              id="land"
+                              style={{
+                                width: "100%",
+                                padding: "0.8rem 1.2rem",
+                                border: "1px solid #d1d5db",
+                                borderRadius: " 4px",
+                                backgroundColor: " #fff",
+                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                paddingRight: "30px",
+                              }}
+                            >
+                              {countriesList.map((country) => {
+                                return (
+                                  <option value={country.name.common}>
+                                    {country.name.common}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                );
+              }
+
               if (!block?.labels || block?.labels.length === 0) {
                 return null; // Skip rendering this block if it has no labels
               }
@@ -1224,14 +1756,23 @@ const DocumentQuestion = ({
 
         {question.valueType.startsWith("filter") && (
           <div>
-            <h3>{Fvalue}</h3>
+            <h3>
+              {value !== ""
+                ? value
+                : (+filterData?.filterStartInt + filterData?.filterEndInt) / 2}
+            </h3>
             <input
               type="range"
               min={filterData?.filterStartInt}
               max={filterData?.filterEndInt}
               value={Fvalue}
               onChange={handleSliderChange}
-              style={{ outline: "none" }}
+              style={{
+                outline: "none",
+                width: "100%",
+                padding: "0",
+                accentColor: "#ada587",
+              }}
             />
           </div>
         )}
@@ -1321,418 +1862,6 @@ const DocumentQuestion = ({
             }}
           />
         )}
-
-        {/* <div className="person">
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "2rem",
-            }}
-          >
-            <div
-              style={{
-                width: "5rem",
-                height: "5rem",
-                backgroundColor: "#9a9278",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "50px",
-              }}
-            >
-              <span>
-                <FiUser color="white" />
-              </span>
-            </div>
-            <p style={{ fontSize: "15px", fontWeight: "bold" }}>Person</p>
-          </div>
-
-          <div>
-            <form>
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="name"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Navn
-                  </label>
-                  <input
-                    id="nmae"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="adresse"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Adresse
-                  </label>
-                  <input
-                    id="adresse"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="cpr"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    CPR nr
-                  </label>
-                  <input id="cpr" type="text" style={{ width: "100%" }}></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "40%",
-                  }}
-                >
-                  <label
-                    htmlFor="postnr"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Postnr
-                  </label>
-                  <input
-                    id="postnr"
-                    type="number"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "55%",
-                  }}
-                >
-                  <label
-                    htmlFor="by"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    By
-                  </label>
-                  <input id="by" type="text" style={{ width: "100%" }}></input>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="name"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Herefter otalt som
-                  </label>
-
-                  <input
-                    id="nmae"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="adresse"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Land
-                  </label>
-                  <select
-                    name="land"
-                    id="land"
-                    style={{
-                      width: "100%",
-                      padding: "0.8rem 1.2rem",
-                      border: "1px solid #d1d5db",
-                      borderRadius: " 4px",
-                      backgroundColor: " #fff",
-                      boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                      paddingRight: "30px",
-                    }}
-                  >
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div> */}
-
-        {/* <div className="company">
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "2rem",
-            }}
-          >
-            <div
-              style={{
-                width: "5rem",
-                height: "5rem",
-                backgroundColor: "#9a9278",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "50px",
-              }}
-            >
-              <span>
-                <BsBuildings color="white" />
-              </span>
-            </div>
-            <p style={{ fontSize: "15px", fontWeight: "bold" }}>Person</p>
-          </div>
-
-          <div>
-            <form>
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="Virksomhedsnavn"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Virksomhedsnavn
-                  </label>
-                  <input
-                    id="Virksomhedsnavn"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="adresse"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Adresse
-                  </label>
-                  <input
-                    id="adresse"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="cpr"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    CPR nr
-                  </label>
-                  <input id="cpr" type="text" style={{ width: "100%" }}></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "40%",
-                  }}
-                >
-                  <label
-                    htmlFor="postnr"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Postnr
-                  </label>
-                  <input
-                    id="postnr"
-                    type="number"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "55%",
-                  }}
-                >
-                  <label
-                    htmlFor="by"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    By
-                  </label>
-                  <input id="by" type="text" style={{ width: "100%" }}></input>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "2rem",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="name"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Herefter otalt som
-                  </label>
-
-                  <input
-                    id="nmae"
-                    type="text"
-                    style={{ width: "100%" }}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "start",
-                    width: "100%",
-                  }}
-                >
-                  <label
-                    htmlFor="adresse"
-                    style={{ marginBottom: "1rem", fontWeight: "700" }}
-                  >
-                    Land
-                  </label>
-                  <select
-                    name="land"
-                    id="land"
-                    style={{
-                      width: "100%",
-                      padding: "0.8rem 1.2rem",
-                      border: "1px solid #d1d5db",
-                      borderRadius: " 4px",
-                      backgroundColor: " #fff",
-                      boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                      paddingRight: "30px",
-                    }}
-                  >
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                    <option value="land">Land</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div> */}
 
         {children}
       </InputContainer>

@@ -763,19 +763,27 @@ const DocumentQuestions = ({
                 ) : null
               )
           ) : (
-            <DocumentQuestionsOverview
-              isDraft={isDraft}
-              data={overviewData}
-              onClick={(index: number) => {
-                setOverviewData((data) =>
-                  data.map((q, i) =>
-                    i === index
-                      ? { ...q, active: true }
-                      : { ...q, active: false }
-                  )
-                );
+            // <DocumentQuestionsOverview
+            //   isDraft={isDraft}
+            //   data={overviewData}
+            //   onClick={(index: number) => {
+            //     setOverviewData((data) =>
+            //       data.map((q, i) =>
+            //         i === index
+            //           ? { ...q, active: true }
+            //           : { ...q, active: false }
+            //       )
+            //     );
+            //   }}
+            // />
+
+            <button
+              onClick={() => {
+                console.log(overviewData);
               }}
-            />
+            >
+              data
+            </button>
           )}
         </Content>
       </Container>
