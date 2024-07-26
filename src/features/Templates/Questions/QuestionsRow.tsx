@@ -394,15 +394,19 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   // ======
 
-  const [countriesList, setCounriesList] = useState([]);
+  const [countriesList, setCountriesList] = useState([]);
 
   const getCountriesList = async () => {
     try {
-      await axios
-        .get("https://restcountries.com/v3.1/all?fields=name")
-        .then((result) => {
-          setCounriesList(result.data);
-        });
+      const result = await axios.get(
+        "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
+      );
+      const sortedCountries = result.data.geonames.sort((a, b) => {
+        if (a.countryName < b.countryName) return -1;
+        if (a.countryName > b.countryName) return 1;
+        return 0;
+      });
+      setCountriesList(sortedCountries);
     } catch (err) {
       console.log(err);
     }
@@ -923,8 +927,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                                 >
                                   {countriesList.map((country) => {
                                     return (
-                                      <option value={country.name.common}>
-                                        {country.name.common}
+                                      <option value={country.countryName}>
+                                        {country.countryName}
                                       </option>
                                     );
                                   })}
@@ -1173,8 +1177,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                                 >
                                   {countriesList.map((country) => {
                                     return (
-                                      <option value={country.name.common}>
-                                        {country.name.common}
+                                      <option value={country.countryName}>
+                                        {country.countryName}
                                       </option>
                                     );
                                   })}
