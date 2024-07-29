@@ -5,6 +5,9 @@ import com.iker.Lexly.Entity.SubQuestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class SubQuestionTransformer extends Transformer<SubQuestion, SubQuestionDTO> {
 
@@ -47,8 +50,23 @@ public class SubQuestionTransformer extends Transformer<SubQuestion, SubQuestion
             dto.setDescriptionDetails(entity.getDescriptionDetails());
             dto.setValueType(entity.getValueType());
             dto.setTextArea(entity.getTextArea());
+            // Ajoutez ici la transformation des sous-questions
+            List<SubQuestionDTO> subQuestionDTOs = entity.getSubQuestions().stream()
+                    .map(this::toDTO)
+                    .collect(Collectors.toList());
+            dto.setSubQuestions(subQuestionDTOs);
             return dto;
         }
+    }
+
+    public SubQuestionDTO convertToDTOWithSubQuestions(SubQuestion subQuestion) {
+        SubQuestionDTO subQuestionDTO = toDTO(subQuestion);
+        List<SubQuestion> subSubQuestions = subQuestion.getSubQuestions();
+        List<SubQuestionDTO> subSubQuestionDTOs = subSubQuestions.stream()
+                .map(this::convertToDTOWithSubQuestions)
+                .collect(Collectors.toList());
+        subQuestionDTO.setSubQuestions(subSubQuestionDTOs);
+        return subQuestionDTO;
     }
 }
 

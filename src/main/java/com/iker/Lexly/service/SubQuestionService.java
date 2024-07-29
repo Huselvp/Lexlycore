@@ -66,9 +66,27 @@ public class SubQuestionService {
         this.formService = formService;
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public List<SubQuestion> getAllSubQuestionsByQuestionId(Long questionId) {
         return subQuestionRepository.findByParentQuestionId(questionId);
+    }*/
+
+    @Transactional(readOnly = true)
+    public List<SubQuestionDTO> getAllSubQuestionsByQuestionId(Long questionId) {
+        List<SubQuestion> subQuestions = subQuestionRepository.findByParentQuestionId(questionId);
+        return subQuestions.stream()
+                .map(this::convertToDTOWithSubQuestions)
+                .collect(Collectors.toList());
+    }
+
+    private SubQuestionDTO convertToDTOWithSubQuestions(SubQuestion subQuestion) {
+        SubQuestionDTO subQuestionDTO = subQuestionTransformer.toDTO(subQuestion);
+        List<SubQuestion> subSubQuestions = subQuestionRepository.findByParentSubQuestionId(subQuestion.getId());
+        List<SubQuestionDTO> subSubQuestionDTOs = subSubQuestions.stream()
+                .map(this::convertToDTOWithSubQuestions)
+                .collect(Collectors.toList());
+        subQuestionDTO.setSubQuestions(subSubQuestionDTOs); // assuming SubQuestionDTO has a field for sub-questions
+        return subQuestionDTO;
     }
 
     @Transactional
@@ -81,6 +99,24 @@ public class SubQuestionService {
         subQuestion.setValueType(subQuestionDTO.getValueType());
         subQuestion.setTextArea(subQuestionDTO.getTextArea());
         subQuestion.setParentQuestion(parentQuestion);
+        SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
+        subQuestionsaved.setPosition(subQuestionsaved.getId().intValue());
+        logger.info("Created Subquestion successfully :{}",subQuestionsaved );
+        return subQuestionsaved;
+    }
+
+    @Transactional
+    public SubQuestion createSubSubQuestion(Long parentSubQuestionId, SubQuestionDTO subQuestionDTO) {
+        SubQuestion parentSubQuestion = subQuestionRepository.findById(parentSubQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent subquestion not found"));
+
+        SubQuestion subQuestion = new SubQuestion();
+        subQuestion.setQuestionText(subQuestionDTO.getQuestionText());
+        subQuestion.setDescription(subQuestionDTO.getDescription());
+        subQuestion.setDescriptionDetails(subQuestionDTO.getDescriptionDetails());
+        subQuestion.setValueType(subQuestionDTO.getValueType());
+        subQuestion.setTextArea(subQuestionDTO.getTextArea());
+        subQuestion.setParentSubQuestion(parentSubQuestion);
         SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
         subQuestionsaved.setPosition(subQuestionsaved.getId().intValue());
         logger.info("Created Subquestion successfully :{}",subQuestionsaved );

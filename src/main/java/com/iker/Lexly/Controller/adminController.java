@@ -48,7 +48,6 @@ public class adminController {
     private final SubQuestionService subQuestionService;
     private final UserTransformer userTransformer;
     private final SubcategoryService subcategoryService;
-
     private final UserRepository userRepository;
     private  final PasswordEncoder passwordEncoder;
     private final QuestionTransformer questionTransformer;
@@ -189,14 +188,24 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/all_questions")
+    /*@GetMapping("/all_questions")
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
         List<QuestionDTO> questionDTOs = questions.stream()
                 .map(questionTransformer::toDTO)
                 .collect(Collectors.toList());
         return questionDTOs;
+    }*/
+
+    @GetMapping("/all_questions")
+    public List<QuestionDTO> getAllQuestions() {
+        List<Question> questions = questionService.getAllQuestions();
+        List<QuestionDTO> questionDTOs = questions.stream()
+                .map(question -> questionTransformer.toDTOWithSubQuestions(question))
+                .collect(Collectors.toList());
+        return questionDTOs;
     }
+
 
 
 
@@ -230,7 +239,7 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("question/{questionId}")
+    /*@GetMapping("question/{questionId}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
         if (question != null) {
@@ -239,7 +248,20 @@ public class adminController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }*/
+
+    @GetMapping("question/{questionId}")
+    public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
+        Question question = questionService.getQuestionById(questionId);
+        if (question != null) {
+            QuestionDTO questionDTO = questionTransformer.toDTOWithSubQuestions(question);
+            return new ResponseEntity<>(questionDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
+
     @PutMapping("question/reorder")
     public ResponseEntity<String> reoderQuestion (@RequestBody List<Long> questionIds) {
         try {
@@ -292,9 +314,15 @@ public class adminController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/questions/subquestions/{questionId}")
+    /*@GetMapping("/questions/subquestions/{questionId}")
     public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
         List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
+        return ResponseEntity.ok(subQuestions);
+    }*/
+
+    @GetMapping("/questions/subquestions/{questionId}")
+    public ResponseEntity<List<SubQuestionDTO>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
+        List<SubQuestionDTO> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
         return ResponseEntity.ok(subQuestions);
     }
 
@@ -303,6 +331,15 @@ public class adminController {
         SubQuestion createdSubQuestion = subQuestionService.createSubQuestion(questionId, subQuestionDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
     }
+
+    @PostMapping("/subquestions/{parentSubQuestionId}")
+    public ResponseEntity<SubQuestion> createSubSubQuestion(
+            @PathVariable Long parentSubQuestionId,
+            @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion createdSubQuestion = subQuestionService.createSubSubQuestion(parentSubQuestionId, subQuestionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
+    }
+
     @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
     public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
         SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);

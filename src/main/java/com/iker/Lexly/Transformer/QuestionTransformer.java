@@ -17,10 +17,12 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
 
     private final FormTransformer formTransformer;
     private final FormRepository formRepository;
+    private final SubQuestionTransformer subQuestionTransformer;
     @Autowired
-    public QuestionTransformer(FormTransformer formTransformer, FormRepository formRepository) {
+    public QuestionTransformer(FormTransformer formTransformer, FormRepository formRepository , SubQuestionTransformer subQuestionTransformer) {
         this.formTransformer = formTransformer;
         this.formRepository = formRepository;
+        this.subQuestionTransformer = subQuestionTransformer;
     }
 
     @Override
@@ -72,6 +74,15 @@ public class QuestionTransformer extends Transformer<Question, QuestionDTO> {
         }
 
         return subQuestionDTO;
+    }
+
+    public QuestionDTO toDTOWithSubQuestions(Question question) {
+        QuestionDTO questionDTO = toDTO(question);
+        List<SubQuestionDTO> subQuestionDTOs = question.getSubQuestions().stream()
+                .map(subQuestionTransformer::convertToDTOWithSubQuestions)
+                .collect(Collectors.toList());
+        questionDTO.setSubQuestions(subQuestionDTOs);
+        return questionDTO;
     }
 }
 
