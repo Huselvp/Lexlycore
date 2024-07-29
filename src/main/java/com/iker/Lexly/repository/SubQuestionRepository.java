@@ -10,6 +10,4 @@ import java.util.List;
 public interface SubQuestionRepository extends JpaRepository<SubQuestion, Long> {
 
     List<SubQuestion> findByParentQuestionId(Long questionId);
-
-    List<SubQuestion> findByParentSubQuestionId(Long SubQuestionId);
 }

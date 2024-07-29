@@ -21,37 +21,30 @@ public class SubQuestion {
     @Column(name = "question_text")
     private String questionText;
 
-    @Column(name = "description")
+    @Column(name="description")
     @JsonProperty("Description")
     private String description;
 
-    @Column(name = "description_details")
+    @Column(name="description_details")
     @JsonProperty("description_details")
     private String descriptionDetails;
 
-    @Column(name = "value_type")
+    @Column(name= "value_type")
     @NotNull
     private String valueType;
 
-    @Column(name = "text_area")
+    @Column(name= "text_area")
     @JsonProperty("text_area")
     private String textArea;
 
-    @Column(name = "position")
+    @Column(name="position")
     private int position;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "parent_question_id")
+//    @JsonIgnore
     private Question parentQuestion;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_sub_question_id")
-    @JsonBackReference
-    private SubQuestion parentSubQuestion;
-
-    @OneToMany(mappedBy = "parentSubQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SubQuestion> subQuestions = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -101,13 +94,9 @@ public class SubQuestion {
         this.textArea = textArea;
     }
 
-    public int getPosition() {
-        return position;
-    }
+    public int getPosition() {return position;}
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
+    public void setPosition(int position) {this.position = position;}
 
     public Question getParentQuestion() {
         return parentQuestion;
@@ -117,29 +106,4 @@ public class SubQuestion {
         this.parentQuestion = parentQuestion;
     }
 
-    public SubQuestion getParentSubQuestion() {
-        return parentSubQuestion;
-    }
-
-    public void setParentSubQuestion(SubQuestion parentSubQuestion) {
-        this.parentSubQuestion = parentSubQuestion;
-    }
-
-    public List<SubQuestion> getSubQuestions() {
-        return subQuestions;
-    }
-
-    public void setSubQuestions(List<SubQuestion> subQuestions) {
-        this.subQuestions = subQuestions;
-    }
-
-    public void addSubQuestion(SubQuestion subQuestion) {
-        subQuestions.add(subQuestion);
-        subQuestion.setParentSubQuestion(this);
-    }
-
-    public void removeSubQuestion(SubQuestion subQuestion) {
-        subQuestions.remove(subQuestion);
-        subQuestion.setParentSubQuestion(null);
-    }
 }

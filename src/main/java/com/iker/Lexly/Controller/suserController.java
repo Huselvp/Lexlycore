@@ -236,18 +236,11 @@ public class suserController {
         }
         return ResponseEntity.ok(response);
     }
-    /*@GetMapping("/questions/subquestions/{questionId}")
+    @GetMapping("/questions/subquestions/{questionId}")
     public ResponseEntity<List<SubQuestion>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
         List<SubQuestion> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
         return ResponseEntity.ok(subQuestions);
-    }*/
-
-    @GetMapping("/questions/subquestions/{questionId}")
-    public ResponseEntity<List<SubQuestionDTO>> getAllSubQuestionsByQuestionId(@PathVariable Long questionId) {
-        List<SubQuestionDTO> subQuestions = subQuestionService.getAllSubQuestionsByQuestionId(questionId);
-        return ResponseEntity.ok(subQuestions);
     }
-
 
     @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
     public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
