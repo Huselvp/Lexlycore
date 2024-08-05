@@ -257,6 +257,55 @@ public class SubQuestionService {
         return Optional.empty();
     }
 
+    public SubQuestion updateSubSubQuestion(Long parentSubQuestionId, Long subQuestionId, SubQuestionDTO subQuestionDTO) {
+        // Trouver la sous-question parent
+        SubQuestion parentSubQuestion = subQuestionRepository.findById(parentSubQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent SubQuestion not found with ID " + parentSubQuestionId));
+
+        // Trouver la sous-question à mettre à jour
+        SubQuestion subQuestion = subQuestionRepository.findById(subQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("SubQuestion not found with ID " + subQuestionId));
+
+        // Vérifier que la sous-question appartient bien à la sous-question parent
+        if (!parentSubQuestion.getSubQuestions().contains(subQuestion)) {
+            throw new IllegalArgumentException("SubQuestion does not belong to the specified parent SubQuestion");
+        }
+
+        // Mettre à jour les propriétés de la sous-question
+        subQuestion.setQuestionText(subQuestionDTO.getQuestionText());
+        subQuestion.setDescription(subQuestionDTO.getDescription());
+        subQuestion.setDescriptionDetails(subQuestionDTO.getDescriptionDetails());
+        subQuestion.setValueType(subQuestionDTO.getValueType());
+        subQuestion.setTextArea(subQuestionDTO.getTextArea());
+
+        // Sauvegarder les modifications
+        return subQuestionRepository.save(subQuestion);
+    }
+
+    public void deleteSubSubQuestion(Long parentSubQuestionId, Long subQuestionId) {
+        // Trouver la sous-question parent
+        SubQuestion parentSubQuestion = subQuestionRepository.findById(parentSubQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent SubQuestion not found with ID " + parentSubQuestionId));
+
+        // Trouver la sous-question à supprimer
+        SubQuestion subQuestion = subQuestionRepository.findById(subQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("SubQuestion not found with ID " + subQuestionId));
+
+        // Vérifier que la sous-question appartient bien à la sous-question parent
+        if (!parentSubQuestion.getSubQuestions().contains(subQuestion)) {
+            throw new IllegalArgumentException("SubQuestion does not belong to the specified parent SubQuestion");
+        }
+
+        // Supprimer la sous-question du parent
+        parentSubQuestion.removeSubQuestion(subQuestion);
+
+        // Sauvegarder les modifications du parent
+        subQuestionRepository.save(parentSubQuestion);
+
+        // Supprimer la sous-question
+        subQuestionRepository.delete(subQuestion);
+    }
+
 
 
 

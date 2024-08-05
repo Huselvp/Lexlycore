@@ -316,6 +316,23 @@ public class adminController {
         SubQuestion createdSubQuestion = subQuestionService.createSubSubQuestion(parentSubQuestionId, subQuestionDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
     }
+    @PutMapping("/subquestions/{parentSubQuestionId}/{subQuestionId}")
+    public ResponseEntity<SubQuestion> updateSubSubQuestion(
+            @PathVariable Long parentSubQuestionId,
+            @PathVariable Long subQuestionId,
+            @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion updatedSubQuestion = subQuestionService.updateSubSubQuestion(parentSubQuestionId, subQuestionId, subQuestionDTO);
+        return ResponseEntity.ok(updatedSubQuestion);
+    }
+
+    @DeleteMapping("/subquestions/{parentSubQuestionId}/{subQuestionId}")
+    public ResponseEntity<Void> deleteSubSubQuestion(
+            @PathVariable Long parentSubQuestionId,
+            @PathVariable Long subQuestionId) {
+        subQuestionService.deleteSubSubQuestion(parentSubQuestionId, subQuestionId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @GetMapping("/subquestions/{parentSubQuestionId}")
     public ResponseEntity<List<SubQuestion>> getAllSubSubQuestionsBySubQuestionId(@PathVariable Long parentSubQuestionId) {
