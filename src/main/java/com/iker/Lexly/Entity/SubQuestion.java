@@ -2,6 +2,7 @@ package com.iker.Lexly.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -41,10 +42,18 @@ public class SubQuestion {
     private int position;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference("question-parent")
     @JoinColumn(name = "parent_question_id")
 //    @JsonIgnore
     private Question parentQuestion;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_sub_question_id")
+    @JsonBackReference("subquestion-parent")
+    private SubQuestion parentSubQuestion;
+
+    @OneToMany(mappedBy = "parentSubQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubQuestion> subQuestions = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -106,4 +115,29 @@ public class SubQuestion {
         this.parentQuestion = parentQuestion;
     }
 
+    public SubQuestion getParentSubQuestion() {
+        return parentSubQuestion;
+    }
+
+    public void setParentSubQuestion(SubQuestion parentSubQuestion) {
+        this.parentSubQuestion = parentSubQuestion;
+    }
+
+    public List<SubQuestion> getSubQuestions() {
+        return subQuestions;
+    }
+
+    public void setSubQuestions(List<SubQuestion> subQuestions) {
+        this.subQuestions = subQuestions;
+    }
+
+    public void addSubQuestion(SubQuestion subQuestion) {
+        subQuestions.add(subQuestion);
+        subQuestion.setParentSubQuestion(this);
+    }
+
+    public void removeSubQuestion(SubQuestion subQuestion) {
+        subQuestions.remove(subQuestion);
+        subQuestion.setParentSubQuestion(null);
+    }
 }

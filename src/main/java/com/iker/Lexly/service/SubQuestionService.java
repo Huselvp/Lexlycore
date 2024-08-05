@@ -87,6 +87,24 @@ public class SubQuestionService {
         return subQuestionsaved;
     }
 
+    @Transactional
+    public SubQuestion createSubSubQuestion(Long parentSubQuestionId, SubQuestionDTO subQuestionDTO) {
+        SubQuestion parentSubQuestion = subQuestionRepository.findById(parentSubQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("Parent subquestion not found"));
+
+        SubQuestion subQuestion = new SubQuestion();
+        subQuestion.setQuestionText(subQuestionDTO.getQuestionText());
+        subQuestion.setDescription(subQuestionDTO.getDescription());
+        subQuestion.setDescriptionDetails(subQuestionDTO.getDescriptionDetails());
+        subQuestion.setValueType(subQuestionDTO.getValueType());
+        subQuestion.setTextArea(subQuestionDTO.getTextArea());
+        subQuestion.setParentSubQuestion(parentSubQuestion);
+        SubQuestion subQuestionsaved = subQuestionRepository.save(subQuestion);
+        subQuestionsaved.setPosition(subQuestionsaved.getId().intValue());
+        logger.info("Created Subquestion successfully :{}",subQuestionsaved );
+        return subQuestionsaved;
+    }
+
     @Transactional(readOnly = true)
     public SubQuestion getSubQuestionById(Long subQuestionId) {
         return subQuestionRepository.findById(subQuestionId)
@@ -200,4 +218,47 @@ public class SubQuestionService {
 
         return subQuestionDTO;
     }
+
+    public List<SubQuestion> getAllSubSubQuestionsBySubQuestionId(Long parentSubQuestionId) {
+        SubQuestion parentSubQuestion = subQuestionRepository.findById(parentSubQuestionId)
+                .orElseThrow(() -> new IllegalArgumentException("SubQuestion not found with ID " + parentSubQuestionId));
+
+        // Récupérer les sous-questions imbriquées
+        return parentSubQuestion.getSubQuestions();
+    }
+
+    public boolean addSubQuestionToParent(SubQuestion parent, SubQuestion subQuestion, Long parentId) {
+        if (parent.getId().equals(parentId)) {
+            //parent.addSubQuestion(subQuestion);
+            return true;
+        }
+
+        for (SubQuestion child : parent.getSubQuestions()) {
+            if (addSubQuestionToParent(child, subQuestion, parentId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Optional<SubQuestion> findSubQuestionById(SubQuestion subQuestion, Long id) {
+        if (subQuestion.getId().equals(id)) {
+            return Optional.of(subQuestion);
+        }
+
+        for (SubQuestion child : subQuestion.getSubQuestions()) {
+            Optional<SubQuestion> result = findSubQuestionById(child, id);
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+
+
+
 }
+

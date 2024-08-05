@@ -2,6 +2,8 @@ package com.iker.Lexly.DTO;
 
 import com.iker.Lexly.Entity.Filter;
 
+import java.util.List;
+
 public class SubQuestionDTO {
     private Long id;
     private String questionText;
@@ -11,6 +13,7 @@ public class SubQuestionDTO {
     private String textArea;
     private FormDTO form;
     private Filter filter;
+    private List<SubQuestionDTO> subQuestions;
 
     public FormDTO getForm() {
         return form;
@@ -70,5 +73,13 @@ public class SubQuestionDTO {
 
     public void setFilter(Filter filter) {
         this.filter = filter;
+    }
+
+    public List<SubQuestionDTO> getSubQuestions() {
+        return subQuestions;
+    }
+
+    public void setSubQuestions(List<SubQuestionDTO> subQuestions) {
+        this.subQuestions = subQuestions;
     }
 }

@@ -53,7 +53,6 @@ public class Template {
     }
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-
     private List<Question> questions = new ArrayList<>();
 
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL,  orphanRemoval = true)

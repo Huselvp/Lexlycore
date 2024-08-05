@@ -46,7 +46,7 @@ public class Question {
 
 
     @OneToMany(mappedBy = "parentQuestion", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("question-parent")
     private List<SubQuestion> subQuestions = new ArrayList<>();
 
 

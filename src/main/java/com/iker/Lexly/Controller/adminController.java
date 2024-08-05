@@ -104,6 +104,8 @@ public class adminController {
 //        AuthenticationResponse authenticationResponse = service.register(request, response);
 //        return ResponseEntity.ok(authenticationResponse);
 //    }
+
+
     @PostMapping("/addSubCategory")
     public ResponseEntity<String> addSubCategory(@RequestBody SubcategoryDTO subcategoryDTO) {
         String result = subcategoryService.addSubCategory(subcategoryDTO);
@@ -193,10 +195,11 @@ public class adminController {
     public List<QuestionDTO> getAllQuestions() {
         List<Question> questions = questionService.getAllQuestions();
         List<QuestionDTO> questionDTOs = questions.stream()
-                .map(questionTransformer::toDTO)
+                .map(questionTransformer::toDTOWithSubQuestions) // Utilisez la méthode recursive
                 .collect(Collectors.toList());
         return questionDTOs;
     }
+
 
 
 
@@ -230,16 +233,18 @@ public class adminController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @GetMapping("question/{questionId}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable Long questionId) {
         Question question = questionService.getQuestionById(questionId);
         if (question != null) {
-            QuestionDTO questionDTO = questionTransformer.toDTO(question);
+            QuestionDTO questionDTO = questionTransformer.toDTOWithSubQuestions(question);
             return new ResponseEntity<>(questionDTO, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @PutMapping("question/reorder")
     public ResponseEntity<String> reoderQuestion (@RequestBody List<Long> questionIds) {
         try {
@@ -303,6 +308,21 @@ public class adminController {
         SubQuestion createdSubQuestion = subQuestionService.createSubQuestion(questionId, subQuestionDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
     }
+
+    @PostMapping("/subquestions/{parentSubQuestionId}")
+    public ResponseEntity<SubQuestion> createSubSubQuestion(
+            @PathVariable Long parentSubQuestionId,
+            @RequestBody SubQuestionDTO subQuestionDTO) {
+        SubQuestion createdSubQuestion = subQuestionService.createSubSubQuestion(parentSubQuestionId, subQuestionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubQuestion);
+    }
+
+    @GetMapping("/subquestions/{parentSubQuestionId}")
+    public ResponseEntity<List<SubQuestion>> getAllSubSubQuestionsBySubQuestionId(@PathVariable Long parentSubQuestionId) {
+        List<SubQuestion> subQuestions = subQuestionService.getAllSubSubQuestionsBySubQuestionId(parentSubQuestionId);
+        return ResponseEntity.ok(subQuestions);
+    }
+
     @GetMapping("/questions/subquestions/{questionId}/{subQuestionId}")
     public ResponseEntity<SubQuestion> getSubQuestionById(@PathVariable Long questionId, @PathVariable Long subQuestionId) {
         SubQuestion subQuestion = subQuestionService.getSubQuestionById(subQuestionId);
