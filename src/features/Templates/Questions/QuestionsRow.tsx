@@ -1451,6 +1451,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 </button>
               ) : null}
             </div>
+
             <div className="hideOverflow questions">
               {question.questionText}
             </div>

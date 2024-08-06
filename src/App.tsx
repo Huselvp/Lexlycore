@@ -47,6 +47,8 @@ import AddSubSubQuestion from "./pages/admin/subSubQuestionsDocs/AddSubSubQuesti
 
 import EditSubSubQuestion from "./pages/admin/subSubQuestionsDocs/EditSubSubQuestion";
 
+import SubQuestionChoice from "./pages/admin/subQuestionChoicedocs/SubQuestionChoice";
+
 import AdminLogin from "./pages/AdminLogin";
 
 function App() {
@@ -94,10 +96,19 @@ function App() {
             path="templates/:templateId/:questionId"
             element={<Choices />}
           />
+
+          <Route
+            path="templates/:templateId/subCoice/:questionId/:subquestionId"
+            element={<SubQuestionChoice />}
+          />
+
+          {/* SubQuestionChoice */}
+
           <Route
             path="templates/:templateId/addQuestion"
             element={<AddQuestion />}
           />
+
           <Route
             path="templates/:templateId/addSubQuestion/:questionId"
             element={<AddSubQuestion />}

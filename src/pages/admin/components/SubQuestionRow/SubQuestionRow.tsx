@@ -1469,7 +1469,9 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
           {subQuestion.valueType.startsWith("checkbox") && (
             <Menus.Button
               icon={<HiEye />}
-              onClick={() => navigate(`${subQuestion.id}`)}
+              onClick={() =>
+                navigate(`subCoice/${questionId}/${subQuestion.id}`)
+              }
             >
               See Choices
             </Menus.Button>

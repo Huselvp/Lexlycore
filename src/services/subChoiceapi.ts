@@ -1,18 +1,19 @@
 import axios from "axios";
 import {
-  addChoiceUrl,
+  addSubChoiceUrl,
   getApiConfig,
-  deleteChoiceUrl,
-  updateChoiceUrl,
+  deleteSubChoiceUrl,
+  updateSubChoiceUrl,
 } from "../utils/constants";
 
-export const addEditChoice = ({
+export const addEditSubChoice = ({
   onAdd,
-  questionId,
+  subquestionId,
   choice,
 }: {
   onAdd: boolean;
   questionId: number;
+  subquestionId: number;
   choice: Choice;
 }): Promise<void> => {
   if (!choice.choice.trim()) throw new Error("Choice is required");
@@ -21,17 +22,18 @@ export const addEditChoice = ({
 
   return axios[`${onAdd ? "post" : "put"}`](
     onAdd
-      ? addChoiceUrl(questionId)
-      : updateChoiceUrl({ questionId, choiceId: choice.id }),
+      ? addSubChoiceUrl(subquestionId)
+      : updateSubChoiceUrl({ subquestionId, choiceId: choice.id }),
     choice,
     getApiConfig()
   );
 };
 
 export const deleteChoice = ({
-  questionId,
+  subquestionId,
   choiceId,
 }: {
-  questionId: number;
   choiceId: number;
-}) => axios.delete(deleteChoiceUrl({ questionId, choiceId }), getApiConfig());
+  subquestionId: number;
+}) =>
+  axios.delete(deleteSubChoiceUrl({ subquestionId, choiceId }), getApiConfig());

@@ -85,6 +85,15 @@ export const deleteChoiceUrl = ({
   questionId: number;
   choiceId: number;
 }) => `${API}/admin/delete-choice/${questionId}/${choiceId}`;
+
+export const deleteSubChoiceUrl = ({
+  choiceId,
+  subquestionId,
+}: {
+  choiceId: number;
+  subquestionId: number;
+}) => `${API}/admin/delete-choice-subquestion/${subquestionId}/${choiceId}`;
+
 export const updateChoiceUrl = ({
   questionId,
   choiceId,
@@ -92,8 +101,20 @@ export const updateChoiceUrl = ({
   questionId: number;
   choiceId: number;
 }) => `${API}/admin/update-choice/${questionId}/${choiceId}`;
+
+export const updateSubChoiceUrl = ({
+  subquestionId,
+  choiceId,
+}: {
+  choiceId: number;
+  subquestionId: number;
+}) => `${API}/admin/update-choice-subquestion/${subquestionId}/${choiceId}`;
+
 export const addChoiceUrl = (id: number) =>
   `${API}/admin/add-choice-question/${id}`;
+
+export const addSubChoiceUrl = (subId: number) =>
+  `${API}/admin/add-choice-subquestion/${subId}`;
 //
 // Auth
 export const updateEmailUrl = () => {
@@ -148,6 +169,7 @@ export const getDocumentQuestionsValuesUrl = (documentId: number) =>
 //   },
 //   withCredentials: true
 // }
+
 export const getApiConfig = (includeToken: boolean = true) => {
   if (includeToken) {
     const token = getToken();
@@ -166,6 +188,7 @@ export const getApiConfig = (includeToken: boolean = true) => {
     withCredentials: true,
   };
 };
+
 export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Number", value: "number" },
   { label: "Short Text", value: "input" },
