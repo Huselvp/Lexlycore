@@ -416,6 +416,47 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     getCountriesList();
   }, []);
 
+  // ============
+
+  const RecursiveSubQuestionRow = ({ subQuestion, questionId }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleOpen = () => {
+      setIsOpen((prev) => !prev);
+    };
+
+    return (
+      <Reorder.Item value={subQuestion} key={subQuestion.id}>
+        <SubQuestionRow
+          id={subQuestion.id}
+          subQuestion={subQuestion}
+          questionId={questionId}
+          isOpen={isOpen}
+          toggleOpen={toggleOpen}
+        />
+
+        {isOpen &&
+          subQuestion.subQuestions &&
+          subQuestion.subQuestions.length > 0 && (
+            <Reorder.Group
+              onReorder={(newOrder) =>
+                handleSubQuestionReorder(subQuestion.id, newOrder)
+              }
+              values={subQuestion.subQuestions}
+            >
+              {subQuestion.subQuestions.map((sq) => (
+                <RecursiveSubQuestionRow
+                  key={sq.id}
+                  subQuestion={sq}
+                  questionId={subQuestion.id}
+                />
+              ))}
+            </Reorder.Group>
+          )}
+      </Reorder.Item>
+    );
+  };
+
   return (
     <>
       <PopUp isOpen={isPopUpOpen}>
@@ -1511,7 +1552,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           </Table.Row>
         </div>
 
-        {caret_icon_active ? (
+        {/* {caret_icon_active ? (
           <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
             {squestionOrderTest?.map((sq, i) => {
               return (
@@ -1520,6 +1561,20 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 </Reorder.Item>
               );
             })}
+          </Reorder.Group>
+        ) : (
+          <div></div>
+        )} */}
+
+        {caret_icon_active ? (
+          <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
+            {squestionOrderTest?.map((sq) => (
+              <RecursiveSubQuestionRow
+                key={sq.id}
+                subQuestion={sq}
+                questionId={question.id}
+              />
+            ))}
           </Reorder.Group>
         ) : (
           <div></div>

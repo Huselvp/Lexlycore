@@ -54,6 +54,7 @@ export const updateQuestionUrl = (id: number) =>
 export const getQuestionUrl = (id: number) => `${API}/admin/question/${id}`;
 
 export const QuestionReorder = () => `${API}/admin/question/reorder`;
+
 // SubQuestion
 export const AddsubQuestionUrl = (id: number) =>
   `${API}/admin/questions/subquestions/${id}`;
@@ -118,8 +119,8 @@ export const createDocumentUrl = (templateId: number) =>
   `${API}/suser/createDocument/${templateId}`;
 // export const createDocumentUrl = (templateId: number) =>
 //   `${API}/suser/createDocument/${templateId}`
-export const addUpdateDocumentQuestionUrl = `${API}/suser/addValues`;
-export const addDocumentQuestionUrl = `${API}/suser/addValues`;
+export const addUpdateDocumentQuestionUrl = `${API}/suser/add-values`;
+export const addDocumentQuestionUrl = `${API}/suser/add-values`;
 export const initiatePaymentUrl = (templateId: number) =>
   `${API}/suser/initiate-payment/${templateId}`;
 

@@ -22,12 +22,13 @@ import Button from "../../../admin/components/UI/btns/Button";
 import AddNewBlock from "../../../admin/components/addNewBlock/AddNewBlock";
 import BlocksContainer from "../../../admin/components/blocksContainer/BlocksContainer";
 import EditBlock from "../../../admin/components/editBlock/editBlock";
+import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
 import { FiUser } from "react-icons/fi";
 
 import { BsBuildings } from "react-icons/bs";
 
-function SubQuestionRow({ subQuestion, questionId }) {
+function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
   const navigate = useNavigate();
 
   // popups controllers
@@ -1396,7 +1397,17 @@ function SubQuestionRow({ subQuestion, questionId }) {
       </PopUp>
 
       <Table.Row id={`menus-row--sq--${subQuestion.id}`}>
-        <div></div>
+        {/* <div></div> */}
+        <div className="down-icon">
+          {subQuestion?.subQuestions?.length > 0 ? (
+            <button
+              style={{ background: "none", border: "none" }}
+              onClick={toggleOpen} // Use the toggleOpen prop here
+            >
+              {!isOpen ? <RxCaretDown /> : <RxCaretUp />}
+            </button>
+          ) : null}
+        </div>
         <div
           className="hideOverflow questionColor"
           style={{ marginLeft: "35px", color: "#646464" }}
@@ -1419,6 +1430,15 @@ function SubQuestionRow({ subQuestion, questionId }) {
             }}
           >
             Edit SubQuestion
+          </Menus.Button>
+
+          <Menus.Button
+            icon={<HiPencil />}
+            onClick={() => {
+              // navigate(`editSubQuestion/${questionId}/${subQuestion.id}`);
+            }}
+          >
+            Add subquestion
           </Menus.Button>
 
           <Menus.Button icon={<HiPencil />}>{subQuestion.id}</Menus.Button>

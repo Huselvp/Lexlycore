@@ -1,16 +1,16 @@
-import styled, { css } from "styled-components"
-import Button from "./Button"
-import Logo from "./Logo"
-import { useNavigate, Link, useSearchParams } from "react-router-dom"
-import { RxHamburgerMenu as BurgerIcon } from "react-icons/rx"
-import { LiaTimesSolid as TimesIcon } from "react-icons/lia"
-import { createPortal } from "react-dom"
-import { useState } from "react"
-import SubMenu from "./SubMenu"
-import Searchbar from "./Searchbar"
-import { useWindowListener } from "../hooks/useWindowListener"
-import { HiOutlineSearch } from "react-icons/hi"
-import { HiArrowSmallLeft } from "react-icons/hi2"
+import styled, { css } from "styled-components";
+import Button from "./Button";
+import Logo from "./Logo";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { RxHamburgerMenu as BurgerIcon } from "react-icons/rx";
+import { LiaTimesSolid as TimesIcon } from "react-icons/lia";
+import { createPortal } from "react-dom";
+import { useState } from "react";
+import SubMenu from "./SubMenu";
+import Searchbar from "./Searchbar";
+import { useWindowListener } from "../hooks/useWindowListener";
+import { HiOutlineSearch } from "react-icons/hi";
+import { HiArrowSmallLeft } from "react-icons/hi2";
 
 const StyledNavbar = styled.nav<{ hideTemplates: boolean }>`
   position: relative;
@@ -51,16 +51,16 @@ const StyledNavbar = styled.nav<{ hideTemplates: boolean }>`
       padding: 1.5rem 2rem;
       gap: 1rem;
     `}
-`
+`;
 const Btn = styled(Button)`
   /* padding: 1rem 3rem; */
   border-radius: var(--rounded-4xl);
   font-size: 1.3rem;
-`
+`;
 const BtnsContainer = styled.div`
   display: flex;
   gap: 1rem;
-`
+`;
 const LoginBtn = styled(Btn)`
   background-color: transparent;
   color: var(--color-stone-500);
@@ -68,7 +68,7 @@ const LoginBtn = styled(Btn)`
   &:hover {
     background-color: var(--color-stone-150);
   }
-`
+`;
 
 const BurgerBtn = styled.button`
   border: none;
@@ -79,7 +79,7 @@ const BurgerBtn = styled.button`
     color: var(--color-grey-700);
     stroke-width: 0.25;
   }
-`
+`;
 const StyledMenu = styled.menu`
   position: fixed;
   top: 0;
@@ -112,7 +112,7 @@ const StyledMenu = styled.menu`
     margin-top: 3rem;
     justify-self: center;
   }
-`
+`;
 const TimesBtn = styled.button`
   display: flex;
   margin-left: auto;
@@ -123,7 +123,7 @@ const TimesBtn = styled.button`
   & svg {
     /* stroke-width: 1; */
   }
-`
+`;
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -134,7 +134,7 @@ const Overlay = styled.div`
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   z-index: 10000;
-`
+`;
 const SearchBtn = styled.button`
   background: none;
   border: none;
@@ -149,7 +149,7 @@ const SearchBtn = styled.button`
     color: var(--color-stone-500);
     font-size: 2.5rem;
   }
-`
+`;
 const SearchbarContainer = styled.div`
   position: absolute;
   top: 0;
@@ -172,16 +172,16 @@ const SearchbarContainer = styled.div`
   & form {
     /* width: 50rem; */
   }
-`
+`;
 
 const Navbar = () => {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const [isMenuHidden, setIsMenuHidden] = useState(true)
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [isMenuHidden, setIsMenuHidden] = useState(true);
   const [isSearchbarContainerHidden, setIsSearchbarContainerHidden] = useState(
     !searchParams.get("s")
-  )
-  const { windowWidth } = useWindowListener()
+  );
+  const { windowWidth } = useWindowListener();
   const Menu = createPortal(
     <>
       <Overlay onClick={() => setIsMenuHidden(true)} />
@@ -228,7 +228,7 @@ const Navbar = () => {
         </ul>
         {windowWidth < 700 && (
           <LoginBtn
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/login/user")}
             variation="priamry"
             size="large"
           >
@@ -238,7 +238,7 @@ const Navbar = () => {
       </StyledMenu>
     </>,
     document.body
-  )
+  );
   return (
     <StyledNavbar hideTemplates={windowWidth < 900}>
       {!isSearchbarContainerHidden && windowWidth < 700 && (
@@ -269,7 +269,7 @@ const Navbar = () => {
         {windowWidth >= 700 && (
           <>
             <LoginBtn
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login/user")}
               variation="priamry"
               size="large"
             >
@@ -289,7 +289,7 @@ const Navbar = () => {
         </BurgerBtn>
       </BtnsContainer>
     </StyledNavbar>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

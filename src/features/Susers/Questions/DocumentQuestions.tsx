@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -50,6 +50,7 @@ const Content = styled.div`
     margin-bottom: 0;
   }
 `;
+
 const Container = styled.div`
   padding: 2rem;
   display: grid;
@@ -88,8 +89,8 @@ const DocumentQuestions = ({
     {
       questionText: string;
       questionId: number;
-      value: any;
       type: string;
+      value: any;
       subQuestions?: {
         subQuestionId: number;
         subQuestionText: string;
@@ -673,6 +674,33 @@ const DocumentQuestions = ({
                             </button>
                           )}
 
+                          {question.valueType === "map" && (
+                            <button
+                              // disabled={}
+                              onClick={(e) => {
+                                if (activeSubQuestions && !display) {
+                                  e.preventDefault();
+                                  setdisplay(true);
+                                } else {
+                                  setdisplay(false);
+                                  setOverviewData((data) =>
+                                    data.map((item, i) => {
+                                      if (i === index + 1) {
+                                        return { ...item, active: true };
+                                      } else {
+                                        return { ...item, active: false };
+                                      }
+                                    })
+                                  );
+                                }
+                                isSubOpen(false);
+                              }}
+                            >
+                              <span>Next map</span>
+                              <ArrowRightIcon />
+                            </button>
+                          )}
+
                           {question.valueType === "day" && (
                             <button
                               disabled={!isDaysFull}
@@ -729,7 +757,8 @@ const DocumentQuestions = ({
 
                           {question.valueType !== "form" &&
                             question.valueType !== "day" &&
-                            question.valueType !== "time" && (
+                            question.valueType !== "time" &&
+                            question.valueType !== "map" && (
                               <button
                                 disabled={!doesActiveQuestionHaveValue}
                                 onClick={(e) => {
