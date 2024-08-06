@@ -1398,7 +1398,7 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
 
       <Table.Row id={`menus-row--sq--${subQuestion.id}`}>
         {/* <div></div> */}
-        <div className="down-icon">
+        <div className="down-icon" style={{ marginLeft: "15px" }}>
           {subQuestion?.subQuestions?.length > 0 ? (
             <button
               style={{ background: "none", border: "none" }}
@@ -1410,7 +1410,7 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
         </div>
         <div
           className="hideOverflow questionColor"
-          style={{ marginLeft: "35px", color: "#646464" }}
+          style={{ marginLeft: "20px", color: "#646464" }}
         >
           {subQuestion.questionText}
         </div>
@@ -1435,7 +1435,7 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
           <Menus.Button
             icon={<HiPencil />}
             onClick={() => {
-              // navigate(`editSubQuestion/${questionId}/${subQuestion.id}`);
+              navigate(`addSubSubQuestion/${subQuestion.id}`);
             }}
           >
             Add subquestion

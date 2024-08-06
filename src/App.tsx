@@ -41,6 +41,12 @@ import EditSubQuestion from "./pages/admin/EditSubQuestion";
 // import AddNewForm from "./pages/admin/addNewForm";
 // import FormBlocs from "./pages/admin/formBlocs";
 
+// ===
+
+import AddSubSubQuestion from "./pages/admin/subSubQuestionsDocs/AddSubSubQuestion";
+
+import EditSubSubQuestion from "./pages/admin/subSubQuestionsDocs/EditSubSubQuestion";
+
 import AdminLogin from "./pages/AdminLogin";
 
 function App() {
@@ -96,10 +102,21 @@ function App() {
             path="templates/:templateId/addSubQuestion/:questionId"
             element={<AddSubQuestion />}
           />
+
+          <Route
+            path="templates/:templateId/addSubSubQuestion/:questionId"
+            element={<AddSubSubQuestion />}
+          />
+
           <Route
             path="templates/:templateId/editSubQuestion/:questionId/:subquestionId"
             element={<EditSubQuestion />}
           />
+
+          {/* <Route
+            path="templates/:templateId/editSubSubQuestion/:questionId/:subquestionId"
+            element={<EditSubSubQuestion />}
+          /> */}
 
           <Route
             path="templates/:templateId/editQuestion/:questionId"

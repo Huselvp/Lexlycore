@@ -58,13 +58,24 @@ export const QuestionReorder = () => `${API}/admin/question/reorder`;
 // SubQuestion
 export const AddsubQuestionUrl = (id: number) =>
   `${API}/admin/questions/subquestions/${id}`;
+
+export const AddSubSubQuestionUrl = (id: number) =>
+  `${API}/admin/subquestions/${id}`;
+
 export const deleteSubQuestionUrl = (idq: number, idsq: number) =>
   `${API}/admin/questions/subquestions/${idq}/${idsq}`;
 
+export const deleteSubSubQuestionUrl = (idq: number, idsq: number) =>
+  `${API}/admin/subquestions/${idq}/${idsq}`;
+
 export const getSubQuestionUrl = (idq: number, idsq: number) =>
   `${API}/admin/questions/subquestions/${idq}/${idsq}`;
+
 export const updateSubQuestionUrl = (idq: number, idsq: number) =>
   `${API}/admin/questions/subquestions/${idsq}/${idq}`;
+
+export const updateSubSubQuestionUrl = (idq: number, idsq: number) =>
+  `${API}/admin/subquestions/${idsq}/${idq}`;
 
 // Choice
 export const deleteChoiceUrl = ({
