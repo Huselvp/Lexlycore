@@ -7,7 +7,11 @@ import SubCoiceRow from "./SubCoiceRow";
 const SubQuesctionCoicesTable = () => {
   const { question } = useSubQuestion();
   const choices = extractChoicesFromString(question!.valueType);
-  console.log(choices);
+  console.log(
+    choices,
+    "########################################################################################"
+  );
+
   return (
     <Menus>
       <Table columns="1.5rem 1fr 1fr 3rem">

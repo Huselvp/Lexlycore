@@ -8,7 +8,6 @@ import { API } from "../../../utils/constants";
 import { getApiConfig } from "../../../utils/constants";
 import { IoMdRemove } from "react-icons/io";
 import axios from "axios";
-import { IoIosClose } from "react-icons/io";
 
 import { FiUser } from "react-icons/fi";
 

@@ -15,6 +15,7 @@ export const deleteTemplateUrl = (id: number) =>
   `${API}/admin/delete_template/${id}`;
 export const updateTemplateUrl = (id: number) =>
   `${API}/admin/update_template/${id}`;
+
 export const createTemplateUrl = () => {
   const token = getToken();
   return `${API}/admin/create_template/${token}`;
@@ -27,6 +28,7 @@ export const updateTemplateCategoryUrl = ({
   categoryId: number;
   templateId: number;
 }) => `${API}/admin/update_category/${templateId}/${categoryId}`;
+
 // Category
 export const getCategoryUrl = (id: number) => `${API}/admin/category/${id}`;
 export const updateCategoryUrl = (id: number) =>
@@ -134,6 +136,7 @@ export const updatePersonalDataUrl = () => {
 };
 export const getUsersUrl = `${API}/admin/all_users`;
 // Document
+
 export const getDocumentsUrl = () => {
   const token = getToken();
   return `${API}/suser/get_documents/${token}`;
@@ -149,10 +152,13 @@ export const generateDocumentUrl = ({
 
 export const createDocumentUrl = (templateId: number) =>
   `${API}/suser/createDocument/${templateId}`;
+
 // export const createDocumentUrl = (templateId: number) =>
 //   `${API}/suser/createDocument/${templateId}`
 export const addUpdateDocumentQuestionUrl = `${API}/suser/add-values`;
+
 export const addDocumentQuestionUrl = `${API}/suser/add-values`;
+
 export const initiatePaymentUrl = (templateId: number) =>
   `${API}/suser/initiate-payment/${templateId}`;
 

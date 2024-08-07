@@ -1,13 +1,16 @@
-import Menus from "../../../../ui/Menus"
-import Table from "../../../../ui/Table"
-import { extractChoicesFromString } from "../../../../utils/helpers"
-import { useQuestion } from "../useQuestion"
-import ChoicesRow from "./ChoicesRow"
+import Menus from "../../../../ui/Menus";
+import Table from "../../../../ui/Table";
+import { extractChoicesFromString } from "../../../../utils/helpers";
+import { useQuestion } from "../useQuestion";
+import ChoicesRow from "./ChoicesRow";
 
 const ChoicesTable = () => {
-  const { question } = useQuestion()
-  const choices = extractChoicesFromString(question!.valueType)
-  console.log(choices)
+  const { question } = useQuestion();
+  const choices = extractChoicesFromString(question!.valueType);
+  console.log(
+    choices,
+    "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+  );
   return (
     <Menus>
       <Table columns="1.5rem 1fr 1fr 3rem">
@@ -23,7 +26,7 @@ const ChoicesTable = () => {
         ></Table.Body>
       </Table>
     </Menus>
-  )
-}
+  );
+};
 
-export default ChoicesTable
+export default ChoicesTable;

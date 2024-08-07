@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -133,7 +133,6 @@ const DocumentQuestions = ({
             type: subQ.type,
           };
         }),
-        // active: i == 0
       };
     });
   });
@@ -196,357 +195,6 @@ const DocumentQuestions = ({
         />
         <Content>
           {activeQuestion ? (
-            // questions.map(
-            //   (question, index) =>
-            //     overviewData.at(index)?.active && (
-            //       <DocumentQuestion
-            //         key={question.id}
-            //         question={question}
-            //         value={overviewData.at(index)?.value || ""}
-            //         setValue={(value: any, type: string) =>
-            //           setOverviewData((current) =>
-            //             current.map((q, i) =>
-            //               i === index ? { ...q, value, type } : q
-            //             )
-            //           )
-            //         }
-            //         isTherData={(value) => {
-            //           isTherFormDataHandler(value);
-            //         }}
-            //         isTherDays={(value) => {
-            //           isTherIsDays(value);
-            //         }}
-            //         isTherTimes={(value) => {
-            //           isTherTimes(value);
-            //         }}
-            //       >
-            //         {question.subQuestions &&
-            //         question.subQuestions.length > 0 &&
-            //         display
-            //           ? question.subQuestions.map((sq, ind) => (
-            //               <DocumentSubQuestion
-            //                 key={sq.subQuestionId}
-            //                 question={sq}
-            //                 data={overviewData}
-            //                 subQuestions={question.subQuestions}
-            //                 mainQuestionId={question.id}
-            //                 value={
-            //                   overviewData[index]?.subQuestions[ind]
-            //                     ?.subQuestionValue as any
-            //                 }
-            //                 setValue={(value, type: string) =>
-            //                   handleSetValue(sq.id, value, type)
-            //                 }
-            //                 subOpen={(value) => {
-            //                   isSubOpen(value);
-            //                 }}
-            //                 isSDataFull={(value) => {
-            //                   isSubDataFull(value);
-            //                 }}
-            //               ></DocumentSubQuestion>
-            //             ))
-            //           : null}
-
-            //         {/* { these are the controllers of the questions} */}
-            //         <BtnsContainer>
-            //           {!overviewData.at(0)?.active && (
-            //             <button
-            //               onClick={() => {
-            //                 setOverviewData((data) =>
-            //                   data.map((item, i) => {
-            //                     if (i === index - 1)
-            //                       return { ...item, active: true };
-            //                     else return { ...item, active: false };
-            //                   })
-            //                 );
-
-            //                 isSubOpen(false);
-            //               }}
-            //             >
-            //               <ArrowLeftIcon />
-            //               <span>Back</span>
-            //             </button>
-            //           )}
-
-            //           {/* {question.valueType === "form" && (
-            //             <button
-            //               disabled={!isFormDataFull}
-            //               onClick={
-            //                 activeSubQuestions && !display
-            //                   ? (e) => {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     }
-            //                   : () => {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1)
-            //                             return { ...item, active: true };
-            //                           else return { ...item, active: false };
-            //                         })
-            //                       );
-            //                     }
-            //               }
-            //             >
-            //               <span>Next</span>
-            //               <ArrowRightIcon />
-            //             </button>
-            //           )}
-
-            //           {question.valueType === "day" && (
-            //             <button
-            //               disabled={!isDaysFull}
-            //               onClick={
-            //                 activeSubQuestions && !display
-            //                   ? (e) => {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     }
-            //                   : () => {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1)
-            //                             return { ...item, active: true };
-            //                           else return { ...item, active: false };
-            //                         })
-            //                       );
-            //                     }
-            //               }
-            //             >
-            //               <span>Next day</span>
-            //               <ArrowRightIcon />
-            //             </button>
-            //           )}
-
-            //           {question.valueType === "time" && (
-            //             <button
-            //               disabled={!isTimesFull}
-            //               onClick={
-            //                 activeSubQuestions && !display
-            //                   ? (e) => {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     }
-            //                   : () => {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1)
-            //                             return { ...item, active: true };
-            //                           else return { ...item, active: false };
-            //                         })
-            //                       );
-            //                     }
-            //               }
-            //             >
-            //               <span>Next time</span>
-            //               <ArrowRightIcon />
-            //             </button>
-            //           )}
-
-            //           {question.valueType !== "form" &&
-            //             question.valueType !== "day" &&
-            //             question.valueType !== "time" &&
-            //             isTheSubQuestionOpen === false && (
-            //               <button
-            //                 disabled={!doesActiveQuestionHaveValue}
-            //                 onClick={
-            //                   activeSubQuestions && !display
-            //                     ? (e) => {
-            //                         e.preventDefault();
-            //                         setdisplay(true);
-            //                       }
-            //                     : () => {
-            //                         setdisplay(false);
-            //                         setOverviewData((data) =>
-            //                           data.map((item, i) => {
-            //                             if (i === index + 1)
-            //                               return { ...item, active: true };
-            //                             else return { ...item, active: false };
-            //                           })
-            //                         );
-            //                       }
-            //                 }
-            //               >
-            //                 <span>Next</span>
-            //                 <ArrowRightIcon />
-            //               </button>
-            //             )}
-
-            //           {isTheSubQuestionOpen && (
-            //             <button
-            //               disabled={!isAllSubQuestionDataFull}
-            //               onClick={(e) => {
-            //                 if (activeSubQuestions && !display) {
-            //                   e.preventDefault();
-            //                   setdisplay(true);
-            //                 } else {
-            //                   setdisplay(false);
-            //                   setOverviewData((data) =>
-            //                     data.map((item, i) => {
-            //                       if (i === index + 1) {
-            //                         return { ...item, active: true };
-            //                       } else {
-            //                         return { ...item, active: false };
-            //                       }
-            //                     })
-            //                   );
-            //                 }
-            //                 setIsAllSubQuestionDataFull(false);
-            //               }}
-            //             >
-            //               <span>Next Sub</span>
-            //               <ArrowRightIcon />
-            //             </button>
-            //           )} */}
-
-            //           {isTheSubQuestionOpen ? (
-            //             <button
-            //               disabled={!isAllSubQuestionDataFull}
-            //               onClick={(e) => {
-            //                 if (activeSubQuestions && !display) {
-            //                   e.preventDefault();
-            //                   setdisplay(true);
-            //                 } else {
-            //                   setdisplay(false);
-            //                   setOverviewData((data) =>
-            //                     data.map((item, i) => {
-            //                       if (i === index + 1) {
-            //                         return { ...item, active: true };
-            //                       } else {
-            //                         return { ...item, active: false };
-            //                       }
-            //                     })
-            //                   );
-            //                 }
-
-            //                 setIsTheSubQuestionOpen(false);
-            //                 setIsAllSubQuestionDataFull(false);
-            //               }}
-            //             >
-            //               <span>Next</span>
-            //               <ArrowRightIcon />
-            //             </button>
-            //           ) : (
-            //             <>
-            //               {question.valueType === "form" && (
-            //                 <button
-            //                   disabled={!isFormDataFull}
-            //                   onClick={(e) => {
-            //                     if (activeSubQuestions && !display) {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     } else {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1) {
-            //                             return { ...item, active: true };
-            //                           } else {
-            //                             return { ...item, active: false };
-            //                           }
-            //                         })
-            //                       );
-            //                     }
-            //                     isSubOpen(false);
-            //                   }}
-            //                 >
-            //                   <span>Next</span>
-            //                   <ArrowRightIcon />
-            //                 </button>
-            //               )}
-
-            //               {question.valueType === "day" && (
-            //                 <button
-            //                   disabled={!isDaysFull}
-            //                   onClick={(e) => {
-            //                     if (activeSubQuestions && !display) {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     } else {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1) {
-            //                             return { ...item, active: true };
-            //                           } else {
-            //                             return { ...item, active: false };
-            //                           }
-            //                         })
-            //                       );
-            //                     }
-            //                     isSubOpen(false);
-            //                   }}
-            //                 >
-            //                   <span>Next</span>
-            //                   <ArrowRightIcon />
-            //                 </button>
-            //               )}
-
-            //               {question.valueType === "time" && (
-            //                 <button
-            //                   disabled={!isTimesFull}
-            //                   onClick={(e) => {
-            //                     if (activeSubQuestions && !display) {
-            //                       e.preventDefault();
-            //                       setdisplay(true);
-            //                     } else {
-            //                       setdisplay(false);
-            //                       setOverviewData((data) =>
-            //                         data.map((item, i) => {
-            //                           if (i === index + 1) {
-            //                             return { ...item, active: true };
-            //                           } else {
-            //                             return { ...item, active: false };
-            //                           }
-            //                         })
-            //                       );
-            //                     }
-            //                     isSubOpen(false);
-            //                   }}
-            //                 >
-            //                   <span>Next</span>
-            //                   <ArrowRightIcon />
-            //                 </button>
-            //               )}
-
-            //               {question.valueType !== "form" &&
-            //                 question.valueType !== "day" &&
-            //                 question.valueType !== "time" && (
-            //                   <button
-            //                     disabled={!doesActiveQuestionHaveValue}
-            //                     onClick={(e) => {
-            //                       if (activeSubQuestions && !display) {
-            //                         e.preventDefault();
-            //                         setdisplay(true);
-            //                       } else {
-            //                         setdisplay(false);
-            //                         setOverviewData((data) =>
-            //                           data.map((item, i) => {
-            //                             if (i === index + 1) {
-            //                               return { ...item, active: true };
-            //                             } else {
-            //                               return { ...item, active: false };
-            //                             }
-            //                           })
-            //                         );
-            //                       }
-
-            //                       isSubOpen(false);
-            //                     }}
-            //                   >
-            //                     <span>Next</span>
-            //                     <ArrowRightIcon />
-            //                   </button>
-            //                 )}
-            //             </>
-            //           )}
-            //         </BtnsContainer>
-            //       </DocumentQuestion>
-            //     )
-            // )
             questions
               .sort((a, b) => a.position - b.position)
               .map((question, index) =>
@@ -792,27 +440,19 @@ const DocumentQuestions = ({
                 ) : null
               )
           ) : (
-            // <DocumentQuestionsOverview
-            //   isDraft={isDraft}
-            //   data={overviewData}
-            //   onClick={(index: number) => {
-            //     setOverviewData((data) =>
-            //       data.map((q, i) =>
-            //         i === index
-            //           ? { ...q, active: true }
-            //           : { ...q, active: false }
-            //       )
-            //     );
-            //   }}
-            // />
-
-            <button
-              onClick={() => {
-                console.log(overviewData);
+            <DocumentQuestionsOverview
+              isDraft={isDraft}
+              data={overviewData}
+              onClick={(index: number) => {
+                setOverviewData((data) =>
+                  data.map((q, i) =>
+                    i === index
+                      ? { ...q, active: true }
+                      : { ...q, active: false }
+                  )
+                );
               }}
-            >
-              data
-            </button>
+            />
           )}
         </Content>
       </Container>

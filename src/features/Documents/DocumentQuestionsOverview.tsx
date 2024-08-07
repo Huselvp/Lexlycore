@@ -118,9 +118,46 @@ const DocumentQuestionsOverview = ({
   const isLoading = isLoading1 || isLoading2;
 
   const clickHandler = () => {
+    // const values = data.map((item) => {
+    //   return {
+    //     documentId: 9,
+    //     questionId: item.questionId,
+    //     type: item.type,
+    //     value: item.value,
+    //   };
+    // });
+
+    // const values = data.map((item) => {
+    //   return {
+    //     documentId: 9,
+    //     questionId: item.questionId,
+    //     type: item.type,
+    //     value: item.value,
+    //     subquestionsValues: [
+    //       item.subQuestions?.map((sub) => ({
+    //         questionId: sub.subQuestionId,
+    //         value: sub.subQuestionValue,
+    //       })) || [],
+    //     ],
+    //   };
+    // });
+
     const values = data.map((item) => {
-      return { questionId: item.questionId, value: item.value };
+      return {
+        documentId: 9,
+        questionId: item.questionId,
+        type: item.type,
+        value: item.value,
+        subquestionsValues:
+          item.subQuestions && item.subQuestions.length > 0
+            ? item.subQuestions.map((sub) => ({
+                questionId: sub.subQuestionId,
+                value: sub.subQuestionValue,
+              }))
+            : [],
+      };
     });
+
     addUpdateDocumentQuestion(
       { values, isDraft },
       {
@@ -469,6 +506,14 @@ const DocumentQuestionsOverview = ({
           {isLoading ? "Loading..." : "Proceed To Checkout"}
         </button>
       </BtnsContainer>
+
+      {/* <button
+        onClick={() => {
+          console.log(data);
+        }}
+      >
+        get data
+      </button> */}
     </>
   );
 };

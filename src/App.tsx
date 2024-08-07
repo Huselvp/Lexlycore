@@ -45,8 +45,6 @@ import EditSubQuestion from "./pages/admin/EditSubQuestion";
 
 import AddSubSubQuestion from "./pages/admin/subSubQuestionsDocs/AddSubSubQuestion";
 
-import EditSubSubQuestion from "./pages/admin/subSubQuestionsDocs/EditSubSubQuestion";
-
 import SubQuestionChoice from "./pages/admin/subQuestionChoicedocs/SubQuestionChoice";
 
 import AdminLogin from "./pages/AdminLogin";

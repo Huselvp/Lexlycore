@@ -10,6 +10,7 @@ import { deleteChoice as deleteChoiceApi } from "../../../../services/subChoicea
 export const useDeleteSubCoice = () => {
   const queryClient = useQueryClient();
   const params = useParams();
+
   const subquestionId = transformParamToNumber(params.subquestionId);
 
   const { isPending: isLoading, mutate: deleteChoice } = useMutation({
@@ -21,5 +22,6 @@ export const useDeleteSubCoice = () => {
     },
     onError: displayErrorMessage,
   });
+
   return { isLoading, deleteChoice };
 };

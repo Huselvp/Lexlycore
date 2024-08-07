@@ -29,6 +29,7 @@ const AddEditSubQoice = ({
 
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+
     const formData = new FormData(event.currentTarget);
     const choiceText = (formData.get("choice") || "") as string;
     const newRelatedText = (formData.get("newRelatedText") || "") as string;
@@ -42,6 +43,7 @@ const AddEditSubQoice = ({
         {
           onSuccess: () => {
             toast.success("Choice added successfully");
+
             onCloseModal?.();
           },
         }
