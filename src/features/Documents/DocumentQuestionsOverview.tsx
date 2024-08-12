@@ -144,15 +144,15 @@ const DocumentQuestionsOverview = ({
 
     const values = data.map((item) => {
       return {
-        documentId: 9,
         questionId: item.questionId,
-        type: item.type,
         value: item.value,
+        type: item.type,
         subquestionsValues:
           item.subQuestions && item.subQuestions.length > 0
             ? item.subQuestions.map((sub) => ({
                 questionId: sub.subQuestionId,
                 value: sub.subQuestionValue,
+                type: sub.type,
               }))
             : [],
       };
@@ -506,14 +506,6 @@ const DocumentQuestionsOverview = ({
           {isLoading ? "Loading..." : "Proceed To Checkout"}
         </button>
       </BtnsContainer>
-
-      {/* <button
-        onClick={() => {
-          console.log(data);
-        }}
-      >
-        get data
-      </button> */}
     </>
   );
 };

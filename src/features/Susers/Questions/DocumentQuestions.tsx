@@ -72,7 +72,8 @@ const DocumentQuestions = ({
   documentQuestionsValues?: DocumentQuestionsValues[];
 }) => {
   const { template } = useTemplate();
-  const questions = template!.questions;
+  const ALLquestions = template!.questions;
+  const questions = flattenSubQuestions(ALLquestions);
   const [display, setdisplay] = useState(false);
 
   // this is the form data
@@ -184,6 +185,36 @@ const DocumentQuestions = ({
   const isSubDataFull = (value) => {
     setIsAllSubQuestionDataFull(value);
   };
+
+  function flattenSubQuestions(questions) {
+    return questions.map((question) => {
+      let flattenedQuestion = { ...question };
+
+      // Recursively process subQuestions
+      if (
+        flattenedQuestion.subQuestions &&
+        flattenedQuestion.subQuestions.length > 0
+      ) {
+        flattenedQuestion.subQuestions = flattenSubQuestions(
+          flattenedQuestion.subQuestions
+        );
+
+        // Extract nested subQuestions from all levels
+        const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
+          (q) => q.subQuestions
+        );
+        flattenedQuestion.subQuestions = [
+          ...flattenedQuestion.subQuestions.map((q) => ({
+            ...q,
+            subQuestions: [],
+          })),
+          ...nestedSubQuestions,
+        ];
+      }
+
+      return flattenedQuestion;
+    });
+  }
 
   return (
     <>

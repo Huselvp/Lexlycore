@@ -173,7 +173,7 @@ const DocumentSubQuestion = ({
 
     // Return the sub-questions
     return subQuestionData ? subQuestionData.subQuestions : [];
-  }, [data, mainQuestionId]); // Dependencies: data and mainQuestionId
+  }, [data, mainQuestionId]);
 
   // get the subquestion data
 
@@ -447,7 +447,7 @@ const DocumentSubQuestion = ({
     );
 
     return allValuesNotEmpty;
-  }, [getSubQuestionData]); // Include getSubQuestionData as a dependency
+  }, [getSubQuestionData]);
 
   useEffect(() => {
     const isDataFull = idAllSubQuestionsValuesIsNotNull();
@@ -1256,13 +1256,13 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {question.valueType.startsWith("map") && (
+        {/* {question.valueType.startsWith("map") && (
           <MapContainer
             getTheMapData={(value) => {
               setValue(value);
             }}
           />
-        )}
+        )}  */}
 
         {children}
       </InputContainer>

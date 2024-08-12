@@ -439,9 +439,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           subQuestion.subQuestions &&
           subQuestion.subQuestions.length > 0 && (
             <Reorder.Group
-              onReorder={(newOrder) =>
-                handleSubQuestionReorder(subQuestion.id, newOrder)
-              }
+              // onReorder={(newOrder) =>
+              //   handleSubQuestionReorder(subQuestion.id, newOrder)
+              // }
               values={subQuestion.subQuestions}
             >
               {subQuestion.subQuestions.map((sq) => (
