@@ -150,7 +150,7 @@ const DocumentQuestionsOverview = ({
         subquestionsValues:
           item.subQuestions && item.subQuestions.length > 0
             ? item.subQuestions.map((sub) => ({
-                questionId: sub.subQuestionId,
+                subQuestionId: sub.subQuestionId,
                 value: sub.subQuestionValue,
                 type: sub.type,
               }))
@@ -504,6 +504,14 @@ const DocumentQuestionsOverview = ({
       <BtnsContainer>
         <button onClick={clickHandler}>
           {isLoading ? "Loading..." : "Proceed To Checkout"}
+        </button>
+
+        <button
+          onClick={() => {
+            console.log(data);
+          }}
+        >
+          get data
         </button>
       </BtnsContainer>
     </>

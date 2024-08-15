@@ -418,12 +418,58 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   // ============
 
-  const RecursiveSubQuestionRow = ({ subQuestion, questionId }) => {
+  // const RecursiveSubQuestionRow = ({ subQuestion, questionId }) => {
+  //   const [isOpen, setIsOpen] = useState(false);
+
+  //   const toggleOpen = () => {
+  //     setIsOpen((prev) => !prev);
+  //   };
+
+  //   return (
+  //     <Reorder.Item value={subQuestion} key={subQuestion.id}>
+  //       <SubQuestionRow
+  //         id={subQuestion.id}
+  //         subQuestion={subQuestion}
+  //         questionId={questionId}
+  //         isOpen={isOpen}
+  //         toggleOpen={toggleOpen}
+  //       />
+
+  //       {isOpen &&
+  //         subQuestion.subQuestions &&
+  //         subQuestion.subQuestions.length > 0 && (
+  //           <Reorder.Group
+  //             // onReorder={(newOrder) =>
+  //             //   handleSubQuestionReorder(subQuestion.id, newOrder)
+  //             // }
+  //             values={subQuestion.subQuestions}
+  //           >
+  //             {subQuestion.subQuestions.map((sq) => (
+  //               <RecursiveSubQuestionRow
+  //                 key={sq.id}
+  //                 subQuestion={sq}
+  //                 questionId={subQuestion.id}
+  //               />
+  //             ))}
+  //           </Reorder.Group>
+  //         )}
+  //     </Reorder.Item>
+  //   );
+  // };
+
+  const RecursiveSubQuestionRow = ({
+    subQuestion,
+    questionId,
+    isNested = false,
+    depth = -1,
+  }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleOpen = () => {
       setIsOpen((prev) => !prev);
     };
+
+    const newDepth = depth + 1;
 
     return (
       <Reorder.Item value={subQuestion} key={subQuestion.id}>
@@ -433,22 +479,21 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           questionId={questionId}
           isOpen={isOpen}
           toggleOpen={toggleOpen}
+          isNested={isNested}
+          depth={newDepth}
         />
 
         {isOpen &&
           subQuestion.subQuestions &&
           subQuestion.subQuestions.length > 0 && (
-            <Reorder.Group
-              // onReorder={(newOrder) =>
-              //   handleSubQuestionReorder(subQuestion.id, newOrder)
-              // }
-              values={subQuestion.subQuestions}
-            >
+            <Reorder.Group values={subQuestion.subQuestions}>
               {subQuestion.subQuestions.map((sq) => (
                 <RecursiveSubQuestionRow
                   key={sq.id}
                   subQuestion={sq}
                   questionId={subQuestion.id}
+                  isNested={true}
+                  depth={newDepth}
                 />
               ))}
             </Reorder.Group>
@@ -1472,8 +1517,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   </Menus.Button>
                 )}
 
-                <Menus.Button icon={<HiEye />}>{question.id}</Menus.Button>
-
                 {question.valueType.startsWith("form") &&
                   (formBlocksId === "" ? (
                     <Menus.Button
@@ -1531,8 +1574,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 >
                   Add SubQuestions
                 </Menus.Button>
-
-                <Menus.Button icon={<HiEye />}>I am the question</Menus.Button>
 
                 <Menus.Button
                   icon={<HiPencil />}

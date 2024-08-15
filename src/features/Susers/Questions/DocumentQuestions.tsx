@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -216,6 +216,29 @@ const DocumentQuestions = ({
     });
   }
 
+  const [mapData, setMapData] = useState(() => {
+    return localStorage.getItem("map");
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setMapData(localStorage.getItem("map"));
+    };
+
+    // Listen for storage changes
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  const updateMapData = (newData) => {
+    localStorage.setItem("map", newData);
+    setMapData(newData);
+  };
+
   return (
     <>
       <DocumentHeader isDraft={isDraft} overviewData={overviewData} />
@@ -250,6 +273,9 @@ const DocumentQuestions = ({
                     isTherTimes={(value) => {
                       isTherTimes(value);
                     }}
+                    getMapData={(value) => {
+                      updateMapData(value);
+                    }}
                   >
                     {question.subQuestions &&
                     question.subQuestions.length > 0 &&
@@ -273,6 +299,9 @@ const DocumentQuestions = ({
                             }}
                             isSDataFull={(value) => {
                               isSubDataFull(value);
+                            }}
+                            getMapData={(value) => {
+                              updateMapData(value);
                             }}
                           />
                         ))

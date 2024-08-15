@@ -649,66 +649,6 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {/* {question.valueType.startsWith("form") && (
-          <div className="form_type">
-            {formBlocks?.map((block) => {
-              
-              if (!block?.labels || block?.labels.length === 0) {
-                return null; 
-              }
-
-              return (
-                <div className="form-block-user" key={block?.id}>
-                  <IoIosClose className="form_type_controllers" size={20} />
-                  {block.labels?.map((label) => {
-                    const existingData = formData?.find(
-                      (data) =>
-                        data?.blockId === block?.id &&
-                        data?.labelId === label?.id
-                    );
-                    const fieldValue = existingData
-                      ? existingData.LabelValue
-                      : "";
-
-                    const handleInputChange = (e) => {
-                      const { value } = e.target;
-                      handleChange(block?.id, label?.id, value);
-                    };
-
-                    return (
-                      <div key={label.id} className="block-input">
-                        <label>{label.name}</label>
-                        {label.type === "SELECT" ? (
-                          <select
-                            name={label.name}
-                            value={fieldValue}
-                            onChange={handleInputChange}
-                          >
-                            <option value="">Select an option</option>
-                            {Object.keys(label.options)?.map((key) => (
-                              <option key={key} value={label.options[key]}>
-                                {label.options[key]}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type={label.type}
-                            name={label.name}
-                            value={fieldValue}
-                            placeholder={label.name}
-                            onChange={handleInputChange}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        )} */}
-
         {question.valueType.startsWith("form") && (
           <div className="form_type">
             {formBlocks?.map((block) => {
@@ -1256,13 +1196,13 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {/* {question.valueType.startsWith("map") && (
+        {question.valueType.startsWith("map") && (
           <MapContainer
             getTheMapData={(value) => {
               setValue(value);
             }}
           />
-        )}  */}
+        )}
 
         {children}
       </InputContainer>

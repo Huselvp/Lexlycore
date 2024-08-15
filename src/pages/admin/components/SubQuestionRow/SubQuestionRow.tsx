@@ -28,7 +28,14 @@ import { FiUser } from "react-icons/fi";
 
 import { BsBuildings } from "react-icons/bs";
 
-function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
+function SubQuestionRow({
+  subQuestion,
+  questionId,
+  isOpen,
+  toggleOpen,
+  isNested,
+  depth,
+}) {
   const navigate = useNavigate();
 
   // popups controllers
@@ -388,6 +395,21 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
   useEffect(() => {
     getCountriesList();
   }, []);
+
+  // ===============
+
+  const colors = [
+    "#FF5733", // Red Orange
+    "#33FF57", // Green
+    "#3357FF", // Blue
+    "#FF33A6", // Pink
+    "#FFD133", // Yellow
+    "#33FFF5", // Aqua
+    "#8C33FF", // Purple
+    "#FF8C33", // Orange
+    "#33FF8C", // Lime
+    "#FF3333", // Red
+  ];
 
   return (
     <React.Fragment>
@@ -1402,7 +1424,7 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
           {subQuestion?.subQuestions?.length > 0 ? (
             <button
               style={{ background: "none", border: "none" }}
-              onClick={toggleOpen} // Use the toggleOpen prop here
+              onClick={toggleOpen}
             >
               {!isOpen ? <RxCaretDown /> : <RxCaretUp />}
             </button>
@@ -1410,13 +1432,25 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
         </div>
         <div
           className="hideOverflow questionColor"
-          style={{ marginLeft: "20px", color: "#646464" }}
+          style={{
+            marginLeft: "20px",
+            color:
+              isNested && depth >= 0 && depth < colors.length
+                ? colors[depth] // Apply color only to nested subquestions
+                : "#646464", // Default color for non-nested subquestions
+          }}
         >
           {subQuestion.questionText}
         </div>
         <div
           className="hideOverflow questionColor"
-          style={{ marginLeft: "35px", color: "#646464" }}
+          style={{
+            marginLeft: "35px",
+            color:
+              isNested && depth >= 0 && depth < colors.length
+                ? colors[depth] // Apply color only to nested subquestions
+                : "#646464", // Default color for non-nested subquestions
+          }}
         >
           {subQuestion.Description}
         </div>
@@ -1440,8 +1474,6 @@ function SubQuestionRow({ subQuestion, questionId, isOpen, toggleOpen }) {
           >
             Add subquestion
           </Menus.Button>
-
-          <Menus.Button icon={<HiPencil />}>{subQuestion.id}</Menus.Button>
 
           {subQuestion.valueType === "form" &&
             (subQuestionFormId === "" ? (

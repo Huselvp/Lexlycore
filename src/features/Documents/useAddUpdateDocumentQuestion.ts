@@ -167,12 +167,276 @@ export const useAddUpdateDocumentQuestion = () => {
         //   return processQuestions(data);
         // };
 
-        const processQuestions = (questions, isSubQuestion = false) => {
-          const processedData = [];
+        // const processQuestions = (questions, isSubQuestion = false) => {
+        //   const processedData = [];
 
-          questions.forEach((question) => {
-            const idKey = "questionId";
+        //   questions.forEach((question) => {
+        //     const idKey = "questionId";
+        //     const valueKey = "value";
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+
+        //       processedData.push({
+        //         [idKey]: question[idKey],
+        //         formValues,
+        //       });
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedData.push({
+        //           [idKey]: question[idKey],
+        //           firstTimeValues: question[valueKey][0]?.time,
+        //           secondTimeValue: question[valueKey][1]?.time,
+        //         });
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+
+        //       processedData.push({
+        //         checkboxValue: checkboxValues,
+        //         [idKey]: question[idKey],
+        //       });
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+
+        //       processedData.push({
+        //         [idKey]: question[idKey],
+        //         days,
+        //       });
+        //     } else {
+        //       processedData.push({
+        //         [idKey]: question[idKey],
+        //         value: question[valueKey],
+        //       });
+        //     }
+
+        //     // Process subquestionsValues recursively
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       const processedSubQuestions = processQuestions(
+        //         question.subquestionsValues,
+        //         true // indicates that we are processing subquestions
+        //       );
+
+        //       processedData.push({
+        //         [idKey]: question[idKey],
+        //         subquestionsValues: processedSubQuestions,
+        //       });
+        //     }
+        //   });
+
+        //   return processedData;
+        // };
+
+        // const processQuestions = (questions) => {
+        //   return questions.map((question) => {
+        //     const idKey = "questionId";
+        //     const valueKey = "value";
+
+        //     let processedQuestion = {
+        //       [idKey]: question[idKey],
+        //     };
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+        //       processedQuestion.formValues = formValues;
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+        //         processedQuestion.secondTimeValue = question[valueKey][1]?.time;
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+        //       processedQuestion.checkboxValue = checkboxValues;
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+        //       processedQuestion.days = days;
+        //     } else {
+        //       processedQuestion.value = question[valueKey];
+        //     }
+
+        //     // Process subquestionsValues recursively within the same object
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       processedQuestion.subquestionsValues = processQuestions(
+        //         question.subquestionsValues
+        //       );
+        //     }
+
+        //     return processedQuestion;
+        //   });
+        // };
+
+        // const processQuestions = (questions, isSubQuestion = false) => {
+        //   return questions.map((question) => {
+        //     // Determine the correct ID key based on whether it's a subquestion or not
+        //     const idKey = isSubQuestion ? "subquestionId" : "questionId";
+        //     const valueKey = "value";
+
+        //     let processedQuestion = {
+        //       [idKey]: question[idKey],
+        //     };
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+        //       processedQuestion.formValues = formValues;
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+        //         processedQuestion.secondTimeValue = question[valueKey][1]?.time;
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+        //       processedQuestion.checkboxValue = checkboxValues;
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+        //       processedQuestion.days = days;
+        //     } else {
+        //       processedQuestion.value = question[valueKey];
+        //     }
+
+        //     // Process subquestionsValues recursively and pass true for isSubQuestion
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       processedQuestion.subquestionsValues = processQuestions(
+        //         question.subquestionsValues,
+        //         true
+        //       );
+        //     }
+
+        //     return processedQuestion;
+        //   });
+        // };
+
+        // const processQuestions = (questions, isSubQuestion = false) => {
+        //   return questions.map((question) => {
+        //     // Determine the correct ID key based on whether it's a subquestion or not
+        //     const idKey = isSubQuestion ? "subQuestionId" : "questionId";
+        //     const valueKey = "value";
+
+        //     let processedQuestion = {
+        //       [idKey]: question[idKey], // Use the appropriate key for ID
+        //       value: question[valueKey], // Add the value field for all types
+        //     };
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+        //       processedQuestion.formValues = formValues;
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+        //         processedQuestion.secondTimeValue = question[valueKey][1]?.time;
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+        //       processedQuestion.checkboxValue = checkboxValues;
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+        //       processedQuestion.days = days;
+        //     }
+
+        //     // Process subquestionsValues recursively and pass true for isSubQuestion
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       processedQuestion.subquestionsValues = processQuestions(
+        //         question.subquestionsValues,
+        //         true
+        //       );
+        //     }
+
+        //     return processedQuestion;
+        //   });
+        // };
+
+        const processQuestions = (questions, isSubQuestion = false) => {
+          return questions.map((question) => {
+            // Determine the correct ID key based on whether it's a subquestion or not
+            const idKey = isSubQuestion ? "subQuestionId" : "questionId";
             const valueKey = "value";
+
+            let processedQuestion = {
+              [idKey]: question[idKey], // Use the appropriate key for ID
+            };
 
             if (question.type === "form") {
               const formValues = Array.isArray(question[valueKey])
@@ -184,31 +448,20 @@ export const useAddUpdateDocumentQuestion = () => {
                     })
                   )
                 : [];
-
-              processedData.push({
-                [idKey]: question[idKey],
-                formValues,
-              });
+              processedQuestion.formValues = formValues;
             } else if (question.type === "time") {
               if (
                 Array.isArray(question[valueKey]) &&
                 question[valueKey].length >= 2
               ) {
-                processedData.push({
-                  [idKey]: question[idKey],
-                  firstTimeValues: question[valueKey][0]?.time,
-                  secondTimeValue: question[valueKey][1]?.time,
-                });
+                processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+                processedQuestion.secondTimeValue = question[valueKey][1]?.time;
               }
             } else if (question.type === "checkbox") {
               const checkboxValues = Array.isArray(question[valueKey])
                 ? question[valueKey]
                 : [question[valueKey]];
-
-              processedData.push({
-                checkboxValue: checkboxValues,
-                [idKey]: question[idKey],
-              });
+              processedQuestion.checkboxValue = checkboxValues;
             } else if (question.type === "day") {
               const days = Array.isArray(question[valueKey])
                 ? question[valueKey].map(({ index, day }) => ({
@@ -216,37 +469,144 @@ export const useAddUpdateDocumentQuestion = () => {
                     day,
                   }))
                 : [];
-
-              processedData.push({
-                [idKey]: question[idKey],
-                days,
-              });
+              processedQuestion.days = days;
             } else {
-              processedData.push({
-                [idKey]: question[idKey],
-                value: question[valueKey],
-              });
+              processedQuestion.value = question[valueKey];
             }
 
-            // Process subquestionsValues recursively
+            // Process subquestionsValues recursively and pass true for isSubQuestion
             if (
               Array.isArray(question.subquestionsValues) &&
               question.subquestionsValues.length > 0
             ) {
-              const processedSubQuestions = processQuestions(
+              processedQuestion.subquestionsValues = processQuestions(
                 question.subquestionsValues,
-                true // indicates that we are processing subquestions
+                true
               );
-
-              processedData.push({
-                [idKey]: question[idKey],
-                subquestionsValues: processedSubQuestions,
-              });
             }
-          });
 
-          return processedData;
+            return processedQuestion;
+          });
         };
+
+        // const processQuestions = (questions) => {
+        //   return questions.map((question) => {
+        //     const isSubQuestion = question.hasOwnProperty("subQuestionId");
+        //     const idKey = isSubQuestion ? "subQuestionId" : "questionId";
+        //     const valueKey = "value";
+
+        //     let processedQuestion = {
+        //       [idKey]: question[idKey],
+        //     };
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+        //       processedQuestion.formValues = formValues;
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+        //         processedQuestion.secondTimeValue = question[valueKey][1]?.time;
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+        //       processedQuestion.checkboxValue = checkboxValues;
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+        //       processedQuestion.days = days;
+        //     } else {
+        //       processedQuestion.value = question[valueKey];
+        //     }
+
+        //     // Process subquestionsValues recursively within the same object
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       processedQuestion.subquestionsValues = processQuestions(
+        //         question.subquestionsValues
+        //       );
+        //     }
+
+        //     return processedQuestion;
+        //   });
+        // };
+
+        // const processQuestions = (questions, isSubQuestion = false) => {
+        //   return questions.map((question) => {
+        //     const idKey = isSubQuestion ? "subQuestionId" : "questionId";
+        //     const valueKey = "value";
+
+        //     let processedQuestion = {
+        //       [idKey]: question[idKey],
+        //       value: question[valueKey],
+        //     };
+
+        //     if (question.type === "form") {
+        //       const formValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(
+        //             ({ blockId, labelId, LabelValue }) => ({
+        //               blockId,
+        //               labelId,
+        //               LabelValue,
+        //             })
+        //           )
+        //         : [];
+        //       processedQuestion.formValues = formValues;
+        //     } else if (question.type === "time") {
+        //       if (
+        //         Array.isArray(question[valueKey]) &&
+        //         question[valueKey].length >= 2
+        //       ) {
+        //         processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+        //         processedQuestion.secondTimeValue = question[valueKey][1]?.time;
+        //       }
+        //     } else if (question.type === "checkbox") {
+        //       const checkboxValues = Array.isArray(question[valueKey])
+        //         ? question[valueKey]
+        //         : [question[valueKey]];
+        //       processedQuestion.checkboxValue = checkboxValues;
+        //     } else if (question.type === "day") {
+        //       const days = Array.isArray(question[valueKey])
+        //         ? question[valueKey].map(({ index, day }) => ({
+        //             index,
+        //             day,
+        //           }))
+        //         : [];
+        //       processedQuestion.days = days;
+        //     }
+
+        //     // Process subquestionsValues recursively within the same object
+        //     if (
+        //       Array.isArray(question.subquestionsValues) &&
+        //       question.subquestionsValues.length > 0
+        //     ) {
+        //       processedQuestion.subquestionsValues = processQuestions(
+        //         question.subquestionsValues,
+        //         true // Set isSubQuestion to true for nested subquestions
+        //       );
+        //     }
+
+        //     return processedQuestion;
+        //   });
+        // };
 
         const orderMyData = (data) => {
           return processQuestions(data);
