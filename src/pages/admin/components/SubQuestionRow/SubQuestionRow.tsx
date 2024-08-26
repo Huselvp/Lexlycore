@@ -399,16 +399,16 @@ function SubQuestionRow({
   // ===============
 
   const colors = [
-    "#FF5733", // Red Orange
-    "#33FF57", // Green
-    "#3357FF", // Blue
-    "#FF33A6", // Pink
-    "#FFD133", // Yellow
-    "#33FFF5", // Aqua
-    "#8C33FF", // Purple
-    "#FF8C33", // Orange
-    "#33FF8C", // Lime
-    "#FF3333", // Red
+    "#FF5733",
+    "#3357FF",
+    "#FF33A6",
+    "#FFD133",
+    "#8C33FF",
+    "#33FFF5",
+    "#FF8C33",
+    "#33FF8C",
+    "#FF3333",
+    "#33FF56",
   ];
 
   return (
@@ -1430,6 +1430,7 @@ function SubQuestionRow({
             </button>
           ) : null}
         </div>
+
         <div
           className="hideOverflow questionColor"
           style={{

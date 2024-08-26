@@ -250,7 +250,7 @@ const DocumentQuestions = ({
         <Content>
           {activeQuestion ? (
             questions
-              .sort((a, b) => a.position - b.position)
+              // .sort((a, b) => a.position - b.position)
               .map((question, index) =>
                 overviewData.at(index)?.active ? (
                   <DocumentQuestion

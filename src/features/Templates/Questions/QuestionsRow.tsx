@@ -41,7 +41,6 @@ import { MdDone } from "react-icons/md";
 
 const QuestionsRow = ({ question }: { question: Question }) => {
   const [formTitle, setFormTitle] = useState("");
-
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [isAddFormNameOpen, setIsAddFormNameOpen] = useState(false);
   const [isSeeBlocksOpen, setIsSeeBlocksOpen] = useState(false);

@@ -236,22 +236,18 @@ const DocumentQuestion = ({
     getFilterData();
   }, [question.id, question?.valueType]);
 
-  // Initialize form data with props value
   useEffect(() => {
     if (value) {
       setFormData(value);
     }
   }, [value]);
 
-  // Count total inputs
   const countTotalInputs = (blocks) => {
     return blocks.reduce((total, block) => total + block?.labels.length, 0);
   };
 
-  // Calculate total inputs
   const totalInputs = countTotalInputs(formBlocks);
 
-  // Update form errors when form blocks change
   useEffect(() => {
     const initialFormErrors = formBlocks?.flatMap((block) =>
       block.labels?.map(() => "")
@@ -408,16 +404,45 @@ const DocumentQuestion = ({
 
   const [countriesList, setCountriesList] = useState([]);
 
+  // const getCountriesList = async () => {
+  //   try {
+  //     const result = await axios.get(
+  //       "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
+  //     );
+  //     const sortedCountries = result.data.geonames.sort((a, b) => {
+  //       if (a.countryName < b.countryName) return -1;
+  //       if (a.countryName > b.countryName) return 1;
+  //       return 0;
+  //     });
+  //     setCountriesList(sortedCountries);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getCountriesList();
+  // }, []);
+
   const getCountriesList = async () => {
     try {
       const result = await axios.get(
         "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
       );
-      const sortedCountries = result.data.geonames.sort((a, b) => {
+
+      // Sort the countries alphabetically
+      let sortedCountries = result.data.geonames.sort((a, b) => {
         if (a.countryName < b.countryName) return -1;
         if (a.countryName > b.countryName) return 1;
         return 0;
       });
+
+      // Move 'Danmark' to the first position
+      sortedCountries = sortedCountries.filter(
+        (country) => country.countryName !== "Danmark"
+      );
+      sortedCountries.unshift({ countryName: "Danmark" });
+
       setCountriesList(sortedCountries);
     } catch (err) {
       console.log(err);
@@ -700,6 +725,49 @@ const DocumentQuestion = ({
     getMapData(value);
   };
 
+  // ----------- CVR DATA -------------
+
+  const [cvrData, setCVRData] = useState({});
+  const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [cvrNumber, setCvrNumber] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("Danmark"); // Default to "Danmark"
+
+  const getSVRDataHandler = async (cvr) => {
+    try {
+      const result = await axios.get(
+        `${API}/suser/company-details/${cvr}`,
+        getApiConfig()
+      );
+
+      if (result.data) {
+        setCVRData(result.data);
+        setVirksomhedsnavn(result.data.name || "");
+        setAdresse(result.data.address || "");
+        setCvrNumber(result.data.cvrNumber || "");
+        setPostalCode(result.data.postalCode || "");
+        setCity(result.data.city || "");
+        setCountry("Danmark"); // Reset to "Danmark" by default
+      } else {
+        clearFormFields(); // Clear fields if data is empty or incorrect
+      }
+    } catch (err) {
+      console.log(err);
+      clearFormFields(); // Clear fields in case of error
+    }
+  };
+
+  const clearFormFields = () => {
+    setVirksomhedsnavn("");
+    setAdresse("");
+    // Don't clear the CVR number; allow the user to modify it
+    setPostalCode("");
+    setCity("");
+    setCountry("Danmark"); // Reset to "Danmark"
+  };
+
   return (
     <>
       <div>
@@ -758,11 +826,11 @@ const DocumentQuestion = ({
           </Choices>
         )}
 
+        {/* this is the form  */}
+
         {question.valueType.startsWith("form") && (
           <div className="form_type">
             {formBlocks?.map((block) => {
-              // Check if the block has any labels
-
               if (block.type === "COMPANY") {
                 return (
                   <div
@@ -833,6 +901,10 @@ const DocumentQuestion = ({
                               id="Virksomhedsnavn"
                               type="text"
                               style={{ width: "100%" }}
+                              value={virksomhedsnavn}
+                              onChange={(e) =>
+                                setVirksomhedsnavn(e.target.value)
+                              }
                             ></input>
                           </div>
                           <div
@@ -856,6 +928,8 @@ const DocumentQuestion = ({
                               id="adresse"
                               type="text"
                               style={{ width: "100%" }}
+                              value={adresse}
+                              onChange={(e) => setAdresse(e.target.value)}
                             ></input>
                           </div>
                         </div>
@@ -876,7 +950,7 @@ const DocumentQuestion = ({
                             }}
                           >
                             <label
-                              htmlFor="cpr"
+                              htmlFor="cvr"
                               style={{
                                 marginBottom: "1rem",
                                 fontWeight: "700",
@@ -885,9 +959,14 @@ const DocumentQuestion = ({
                               CVR nr
                             </label>
                             <input
-                              id="cpr"
+                              id="cvr"
                               type="text"
                               style={{ width: "100%" }}
+                              value={cvrNumber}
+                              onChange={(e) => {
+                                setCvrNumber(e.target.value);
+                                getSVRDataHandler(e.target.value);
+                              }}
                             ></input>
                           </div>
                           <div
@@ -911,6 +990,8 @@ const DocumentQuestion = ({
                               id="postnr"
                               type="number"
                               style={{ width: "100%" }}
+                              value={postalCode}
+                              onChange={(e) => setPostalCode(e.target.value)}
                             ></input>
                           </div>
                           <div
@@ -934,6 +1015,8 @@ const DocumentQuestion = ({
                               id="by"
                               type="text"
                               style={{ width: "100%" }}
+                              value={city}
+                              onChange={(e) => setCity(e.target.value)}
                             ></input>
                           </div>
                         </div>
@@ -998,6 +1081,8 @@ const DocumentQuestion = ({
                                 boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
                                 paddingRight: "30px",
                               }}
+                              value={country}
+                              onChange={(e) => setCountry(e.target.value)}
                             >
                               {countriesList.map((country) => {
                                 return (
@@ -1266,7 +1351,7 @@ const DocumentQuestion = ({
               }
 
               if (!block?.labels || block?.labels.length === 0) {
-                return null; // Skip rendering this block if it has no labels
+                return null;
               }
 
               return (
@@ -1426,6 +1511,14 @@ const DocumentQuestion = ({
         {question.valueType.startsWith("map") && (
           <MapContainer setMapValue={handelSetMapValue} />
         )}
+
+        {/* <button
+          onClick={() => {
+            console.log(cvrData);
+          }}
+        >
+          get cvr data
+        </button> */}
 
         {children}
       </InputContainer>

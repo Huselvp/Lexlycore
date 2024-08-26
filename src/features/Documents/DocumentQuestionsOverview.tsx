@@ -315,97 +315,6 @@ const DocumentQuestionsOverview = ({
                 </li>
               )}
 
-              {/* {caret_icon_active[i] && (
-                <div>
-                  {item?.subQuestions?.map((sq, ind) => (
-                    <React.Fragment key={ind}>
-                      <li>
-                        <p>{sq.subQuestionText}</p>
-                        <button onClick={() => onClick(i)}>
-                          <EditIcon />
-                        </button>
-                        <p>{sq.subQuestionValue}</p>
-                      </li>
-
-                      {sq.type === "day" && (
-                        <li>
-                          <p>{sq.subQuestionText}</p>
-                          <button onClick={() => onClick(i)}>
-                            <EditIcon />
-                          </button>
-                          <p>
-                            {sq.subQuestionValue[0].day}
-                            {"-"}
-                            {sq.subQuestionValue[1].day}
-                          </p>
-                        </li>
-                      )}
-
-                      {sq.type === "day" && (
-                        <li>
-                          <p>{sq.questionText}</p>
-                          <button onClick={() => onClick(i)}>
-                            <EditIcon />
-                          </button>
-                          <p>
-                            {sq.value[0].day}
-                            {"-"}
-                            {sq.value[1].day}
-                          </p>
-                        </li>
-                      )}
-
-                      {sq.type === "form" && (
-                        <li
-                          key={i}
-                          style={{ display: "flex", flexDirection: "column" }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              width: "100%",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <p
-                                style={{
-                                  color: "var(--color-stone-500)",
-                                  fontSize: "1.7rem",
-                                  fontWeight: "600",
-                                }}
-                              >
-                                {sq.questionText}
-                              </p>
-                            </div>
-                            <button onClick={() => onClick(i)}>
-                              <EditIcon />
-                            </button>
-                          </div>
-                          <div>
-                            {item.value?.map((q) => {
-                              return (
-                                <div key={q.questionText}>
-                                  <p>{q.questionText}</p>
-                                  <p>{q.LabelValue}</p>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </li>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
-              )} */}
-
               {caret_icon_active[i] && (
                 <div>
                   {item?.subQuestions?.map((sq, ind) => (
@@ -504,14 +413,6 @@ const DocumentQuestionsOverview = ({
       <BtnsContainer>
         <button onClick={clickHandler}>
           {isLoading ? "Loading..." : "Proceed To Checkout"}
-        </button>
-
-        <button
-          onClick={() => {
-            console.log(data);
-          }}
-        >
-          get data
         </button>
       </BtnsContainer>
     </>
