@@ -31,6 +31,7 @@ import {
 } from "@vis.gl/react-google-maps";
 
 import debounce from "lodash/debounce";
+import { v4 as uuidv4 } from "uuid";
 
 import "../../../ui/map/styles.css";
 
@@ -246,7 +247,50 @@ const DocumentQuestion = ({
     return blocks.reduce((total, block) => total + block?.labels.length, 0);
   };
 
-  const totalInputs = countTotalInputs(formBlocks);
+  const defaultLabels = {
+    COMPANY: [
+      { labelName: "Virksomhedsnavn", type: "TEXT" },
+      { labelName: "Adresse", type: "TEXT" },
+      { labelName: "CVR nr", type: "NUMBER" },
+      { labelName: "Postnr", type: "NUMBER" },
+      { labelName: "By", type: "TEXT" },
+      { labelName: "Herefter otalt som", type: "TEXT" },
+      // { labelName: "Land", type: "SELECT" },
+    ],
+    PERSON: [
+      { labelName: "Navn", type: "TEXT", id: 196548 },
+      { labelName: "Adresse", type: "TEXT", id: 48764541 },
+      { labelName: "CPR nr", type: "NUMBER", id: 1921346 },
+      { labelName: "Postnr", type: "NUMBER", id: 781 },
+      { labelName: "By", type: "TEXT", id: 198 },
+      { labelName: "Herefter otalt som", type: "TEXT", id: 1000 },
+      // { labelName: "Land", type: "SELECT" },
+    ],
+  };
+
+  const generateFormDataWithUniqueLabels = (formBlocks) => {
+    let generatedId = 0;
+    return formBlocks.map((block) => {
+      if (block.type === "COMPANY" || block.type === "PERSON") {
+        const labels = defaultLabels[block.type].map((label) => ({
+          // id: uuidv4(),
+          name: label.labelName,
+          type: label.type,
+          id: generatedId++ / block.id,
+        }));
+
+        return {
+          ...block,
+          labels, // Add generated labels to the block
+        };
+      }
+      return block;
+    });
+  };
+
+  const newBlocksForm = generateFormDataWithUniqueLabels(formBlocks);
+
+  const totalInputs = countTotalInputs(newBlocksForm);
 
   useEffect(() => {
     const initialFormErrors = formBlocks?.flatMap((block) =>
@@ -352,7 +396,6 @@ const DocumentQuestion = ({
   }, [times, isTherTimes]);
 
   const isSecondTimeDisabled = times[0]?.time === "";
-
   // ========================
 
   const isDaysHaveValues = () => {
@@ -403,26 +446,6 @@ const DocumentQuestion = ({
   // ========================
 
   const [countriesList, setCountriesList] = useState([]);
-
-  // const getCountriesList = async () => {
-  //   try {
-  //     const result = await axios.get(
-  //       "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
-  //     );
-  //     const sortedCountries = result.data.geonames.sort((a, b) => {
-  //       if (a.countryName < b.countryName) return -1;
-  //       if (a.countryName > b.countryName) return 1;
-  //       return 0;
-  //     });
-  //     setCountriesList(sortedCountries);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getCountriesList();
-  // }, []);
 
   const getCountriesList = async () => {
     try {
@@ -727,13 +750,85 @@ const DocumentQuestion = ({
 
   // ----------- CVR DATA -------------
 
+  const [companyData, setCompanyData] = useState({
+    virksomhedsnavn: "",
+    adresse: "",
+    cvrNumber: "",
+    postalCode: "",
+    city: "",
+    country: "Danmark",
+    hereafterReferredTo: "",
+  });
+
+  const [personData, setPersonData] = useState({
+    name: "",
+    adresse: "",
+    cprNumber: "",
+    postalCode: "",
+    city: "",
+    country: "Danmark",
+    hereafterReferredTo: "",
+  });
+
+  const [personVirksomhedsnavn, setPersonVirksomhedsnavn] = useState("");
+  const [personAdresse, setPersonAdresse] = useState("");
+  const [personCprNumber, setPersonCprNumber] = useState("");
+  const [personPostalCode, setPersonPostalCode] = useState("");
+  const [personCity, setPersonCity] = useState("");
+  const [personCountry, setPersonCountry] = useState("Danmark");
+  const [personHerefterOtaltSom, setPersonHerefterOtaltSom] = useState("");
+
+  // Effect to update companyData whenever individual state variables change
+  useEffect(() => {
+    setPersonData({
+      name: personVirksomhedsnavn,
+      adresse: personAdresse,
+      cprNumber: personCprNumber,
+      postalCode: personPostalCode,
+      city: personCity,
+      country: personCountry,
+      hereafterReferredTo: personHerefterOtaltSom,
+    });
+  }, [
+    personVirksomhedsnavn,
+    personAdresse,
+    personCprNumber,
+    personPostalCode,
+    personCity,
+    personCountry,
+    personHerefterOtaltSom,
+  ]);
+
   const [cvrData, setCVRData] = useState({});
+
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
   const [cvrNumber, setCvrNumber] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState("Danmark"); // Default to "Danmark"
+  const [country, setCountry] = useState("Danmark");
+  const [herefterOtaltSom, setHerefterOtaltSom] = useState("");
+
+  // Effect to update companyData whenever individual state variables change
+  useEffect(() => {
+    setCompanyData({
+      virksomhedsnavn,
+      adresse,
+      cvrNumber,
+      postalCode,
+      city,
+      country,
+      hereafterReferredTo: herefterOtaltSom,
+    });
+  }, [
+    virksomhedsnavn,
+    adresse,
+    cvrNumber,
+    postalCode,
+    city,
+    country,
+    herefterOtaltSom,
+  ]);
 
   const getSVRDataHandler = async (cvr) => {
     try {
@@ -749,23 +844,24 @@ const DocumentQuestion = ({
         setCvrNumber(result.data.cvrNumber || "");
         setPostalCode(result.data.postalCode || "");
         setCity(result.data.city || "");
-        setCountry("Danmark"); // Reset to "Danmark" by default
+        setCountry("Danmark");
+        setHerefterOtaltSom(result.data.hereafterReferredTo || "");
       } else {
-        clearFormFields(); // Clear fields if data is empty or incorrect
+        clearFormFields();
       }
     } catch (err) {
       console.log(err);
-      clearFormFields(); // Clear fields in case of error
+      clearFormFields();
     }
   };
 
   const clearFormFields = () => {
     setVirksomhedsnavn("");
     setAdresse("");
-    // Don't clear the CVR number; allow the user to modify it
     setPostalCode("");
     setCity("");
-    setCountry("Danmark"); // Reset to "Danmark"
+    setCountry("Danmark");
+    setHerefterOtaltSom("");
   };
 
   return (
@@ -828,277 +924,66 @@ const DocumentQuestion = ({
 
         {/* this is the form  */}
 
+        {/* {question.valueType.startsWith("form") && (
+          <div className="form_type">
+            {generateFormDataWithUniqueLabels(formBlocks)?.map((block) => {
+              return (
+                <div className="form-block-user" key={block?.id}>
+                  {block.labels?.map((label) => {
+                    const existingData = formData?.find(
+                      (data) =>
+                        data?.blockId === block?.id &&
+                        data?.labelId === label?.id
+                    );
+                    const fieldValue = existingData
+                      ? existingData.LabelValue
+                      : "";
+                    const questionText = label.name;
+
+                    const handleInputChange = (e) => {
+                      const { value } = e.target;
+                      handleChange(block?.id, label?.id, value, questionText);
+                    };
+
+                    return (
+                      <div key={label.id} className="block-input">
+                        <label>{label.name}</label>
+                        {label.type === "SELECT" ? (
+                          <select
+                            name={label.name}
+                            value={fieldValue}
+                            onChange={handleInputChange}
+                          >
+                            <option value="">Select an option</option>
+                            {Object.keys(label.options)?.map((key) => (
+                              <option key={key} value={label.options[key]}>
+                                {label.options[key]}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={label.type}
+                            name={label.name}
+                            value={fieldValue}
+                            placeholder={label.name}
+                            onChange={handleInputChange}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )} */}
+
         {question.valueType.startsWith("form") && (
           <div className="form_type">
-            {formBlocks?.map((block) => {
-              if (block.type === "COMPANY") {
-                return (
-                  <div
-                    className="company"
-                    style={{
-                      backgroundColor: "rgb(255, 255, 255)",
-                      padding: "2rem",
-                      borderRadius: "10px",
-                      width: "100%",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginBottom: "2rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "5rem",
-                          height: "5rem",
-                          backgroundColor: "#9a9278",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50px",
-                        }}
-                      >
-                        <span>
-                          <BsBuildings color="white" />
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
-                        Virksomhed
-                      </p>
-                    </div>
-
-                    <div>
-                      <form>
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="Virksomhedsnavn"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Virksomhedsnavn
-                            </label>
-                            <input
-                              id="Virksomhedsnavn"
-                              type="text"
-                              style={{ width: "100%" }}
-                              value={virksomhedsnavn}
-                              onChange={(e) =>
-                                setVirksomhedsnavn(e.target.value)
-                              }
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Adresse
-                            </label>
-                            <input
-                              id="adresse"
-                              type="text"
-                              style={{ width: "100%" }}
-                              value={adresse}
-                              onChange={(e) => setAdresse(e.target.value)}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="cvr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              CVR nr
-                            </label>
-                            <input
-                              id="cvr"
-                              type="text"
-                              style={{ width: "100%" }}
-                              value={cvrNumber}
-                              onChange={(e) => {
-                                setCvrNumber(e.target.value);
-                                getSVRDataHandler(e.target.value);
-                              }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "40%",
-                            }}
-                          >
-                            <label
-                              htmlFor="postnr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Postnr
-                            </label>
-                            <input
-                              id="postnr"
-                              type="number"
-                              style={{ width: "100%" }}
-                              value={postalCode}
-                              onChange={(e) => setPostalCode(e.target.value)}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "55%",
-                            }}
-                          >
-                            <label
-                              htmlFor="by"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              By
-                            </label>
-                            <input
-                              id="by"
-                              type="text"
-                              style={{ width: "100%" }}
-                              value={city}
-                              onChange={(e) => setCity(e.target.value)}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Herefter otalt som
-                            </label>
-
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Land
-                            </label>
-                            <select
-                              name="land"
-                              id="land"
-                              style={{
-                                width: "100%",
-                                padding: "0.8rem 1.2rem",
-                                border: "1px solid #d1d5db",
-                                borderRadius: " 4px",
-                                backgroundColor: " #fff",
-                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                paddingRight: "30px",
-                              }}
-                              value={country}
-                              onChange={(e) => setCountry(e.target.value)}
-                            >
-                              {countriesList.map((country) => {
-                                return (
-                                  <option value={country.countryName}>
-                                    {country.countryName}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                );
-              } else if (block.type === "PERSON") {
+            {generateFormDataWithUniqueLabels(formBlocks)?.map((block) => {
+              // THE PROBLEM THAT I HAVE HERE IS I DON4T COLLECT THE DATA OF THE PERSON WITH THE RIGHT ID
+              if (block.type === "PERSON") {
                 return (
                   <div
                     className="person"
@@ -1108,6 +993,7 @@ const DocumentQuestion = ({
                       borderRadius: "10px",
                       width: "100%",
                     }}
+                    key={block?.id}
                   >
                     <div
                       style={{
@@ -1138,225 +1024,230 @@ const DocumentQuestion = ({
                       </p>
                     </div>
 
-                    <div>
-                      <form>
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
+                    <form>
+                      {/* First Row */}
+                      <div
+                        style={{ display: "flex", width: "100%", gap: "2rem" }}
+                      >
+                        <div style={{ width: "100%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
                           >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Navn
-                            </label>
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
+                            Navn
+                          </label>
+                          <input
+                            type="text"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "Navn"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "Navn",
+                                e.target.value,
+                                "Navn"
+                              );
                             }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Adresse
-                            </label>
-                            <input
-                              id="adresse"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
+                          />
                         </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
+                        <div style={{ width: "100%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
                           >
-                            <label
-                              htmlFor="cpr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              CPR nr
-                            </label>
-                            <input
-                              id="cpr"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "40%",
+                            Adresse
+                          </label>
+                          <input
+                            type="text"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "Adresse"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "Adresse",
+                                e.target.value,
+                                "Adresse"
+                              );
                             }}
-                          >
-                            <label
-                              htmlFor="postnr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Postnr
-                            </label>
-                            <input
-                              id="postnr"
-                              type="number"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "55%",
-                            }}
-                          >
-                            <label
-                              htmlFor="by"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              By
-                            </label>
-                            <input
-                              id="by"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
+                          />
                         </div>
+                      </div>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
+                      {/* Second Row */}
+                      <div
+                        style={{ display: "flex", width: "100%", gap: "2rem" }}
+                      >
+                        <div style={{ width: "100%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
                           >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Herefter otalt som
-                            </label>
-
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
+                            CPR nr
+                          </label>
+                          <input
+                            type="text"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "CPR"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "CPR",
+                                e.target.value,
+                                "CPR"
+                              );
                             }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Land
-                            </label>
-                            <select
-                              name="land"
-                              id="land"
-                              style={{
-                                width: "100%",
-                                padding: "0.8rem 1.2rem",
-                                border: "1px solid #d1d5db",
-                                borderRadius: " 4px",
-                                backgroundColor: " #fff",
-                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                paddingRight: "30px",
-                              }}
-                            >
-                              {countriesList.map((country) => {
-                                return (
-                                  <option value={country.countryName}>
-                                    {country.countryName}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          </div>
+                          />
                         </div>
-                      </form>
-                    </div>
+                        <div style={{ width: "40%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
+                          >
+                            Postnr
+                          </label>
+                          <input
+                            type="number"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "Postnr"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "Postnr",
+                                e.target.value,
+                                "Postnr"
+                              );
+                            }}
+                          />
+                        </div>
+                        <div style={{ width: "55%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
+                          >
+                            By
+                          </label>
+                          <input
+                            type="text"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "By"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "By",
+                                e.target.value,
+                                "By"
+                              );
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Third Row */}
+                      <div
+                        style={{ display: "flex", width: "100%", gap: "2rem" }}
+                      >
+                        <div style={{ width: "100%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
+                          >
+                            Herefter otalt som
+                          </label>
+                          <input
+                            type="text"
+                            style={{ width: "100%" }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "HerefterOtaltSom"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "HerefterOtaltSom",
+                                e.target.value,
+                                "Herefter otalt som"
+                              );
+                            }}
+                          />
+                        </div>
+                        <div style={{ width: "100%" }}>
+                          <label
+                            style={{ marginBottom: "1rem", fontWeight: "700" }}
+                          >
+                            Land
+                          </label>
+                          <select
+                            style={{
+                              width: "100%",
+                              padding: "0.8rem 1.2rem",
+                              border: "1px solid #d1d5db",
+                              borderRadius: "4px",
+                              backgroundColor: "#fff",
+                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                              paddingRight: "30px",
+                            }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === "Land"
+                              )?.LabelValue || ""
+                            }
+                            onChange={(e) => {
+                              handleChange(
+                                block?.id,
+                                "Land",
+                                e.target.value,
+                                "Land"
+                              );
+                            }}
+                          >
+                            <option value="">Select a country</option>
+                            {countriesList.map((country) => (
+                              <option
+                                key={country.countryName}
+                                value={country.countryName}
+                              >
+                                {country.countryName}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 );
               }
 
-              if (!block?.labels || block?.labels.length === 0) {
-                return null;
-              }
-
               return (
                 <div className="form-block-user" key={block?.id}>
-                  {/* <IoIosClose className="form_type_controllers" size={20} /> */}
                   {block.labels?.map((label) => {
                     const existingData = formData?.find(
                       (data) =>
@@ -1512,13 +1403,15 @@ const DocumentQuestion = ({
           <MapContainer setMapValue={handelSetMapValue} />
         )}
 
-        {/* <button
+        <button
           onClick={() => {
-            console.log(cvrData);
+            console.log(formBlocks);
+            console.log(generateFormDataWithUniqueLabels(formBlocks));
+            console.log(formData);
           }}
         >
-          get cvr data
-        </button> */}
+          get data and test
+        </button>
 
         {children}
       </InputContainer>
