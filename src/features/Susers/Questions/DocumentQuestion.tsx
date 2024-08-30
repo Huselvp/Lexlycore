@@ -864,6 +864,10 @@ const DocumentQuestion = ({
 
   // ----------- CVR DATA -------------
 
+  const [CVR, setCVR] = useState("");
+  const [CVRBlockId, setCVRBlockId] = useState("");
+  const [isCVRRight, setIsCVRRight] = useState(false);
+
   const getSVRDataHandler = async (cvr) => {
     try {
       const result = await axios.get(
@@ -880,12 +884,15 @@ const DocumentQuestion = ({
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
         console.log(result.data);
+        setIsCVRRight(true);
       } else {
         clearFormFields();
+        setIsCVRRight(true);
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
+      setIsCVRRight(true);
     }
   };
 
@@ -897,6 +904,195 @@ const DocumentQuestion = ({
     // setCountry("Danmark");
     // setHerefterOtaltSom("");
   };
+
+  // =============
+
+  // const handleCVRChanges = (cvr, blockId) => {
+  //   console.log("I am here and working good");
+  //   console.log(blockId);
+
+  //   // Ensure the targeted block exists
+  //   let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+  //   if (!targetedBlock) return;
+
+  //   console.log(targetedBlock);
+
+  //   // Map field names to their corresponding variables
+  //   const fieldMappings = {
+  //     Virksomhedsnavn: virksomhedsnavn,
+  //     Adresse: adresse,
+  //     "CVR nr": cvr,
+  //     Postnr: postalCode,
+  //     By: city,
+  //     Land: country,
+  //     HerefterOtaltSom: herefterOtaltSom,
+  //   };
+
+  //   setFormData((prevFormData) => {
+  //     const updatedFormData = [...prevFormData];
+
+  //     // Iterate over fieldMappings to update or add data
+  //     Object.entries(fieldMappings).forEach(([labelName, value]) => {
+  //       const existingEntryIndex = updatedFormData.findIndex(
+  //         (entry) => entry.blockId === blockId && entry.labelId === labelName
+  //       );
+
+  //       if (existingEntryIndex !== -1) {
+  //         // Update the existing entry
+  //         updatedFormData[existingEntryIndex].LabelValue = value;
+  //       } else {
+  //         // Add a new entry
+  //         updatedFormData.push({
+  //           blockId,
+  //           labelId: labelName,
+  //           LabelValue: value,
+  //           questionText: labelName,
+  //         });
+  //       }
+  //     });
+
+  //     // Directly update the form data and state
+  //     setValue(updatedFormData, question.valueType);
+
+  //     return updatedFormData;
+  //   });
+  // };
+
+  // const handleCVRChanges = (cvr, blockId) => {
+  //   console.log("I am here and working good");
+  //   console.log(blockId);
+
+  //   // Ensure the targeted block exists
+  //   let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+  //   if (!targetedBlock) return;
+
+  //   console.log(targetedBlock);
+
+  //   // Map field names to their corresponding variables
+  //   const fieldMappings = {
+  //     Virksomhedsnavn: virksomhedsnavn,
+  //     Adresse: adresse,
+  //     "CVR nr": cvr,
+  //     Postnr: postalCode,
+  //     By: city,
+  //     Land: country,
+  //     HerefterOtaltSom: herefterOtaltSom,
+  //   };
+
+  //   setFormData((prevFormData) => {
+  //     let updatedFormData = [...prevFormData];
+
+  //     // Iterate over fieldMappings to update, add, or remove data
+  //     Object.entries(fieldMappings).forEach(([labelName, value]) => {
+  //       const existingEntryIndex = updatedFormData.findIndex(
+  //         (entry) => entry.blockId === blockId && entry.labelId === labelName
+  //       );
+
+  //       const targetedlabelId = targetedBlock.labels.find(
+  //         (label) => label.name == labelName
+  //       );
+
+  //       console.log(targetedlabelId?.id, "here is the ");
+
+  //       if (value !== "") {
+  //         if (existingEntryIndex !== -1) {
+  //           // Update the existing entry
+  //           updatedFormData[existingEntryIndex].LabelValue = value;
+  //         } else {
+  //           // Add a new entry
+  //           updatedFormData.push({
+  //             blockId,
+  //             labelId: targetedlabelId?.id,
+  //             LabelValue: value,
+  //             questionText: labelName,
+  //           });
+  //         }
+  //       } else {
+  //         if (existingEntryIndex !== -1) {
+  //           // Remove the entry if the value is an empty string
+  //           updatedFormData.splice(existingEntryIndex, 1);
+  //         }
+  //       }
+  //     });
+
+  //     // Directly update the form data and state
+  //     setValue(updatedFormData, question.valueType);
+
+  //     return updatedFormData;
+  //   });
+  // };
+
+  const handleCVRChanges = (cvr, blockId) => {
+    console.log("I am here and working good");
+    console.log(blockId);
+
+    // Ensure the targeted block exists
+    let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+    if (!targetedBlock) return;
+
+    console.log(targetedBlock);
+
+    // Map field names to their corresponding variables
+    const fieldMappings = {
+      Virksomhedsnavn: virksomhedsnavn,
+      Adresse: adresse,
+      "CVR nr": cvr,
+      Postnr: postalCode,
+      By: city,
+      Land: country,
+      HerefterOtaltSom: herefterOtaltSom,
+    };
+
+    setFormData((prevFormData) => {
+      let updatedFormData = [...prevFormData];
+
+      // Iterate over fieldMappings to update, add, or remove data
+      Object.entries(fieldMappings).forEach(([labelName, value]) => {
+        // Find the labelId from the targetedBlock's labels
+        const targetedLabel = targetedBlock.labels.find(
+          (label) => label.name === labelName
+        );
+        const labelId = targetedLabel ? targetedLabel.id : null; // Safely retrieve labelId
+
+        if (labelId) {
+          // Proceed only if labelId is found
+          const existingEntryIndex = updatedFormData.findIndex(
+            (entry) => entry.blockId === blockId && entry.labelId === labelId
+          );
+
+          if (value !== "") {
+            if (existingEntryIndex !== -1) {
+              // Update the existing entry
+              updatedFormData[existingEntryIndex].LabelValue = value;
+            } else {
+              // Add a new entry
+              updatedFormData.push({
+                blockId,
+                labelId,
+                LabelValue: value,
+                questionText: labelName,
+              });
+            }
+          } else {
+            if (existingEntryIndex !== -1) {
+              // Remove the entry if the value is an empty string
+              updatedFormData.splice(existingEntryIndex, 1);
+            }
+          }
+        }
+      });
+
+      // Directly update the form data and state
+      setValue(updatedFormData, question.valueType);
+
+      return updatedFormData;
+    });
+  };
+
+  // UseEffect with the updated dependency array
+  useEffect(() => {
+    handleCVRChanges(CVR, CVRBlockId);
+  }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
 
   return (
     <>
@@ -1185,7 +1381,7 @@ const DocumentQuestion = ({
                                 e.target.value,
                                 block.labels[2]?.name
                               );
-                              getSVRDataHandler(e.target.value);
+                              // getSVRDataHandler(e.target.value);
                             }}
                           />
                         </div>
@@ -1329,6 +1525,45 @@ const DocumentQuestion = ({
                           >
                             Land
                           </label>
+                          {/* <select
+                            name="land"
+                            id="land"
+                            style={{
+                              width: "100%",
+                              padding: "0.8rem 1.2rem",
+                              border: "1px solid #d1d5db",
+                              borderRadius: "4px",
+                              backgroundColor: "#fff",
+                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                              paddingRight: "30px",
+                            }}
+                            value={
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === block.labels[6]?.id
+                              )?.LabelValue || "Danemark"
+                            }
+                            onChange={(e) =>
+                              handleChange(
+                                block?.id,
+                                block.labels[6]?.id,
+                                e.target.value,
+                                block.labels[6]?.name
+                              )
+                            }
+                          >
+                            <option>Land</option>
+                            {countriesList.map((country) => (
+                              <option
+                                key={country.countryName}
+                                value={country.countryName}
+                              >
+                                {country.countryName}
+                              </option>
+                            ))}
+                          </select> */}
+
                           <select
                             name="land"
                             id="land"
@@ -1346,7 +1581,7 @@ const DocumentQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || ""
+                              )?.LabelValue || "" // Default value is set to an empty string
                             }
                             onChange={(e) =>
                               handleChange(
@@ -1357,6 +1592,8 @@ const DocumentQuestion = ({
                               )
                             }
                           >
+                            <option value="">Land</option>{" "}
+                            {/* Placeholder option */}
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}
@@ -1444,12 +1681,11 @@ const DocumentQuestion = ({
                             type="text"
                             style={{ width: "100%" }}
                             value={
-                              // formData?.find(
-                              //   (data) =>
-                              //     data?.blockId === block?.id &&
-                              //     data?.labelId === block.labels[0]?.id
-                              // )?.LabelValue || ""
-                              virksomhedsnavn
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === block.labels[0]?.id
+                              )?.LabelValue || virksomhedsnavn
                             }
                             onChange={(e) => {
                               handleChange(
@@ -1485,13 +1721,11 @@ const DocumentQuestion = ({
                             type="text"
                             style={{ width: "100%" }}
                             value={
-                              // formData?.find(
-                              //   (data) =>
-                              //     data?.blockId === block?.id &&
-                              //     data?.labelId === block.labels[1]?.id
-                              // )?.LabelValue || ""
-
-                              adresse
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === block.labels[1]?.id
+                              )?.LabelValue || adresse
                             }
                             onChange={(e) => {
                               handleChange(
@@ -1540,17 +1774,19 @@ const DocumentQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[2]?.id
-                              )?.LabelValue || ""
-                              // cvrNumber
+                              )?.LabelValue || cvrNumber
                             }
                             onChange={(e) => {
-                              handleChange(
-                                block?.id,
-                                block.labels[2]?.id,
-                                e.target.value,
-                                block.labels[2]?.name
-                              );
+                              // handleChange(
+                              //   block?.id,
+                              //   block.labels[2]?.id,
+                              //   e.target.value,
+                              //   block.labels[2]?.name
+                              // );
+                              setCvrNumber(e.target.value);
                               getSVRDataHandler(e.target.value);
+                              setCVR(e.target.value);
+                              setCVRBlockId(block?.id);
                             }}
                           />
                         </div>
@@ -1576,12 +1812,11 @@ const DocumentQuestion = ({
                             type="number"
                             style={{ width: "100%" }}
                             value={
-                              // formData?.find(
-                              //   (data) =>
-                              //     data?.blockId === block?.id &&
-                              //     data?.labelId === block.labels[3]?.id
-                              // )?.LabelValue || ""
-                              postalCode
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === block.labels[3]?.id
+                              )?.LabelValue || postalCode
                             }
                             onChange={(e) => {
                               setPostalCode(e.target.value);
@@ -1616,13 +1851,11 @@ const DocumentQuestion = ({
                             type="text"
                             style={{ width: "100%" }}
                             value={
-                              // formData?.find(
-                              //   (data) =>
-                              //     data?.blockId === block?.id &&
-                              //     data?.labelId === block.labels[4]?.id
-                              // )?.LabelValue || ""
-
-                              city
+                              formData?.find(
+                                (data) =>
+                                  data?.blockId === block?.id &&
+                                  data?.labelId === block.labels[4]?.id
+                              )?.LabelValue || city
                             }
                             onChange={(e) => {
                               handleChange(
@@ -1728,6 +1961,7 @@ const DocumentQuestion = ({
                               )
                             }
                           >
+                            <option value="">Land</option>{" "}
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}
@@ -1901,7 +2135,7 @@ const DocumentQuestion = ({
           <MapContainer setMapValue={handelSetMapValue} />
         )}
 
-        <button
+        {/* <button
           onClick={() => {
             console.log(formBlocks);
             console.log(generateFormDataWithUniqueLabels(formBlocks));
@@ -1912,6 +2146,14 @@ const DocumentQuestion = ({
         >
           get data and test
         </button>
+
+        <button
+          onClick={() => {
+            console.log(value);
+          }}
+        >
+          get the value
+        </button> */}
 
         {children}
       </InputContainer>
