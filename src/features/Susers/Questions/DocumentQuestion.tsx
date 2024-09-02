@@ -268,39 +268,6 @@ const DocumentQuestion = ({
     ],
   };
 
-  // const generateFormDataWithUniqueLabels = (formBlocks) => {
-  //   let generatedId = 0;
-  //   return formBlocks.map((block) => {
-  //     if (block.type === "COMPANY" || block.type === "PERSON") {
-  //       const labels = defaultLabels[block.type].map((label) => ({
-  //         name: label.labelName,
-  //         type: label.type,
-  //         // id: generatedId++ / block.id,
-
-  //         if(!idsArray.includes(generatedId)){
-  //           id : generatedId
-  //         }else{
-  //           generatedId++
-  //         }
-  //       }));
-
-  //       return {
-  //         ...block,
-  //         labels,
-  //       };
-  //     }
-  //     return block;
-  //   });
-  // };
-
-  // const newBlocksForm = generateFormDataWithUniqueLabels(formBlocks);
-
-  // const collectLabelIds = (formBlocks) => {
-  //   return formBlocks.flatMap((block) => block.labels.map((label) => label.id));
-  // };
-
-  // let idsArray = collectLabelIds(newBlocksForm);
-
   const collectLabelIds = (formBlocks) => {
     return formBlocks.flatMap((block) => block.labels.map((label) => label.id));
   };
@@ -349,33 +316,6 @@ const DocumentQuestion = ({
     setFormErrors(initialFormErrors);
   }, [formBlocks]);
 
-  // const handleChange = useCallback(
-  //   (blockId, labelId, value, questionText) => {
-  //     setFormData((prevFormData) => {
-  //       const updatedFormData = prevFormData.filter(
-  //         (item) => !(item?.blockId === blockId && item?.labelId === labelId)
-  //       );
-
-  //       if (value.trim() !== "") {
-  //         updatedFormData.push({
-  //           blockId,
-  //           labelId,
-  //           LabelValue: value,
-  //           questionText,
-  //         });
-  //       }
-
-  //       const allInputsFilled = updatedFormData?.length === totalInputs;
-  //       setIsAllDataEntered(allInputsFilled);
-  //       isTherData(allInputsFilled);
-  //       setValue(updatedFormData, question.valueType);
-
-  //       return updatedFormData;
-  //     });
-  //   },
-  //   [totalInputs, isTherData, setValue]
-  // );
-
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
   const [cvrNumber, setCvrNumber] = useState("");
@@ -390,35 +330,6 @@ const DocumentQuestion = ({
         const updatedFormData = prevFormData.filter(
           (item) => !(item?.blockId === blockId && item?.labelId === labelId)
         );
-
-        // i stoped here i also should check if ther is no error while geting the data from that api
-
-        // if (
-        //   questionText === "CVR nr" &&
-        //   adresse !== "" &&
-        //   postalCode !== "" &&
-        //   city !== "" &&
-        //   virksomhedsnavn !== ""
-        // ) {
-        //   let targetedBlock = newBlocksForm.find(
-        //     (block) => block.id == blockId
-        //   );
-
-        //   for (let i = 0; i < targetedBlock.labels.length; i++) {
-        //     switch (targetedBlock.labels[i].) {
-        //       case "Virksomhedsnavn":
-        //         updatedFormData.push({
-        //           blockId: blockId,
-        //           labelId: targetedBlock.labels[i].id,
-        //           LabelValue: virksomhedsnavn,
-        //           questionText: targetedBlock.labels[i].questionText,
-        //         });
-        //         break;
-        //     }
-        //   }
-
-        //   console.log(targetedBlock);
-        // }
 
         if (value.trim() !== "") {
           updatedFormData.push({
