@@ -1,8 +1,8 @@
-import styled from "styled-components"
-import Logo from "../../ui/Logo"
-import { FaSave as SaveIcon } from "react-icons/fa"
-import { useAddUpdateDocumentQuestion } from "./useAddUpdateDocumentQuestion"
-import { useNavigate } from "react-router-dom"
+import styled from "styled-components";
+import Logo from "../../ui/Logo";
+import { FaSave as SaveIcon } from "react-icons/fa";
+import { useAddUpdateDocumentQuestion } from "./useAddUpdateDocumentQuestion";
+import { useNavigate } from "react-router-dom";
 
 const Header = styled.div`
   background-color: var(--white);
@@ -28,34 +28,35 @@ const Header = styled.div`
       color: var(--color-stone-600);
     }
   }
-`
+`;
 const DocumentHeader = ({
   isDraft,
-  overviewData
+  overviewData,
 }: {
-  isDraft: boolean
+  isDraft: boolean;
   overviewData: {
-    questionText: string
-    questionId: number
-    value: string | number
-    active: boolean
-  }[]
+    questionText: string;
+    questionId: number;
+    value: string | number;
+    active: boolean;
+  }[];
 }) => {
   const { isLoading, addUpdateDocumentQuestion } =
-    useAddUpdateDocumentQuestion()
-  const navigate = useNavigate()
+    useAddUpdateDocumentQuestion();
+  const navigate = useNavigate();
 
   const clickHandler = () => {
     const values = overviewData.filter((item) => {
-      if (item.value) return { questionId: item.questionId, value: item.value }
-    })
+      if (item.value) return { questionId: item.questionId, value: item.value };
+    });
+
     addUpdateDocumentQuestion(
       { isDraft, values },
       {
-        onSuccess: () => navigate("/u/documents")
+        onSuccess: () => navigate("/u/documents"),
       }
-    )
-  }
+    );
+  };
 
   return (
     <Header>
@@ -65,7 +66,7 @@ const DocumentHeader = ({
         <SaveIcon />
       </button>
     </Header>
-  )
-}
+  );
+};
 
-export default DocumentHeader
+export default DocumentHeader;

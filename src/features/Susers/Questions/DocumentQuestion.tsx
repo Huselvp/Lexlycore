@@ -37,6 +37,8 @@ import "../../../ui/map/styles.css";
 
 // import MapContainer from "../../../ui/map/MapContainer";
 
+import MMapComponent from "./MMapComponent";
+
 const Checkbox = styled.input`
   /* accent-color: var(--color-stone-300); */
   /* border: none; */
@@ -505,6 +507,16 @@ const DocumentQuestion = ({
 
   const MAP_API_KEY = "AIzaSyB8HxTy1ONHp4EbqDUcHgbjZcQQ9aGLvqM";
 
+  let testtt;
+
+  const [mapAdress, setMapAdress] = useState("");
+  const [mapApartment, setMapApartment] = useState("");
+  const [mapPostalCode, setMapPostalCode] = useState("");
+  const [mapCity, setMapCity] = useState("");
+  const [mapCountry, setMapCountry] = useState("");
+
+  const [mapData, setMapData] = useState({});
+
   interface AddressDetails {
     address: string;
     apartment: string;
@@ -557,10 +569,12 @@ const DocumentQuestion = ({
 
     useEffect(() => {
       const formattedAddress = `${addressDetails.apartment}, ${addressDetails.address}, ${addressDetails.city}, ${addressDetails.country}, ${addressDetails.postal_code}, ${addressDetails.x}, ${addressDetails.y}`;
-      setMapValue(formattedAddress, "map");
+      //setMapValue(formattedAddress, "map");
       localStorage.setItem("map", formattedAddress);
-      setValue(formattedAddress);
-
+      //setMapData(addressDetails);
+      //setValue(formattedAddress);
+      testtt = addressDetails;
+      console.log(addressDetails);
       console.log(formattedAddress);
     }, [addressDetails, setMapValue]);
 
@@ -589,10 +603,10 @@ const DocumentQuestion = ({
             marker={marker}
             setAddressDetails={setAddressDetails}
           />
-          <AddressLocal
+          {/* <AddressLocal
             addressDetails={addressDetails}
             setAddressDetails={setAddressDetails}
-          />
+          /> */}
         </div>
       </APIProvider>
     );
@@ -2043,28 +2057,13 @@ const DocumentQuestion = ({
         )}
 
         {question.valueType.startsWith("map") && (
-          <MapContainer setMapValue={handelSetMapValue} />
+          <MMapComponent
+            key={question.id}
+            getMapData={(value) => {
+              setValue(value);
+            }}
+          />
         )}
-
-        {/* <button
-          onClick={() => {
-            console.log(formBlocks);
-            console.log(generateFormDataWithUniqueLabels(formBlocks));
-            console.log(formData);
-
-            console.log(collectLabelIds(newBlocksForm));
-          }}
-        >
-          get data and test
-        </button>
-
-        <button
-          onClick={() => {
-            console.log(value);
-          }}
-        >
-          get the value
-        </button> */}
 
         {children}
       </InputContainer>
