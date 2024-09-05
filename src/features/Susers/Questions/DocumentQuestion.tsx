@@ -183,7 +183,7 @@ const DocumentQuestion = ({
   isTherData,
   isTherDays,
   isTherTimes,
-  getMapData,
+  isMapDataFullAdded,
 }: {
   question: Question;
   children: ReactNode;
@@ -781,12 +781,6 @@ const DocumentQuestion = ({
     );
   };
 
-  const handelSetMapValue = (value: string, valueType: string) => {
-    // setValue(value, valueType);
-    console.log(value);
-    getMapData(value);
-  };
-
   // ----------- CVR DATA -------------
 
   const [CVR, setCVR] = useState("");
@@ -1018,6 +1012,34 @@ const DocumentQuestion = ({
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
+
+  const convertStringToAddressObject = (dataString) => {
+    if (typeof dataString !== "string") {
+      // If the input is not a string, return an empty object or handle it accordingly
+      console.error("Expected a string but got:", typeof dataString);
+      return {
+        apartment: "",
+        address: "",
+        city: "",
+        country: "",
+        postal_code: "",
+        x: null,
+        y: null,
+      };
+    }
+
+    const parts = dataString.split(", ");
+
+    return {
+      apartment: parts[0] || "",
+      address: parts[1] || "",
+      city: parts[2] || "",
+      country: parts[3] || "",
+      postal_code: parts[4] || "",
+      x: parts[5] ? parseFloat(parts[5]) : null,
+      y: parts[6] ? parseFloat(parts[6]) : null,
+    };
+  };
 
   return (
     <>
@@ -2061,6 +2083,10 @@ const DocumentQuestion = ({
             key={question.id}
             getMapData={(value) => {
               setValue(value);
+            }}
+            data={convertStringToAddressObject(value)}
+            isFull={(value) => {
+              isMapDataFullAdded(value);
             }}
           />
         )}

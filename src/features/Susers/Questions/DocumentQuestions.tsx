@@ -170,6 +170,12 @@ const DocumentQuestions = ({
     setIsFormDataFull(value);
   };
 
+  const [isMapDataFull, setIsMapDataFull] = useState(false);
+
+  const isMapDatafullHandler = (value) => {
+    setIsMapDataFull(value);
+  };
+
   const isTherIsDays = (value) => {
     setIsDaysFull(value);
   };
@@ -216,29 +222,6 @@ const DocumentQuestions = ({
     });
   }
 
-  const [mapData, setMapData] = useState(() => {
-    return localStorage.getItem("map");
-  });
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setMapData(localStorage.getItem("map"));
-    };
-
-    // Listen for storage changes
-    window.addEventListener("storage", handleStorageChange);
-
-    // Cleanup listener on component unmount
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
-
-  const updateMapData = (newData) => {
-    localStorage.setItem("map", newData);
-    setMapData(newData);
-  };
-
   return (
     <>
       <DocumentHeader isDraft={isDraft} overviewData={overviewData} />
@@ -273,8 +256,8 @@ const DocumentQuestions = ({
                     isTherTimes={(value) => {
                       isTherTimes(value);
                     }}
-                    getMapData={(value) => {
-                      updateMapData(value);
+                    isMapDataFullAdded={(value) => {
+                      isMapDatafullHandler(value);
                     }}
                   >
                     {question.subQuestions &&
@@ -300,8 +283,8 @@ const DocumentQuestions = ({
                             isSDataFull={(value) => {
                               isSubDataFull(value);
                             }}
-                            getMapData={(value) => {
-                              updateMapData(value);
+                            isMapDataFullAdded={(value) => {
+                              isMapDatafullHandler(value);
                             }}
                           />
                         ))
@@ -384,7 +367,7 @@ const DocumentQuestions = ({
 
                           {question.valueType === "map" && (
                             <button
-                              // disabled={}
+                              disabled={!isMapDataFull}
                               onClick={(e) => {
                                 if (activeSubQuestions && !display) {
                                   e.preventDefault();

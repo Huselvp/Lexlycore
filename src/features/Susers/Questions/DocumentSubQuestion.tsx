@@ -13,7 +13,7 @@ import { FiUser } from "react-icons/fi";
 
 import { BsBuildings } from "react-icons/bs";
 
-import MapContainer from "../../../ui/map/MapContainer";
+import MMapComponent from "./MMapComponent";
 
 const Checkbox = styled.input`
   /* accent-color: var(--color-stone-300); */
@@ -154,6 +154,7 @@ const DocumentSubQuestion = ({
   data,
   mainQuestionId,
   isSDataFull,
+  isMapDataFullAdded,
 }: {
   question: SubQuestion;
   children: ReactNode;
@@ -783,6 +784,34 @@ const DocumentSubQuestion = ({
   useEffect(() => {
     getCountriesList();
   }, []);
+
+  const convertStringToAddressObject = (dataString) => {
+    if (typeof dataString !== "string") {
+      // If the input is not a string, return an empty object or handle it accordingly
+      console.error("Expected a string but got:", typeof dataString);
+      return {
+        apartment: "",
+        address: "",
+        city: "",
+        country: "",
+        postal_code: "",
+        x: null,
+        y: null,
+      };
+    }
+
+    const parts = dataString.split(", ");
+
+    return {
+      apartment: parts[0] || "",
+      address: parts[1] || "",
+      city: parts[2] || "",
+      country: parts[3] || "",
+      postal_code: parts[4] || "",
+      x: parts[5] ? parseFloat(parts[5]) : null,
+      y: parts[6] ? parseFloat(parts[6]) : null,
+    };
+  };
 
   return (
     <>
@@ -2324,9 +2353,14 @@ const DocumentSubQuestion = ({
         )}
 
         {question.valueType.startsWith("map") && (
-          <MapContainer
-            getTheMapData={(value) => {
+          <MMapComponent
+            key={question.id}
+            getMapData={(value) => {
               setValue(value);
+            }}
+            data={convertStringToAddressObject(value)}
+            isFull={(value) => {
+              isMapDataFullAdded(value);
             }}
           />
         )}
