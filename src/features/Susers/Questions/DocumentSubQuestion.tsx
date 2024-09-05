@@ -2356,7 +2356,7 @@ const DocumentSubQuestion = ({
           <MMapComponent
             key={question.id}
             getMapData={(value) => {
-              setValue(value);
+              setValue(value, "map");
             }}
             data={convertStringToAddressObject(value)}
             isFull={(value) => {

@@ -176,6 +176,34 @@ const DocumentQuestionsOverview = ({
     setCaretIconActive(newCaretState);
   };
 
+  const convertStringToAddressObject = (dataString) => {
+    if (typeof dataString !== "string") {
+      // If the input is not a string, return an empty object or handle it accordingly
+      console.error("Expected a string but got:", typeof dataString);
+      return {
+        apartment: "",
+        address: "",
+        city: "",
+        country: "",
+        postal_code: "",
+        x: null,
+        y: null,
+      };
+    }
+
+    const parts = dataString.split(", ");
+
+    return {
+      apartment: parts[0] || "",
+      address: parts[1] || "",
+      city: parts[2] || "",
+      country: parts[3] || "",
+      postal_code: parts[4] || "",
+      x: parts[5] ? parseFloat(parts[5]) : null,
+      y: parts[6] ? parseFloat(parts[6]) : null,
+    };
+  };
+
   return (
     <>
       <div>
@@ -188,7 +216,8 @@ const DocumentQuestionsOverview = ({
             <>
               {item.type !== "form" &&
                 item.type !== "day" &&
-                item.type !== "time" && (
+                item.type !== "time" &&
+                item.type !== "map" && (
                   <li key={i}>
                     <p>
                       {item?.subQuestions?.length > 0 ? (
@@ -211,6 +240,66 @@ const DocumentQuestionsOverview = ({
                     <p>{item.value}</p>
                   </li>
                 )}
+
+              {item.type === "map" && (
+                <li
+                  key={i}
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
+                  {/* Process map values outside of JSX */}
+                  {(() => {
+                    const mapValues = convertStringToAddressObject(item.value);
+                    return (
+                      <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "100%",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            {item?.subQuestions?.length > 0 ? (
+                              <button
+                                style={{ background: "none", border: "none" }}
+                                onClick={() => toggleSubQuestions(i)}
+                              >
+                                {!caret_icon_active[i] ? (
+                                  <RxCaretDown />
+                                ) : (
+                                  <RxCaretUp />
+                                )}
+                              </button>
+                            ) : null}
+                            <p
+                              style={{
+                                color: "var(--color-stone-500)",
+                                fontSize: "1.7rem",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {item.questionText}
+                            </p>
+                          </div>
+                          <button onClick={() => onClick(i)}>
+                            <EditIcon />
+                          </button>
+                        </div>
+                        <div>
+                          <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </li>
+              )}
 
               {item.type === "form" && (
                 <li
@@ -321,7 +410,8 @@ const DocumentQuestionsOverview = ({
                     <React.Fragment key={ind}>
                       {sq.type !== "day" &&
                         sq.type !== "time" &&
-                        sq.type !== "form" && (
+                        sq.type !== "form" &&
+                        sq.type !== "map" && (
                           <li>
                             <p>{sq.subQuestionText}</p>
                             <button onClick={() => onClick(i)}>
@@ -344,6 +434,24 @@ const DocumentQuestionsOverview = ({
                           </p>
                         </li>
                       )}
+
+                      {sq.type === "map" &&
+                        (() => {
+                          // Perform the logic to process map values
+                          const mapValues = convertStringToAddressObject(
+                            sq.subQuestionValue
+                          );
+
+                          return (
+                            <li key={i}>
+                              <p>{sq.subQuestionText}</p>
+                              <button onClick={() => onClick(i)}>
+                                <EditIcon />
+                              </button>
+                              <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
+                            </li>
+                          );
+                        })()}
 
                       {sq.type === "time" && (
                         <li>
