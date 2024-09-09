@@ -417,45 +417,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   // ============
 
-  // const RecursiveSubQuestionRow = ({ subQuestion, questionId }) => {
-  //   const [isOpen, setIsOpen] = useState(false);
-
-  //   const toggleOpen = () => {
-  //     setIsOpen((prev) => !prev);
-  //   };
-
-  //   return (
-  //     <Reorder.Item value={subQuestion} key={subQuestion.id}>
-  //       <SubQuestionRow
-  //         id={subQuestion.id}
-  //         subQuestion={subQuestion}
-  //         questionId={questionId}
-  //         isOpen={isOpen}
-  //         toggleOpen={toggleOpen}
-  //       />
-
-  //       {isOpen &&
-  //         subQuestion.subQuestions &&
-  //         subQuestion.subQuestions.length > 0 && (
-  //           <Reorder.Group
-  //             // onReorder={(newOrder) =>
-  //             //   handleSubQuestionReorder(subQuestion.id, newOrder)
-  //             // }
-  //             values={subQuestion.subQuestions}
-  //           >
-  //             {subQuestion.subQuestions.map((sq) => (
-  //               <RecursiveSubQuestionRow
-  //                 key={sq.id}
-  //                 subQuestion={sq}
-  //                 questionId={subQuestion.id}
-  //               />
-  //             ))}
-  //           </Reorder.Group>
-  //         )}
-  //     </Reorder.Item>
-  //   );
-  // };
-
   const RecursiveSubQuestionRow = ({
     subQuestion,
     questionId,

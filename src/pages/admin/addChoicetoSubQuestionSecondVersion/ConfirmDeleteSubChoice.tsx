@@ -1,8 +1,8 @@
-import Button from "../../../../ui/Button";
-import ConfirmDelete from "../../../../ui/ConfirmDelete";
-import { useDeleteChoice } from "./useDeleteChoice";
+import Button from "../../../ui/Button";
+import ConfirmDelete from "../../../ui/ConfirmDelete";
+import { useDeleteChoice } from "./useDeleteSubChoice";
 
-const ConfirmDeleteChoice = ({
+const ConfirmDeleteSubChoice = ({
   choiceId,
   onCloseModal,
 }: {
@@ -30,9 +30,7 @@ const ConfirmDeleteChoice = ({
           variation="danger"
           size="medium"
           disabled={isLoading}
-          onClick={() => {
-            deleteChoice(choiceId, { onSettled: onCloseModal });
-          }}
+          onClick={() => deleteChoice(choiceId, { onSettled: onCloseModal })}
         >
           Delete
         </Button>
@@ -41,4 +39,4 @@ const ConfirmDeleteChoice = ({
   );
 };
 
-export default ConfirmDeleteChoice;
+export default ConfirmDeleteSubChoice;

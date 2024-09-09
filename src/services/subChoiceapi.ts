@@ -6,8 +6,6 @@ import {
   updateSubChoiceUrl,
 } from "../utils/constants";
 
-import { getSubQuestion } from "./subquestionapi";
-
 export const addEditSubChoice = ({
   onAdd,
   subquestionId,

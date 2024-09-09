@@ -37,17 +37,14 @@ import News from "./pages/News";
 import ProtectedRoute from "./ui/protectedRoute";
 import AddSubQuestion from "./pages/admin/AddSubQuestion";
 import EditSubQuestion from "./pages/admin/EditSubQuestion";
-// import QuestionnaireWizard from "./ui/Testing/Wizard";
-// import AddNewForm from "./pages/admin/addNewForm";
-// import FormBlocs from "./pages/admin/formBlocs";
-
-// ===
 
 import AddSubSubQuestion from "./pages/admin/subSubQuestionsDocs/AddSubSubQuestion";
 
 import SubQuestionChoice from "./pages/admin/subQuestionChoicedocs/SubQuestionChoice";
 
 import AdminLogin from "./pages/AdminLogin";
+
+import SubQuestionChoices from "./pages/admin/addChoicetoSubQuestionSecondVersion/SubQuestionChoices";
 
 function App() {
   return (
@@ -97,7 +94,7 @@ function App() {
 
           <Route
             path="templates/:templateId/subCoice/:questionId/:subquestionId"
-            element={<SubQuestionChoice />}
+            element={<SubQuestionChoices />}
           />
 
           {/* SubQuestionChoice */}

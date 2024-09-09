@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import Form from "../../../../ui/AuthForm";
-import Button from "../../../../ui/Button";
-import { useAddEditChoice } from "./useAddEditChoice";
-import Row from "../../../../ui/Row";
+import Form from "../../../ui/AuthForm";
+import Button from "../../../ui/Button";
+import { useAddEditSubChoice } from "./useAddEditSubChoice";
+import Row from "../../../ui/Row";
 import { FormEventHandler } from "react";
 import toast from "react-hot-toast";
 
@@ -16,7 +16,7 @@ const Container = styled.div`
     width: 85vw;
   }
 `;
-const AddEditChoice = ({
+const AddEditSubChoice = ({
   onAdd,
   onCloseModal,
   choice,
@@ -25,7 +25,7 @@ const AddEditChoice = ({
   onCloseModal?: () => void;
   choice?: Choice;
 }) => {
-  const { isLoading, addEditChoice } = useAddEditChoice();
+  const { isLoading, addEditChoice } = useAddEditSubChoice();
 
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -111,4 +111,4 @@ const AddEditChoice = ({
   );
 };
 
-export default AddEditChoice;
+export default AddEditSubChoice;
