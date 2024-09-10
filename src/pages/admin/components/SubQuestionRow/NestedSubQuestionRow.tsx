@@ -1,236 +1,193 @@
-import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
-import Menus from "../../../ui/Menus";
-import Table from "../../../ui/Table";
-import Modal from "../../../ui/Modal";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { RxCaretDown, RxCaretUp } from "react-icons/rx";
-
+import { getApiConfig } from "../../../../utils/constants";
+import { API } from "../../../../utils/constants";
+import axios from "axios";
+import Table from "../../../../ui/Table";
+import Menus from "../../../../ui/Menus";
+import Modal from "../../../../ui/Modal";
+import ConfirmDeleteSubQuestion from "../../../../features/Templates/Questions/ConfirmDeleteSubQuestion";
+import { HiPencil, HiTrash, HiEye } from "react-icons/hi2";
+import { MdDone } from "react-icons/md";
+import { IoIosClose } from "react-icons/io";
+import { HiOutlineDuplicate } from "react-icons/hi";
+import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-
-import { Reorder } from "framer-motion";
-
-import axios from "axios";
-import { API, getApiConfig } from "../../../utils/constants";
-
-import SubQuestionRow from "../../../pages/admin/components/SubQuestionRow/SubQuestionRow";
-
-import PopUp from "../../../pages/admin/components/popUp/PopUp";
-
-import PopUpContentContainer from "../../../pages/admin/components/popup_content_container/PopUpContantContainer";
-import Form from "../../../pages/admin/components/UI/form/Form";
-import Button from "../../../pages/admin/components/UI/btns/Button";
-import AddNewBlock from "../../../pages/admin/components/addNewBlock/AddNewBlock";
-import BlocksContainer from "../../../pages/admin/components/blocksContainer/BlocksContainer";
-import EditBlock from "../../../pages/admin/components/editBlock/editBlock";
+import PopUp from "../../../admin/components/popUp/PopUp";
+import PopUpContentContainer from "../../../admin/components/popup_content_container/PopUpContantContainer";
+import Form from "../../../admin/components/UI/form/Form";
+import Button from "../../../admin/components/UI/btns/Button";
+import AddNewBlock from "../../../admin/components/addNewBlock/AddNewBlock";
+import BlocksContainer from "../../../admin/components/blocksContainer/BlocksContainer";
+import EditBlock from "../../../admin/components/editBlock/editBlock";
+import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
 import { FiUser } from "react-icons/fi";
 
 import { BsBuildings } from "react-icons/bs";
 
-import { IoIosClose } from "react-icons/io";
-import { HiOutlineDuplicate } from "react-icons/hi";
+function NestedSubQuestionRow({
+  subQuestion,
+  questionId,
+  isOpen,
+  toggleOpen,
+  isNested,
+  depth,
+}) {
+  const navigate = useNavigate();
 
-import { FaRegEdit } from "react-icons/fa";
+  // popups controllers
 
-import { MdDeleteOutline } from "react-icons/md";
-
-import { MdDone } from "react-icons/md";
-
-const QuestionsRow = ({ question }: { question: Question }) => {
-  const [formTitle, setFormTitle] = useState("");
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
-  const [isAddFormNameOpen, setIsAddFormNameOpen] = useState(false);
-  const [isSeeBlocksOpen, setIsSeeBlocksOpen] = useState(false);
-  const [isEditBlockOpen, setIsEditBlockOpen] = useState(false);
-  const [formBlocksId, setFormBlocksId] = useState("");
-  const [isTherBlocks, setIsTherBlocks] = useState(false);
 
-  const [isAddMaxMinValuesOpen, setIsAddMaxMinValuesOpen] = useState(false);
+  const [isAddSubQuestionFormNameOpen, setIsAddSubQuestionFormNameOpen] =
+    useState(false);
+
+  const [isSeeSubQuestionFormBlocksOpen, setIsSeeSubQuestionBlocks] =
+    useState(false);
+
+  const [isEditSubQuestionBlocksOpen, setIsEditSubQuestionBlocksOpen] =
+    useState(false);
+
+  const [isSeeAlSubQuestionBlocksOpen, setIsSeeAllSubQuestionBlocksOpen] =
+    useState(false);
 
   const [isSeeAllBlocksInpusOpen, setIsSeeAllBlocksInputOpen] = useState(false);
 
   const [isAddBlockTypeOpen, setIsAddBlockTypeOpen] = useState(false);
 
-  const [blockId, setBlockId] = useState(0);
+  // SubQuestion data
 
-  const [caret_icon_active, setcaret] = useState(false);
+  const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
 
-  const navigate = useNavigate();
+  const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
 
-  const [blockType, setBlockType] = useState("");
+  const [subQuestionFormId, setSubQuestionFormId] = useState("");
 
-  const [formBlocs, setFormBlocs] = useState([]);
-
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(0);
-
-  const [blockPositions, setBlockPositions] = useState([]);
-
-  const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
-    useState(false);
-  const [updatedMinValue, setUpdatedMinValue] = useState(0);
-  const [updatedMaxValue, setUpdatedMaxValue] = useState(0);
-
-  const openBlockTypeHandler = () => {
-    setIsAddBlockTypeOpen(true);
-    setIsSeeBlocksOpen(false);
-  };
-
-  const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target;
-
-    if (checked) {
-      setBlockType(value);
-    } else {
-      setBlockType("");
-    }
-  };
-
-  const [squestionOrderTest, setSQuestionOrderTest] = useState(
-    question?.subQuestions.sort((a, b) => a.position - b.position)
-  );
-  const squestionIds = squestionOrderTest.map((q) => q?.id);
-
-  const handleReorder = (newOrder) => {
-    setSQuestionOrderTest(newOrder);
-  };
+  const [subQuestionBlockId, setSubQuestionBlockId] = useState("");
 
   const [formBlocksData, setFormBblocksData] = useState([]);
 
-  useEffect(() => {
-    const reorderQuestions = async (squestionids: number[]) => {
-      try {
-        await axios.put(
-          `${API}/admin/questions/subquestions/reorder/${question.id}`,
-          squestionids,
-          getApiConfig()
-        );
-      } catch (error) {
-        console.error("Error reordering questions:", error);
-      }
-    };
-
-    reorderQuestions(squestionIds);
-  }, [squestionOrderTest]);
-
-  useEffect(() => {
-    setSQuestionOrderTest(question?.subQuestions);
-  }, [question?.subQuestions]);
-
-  const get_form_blocks_handler = useCallback(async (id) => {
+  const createSubQuestionFormHandler = async () => {
     try {
-      const result = await axios.get(
-        `${API}/form/blocks/${id}`,
-        getApiConfig()
-      );
-      const blocks = result?.data;
-      setFormBlocs(blocks);
-      setIsTherBlocks(blocks.length > 0);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
-  const get_formId = useCallback(
-    async (id) => {
-      try {
-        const result = await axios.get(
-          `${API}/form/get-by-question-id/${id}`,
-          getApiConfig()
-        );
-        const formId = result?.data;
-        if (typeof formId === "number") {
-          setFormBlocksId(formId);
-          await get_form_blocks_handler(formId);
-        } else {
-          setFormBlocksId("");
-        }
-      } catch (err) {
-        console.error(err);
+      if (subQuestionFormTitle !== "") {
+        await axios
+          .post(
+            `${API}/form/create-sub/${subQuestion.id}`,
+            { title: subQuestionFormTitle },
+            getApiConfig()
+          )
+          .then((result) => {
+            setIsAddSubQuestionFormNameOpen(false);
+            setIsSeeSubQuestionBlocks(true);
+            getSubQuestionFormBlocksHandler(subQuestionFormId);
+            setSubQuestionFormId(result?.data.id);
+          });
+      } else {
+        console.log("form title should not be empty");
       }
-    },
-    [get_form_blocks_handler, API, getApiConfig]
-  );
-
-  useEffect(() => {
-    if (question?.id) {
-      get_formId(question.id);
-    }
-  }, [get_formId, question.id]);
-
-  const submit_form_name_handler = async () => {
-    if (!formTitle) {
-      console.log("form title should not be empty");
-      return;
-    }
-    try {
-      const result = await axios.post(
-        `${API}/form/create/${question.id}`,
-        { title: formTitle },
-        getApiConfig()
-      );
-      setIsAddFormNameOpen(false);
-      setIsSeeBlocksOpen(true);
-      get_form_blocks_handler(result?.data.question.id);
-      setFormBlocksId(result?.data.id);
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
 
-  const create_new_block_handler = async () => {
+  const getSubQuestionFormId = async (id) => {
     try {
-      const result = await axios.post(
-        `${API}/form/block/${formBlocksId}`,
-        { type: blockType === "null" ? null : blockType },
-        getApiConfig()
-      );
-      get_form_blocks_handler(formBlocksId);
-      setIsAddBlockTypeOpen(false);
-      setIsSeeBlocksOpen(true);
+      await axios
+        .get(`${API}/form/get-by-sub-question-id/${id}`, getApiConfig())
+        .then((result) => {
+          if (typeof result.data === "number") {
+            setSubQuestionFormId(`${result?.data}`);
+            getSubQuestionFormBlocksHandler(result?.data);
+          } else {
+            setSubQuestionFormId("");
+            return;
+          }
+        });
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
 
-  const delete_block_handler = useCallback(
-    async (id) => {
-      try {
-        await axios.delete(
-          `${API}/form/block/${formBlocksId}/${id}`,
-          getApiConfig()
-        );
-        get_form_blocks_handler(formBlocksId);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [formBlocksId, get_form_blocks_handler, API, getApiConfig]
-  );
+  useEffect(() => {
+    getSubQuestionFormId(subQuestion.id);
+  }, [subQuestion.id]);
 
-  const duplicate_block_handler = useCallback(
-    async (id) => {
-      try {
-        await axios.post(
-          `${API}/form/block/duplicate/${formBlocksId}/${id}`,
+  const getSubQuestionFormBlocksHandler = async (id) => {
+    try {
+      await axios
+        .get(`${API}/form/blocks/${id}`, getApiConfig())
+        .then((result) => {
+          if (result.data.length !== 0) {
+            setSubQuestionFormBlocks(result?.data);
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getSubQuestionFormBlocksHandler(subQuestionFormId);
+  }, [subQuestionFormId]);
+
+  const [blockType, setBlockType] = useState("");
+
+  const create_subQuestion_new_block_handler = async () => {
+    try {
+      await axios
+        .post(
+          `${API}/form/block/${subQuestionFormId}`,
+          {
+            type: blockType === "null" ? null : blockType,
+          },
+          getApiConfig()
+        )
+        .then((result) => {
+          getSubQuestionFormBlocksHandler(subQuestionFormId);
+          setIsAddBlockTypeOpen(false);
+          setIsSeeSubQuestionBlocks(true);
+          get_form_blocks(subQuestion.id);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const delete_subQuestion_block_handler = async (id) => {
+    try {
+      await axios
+        .delete(`${API}/form/block/${subQuestionFormId}/${id}`, getApiConfig())
+        .then((result) => {
+          getSubQuestionFormBlocksHandler(subQuestionFormId);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const duplicate_subQuestion_block_handler = async (id) => {
+    try {
+      await axios
+        .post(
+          `${API}/form/block/duplicate/${subQuestionFormId}/${id}`,
           {},
           getApiConfig()
-        );
-        get_form_blocks_handler(formBlocksId);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [formBlocksId, get_form_blocks_handler, API, getApiConfig]
-  );
+        )
+        .then((result) => {
+          getSubQuestionFormBlocksHandler(subQuestionFormId);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const get_form_blocks = async (id) => {
     try {
       const result = await axios.get(
-        `${API}/suser/question-details/${id}`,
+        `${API}/suser/sub-question-details/${id}`,
         getApiConfig()
       );
       setFormBblocksData(result?.data.form.blocks);
@@ -241,12 +198,17 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   useEffect(() => {
-    get_form_blocks(question.id);
-  }, [question.id]);
+    get_form_blocks(subQuestion.id);
+  }, [subQuestion.id]);
 
-  // ++++++++++++++++++++
+  // ==============================
 
-  const add_min_max_value_handler = async (id) => {
+  const [isAddMaxMinValuesOpen, setIsAddMaxMinValuesOpen] = useState(false);
+
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+
+  const add_min_max_value_handler = async () => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
       console.error("minValue or maxValue is not defined");
       return;
@@ -255,7 +217,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     try {
       await axios
         .post(
-          `${API}/filter/add-question/${id}`,
+          `${API}/filter/add-subQuestion/${subQuestion.id}`,
           {
             filterStart: `${minValue}`,
             filterEnd: `${maxValue}`,
@@ -265,7 +227,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         .then((result) => {
           setIsPopUpOpen(false);
           setIsAddMaxMinValuesOpen(false);
-          getFilterInformation(question?.id, question?.valueType);
+          getFilterInformation(subQuestion?.id, subQuestion?.valueType);
         });
     } catch (err) {
       console.error(err);
@@ -279,7 +241,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     if (type === "filter") {
       try {
         await axios
-          .get(`${API}/filter/get-by-question-id/${id}`, getApiConfig())
+          .get(`${API}/filter/get-by-sub-question-id/${id}`, getApiConfig())
           .then((result) => {
             setIsFilterHaveValue(true);
             setFilterData(result?.data);
@@ -292,8 +254,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   useEffect(() => {
-    getFilterInformation(question?.id, question?.valueType);
-  }, [question?.id, question?.valueType]);
+    getFilterInformation(subQuestion?.id, subQuestion?.valueType);
+  }, [subQuestion?.id, subQuestion?.valueType]);
+
+  const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
+    useState(false);
+
+  const [updatedMinValue, setUpdatedMinValue] = useState(0);
+  const [updatedMaxValue, setUpdatedMaxValue] = useState(0);
 
   const updateMinMaxValuesHandler = async (id) => {
     try {
@@ -321,7 +289,24 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
   };
 
-  // ====================
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+
+    if (checked) {
+      setBlockType(value);
+    } else {
+      setBlockType("");
+    }
+  };
+
+  const openBlockTypeHandler = () => {
+    setIsAddBlockTypeOpen(true);
+    setIsSeeSubQuestionBlocks(false);
+  };
+
+  // +++++++++++++++++++++++++++
+
+  const [blockPositions, setBlockPositions] = useState([]);
 
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
@@ -360,15 +345,15 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   useEffect(() => {
-    setBlockPositions(formBlocs?.map((bloc) => bloc.id));
-  }, [formBlocs]);
+    setBlockPositions(subQuestionFormBlocks?.map((bloc) => bloc.id));
+  }, [subQuestionFormBlocks]);
 
   const moveItem = (fromIndex, toIndex) => {
-    const updatedItems = [...formBlocs];
+    const updatedItems = [...subQuestionFormBlocks];
     const [movedItem] = updatedItems.splice(fromIndex, 1);
     updatedItems.splice(toIndex, 0, movedItem);
 
-    setFormBlocs(updatedItems); // Update the state with the new order of items
+    setSubQuestionFormBlocks(updatedItems); // Update the state with the new order of items
 
     // Update block positions to match the new order
     const updatedBlockPositions = updatedItems.map((item) => item.id);
@@ -387,11 +372,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     }
   };
 
-  // ============
-
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-
-  // ======
+  // =====
 
   const [countriesList, setCountriesList] = useState([]);
 
@@ -415,175 +396,56 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     getCountriesList();
   }, []);
 
-  // ============
+  // ===============
 
-  // const RecursiveSubQuestionRow = ({
-  //   subQuestion,
-  //   questionId,
-  //   isNested = false,
-  //   depth = -1,
-  // }) => {
-  //   const [isOpen, setIsOpen] = useState(false);
-
-  //   const toggleOpen = () => {
-  //     setIsOpen((prev) => !prev);
-  //   };
-
-  //   const newDepth = depth + 1;
-
-  //   return (
-  //     <Reorder.Item value={subQuestion} key={subQuestion.id}>
-  //       <SubQuestionRow
-  //         id={subQuestion.id}
-  //         subQuestion={subQuestion}
-  //         questionId={questionId}
-  //         isOpen={isOpen}
-  //         toggleOpen={toggleOpen}
-  //         isNested={isNested}
-  //         depth={newDepth}
-  //       />
-
-  //       {isOpen &&
-  //         subQuestion.subQuestions &&
-  //         subQuestion.subQuestions.length > 0 && (
-  //           <Reorder.Group
-  //             onReorder={() => {
-  //               console.log(100);
-  //             }}
-  //             values={subQuestion.subQuestions}
-  //           >
-  //             {subQuestion.subQuestions.map((sq) => (
-  //               <RecursiveSubQuestionRow
-  //                 key={sq.id}
-  //                 subQuestion={sq}
-  //                 questionId={subQuestion.id}
-  //                 isNested={true}
-  //                 depth={newDepth}
-  //               />
-  //             ))}
-  //           </Reorder.Group>
-  //         )}
-  //     </Reorder.Item>
-  //   );
-  // };
-
-  // Helper function to collect all subquestion IDs
-  const collectSubQuestionIds = (subQuestion) => {
-    let ids = [subQuestion.id];
-
-    if (subQuestion.subQuestions) {
-      for (const sq of subQuestion.subQuestions) {
-        ids = ids.concat(collectSubQuestionIds(sq));
-      }
-    }
-
-    return ids;
-  };
-
-  const RecursiveSubQuestionRow = ({
-    subQuestion,
-    questionId,
-    isNested = false,
-    depth = -1,
-  }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [newPlace, setNewPlace] = useState(subQuestion);
-
-    const toggleOpen = () => {
-      setIsOpen((prev) => !prev);
-    };
-
-    const newDepth = depth + 1;
-
-    const handleReorder = (newOrder) => {
-      console.log("New order:", newOrder);
-
-      // Assuming newOrder is an array of reordered subQuestions
-      const updatedSubQuestions = newOrder.map((item) => ({
-        ...item,
-        subQuestions: item.subQuestions
-          ? item.subQuestions.map((sub) => ({ ...sub }))
-          : [],
-      }));
-
-      setNewPlace((prev) => ({
-        ...prev,
-        subQuestions: updatedSubQuestions,
-      }));
-
-      const collectedIds = collectSubQuestionIds(subQuestion);
-      console.log("Collected IDs:", collectedIds);
-    };
-
-    return (
-      <Reorder.Item value={newPlace} key={newPlace.id}>
-        <SubQuestionRow
-          id={newPlace.id}
-          subQuestion={newPlace}
-          questionId={questionId}
-          isOpen={isOpen}
-          toggleOpen={toggleOpen}
-          isNested={isNested}
-          depth={newDepth}
-        />
-
-        {isOpen &&
-          newPlace.subQuestions &&
-          newPlace.subQuestions.length > 0 && (
-            <Reorder.Group
-              onReorder={handleReorder}
-              values={newPlace.subQuestions}
-            >
-              {newPlace.subQuestions?.map((sq) => (
-                <RecursiveSubQuestionRow
-                  key={sq.id}
-                  subQuestion={sq}
-                  questionId={newPlace.id}
-                  isNested={true}
-                  depth={newDepth}
-                />
-              ))}
-            </Reorder.Group>
-          )}
-      </Reorder.Item>
-    );
-  };
+  const colors = [
+    "#FF5733",
+    "#3357FF",
+    "#FF33A6",
+    "#FFD133",
+    "#8C33FF",
+    "#33FFF5",
+    "#FF8C33",
+    "#33FF8C",
+    "#FF3333",
+    "#33FF56",
+  ];
 
   return (
-    <>
+    <React.Fragment>
       <PopUp isOpen={isPopUpOpen}>
         <PopUpContentContainer
           onClose={() => {
             setIsPopUpOpen(false);
-            setIsAddFormNameOpen(false);
-            setIsSeeBlocksOpen(false);
-            setIsEditBlockOpen(false);
+            setIsAddSubQuestionFormNameOpen(false);
+            setIsEditSubQuestionBlocksOpen(false);
+            setIsSeeAllSubQuestionBlocksOpen(false);
+            setIsSeeSubQuestionBlocks(false);
           }}
           onSeeAllBlocks={() => {
             setIsSeeAllBlocksInputOpen(true);
-            setIsAddFormNameOpen(false);
-            setIsSeeBlocksOpen(false);
-            setIsEditBlockOpen(false);
-            console.log(formBlocksData);
-            get_form_blocks(question.id);
+            setIsAddSubQuestionFormNameOpen(false);
+            setIsSeeSubQuestionBlocks(false);
+            setIsEditSubQuestionBlocksOpen(false);
+            get_form_blocks(subQuestion.id);
           }}
-          isBlocksOpen={isSeeBlocksOpen}
+          isBlocksOpen={isSeeSubQuestionFormBlocksOpen}
         >
           <div>
-            {isAddFormNameOpen && (
+            {isAddSubQuestionFormNameOpen && (
               <Form>
                 <label>Add form name</label>
                 <input
                   placeholder="Enter form name"
                   onChange={(e) => {
-                    setFormTitle(e.target.value);
+                    setSubQuestionFormTitle(e.target.value);
                   }}
                 ></input>
                 <div className="see_blocs_controller add-new-input">
                   <Button
                     type="button"
                     onClick={() => {
-                      submit_form_name_handler();
+                      createSubQuestionFormHandler();
                     }}
                   >
                     <MdDone />
@@ -592,8 +454,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     type="button"
                     onClick={() => {
                       setIsPopUpOpen(false);
-                      setIsAddFormNameOpen(false);
-                      setIsSeeBlocksOpen(false);
+                      setIsAddSubQuestionFormNameOpen(false);
                     }}
                   >
                     <IoIosClose />
@@ -602,10 +463,47 @@ const QuestionsRow = ({ question }: { question: Question }) => {
               </Form>
             )}
 
-            {isSeeBlocksOpen && (
+            {isSeeSubQuestionFormBlocksOpen && (
               <BlocksContainer>
+                {/* {subQuestionFormBlocks?.map((block, index) => {
+                  return (
+                    <Block key={index}>
+                      <div className="block-controlers">
+                        <button>
+                          <FaRegEdit
+                            size={20}
+                            onClick={() => {
+                              setIsEditSubQuestionBlocksOpen(true);
+                              setIsAddSubQuestionFormNameOpen(false);
+                              setIsSeeAllSubQuestionBlocksOpen(false);
+                              setIsSeeSubQuestionBlocks(false);
+                              setSubQuestionBlockId(block.id);
+                            }}
+                          />
+                        </button>
+                        <button>
+                          <HiOutlineDuplicate
+                            size={20}
+                            onClick={() => {
+                              duplicate_subQuestion_block_handler(block.id);
+                            }}
+                          />
+                        </button>
+                        <button>
+                          <MdDeleteOutline
+                            size={20}
+                            onClick={() => {
+                              delete_subQuestion_block_handler(block.id);
+                            }}
+                          />
+                        </button>
+                      </div>
+                    </Block>
+                  );
+                })} */}
+
                 <DndProvider backend={HTML5Backend}>
-                  {formBlocs?.map((item, index) => (
+                  {subQuestionFormBlocks?.map((item, index) => (
                     <DraggableItem
                       key={item.id}
                       item={item}
@@ -614,22 +512,25 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     >
                       <div className="item-controlers">
                         {item.type !== "COMPANY" && item.type !== "PERSON" && (
-                          <button
-                            onClick={() => {
-                              setIsEditBlockOpen(true);
-                              setIsAddFormNameOpen(false);
-                              setIsSeeBlocksOpen(false);
-                              setBlockId(item.id);
-                            }}
-                          >
-                            <FaRegEdit size={20} />
+                          <button>
+                            <FaRegEdit
+                              size={20}
+                              onClick={() => {
+                                setIsEditSubQuestionBlocksOpen(true);
+                                setIsAddSubQuestionFormNameOpen(false);
+                                setIsSeeAllSubQuestionBlocksOpen(false);
+                                setIsSeeSubQuestionBlocks(false);
+                                setSubQuestionBlockId(item.id);
+                                get_form_blocks(subQuestion.id);
+                              }}
+                            />
                           </button>
                         )}
                         <button>
                           <HiOutlineDuplicate
                             size={20}
                             onClick={() => {
-                              duplicate_block_handler(item.id);
+                              duplicate_subQuestion_block_handler(item.id);
                             }}
                           />
                         </button>
@@ -637,7 +538,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                           <MdDeleteOutline
                             size={20}
                             onClick={() => {
-                              delete_block_handler(item.id);
+                              delete_subQuestion_block_handler(item.id);
                             }}
                           />
                         </button>
@@ -666,6 +567,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       position: absolute;
                       top: 1rem;
                       right: 1rem;
+                      display: flex;
                     }
 
                     .item h1 {
@@ -685,6 +587,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     }
                   `}</style>
                 </DndProvider>
+
                 <AddNewBlock openBlockType={openBlockTypeHandler} />
               </BlocksContainer>
             )}
@@ -788,7 +691,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   <Button
                     type="button"
                     onClick={() => {
-                      create_new_block_handler();
+                      create_subQuestion_new_block_handler();
                     }}
                   >
                     <MdDone />
@@ -797,26 +700,13 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     type="button"
                     onClick={() => {
                       setIsAddBlockTypeOpen(false);
-                      setIsSeeBlocksOpen(true);
+                      setIsSeeSubQuestionBlocks(true);
                     }}
                   >
                     <IoIosClose />
                   </Button>
                 </div>
               </div>
-            )}
-
-            {isEditBlockOpen && (
-              <EditBlock
-                onSeeBlocksOpen={() => {
-                  setIsSeeBlocksOpen(true);
-                  setIsPopUpOpen(true);
-                  setIsEditBlockOpen(false);
-                  setIsAddFormNameOpen(false);
-                }}
-                isBlocksOpen={isSeeBlocksOpen}
-                id={blockId}
-              />
             )}
 
             {isSeeAllBlocksInpusOpen && (
@@ -1324,16 +1214,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     );
                   }
 
-                  // Check if the block has data (e.g., labels) before rendering
                   if (!block.labels || block.labels.length === 0) {
                     return null;
                   }
 
                   return (
                     <div className="form-block-user" key={block.id}>
-                      {/* <IoIosClose className="form_type_controllers" size={20} /> */}
+                      <IoIosClose className="form_type_controllers" size={20} />
                       {block.labels?.map((label, labelIndex) => {
-                        // Check if the label name is empty before rendering
                         if (!label.name) {
                           return null;
                         }
@@ -1374,13 +1262,60 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      setIsSeeBlocksOpen(true);
+                      setIsSeeSubQuestionBlocks(true);
                       setIsSeeAllBlocksInputOpen(false);
                     }}
                   >
                     Back
                   </button>
                 </div>
+              </div>
+            )}
+
+            {isEditSubQuestionBlocksOpen && (
+              <EditBlock
+                onSeeBlocksOpen={() => {
+                  setIsSeeSubQuestionBlocks(true);
+                  setIsEditSubQuestionBlocksOpen(false);
+                  setIsAddSubQuestionFormNameOpen(false);
+                }}
+                isBlocksOpen={isSeeSubQuestionFormBlocksOpen}
+                id={subQuestionBlockId}
+              />
+            )}
+
+            {isSeeAlSubQuestionBlocksOpen && (
+              <div className="form_type">
+                {subQuestionFormBlocks?.map((block, blockIndex) => {
+                  return (
+                    <div className="form-block-user" key={block.id}>
+                      {/* <IoIosClose className="form_type_controllers" size={20} /> */}
+
+                      {block.labels?.map((label, labelIndex) => {
+                        return (
+                          <div key={label.id} className="block-input">
+                            <label>{label.name}</label>
+                            {label.type === "SELECT" ? (
+                              <select name={label.name}>
+                                {Object.keys(label.options)?.map((key) => (
+                                  <option key={key} value={key}>
+                                    {label.options[key]}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={label.type}
+                                name={label.name}
+                                placeholder={label.name}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -1403,27 +1338,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ></input>
                 </form>
 
-                {/* <div className="controllers">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      add_min_max_value_handler(question.id);
-                    }}
-                  >
-                    <MdDone />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // setIsSeeBlocksOpen(true);
-                      // setIsSeeAllBlocksInputOpen(false);
-                    }}
-                  >
-                    Back
-                  </button>
-                </div> */}
-
                 <div
                   className="see_blocs_controller add-new-input"
                   style={{
@@ -1435,7 +1349,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      add_min_max_value_handler(question.id);
+                      add_min_max_value_handler(subQuestion.id);
                     }}
                   >
                     <MdDone />
@@ -1472,28 +1386,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   ></input>
                 </form>
 
-                {/* <div className="controllers">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      updateMinMaxValuesHandler(question.id);
-                      console.log(question);
-                    }}
-                  >
-                    <MdDone />
-                  </Button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // setIsSeeBlocksOpen(true);
-                      // setIsSeeAllBlocksInputOpen(false);
-                    }}
-                  >
-                    Back
-                  </button>
-                </div> */}
-
                 <div
                   className="see_blocs_controller add-new-input"
                   style={{
@@ -1505,7 +1397,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      updateMinMaxValuesHandler(question.id);
+                      updateMinMaxValuesHandler(subQuestion.id);
                     }}
                   >
                     <MdDone />
@@ -1526,151 +1418,142 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         </PopUpContentContainer>
       </PopUp>
 
-      <Reorder.Item value={question} key={question.id}>
-        <div>
-          <Table.Row id={`menus-row--${question.id}`}>
-            <div>
-              {question?.subQuestions?.length > 0 ? (
-                <button
-                  style={{ background: "none", border: "none" }}
-                  // here were i activate and desactivate the toggle
-                  onClick={() => {
-                    setcaret((prevCaret) => !prevCaret);
-                    setIsSubMenuOpen(true);
-                  }}
-                >
-                  {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
-                </button>
-              ) : null}
-            </div>
-
-            <div className="hideOverflow questions">
-              {question.questionText}
-            </div>
-            <div className="hideOverflow questions">{question.description}</div>
-
-            {caret_icon_active === false && (
-              <Menus.Toggle id={String(question.id)} />
-            )}
-
-            {caret_icon_active === false && (
-              <Menus.List id={String(question.id)}>
-                {question.valueType.startsWith("checkbox") && (
-                  <Menus.Button
-                    icon={<HiEye />}
-                    onClick={() => navigate(`${question.id}`)}
-                  >
-                    See Choices
-                  </Menus.Button>
-                )}
-
-                {question.valueType.startsWith("form") &&
-                  (formBlocksId === "" ? (
-                    <Menus.Button
-                      icon={<HiEye />}
-                      onClick={() => {
-                        setIsPopUpOpen(true);
-                        setIsAddFormNameOpen(true);
-                        console.log(question.id);
-                      }}
-                    >
-                      Add form
-                    </Menus.Button>
-                  ) : (
-                    <Menus.Button
-                      icon={<HiEye />}
-                      onClick={() => {
-                        setIsPopUpOpen(true);
-                        setIsSeeBlocksOpen(true);
-                        setIsSeeAllBlocksInputOpen(false);
-                        localStorage.setItem("isSeeBlockOpen", "true");
-                      }}
-                    >
-                      See Blocs
-                    </Menus.Button>
-                  ))}
-
-                {question.valueType.startsWith("filter") &&
-                  (!isFilterHaveValue ? (
-                    <Menus.Button
-                      icon={<HiEye />}
-                      onClick={() => {
-                        setIsAddMaxMinValuesOpen(true);
-                        setIsPopUpOpen(true);
-                        console.log("this is working");
-                      }}
-                    >
-                      Add min max values
-                    </Menus.Button>
-                  ) : (
-                    <Menus.Button
-                      icon={<HiEye />}
-                      onClick={() => {
-                        setIsUpdatedMaxMinValuesOpen(true);
-                        setIsPopUpOpen(true);
-                        console.log("this is working");
-                      }}
-                    >
-                      Edit Min Max Values
-                    </Menus.Button>
-                  ))}
-
-                <Menus.Button
-                  icon={<HiEye />}
-                  onClick={() => navigate(`addSubQuestion/${question.id}`)}
-                >
-                  Add SubQuestions
-                </Menus.Button>
-
-                <Menus.Button
-                  icon={<HiPencil />}
-                  onClick={() => navigate(`editQuestion/${question.id}`)}
-                >
-                  Edit
-                </Menus.Button>
-
-                <Modal.Open opens={`delete-question-${question.id}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                </Modal.Open>
-              </Menus.List>
-            )}
-
-            <Modal.Window name={`delete-question-${question.id}`}>
-              <ConfirmDeleteQuestion questionId={question.id} />
-            </Modal.Window>
-          </Table.Row>
+      <Table.Row id={`menus-row--sq--${subQuestion.id}`}>
+        {/* <div></div> */}
+        <div className="down-icon" style={{ marginLeft: "15px" }}>
+          {subQuestion?.subQuestions?.length > 0 ? (
+            <button
+              style={{ background: "none", border: "none" }}
+              onClick={toggleOpen}
+            >
+              {!isOpen ? <RxCaretDown /> : <RxCaretUp />}
+            </button>
+          ) : null}
         </div>
 
-        {/* {caret_icon_active ? (
-          <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
-            {squestionOrderTest?.map((sq, i) => {
-              return (
-                <Reorder.Item value={sq} key={sq.id}>
-                  <SubQuestionRow subQuestion={sq} questionId={question.id} />
-                </Reorder.Item>
-              );
-            })}
-          </Reorder.Group>
-        ) : (
-          <div></div>
-        )} */}
+        <div
+          className="hideOverflow questionColor"
+          style={{
+            marginLeft: "20px",
+            color:
+              isNested && depth >= 0 && depth < colors.length
+                ? colors[depth] // Apply color only to nested subquestions
+                : "#646464", // Default color for non-nested subquestions
+          }}
+        >
+          {subQuestion.questionText}
+        </div>
+        <div
+          className="hideOverflow questionColor"
+          style={{
+            marginLeft: "35px",
+            color:
+              isNested && depth >= 0 && depth < colors.length
+                ? colors[depth] // Apply color only to nested subquestions
+                : "#646464", // Default color for non-nested subquestions
+          }}
+        >
+          {subQuestion.Description}
+        </div>
+        <Menus.Toggle id={String(subQuestion.id)} />
+        {/* this is the button who open the subList*/}
+        <Menus.ListSub id={String(subQuestion.id)}>
+          <Menus.Button
+            icon={<HiPencil />}
+            onClick={() => {
+              navigate(`editSubQuestion/${questionId}/${subQuestion.id}`);
+            }}
+          >
+            Edit SubQuestion
+          </Menus.Button>
 
-        {caret_icon_active ? (
-          <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
-            {squestionOrderTest?.map((sq) => (
-              <RecursiveSubQuestionRow
-                key={sq.id}
-                subQuestion={sq}
-                questionId={question.id}
-              />
+          <Menus.Button
+            icon={<HiPencil />}
+            onClick={() => {
+              navigate(`addSubSubQuestion/${subQuestion.id}`);
+            }}
+          >
+            Add subquestion
+          </Menus.Button>
+
+          {subQuestion.valueType === "form" &&
+            (subQuestionFormId === "" ? (
+              <Menus.Button
+                icon={<HiPencil />}
+                onClick={() => {
+                  setIsPopUpOpen(true);
+                  setIsAddSubQuestionFormNameOpen(true);
+                }}
+              >
+                Add form
+              </Menus.Button>
+            ) : (
+              <Menus.Button
+                icon={<HiPencil />}
+                onClick={() => {
+                  setIsPopUpOpen(true);
+                  setIsSeeSubQuestionBlocks(true);
+                }}
+              >
+                See blocks
+              </Menus.Button>
             ))}
-          </Reorder.Group>
-        ) : (
-          <div></div>
-        )}
-      </Reorder.Item>
-    </>
-  );
-};
 
-export default QuestionsRow;
+          {subQuestion.valueType.startsWith("checkbox") && (
+            <Menus.Button
+              icon={<HiEye />}
+              onClick={() =>
+                navigate(`subCoice/${questionId}/${subQuestion.id}`)
+              }
+            >
+              See Choices
+            </Menus.Button>
+          )}
+
+          {subQuestion.valueType.startsWith("filter") &&
+            (!isFilterHaveValue ? (
+              <Menus.Button
+                icon={<HiEye />}
+                onClick={() => {
+                  setIsAddMaxMinValuesOpen(true);
+                  setIsPopUpOpen(true);
+                  console.log("this is working");
+                }}
+              >
+                Add min max values
+              </Menus.Button>
+            ) : (
+              <Menus.Button
+                icon={<HiEye />}
+                onClick={() => {
+                  setIsUpdatedMaxMinValuesOpen(true);
+                  setIsPopUpOpen(true);
+                  console.log("this is working");
+                }}
+              >
+                Edit Min Max Values
+              </Menus.Button>
+            ))}
+
+          <Modal.Open
+            opens={`delete-subquestion-${subQuestion.id}-${questionId}`}
+          >
+            <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+          </Modal.Open>
+        </Menus.ListSub>
+
+        {/* {this is the window to confirm the delete} */}
+        <Modal.Window
+          name={`delete-subquestion-${subQuestion.id}-${questionId}`}
+        >
+          <ConfirmDeleteSubQuestion
+            questionParentId={Number(questionId)}
+            questionId={Number(subQuestion.id)}
+          />
+        </Modal.Window>
+      </Table.Row>
+    </React.Fragment>
+  );
+}
+
+export default NestedSubQuestionRow;
