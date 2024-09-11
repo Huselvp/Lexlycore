@@ -4,7 +4,7 @@ import Table from "../../../ui/Table";
 import Modal from "../../../ui/Modal";
 import { useNavigate } from "react-router-dom";
 import ConfirmDeleteQuestion from "./ConfirmDeleteQuestion";
-import { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -468,10 +468,94 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   // };
 
   // Helper function to collect all subquestion IDs
+  // const collectSubQuestionIds = (subQuestion) => {
+  //   let ids = [subQuestion.id];
+
+  //   if (subQuestion.subQuestions) {
+  //     for (const sq of subQuestion.subQuestions) {
+  //       ids = ids.concat(collectSubQuestionIds(sq));
+  //     }
+  //   }
+
+  //   return ids;
+  // };
+
+  // const RecursiveSubQuestionRow = ({
+  //   question,
+  //   subQuestion,
+  //   questionId,
+  //   isNested = false,
+  //   depth = -1,
+  // }) => {
+  //   const [isOpen, setIsOpen] = useState(false);
+  //   const [newPlace, setNewPlace] = useState(subQuestion);
+
+  //   const toggleOpen = () => {
+  //     setIsOpen((prev) => !prev);
+  //   };
+
+  //   const newDepth = depth + 1;
+
+  //   const handleReorder = (newOrder) => {
+  //     console.log("New order:", newOrder);
+
+  //     // Assuming newOrder is an array of reordered subQuestions
+  //     const updatedSubQuestions = newOrder.map((item) => ({
+  //       ...item,
+  //       subQuestions: item.subQuestions
+  //         ? item.subQuestions.map((sub) => ({ ...sub }))
+  //         : [],
+  //     }));
+
+  //     setNewPlace((prev) => ({
+  //       ...prev,
+  //       subQuestions: updatedSubQuestions,
+  //     }));
+
+  //     const collectedIds = collectSubQuestionIds(question.subQuestions);
+  //     console.log("Collected IDs:", collectedIds);
+  //     console.log(question, "9999999999999999999999999999");
+  //   };
+
+  //   return (
+  //     <Reorder.Item value={newPlace} key={newPlace.id}>
+  //       <SubQuestionRow
+  //         id={newPlace.id}
+  //         subQuestion={newPlace}
+  //         questionId={questionId}
+  //         isOpen={isOpen}
+  //         toggleOpen={toggleOpen}
+  //         isNested={isNested}
+  //         depth={newDepth}
+  //       />
+
+  //       {isOpen &&
+  //         newPlace.subQuestions &&
+  //         newPlace.subQuestions.length > 0 && (
+  //           <Reorder.Group
+  //             onReorder={handleReorder}
+  //             values={newPlace.subQuestions}
+  //           >
+  //             {newPlace.subQuestions?.map((sq) => (
+  //               <RecursiveSubQuestionRow
+  //                 key={sq.id}
+  //                 subQuestion={sq}
+  //                 questionId={newPlace.id}
+  //                 isNested={true}
+  //                 depth={newDepth}
+  //               />
+  //             ))}
+  //           </Reorder.Group>
+  //         )}
+  //     </Reorder.Item>
+  //   );
+  // };
+
+  // Function to collect all subquestion and nested subquestion IDs
   const collectSubQuestionIds = (subQuestion) => {
     let ids = [subQuestion.id];
 
-    if (subQuestion.subQuestions) {
+    if (subQuestion.subQuestions && subQuestion.subQuestions.length > 0) {
       for (const sq of subQuestion.subQuestions) {
         ids = ids.concat(collectSubQuestionIds(sq));
       }
@@ -480,74 +564,102 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     return ids;
   };
 
-  const RecursiveSubQuestionRow = ({
-    subQuestion,
-    questionId,
-    isNested = false,
-    depth = -1,
-  }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [newPlace, setNewPlace] = useState(subQuestion);
+  const RecursiveSubQuestionRow = React.memo(
+    ({ question, subQuestion, questionId, isNested = false, depth = -1 }) => {
+      const [isOpen, setIsOpen] = useState(false);
+      const [newPlace, setNewPlace] = useState(subQuestion);
 
-    const toggleOpen = () => {
-      setIsOpen((prev) => !prev);
-    };
+      const toggleOpen = () => {
+        setIsOpen((prev) => !prev);
+      };
 
-    const newDepth = depth + 1;
+      const newDepth = depth + 1;
 
-    const handleReorder = (newOrder) => {
-      console.log("New order:", newOrder);
+      // Handle reorder and collect IDs of subquestions
+      const handleReorder = (newOrder) => {
+        console.log("New order:", newOrder);
 
-      // Assuming newOrder is an array of reordered subQuestions
-      const updatedSubQuestions = newOrder.map((item) => ({
-        ...item,
-        subQuestions: item.subQuestions
-          ? item.subQuestions.map((sub) => ({ ...sub }))
-          : [],
-      }));
+        // Update the subQuestions structure after reorder
+        const updatedSubQuestions = newOrder.map((item) => ({
+          ...item,
+          subQuestions: item.subQuestions
+            ? item.subQuestions.map((sub) => ({ ...sub }))
+            : [],
+        }));
 
-      setNewPlace((prev) => ({
-        ...prev,
-        subQuestions: updatedSubQuestions,
-      }));
+        // Update state with the new subQuestions structure
+        setNewPlace((prev) => ({
+          ...prev,
+          subQuestions: updatedSubQuestions,
+        }));
 
-      const collectedIds = collectSubQuestionIds(subQuestion);
-      console.log("Collected IDs:", collectedIds);
-    };
+        // Collect all IDs for subquestions of the question
+        const collectedIds = question.subQuestions
+          ? question.subQuestions.flatMap(collectSubQuestionIds)
+          : [];
 
-    return (
-      <Reorder.Item value={newPlace} key={newPlace.id}>
-        <SubQuestionRow
-          id={newPlace.id}
-          subQuestion={newPlace}
-          questionId={questionId}
-          isOpen={isOpen}
-          toggleOpen={toggleOpen}
-          isNested={isNested}
-          depth={newDepth}
-        />
+        console.log("Collected IDs:", collectedIds);
+        console.log(question, "9999999999999999999999999999");
 
-        {isOpen &&
-          newPlace.subQuestions &&
-          newPlace.subQuestions.length > 0 && (
-            <Reorder.Group
-              onReorder={handleReorder}
-              values={newPlace.subQuestions}
-            >
-              {newPlace.subQuestions?.map((sq) => (
-                <RecursiveSubQuestionRow
-                  key={sq.id}
-                  subQuestion={sq}
-                  questionId={newPlace.id}
-                  isNested={true}
-                  depth={newDepth}
-                />
-              ))}
-            </Reorder.Group>
-          )}
-      </Reorder.Item>
-    );
-  };
+        // Extract the IDs from the new order
+        const newOrderIds = newOrder.map((item) => item.id);
+
+        // Function to reorder the subquestions based on their IDs
+        const reorderQuestions = async (squestionids) => {
+          try {
+            await axios
+              .put(
+                `${API}/admin/questions/subquestions/reorder/${question.id}`,
+                squestionids,
+                getApiConfig()
+              )
+              .then((result) => {
+                console.log(result.data);
+              });
+          } catch (error) {
+            console.error("Error reordering questions:", error);
+          }
+        };
+
+        // Call reorderQuestions with the array of reordered subquestion IDs
+        reorderQuestions(newOrderIds);
+      };
+
+      return (
+        <Reorder.Item value={newPlace} key={newPlace.id}>
+          <SubQuestionRow
+            id={newPlace.id}
+            subQuestion={newPlace}
+            questionId={questionId}
+            isOpen={isOpen}
+            toggleOpen={toggleOpen}
+            isNested={isNested}
+            depth={newDepth}
+          />
+
+          {isOpen &&
+            newPlace.subQuestions &&
+            newPlace.subQuestions.length > 0 && (
+              <Reorder.Group
+                onReorder={handleReorder}
+                values={newPlace.subQuestions}
+              >
+                {newPlace.subQuestions?.map((sq) => (
+                  <RecursiveSubQuestionRow
+                    key={sq.id}
+                    subQuestion={sq}
+                    questionId={newPlace.id}
+                    isNested={true}
+                    depth={newDepth}
+                    question={question}
+                  />
+                ))}
+              </Reorder.Group>
+            )}
+        </Reorder.Item>
+      );
+    }
+  );
 
   return (
     <>
@@ -1659,6 +1771,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
             {squestionOrderTest?.map((sq) => (
               <RecursiveSubQuestionRow
+                question={question}
                 key={sq.id}
                 subQuestion={sq}
                 questionId={question.id}

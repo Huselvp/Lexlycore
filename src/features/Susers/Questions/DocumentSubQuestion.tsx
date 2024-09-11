@@ -372,14 +372,6 @@ const DocumentSubQuestion = ({
     }
   }, [getSubquestion()]);
 
-  // // Count total inputs
-  // const countTotalInputs = (blocks) => {
-  //   return blocks.reduce((total, block) => total + block?.labels.length, 0);
-  // };
-
-  // // Calculate total inputs
-  // const totalInputs = countTotalInputs(formBlocks);
-
   const countTotalInputs = (blocks) => {
     return blocks.reduce((total, block) => total + block?.labels.length, 0);
   };
@@ -453,26 +445,6 @@ const DocumentSubQuestion = ({
     );
     setFormErrors(initialFormErrors);
   }, [formBlocks]);
-
-  // Handle input change
-  // const handleChange = useCallback(
-  //   (blockId, labelId, value) => {
-  //     setFormData((prevFormData) => {
-  //       const updatedFormData = prevFormData?.filter(
-  //         (item) => !(item?.blockId === blockId && item?.labelId === labelId)
-  //       );
-
-  //       if (value.trim() !== "") {
-  //         updatedFormData.push({ blockId, labelId, LabelValue: value });
-  //       }
-
-  //       setValue(updatedFormData); // Pass updated data to setValue
-
-  //       return updatedFormData;
-  //     });
-  //   },
-  //   [totalInputs, setValue]
-  // );
 
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
@@ -549,126 +521,7 @@ const DocumentSubQuestion = ({
     setAdresse("");
     setPostalCode("");
     setCity("");
-    // setCountry("Danmark");
-    // setHerefterOtaltSom("");
   };
-
-  // =============
-
-  // const handleCVRChanges = (cvr, blockId) => {
-  //   console.log("I am here and working good");
-  //   console.log(blockId);
-
-  //   // Ensure the targeted block exists
-  //   let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
-  //   if (!targetedBlock) return;
-
-  //   console.log(targetedBlock);
-
-  //   // Map field names to their corresponding variables
-  //   const fieldMappings = {
-  //     Virksomhedsnavn: virksomhedsnavn,
-  //     Adresse: adresse,
-  //     "CVR nr": cvr,
-  //     Postnr: postalCode,
-  //     By: city,
-  //     Land: country,
-  //     HerefterOtaltSom: herefterOtaltSom,
-  //   };
-
-  //   setFormData((prevFormData) => {
-  //     const updatedFormData = [...prevFormData];
-
-  //     // Iterate over fieldMappings to update or add data
-  //     Object.entries(fieldMappings).forEach(([labelName, value]) => {
-  //       const existingEntryIndex = updatedFormData.findIndex(
-  //         (entry) => entry.blockId === blockId && entry.labelId === labelName
-  //       );
-
-  //       if (existingEntryIndex !== -1) {
-  //         // Update the existing entry
-  //         updatedFormData[existingEntryIndex].LabelValue = value;
-  //       } else {
-  //         // Add a new entry
-  //         updatedFormData.push({
-  //           blockId,
-  //           labelId: labelName,
-  //           LabelValue: value,
-  //           questionText: labelName,
-  //         });
-  //       }
-  //     });
-
-  //     // Directly update the form data and state
-  //     setValue(updatedFormData, question.valueType);
-
-  //     return updatedFormData;
-  //   });
-  // };
-
-  // const handleCVRChanges = (cvr, blockId) => {
-  //   console.log("I am here and working good");
-  //   console.log(blockId);
-
-  //   // Ensure the targeted block exists
-  //   let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
-  //   if (!targetedBlock) return;
-
-  //   console.log(targetedBlock);
-
-  //   // Map field names to their corresponding variables
-  //   const fieldMappings = {
-  //     Virksomhedsnavn: virksomhedsnavn,
-  //     Adresse: adresse,
-  //     "CVR nr": cvr,
-  //     Postnr: postalCode,
-  //     By: city,
-  //     Land: country,
-  //     HerefterOtaltSom: herefterOtaltSom,
-  //   };
-
-  //   setFormData((prevFormData) => {
-  //     let updatedFormData = [...prevFormData];
-
-  //     // Iterate over fieldMappings to update, add, or remove data
-  //     Object.entries(fieldMappings).forEach(([labelName, value]) => {
-  //       const existingEntryIndex = updatedFormData.findIndex(
-  //         (entry) => entry.blockId === blockId && entry.labelId === labelName
-  //       );
-
-  //       const targetedlabelId = targetedBlock.labels.find(
-  //         (label) => label.name == labelName
-  //       );
-
-  //       console.log(targetedlabelId?.id, "here is the ");
-
-  //       if (value !== "") {
-  //         if (existingEntryIndex !== -1) {
-  //           // Update the existing entry
-  //           updatedFormData[existingEntryIndex].LabelValue = value;
-  //         } else {
-  //           // Add a new entry
-  //           updatedFormData.push({
-  //             blockId,
-  //             labelId: targetedlabelId?.id,
-  //             LabelValue: value,
-  //             questionText: labelName,
-  //           });
-  //         }
-  //       } else {
-  //         if (existingEntryIndex !== -1) {
-  //           // Remove the entry if the value is an empty string
-  //           updatedFormData.splice(existingEntryIndex, 1);
-  //         }
-  //       }
-  //     });
-
-  //     // Directly update the form data and state
-  //     setValue(updatedFormData, question.valueType);
-
-  //     return updatedFormData;
-  //   });
-  // };
 
   const handleCVRChanges = (cvr, blockId) => {
     console.log("I am here and working good");
@@ -876,10 +729,10 @@ const DocumentSubQuestion = ({
                 <Checkbox
                   name="choice"
                   id={choice.choice}
-                  value={choice.newRelatedText}
+                  value={choice.choice}
                   type="radio"
-                  onChange={() => setValue(choice.newRelatedText, "checkbox")}
-                  checked={value === choice.newRelatedText}
+                  onChange={() => setValue(choice.choice, "checkbox")}
+                  checked={value === choice.choice}
                 />
                 <label htmlFor={choice.choice}>{choice.choice}</label>
               </div>
