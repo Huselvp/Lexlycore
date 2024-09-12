@@ -6,10 +6,17 @@ import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
 } from "react-icons/hi";
+
 import DocumentQuestionsOverview from "../../Documents/DocumentQuestionsOverview";
 import QuestiontsSlider from "../../../ui/QuestiontsSlider";
 import DocumentHeader from "../../Documents/DocumentHeader";
 import DocumentSubQuestion from "./DocumentSubQuestion";
+import axios from "axios";
+
+import { useParams } from "react-router-dom";
+
+import { API } from "../../../utils/constants";
+import { getApiConfig } from "../../../utils/constants";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -139,11 +146,39 @@ const DocumentQuestions = ({
   });
 
   const isDraft = overviewData.some((q) => !q.value);
+
+  const params = useParams();
+
+  const documentId = params.documentId;
+
+  const [draftData, setDratfData] = useState([]);
+
+  useEffect(() => {
+    const draftDataHandler = async (id) => {
+      try {
+        axios
+          .get(`${API}/suser/resume-progress/${id}`, getApiConfig())
+          .then((result) => {
+            console.log(
+              result.data,
+              "11111111111111111111111111111111111111111111111111111111111111"
+            );
+            setDratfData(result.data);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    draftDataHandler(documentId);
+  }, [documentId]);
+
   const activeQuestion = overviewData.find((q) => q.active);
 
   const activeQuestionIndex = overviewData.findIndex(
     (q) => q === activeQuestion
   );
+
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
   // console.log("test active subq", activeSubQuestions);
@@ -153,7 +188,6 @@ const DocumentQuestions = ({
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
     // here he saves the input data
-
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -360,7 +394,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next</span>
+                              <span>Next 0000</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -414,7 +448,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next</span>
+                              <span>Next 000</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -441,7 +475,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next</span>
+                              <span>Next 000</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -472,7 +506,7 @@ const DocumentQuestions = ({
                                   isSubOpen(false);
                                 }}
                               >
-                                <span>Next</span>
+                                <span>Next 0000</span>
                                 <ArrowRightIcon />
                               </button>
                             )}
@@ -498,6 +532,16 @@ const DocumentQuestions = ({
             />
           )}
         </Content>
+
+        <button
+          onClick={() => {
+            console.log(isDraft);
+            console.log(overviewData);
+            console.log(draftData, "888888888888888888888888888888888888");
+          }}
+        >
+          test
+        </button>
       </Container>
     </>
   );

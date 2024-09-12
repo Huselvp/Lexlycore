@@ -169,13 +169,6 @@ export const chargePaymentUrl = `${API}/suser/charge-payment`;
 export const getDocumentQuestionsValuesUrl = (documentId: number) =>
   `${API}/suser/values/${documentId}`;
 
-// export const getApiConfig = {
-//   headers: {
-//     "Content-Type": "application/json"
-//   },
-//   withCredentials: true
-// }
-
 export const getApiConfig = (includeToken: boolean = true) => {
   if (includeToken) {
     const token = getToken();
@@ -206,7 +199,4 @@ export const questionsAnsewersTypes: questionAnswersType[] = [
   { label: "Time", value: "time" },
   { label: "Date", value: "date" },
   { label: "Map", value: "map" },
-  // { label: "True/False", value: "boolean" }
 ];
-
-// this is a test her it is

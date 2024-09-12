@@ -1,11 +1,4 @@
-import {
-  ReactNode,
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from "react";
+import { ReactNode, useMemo, useState, useEffect, useCallback } from "react";
 import Form from "../../../ui/AuthForm";
 import { extractChoicesFromString } from "../../../utils/helpers";
 import styled from "styled-components";
@@ -17,17 +10,6 @@ import "./styles/form.css";
 import { IoMdRemove } from "react-icons/io";
 import { FiUser } from "react-icons/fi";
 import { BsBuildings } from "react-icons/bs";
-
-import {
-  APIProvider,
-  ControlPosition,
-  MapControl,
-  AdvancedMarker,
-  Map,
-  useMap,
-  useMapsLibrary,
-  useAdvancedMarkerRef,
-} from "@vis.gl/react-google-maps";
 
 import "../../../ui/map/styles.css";
 

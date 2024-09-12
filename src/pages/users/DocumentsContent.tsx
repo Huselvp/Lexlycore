@@ -1,17 +1,17 @@
-import { useDocuments } from "../../features/Documents/useDocuments"
-import styled from "styled-components"
-import { HiMiniDocumentArrowDown, HiPencil } from "react-icons/hi2"
-import { HiMiniShoppingCart } from "react-icons/hi2"
-import { HiTrash } from "react-icons/hi2"
-import { formatCurrency } from "../../utils/helpers"
-import FilterBanner from "../../ui/FilterBanner"
-import { useState } from "react"
-import Menus from "../../ui/Menus"
-import Modal from "../../ui/Modal"
-import ConfirmDeleteDocument from "../../features/Documents/ConfirmDeleteDocument"
-import { useGenerateDocument } from "../../features/Documents/useGenerateDocument"
-import { useInitiatePayment } from "../../features/Payment/useInitiatePayment"
-import { useNavigate } from "react-router-dom"
+import { useDocuments } from "../../features/Documents/useDocuments";
+import styled from "styled-components";
+import { HiMiniDocumentArrowDown, HiPencil } from "react-icons/hi2";
+import { HiMiniShoppingCart } from "react-icons/hi2";
+import { HiTrash } from "react-icons/hi2";
+import { formatCurrency } from "../../utils/helpers";
+import FilterBanner from "../../ui/FilterBanner";
+import { useState } from "react";
+import Menus from "../../ui/Menus";
+import Modal from "../../ui/Modal";
+import ConfirmDeleteDocument from "../../features/Documents/ConfirmDeleteDocument";
+import { useGenerateDocument } from "../../features/Documents/useGenerateDocument";
+import { useInitiatePayment } from "../../features/Payment/useInitiatePayment";
+import { useNavigate } from "react-router-dom";
 
 const Items = styled.ul`
   display: grid;
@@ -39,7 +39,7 @@ const Items = styled.ul`
       }
     }
   }
-`
+`;
 const Status = styled.p<{ status: "paid" | "unpaid" | "draft" }>`
   justify-self: start;
   /* background-color: var(--color-yellow-100); */
@@ -54,7 +54,7 @@ const Status = styled.p<{ status: "paid" | "unpaid" | "draft" }>`
   font-weight: 500;
   font-size: 1.2rem;
   border-radius: var(--rounded-3xl);
-`
+`;
 const TemplateName = styled.p`
   font-weight: 500;
   font-size: 1.8rem;
@@ -63,11 +63,11 @@ const TemplateName = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   white-space: normal;
-`
+`;
 const TemplatePrice = styled.p`
   justify-self: end;
   font-weight: 500;
-`
+`;
 const TemplateDes = styled.p`
   align-self: start;
   font-size: 1.4rem;
@@ -77,19 +77,20 @@ const TemplateDes = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   white-space: normal;
-`
-const NoData = styled.p``
+`;
+const NoData = styled.p``;
 
 const DocumentsContent = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { isLoading: isGeneratingDocument, generateDocument } =
-    useGenerateDocument()
-  const { documents } = useDocuments()
+    useGenerateDocument();
+  const { documents } = useDocuments();
   const { isLoading: isInitiatingPayment, initiatePayment } =
-    useInitiatePayment()
+    useInitiatePayment();
   const [filter, setFilter] = useState<"all" | "paid" | "unpaid" | "draft">(
     "all"
-  )
+  );
+
   const data =
     filter === "draft"
       ? documents.filter((doc) => doc.draft)
@@ -97,7 +98,7 @@ const DocumentsContent = () => {
       ? documents.filter((doc) => !doc.draft && !doc.paymentStatus)
       : filter === "paid"
       ? documents.filter((doc) => !doc.draft && doc.paymentStatus)
-      : documents
+      : documents;
 
   return (
     <>
@@ -142,7 +143,7 @@ const DocumentsContent = () => {
                             generateDocument({
                               documentId: document.id,
                               templateId: document.template.id,
-                              templateName: document.template.templateName
+                              templateName: document.template.templateName,
                             })
                           }
                         >
@@ -154,7 +155,7 @@ const DocumentsContent = () => {
                           onClick={() =>
                             initiatePayment({
                               templateId: document.template.id,
-                              documentId: document.id
+                              documentId: document.id,
                             })
                           }
                           icon={<HiMiniShoppingCart />}
@@ -188,7 +189,7 @@ const DocumentsContent = () => {
         </Menus>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default DocumentsContent
+export default DocumentsContent;
