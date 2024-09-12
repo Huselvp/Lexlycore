@@ -309,11 +309,6 @@ const DocumentHeader = ({
 
     const lastQuestionId = getLastNonEmptyQuestionId(finalData);
 
-    // console.log(
-    //   overviewData,
-    //   "66666666666666666666666666666666666666666666666666666666"
-    // );
-
     console.log(
       lastQuestionId,
       "66666666666666666666666666666666666666666666666666666666"
@@ -327,7 +322,7 @@ const DocumentHeader = ({
           lastAnsweredQuestionId: lastQuestionId,
           values: finalData,
         }, // Data to send in the body
-        getApiConfig() // Configuration, such as headers or additional options
+        getApiConfig()
       )
       .then((result) => {
         console.log(
