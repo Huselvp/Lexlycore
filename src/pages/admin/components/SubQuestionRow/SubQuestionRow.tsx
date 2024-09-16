@@ -411,6 +411,11 @@ function SubQuestionRow({
     "#33FF56",
   ];
 
+  useEffect(() => {
+    console.log(depth, "i am the depth");
+    localStorage.setItem("depth", depth);
+  }, [depth]);
+
   return (
     <React.Fragment>
       <PopUp isOpen={isPopUpOpen}>
@@ -1437,7 +1442,7 @@ function SubQuestionRow({
             marginLeft: "20px",
             color:
               isNested && depth >= 0 && depth < colors.length
-                ? colors[depth] // Apply color only to nested subquestions
+                ? colors[depth - 1] // Apply color only to nested subquestions
                 : "#646464", // Default color for non-nested subquestions
           }}
         >
@@ -1449,7 +1454,7 @@ function SubQuestionRow({
             marginLeft: "35px",
             color:
               isNested && depth >= 0 && depth < colors.length
-                ? colors[depth] // Apply color only to nested subquestions
+                ? colors[depth - 1] // Apply color only to nested subquestions
                 : "#646464", // Default color for non-nested subquestions
           }}
         >
