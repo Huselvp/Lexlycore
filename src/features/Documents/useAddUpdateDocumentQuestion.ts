@@ -1,69 +1,3 @@
-// import { useMutation } from "@tanstack/react-query";
-// import { addUpdateDocumentQuestion as addUpdateDocumentQuestionApi } from "../../services/documentApi";
-// import {
-//   displayErrorMessage,
-//   transformParamToNumber,
-// } from "../../utils/helpers";
-// import { useParams } from "react-router-dom";
-
-// export const useAddUpdateDocumentQuestion = () => {
-//   const params = useParams();
-//   const documentId = transformParamToNumber(params.documentId);
-
-//   // const { isPending: isLoading, mutate: addUpdateDocumentQuestion } =
-//   //   useMutation({
-//   //     mutationFn: ({
-//   //       isDraft,
-//   //       values,
-//   //     }: {
-//   //       isDraft: boolean;
-//   //       values: { questionId: number; value: string | number }[];
-//   //     }) =>
-//   //       addUpdateDocumentQuestionApi({
-//   //         isDraft,
-//   //         values,
-//   //         documentId,
-//   //       }),
-
-//   //       console.log({
-//   //         isDraft,
-//   //         values,
-//   //         documentId,
-//   //       })
-
-//   //     onError: displayErrorMessage,
-//   //   });
-
-//   const { isPending: isLoading, mutate: addUpdateDocumentQuestion } =
-//     useMutation({
-//       mutationFn: ({
-//         isDraft,
-//         values,
-//       }: {
-//         isDraft: boolean;
-//         values: { questionId: number; value: string | number }[];
-//       }) => {
-//         console.log(
-//           {
-//             isDraft,
-//             values,
-//             documentId,
-//           },
-//           "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-//         );
-
-//         return addUpdateDocumentQuestionApi({
-//           isDraft,
-//           values,
-//           documentId,
-//         });
-//       },
-//       onError: displayErrorMessage,
-//     });
-
-//   return { isLoading, addUpdateDocumentQuestion };
-// };
-
 import { useMutation } from "@tanstack/react-query";
 import { addUpdateDocumentQuestion as addUpdateDocumentQuestionApi } from "../../services/documentApi";
 import {
@@ -127,6 +61,18 @@ export const useAddUpdateDocumentQuestion = () => {
                   }))
                 : [];
               processedQuestion.days = days;
+            } else if (question.type === "map") {
+              // Split the map string by commas and trim each part
+              const mapString = question[valueKey] || "";
+              const mapParts = mapString.split(",").map((part) => part.trim());
+
+              // Create mapValues object with keys as 1, 2, 3, etc.
+              const mapValues = mapParts.reduce((acc, value, index) => {
+                acc[index + 1] = value;
+                return acc;
+              }, {});
+
+              processedQuestion.mapValues = mapValues;
             } else {
               processedQuestion.value = question[valueKey];
             }
@@ -153,11 +99,14 @@ export const useAddUpdateDocumentQuestion = () => {
         // Process and log data
         const finalData = orderMyData(values);
 
-        console.log({
-          isDraft,
-          finalData,
-          documentId,
-        });
+        console.log(
+          {
+            isDraft,
+            finalData,
+            documentId,
+          },
+          "777777777777777777777777777777"
+        );
 
         // Make the API call
         return addUpdateDocumentQuestionApi({

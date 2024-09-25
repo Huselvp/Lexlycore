@@ -2,6 +2,7 @@ import { getToken } from "./helpers";
 
 export const MaxItemsPerPage = 10;
 export const API = import.meta.env.VITE_API;
+
 // Auth
 export const registerURL = `${API}/auth/register`;
 export const loginURL = `${API}/auth/login`;
@@ -44,6 +45,7 @@ export const assignCategoryUrl = ({
   categoryId: number;
   templateId: number;
 }) => `${API}/admin/assignSubcategory/${templateId}/${categoryId}`;
+
 //Question
 export const createQuestionUrl = (id: number) =>
   `${API}/admin/create_question/${id}`;
@@ -117,7 +119,7 @@ export const addChoiceUrl = (id: number) =>
 
 export const addSubChoiceUrl = (subId: number) =>
   `${API}/admin/add-choice-subquestion/${subId}`;
-//
+
 // Auth
 export const updateEmailUrl = () => {
   const token = getToken();
@@ -137,6 +139,7 @@ export const updatePersonalDataUrl = () => {
 export const getUsersUrl = `${API}/admin/all_users`;
 // Document
 
+// houda must remove the access token from here to be able to get the data
 export const getDocumentsUrl = () => {
   const token = getToken();
   return `${API}/suser/get_documents/${token}`;
@@ -155,6 +158,7 @@ export const createDocumentUrl = (templateId: number) =>
 
 // export const createDocumentUrl = (templateId: number) =>
 //   `${API}/suser/createDocument/${templateId}`
+
 export const addUpdateDocumentQuestionUrl = `${API}/suser/add-values`;
 
 export const addDocumentQuestionUrl = `${API}/suser/add-values`;

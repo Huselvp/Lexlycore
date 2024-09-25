@@ -137,8 +137,13 @@ const DocumentQuestionsOverview = ({
     addUpdateDocumentQuestion(
       { values, isDraft },
       {
+        // here i need to check if the user logged in or not
         onSuccess: () => {
-          initiatePayment();
+          if (localStorage.getItem("access_token") === "") {
+            console.log("you can't pay you need to login first");
+          } else {
+            initiatePayment();
+          }
         },
       }
     );
@@ -217,6 +222,28 @@ const DocumentQuestionsOverview = ({
                   </li>
                 )}
 
+              {item.type === "time" && (
+                <li key={i}>
+                  {item?.subQuestions?.length > 0 ? (
+                    <button
+                      style={{ background: "none", border: "none" }}
+                      onClick={() => toggleSubQuestions(i)}
+                    >
+                      {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
+                    </button>
+                  ) : null}
+                  <p>{item.questionText}</p>
+                  <button onClick={() => onClick(i)}>
+                    <EditIcon />
+                  </button>
+                  <p>
+                    {item.value[0].time}
+                    {"-"}
+                    {item.value[1].time}
+                  </p>
+                </li>
+              )}
+
               {item.type === "map" && (
                 <li
                   key={i}
@@ -226,7 +253,7 @@ const DocumentQuestionsOverview = ({
                   {(() => {
                     const mapValues = convertStringToAddressObject(item.value);
                     return (
-                      <div>
+                      <div style={{ width: "100%" }}>
                         <div
                           style={{
                             display: "flex",
@@ -354,28 +381,6 @@ const DocumentQuestionsOverview = ({
                     {item.value[0].day}
                     {"-"}
                     {item.value[1].day}
-                  </p>
-                </li>
-              )}
-
-              {item.type === "time" && (
-                <li key={i}>
-                  {item?.subQuestions?.length > 0 ? (
-                    <button
-                      style={{ background: "none", border: "none" }}
-                      onClick={() => toggleSubQuestions(i)}
-                    >
-                      {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
-                    </button>
-                  ) : null}
-                  <p>{item.questionText}</p>
-                  <button onClick={() => onClick(i)}>
-                    <EditIcon />
-                  </button>
-                  <p>
-                    {item.value[0].time}
-                    {"-"}
-                    {item.value[1].time}
                   </p>
                 </li>
               )}

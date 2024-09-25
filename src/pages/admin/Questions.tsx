@@ -8,6 +8,7 @@ import { useTemplate } from "../../features/Templates/useTemplate";
 import Spinner from "../../ui/Spinner";
 import ErrorMessage from "../../ui/ErrorMessage";
 import { useEffect, useState } from "react";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 
 const Questions = () => {
   // const { templateId } = useParams()
@@ -214,6 +215,16 @@ const Questions = () => {
         </div>
       </div>
       <QuestionsTable />
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "end",
+          marginTop: "2rem",
+        }}
+      >
+        <MdOutlineRemoveRedEye size={30} style={{ cursor: "pointer" }} />
+      </div>
     </Modal>
   );
 };
