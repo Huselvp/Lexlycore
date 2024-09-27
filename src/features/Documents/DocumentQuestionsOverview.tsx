@@ -142,7 +142,7 @@ const DocumentQuestionsOverview = ({
           if (localStorage.getItem("access_token") === "") {
             console.log("you can't pay you need to login first");
           } else {
-            // initiatePayment();
+            initiatePayment();
 
             console.log("hi i am dying");
           }

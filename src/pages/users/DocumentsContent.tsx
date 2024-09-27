@@ -104,6 +104,95 @@ const DocumentsContent = () => {
 
   const [documentQuestions, setDocumentQuestions] = useState([]);
 
+  // const getPDF = async (id, title) => {
+  //   try {
+  //     await axios
+  //       .get(`${API}/suser/values/${id}`, getApiConfig())
+  //       .then((result) => {
+  //         setDocumentQuestions(result.data);
+  //         console.log(result.data);
+  //         // Update state
+  //         handleGeneratePdf(result.data, title, i); // Pass the result directly to the function
+  //       });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  // // Function to extract both texte and value from questions
+  // function extractTextes(questions) {
+  //   const texteArray = [];
+
+  //   questions.forEach((item) => {
+  //     if (item.question && item.question.texte) {
+  //       // Replace the placeholder [value] with the actual value
+  //       const updatedText = item.question.texte.replaceAll(
+  //         "[value]",
+  //         item.value
+  //       );
+
+  //       // Append the updated text to the array
+  //       texteArray.push(updatedText);
+  //     }
+  //   });
+
+  //   return texteArray;
+  // }
+
+  // // Component to extract and return raw HTML content from documentQuestions
+  // const DocumentQuestionsDisplay = ({ documentQuestions }) => {
+  //   const textes = extractTextes(documentQuestions);
+
+  //   // Add margin-bottom: 2rem to each extracted HTML block
+  //   return textes
+  //     .map(
+  //       (texte) => `<div style="margin-bottom: 1rem;">${texte}</div>` // Add margin-bottom here
+  //     )
+  //     .join(""); // Return the combined HTML content as string
+  // };
+
+  // // Function to convert HTML content to PDF
+  // const convertToPdf = (title, logo, contentHtml) => {
+  //   // Define the header HTML, using a specific font family, smaller font size, and margin
+  //   const header = `
+  //     <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
+  //       <h2 style="font-size: 16px;">${title}</h2>
+  //       <img src="${logo}" width="100" height="100" alt="Logo" />
+  //     </div>`;
+
+  //   // Apply the same font family and size to the entire content, adding margin between parent tags
+  //   const content = `
+  //     <div style="font-family: Arial, sans-serif; font-size: 12px;">
+  //       ${header}
+  //       ${contentHtml} <!-- The contentHtml already has the margin applied in each div -->
+  //     </div>`;
+
+  //   const options = {
+  //     filename: "my-document.pdf",
+  //     margin: 1,
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2, useCORS: true },
+  //     jsPDF: {
+  //       unit: "in",
+  //       format: "letter",
+  //       orientation: "portrait",
+  //     },
+  //   };
+
+  //   // Generate the PDF with the header and content included
+  //   html2pdf().set(options).from(content).save();
+  // };
+
+  // const handleGeneratePdf = (documentQuestions, title, logo) => {
+  //   // Generate HTML content from DocumentQuestionsDisplay
+  //   const contentHtml = DocumentQuestionsDisplay({ documentQuestions });
+
+  //   // Pass it to the convertToPdf function
+  //   convertToPdf(title, logo, contentHtml);
+  // };
+
+  // ==============
+
   const getPDF = async (id, title) => {
     try {
       await axios
@@ -119,24 +208,42 @@ const DocumentsContent = () => {
     }
   };
 
-  // ==============
-
-  // Function to extract both texte and value from questions
+  // Function to extract both texte and value from questions, including nested subquestions
   function extractTextes(questions) {
     const texteArray = [];
 
-    questions.forEach((item) => {
-      if (item.question && item.question.texte) {
-        // Replace the placeholder [value] with the actual value
-        const updatedText = item.question.texte.replaceAll(
-          "[value]",
-          item.value
-        );
+    // Recursive function to traverse questions and nested subquestions
+    function traverseQuestions(questions) {
+      questions.forEach((item) => {
+        if (item.question) {
+          // If 'texte' exists, replace [value] with the actual value
+          if (item.question.texte) {
+            const updatedText = item.question.texte.replaceAll(
+              "[value]",
+              item.value
+            );
+            texteArray.push(updatedText);
+          }
 
-        // Append the updated text to the array
-        texteArray.push(updatedText);
-      }
-    });
+          // If 'text_area' exists, replace [value] with the actual value
+          if (item.question.text_area) {
+            const updatedText = item.question.text_area.replaceAll(
+              "[value]",
+              item.value
+            );
+            texteArray.push(updatedText);
+          }
+        }
+
+        // If there are nested subquestions, recurse into them
+        if (item.subquestions && item.subquestions.length > 0) {
+          traverseQuestions(item.subquestions);
+        }
+      });
+    }
+
+    // Start traversing the main questions
+    traverseQuestions(questions);
 
     return texteArray;
   }
@@ -145,10 +252,10 @@ const DocumentsContent = () => {
   const DocumentQuestionsDisplay = ({ documentQuestions }) => {
     const textes = extractTextes(documentQuestions);
 
-    // Add margin-bottom: 2rem to each extracted HTML block
+    // Apply margin-bottom: 1rem to each extracted HTML block
     return textes
       .map(
-        (texte) => `<div style="margin-bottom: 1rem;">${texte}</div>` // Add margin-bottom here
+        (texte) => `<div>${texte}</div>` // Wrap each texte inside a div
       )
       .join(""); // Return the combined HTML content as string
   };
@@ -166,7 +273,7 @@ const DocumentsContent = () => {
     const content = `
       <div style="font-family: Arial, sans-serif; font-size: 12px;">
         ${header}
-        ${contentHtml} <!-- The contentHtml already has the margin applied in each div -->
+        <div style="margin-bottom: 1rem;">${contentHtml}</div>
       </div>`;
 
     const options = {
@@ -179,6 +286,7 @@ const DocumentsContent = () => {
         format: "letter",
         orientation: "portrait",
       },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // Enable page breaks for long content
     };
 
     // Generate the PDF with the header and content included
@@ -192,10 +300,6 @@ const DocumentsContent = () => {
     // Pass it to the convertToPdf function
     convertToPdf(title, logo, contentHtml);
   };
-
-  const title = "Houda contract";
-
-  // ==============
 
   const data =
     filter === "draft"

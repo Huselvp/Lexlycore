@@ -1,10 +1,10 @@
-import { formatCurrency } from "../../utils/helpers"
-import { HiOutlineArrowNarrowRight as ArrowRightIcon } from "react-icons/hi"
-import { FcCheckmark as CheckMarkIcon } from "react-icons/fc"
-import styled from "styled-components"
-import { useCreateDocument } from "../../features/Documents/useCreateDocument"
-import { useUser } from "../../features/Authentication/useUser"
-import { useNavigate } from "react-router-dom"
+import { formatCurrency } from "../../utils/helpers";
+import { HiOutlineArrowNarrowRight as ArrowRightIcon } from "react-icons/hi";
+import { FcCheckmark as CheckMarkIcon } from "react-icons/fc";
+import styled from "styled-components";
+import { useCreateDocument } from "../../features/Documents/useCreateDocument";
+import { useUser } from "../../features/Authentication/useUser";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   /* padding-right: 2rem; */
@@ -89,17 +89,17 @@ const Container = styled.div`
       top: unset;
     }
   }
-`
+`;
 
 const TemplatePriceCard = ({ template }: { template: Template }) => {
-  const { isLoading, createDocument } = useCreateDocument()
-  const { isAuthenticated, user } = useUser()
-  const navigate = useNavigate()
+  const { isLoading, createDocument } = useCreateDocument();
+  const { isAuthenticated, user } = useUser();
+  const navigate = useNavigate();
   const clickHandler = () => {
-    if (!isAuthenticated) return navigate("/login")
-    if (user!.role === "ADMIN") return
-    createDocument(template.id)
-  }
+    if (!isAuthenticated) return navigate("/login");
+    if (user!.role === "ADMIN") return;
+    createDocument(template.id);
+  };
   return (
     <Container>
       <div>
@@ -141,7 +141,7 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
         </div>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default TemplatePriceCard
+export default TemplatePriceCard;

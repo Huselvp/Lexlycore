@@ -87,6 +87,7 @@ function App() {
           /> */}
 
           <Route path="templates/:templateId" element={<Questions />} />
+
           <Route
             path="templates/:templateId/:questionId"
             element={<Choices />}

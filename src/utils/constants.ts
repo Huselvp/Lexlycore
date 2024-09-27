@@ -153,6 +153,7 @@ export const generateDocumentUrl = ({
   templateId: number;
 }) => `${API}/suser/generate-pdf/${documentId}/${templateId}`;
 
+// should be a create document for the gust
 export const createDocumentUrl = (templateId: number) =>
   `${API}/suser/createDocument/${templateId}`;
 
