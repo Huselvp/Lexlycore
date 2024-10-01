@@ -25,9 +25,9 @@ public class GuestService {
             if (template != null) {
                     Documents document = new Documents();
                     logger.info("Document has been created successfully {}");
-                    return new GuestDocumentResponse("Document created successfully.");
+                    return new GuestDocumentResponse("Document created successfully", document.getId());
                 } else {
-                    return new GuestDocumentResponse("User not found.");
+                    return new GuestDocumentResponse("please retry",null);
                 }
             }
         }
