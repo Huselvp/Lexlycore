@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { FaEdit as EditIcon } from "react-icons/fa";
-import { useAddUpdateDocumentQuestion } from "./useAddUpdateDocumentQuestion";
-import { useInitiatePayment } from "../Payment/useInitiatePayment";
+import { guestUseAddUpdateDocumentQuestion } from "./guestUseAddUpdateDocumentQuestion";
+import { useInitiatePayment } from "../../../Payment/useInitiatePayment";
 import React, { useState } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
@@ -89,7 +89,7 @@ const BtnsContainer = styled.div`
   }
 `;
 
-const DocumentQuestionsOverview = ({
+const GuestDocumentQuestionOverView = ({
   data,
   isDraft,
   onClick,
@@ -113,7 +113,7 @@ const DocumentQuestionsOverview = ({
   );
 
   const { isLoading: isLoading1, addUpdateDocumentQuestion } =
-    useAddUpdateDocumentQuestion();
+    guestUseAddUpdateDocumentQuestion();
   const { isLoading: isLoading2, initiatePayment } = useInitiatePayment();
   const isLoading = isLoading1 || isLoading2;
 
@@ -146,8 +146,6 @@ const DocumentQuestionsOverview = ({
         },
       }
     );
-
-    // Redirect the user to the checkout page
   };
 
   const toggleSubQuestions = (index: number) => {
@@ -500,11 +498,11 @@ const DocumentQuestionsOverview = ({
       </Content>
       <BtnsContainer>
         <button onClick={clickHandler}>
-          {isLoading ? "Loading..." : "Proceed To Checkout"}
+          {isLoading ? "Loading..." : "Guest Proceed To Checkout"}
         </button>
       </BtnsContainer>
     </>
   );
 };
 
-export default DocumentQuestionsOverview;
+export default GuestDocumentQuestionOverView;

@@ -40,11 +40,11 @@ import EditSubQuestion from "./pages/admin/EditSubQuestion";
 
 import AddSubSubQuestion from "./pages/admin/subSubQuestionsDocs/AddSubSubQuestion";
 
-import SubQuestionChoice from "./pages/admin/subQuestionChoicedocs/SubQuestionChoice";
-
 import AdminLogin from "./pages/AdminLogin";
 
 import SubQuestionChoices from "./pages/admin/addChoicetoSubQuestionSecondVersion/SubQuestionChoices";
+
+import GuestDocument from "./pages/guest/GuestDocument";
 
 function App() {
   return (
@@ -56,6 +56,7 @@ function App() {
         <Route path="/templates" element={<Templates />} />
         <Route path="/article/:article" element={<Article />} />
         <Route path="/templates/:templateId" element={<Template />} />
+        <Route path="/guest-document/:templateId" element={<GuestDocument />} />
         <Route element={<StaticLayout />}>
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />

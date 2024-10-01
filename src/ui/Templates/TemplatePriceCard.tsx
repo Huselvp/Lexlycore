@@ -6,6 +6,8 @@ import { useCreateDocument } from "../../features/Documents/useCreateDocument";
 import { useUser } from "../../features/Authentication/useUser";
 import { useNavigate } from "react-router-dom";
 
+import { getToken } from "../../utils/helpers";
+
 const Container = styled.div`
   /* padding-right: 2rem; */
   padding: 3rem 2rem 0 0;
@@ -95,11 +97,22 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
   const { isLoading, createDocument } = useCreateDocument();
   const { isAuthenticated, user } = useUser();
   const navigate = useNavigate();
+  const token = getToken();
+
   const clickHandler = () => {
-    if (!isAuthenticated) return navigate("/login");
-    if (user!.role === "ADMIN") return;
+    if (!isAuthenticated) {
+      navigate(`/guest-document/${template.id}`);
+      return; // Stop further execution if not authenticated
+    }
+
+    if (user && user.role === "ADMIN") {
+      return; // Stop further execution if the user is an admin
+    }
+
+    // If authenticated and not an admin, call createDocument
     createDocument(template.id);
   };
+
   return (
     <Container>
       <div>

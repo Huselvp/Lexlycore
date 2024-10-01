@@ -1,22 +1,24 @@
 import styled from "styled-components";
-import { useTemplate } from "../../Templates/useTemplate";
-import DocumentQuestion from "./DocumentQuestion";
+import { useTemplate } from "../../../Templates/useTemplate";
+
 import { useEffect, useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
 } from "react-icons/hi";
 
-import DocumentQuestionsOverview from "../../Documents/DocumentQuestionsOverview";
-import QuestiontsSlider from "../../../ui/QuestiontsSlider";
-import DocumentHeader from "../../Documents/DocumentHeader";
-import DocumentSubQuestion from "./DocumentSubQuestion";
+import GuestDocumentQuestionOverView from "./GuestDocumentQuestionOverView";
+import QuestiontsSlider from "../../../../ui/QuestiontsSlider";
+import DocumentHeader from "../../../Documents/DocumentHeader";
+
+import GuestDocumentQuestion from "./GuestDocumentQuestion";
+import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
 import axios from "axios";
 
 import { useParams } from "react-router-dom";
 
-import { API } from "../../../utils/constants";
-import { getApiConfig } from "../../../utils/constants";
+import { API } from "../../../../utils/constants";
+import { getApiConfig } from "../../../../utils/constants";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -74,7 +76,7 @@ const Container = styled.div`
   }
 `;
 
-const DocumentQuestions = ({
+const GuestDocumentQuestions = ({
   documentQuestionsValues,
 }: {
   documentQuestionsValues?: DocumentQuestionsValues[];
@@ -272,7 +274,7 @@ const DocumentQuestions = ({
               // .sort((a, b) => a.position - b.position)
               .map((question, index) =>
                 overviewData.at(index)?.active ? (
-                  <DocumentQuestion
+                  <GuestDocumentQuestion
                     key={question.id}
                     question={question}
                     value={overviewData.at(index)?.value || ""}
@@ -300,7 +302,7 @@ const DocumentQuestions = ({
                     question.subQuestions.length > 0 &&
                     display
                       ? question.subQuestions.map((sq, ind) => (
-                          <DocumentSubQuestion
+                          <GuestDocumentSubQuestion
                             key={sq.subQuestionId}
                             question={sq}
                             data={overviewData}
@@ -396,7 +398,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 0000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -450,7 +452,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -477,7 +479,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -508,18 +510,18 @@ const DocumentQuestions = ({
                                   isSubOpen(false);
                                 }}
                               >
-                                <span>Next 0000</span>
+                                <span>Next</span>
                                 <ArrowRightIcon />
                               </button>
                             )}
                         </>
                       )}
                     </BtnsContainer>
-                  </DocumentQuestion>
+                  </GuestDocumentQuestion>
                 ) : null
               )
           ) : (
-            <DocumentQuestionsOverview
+            <GuestDocumentQuestionOverView
               isDraft={isDraft}
               data={overviewData}
               onClick={(index: number) => {
@@ -549,4 +551,4 @@ const DocumentQuestions = ({
   );
 };
 
-export default DocumentQuestions;
+export default GuestDocumentQuestions;

@@ -144,6 +144,7 @@ export const getDocumentsUrl = () => {
   const token = getToken();
   return `${API}/suser/get_documents/${token}`;
 };
+
 //
 export const generateDocumentUrl = ({
   documentId,
@@ -185,6 +186,15 @@ export const getApiConfig = (includeToken: boolean = true) => {
       withCredentials: true,
     };
   }
+  return {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  };
+};
+
+export const getGuestApiConfig = () => {
   return {
     headers: {
       "Content-Type": "application/json",

@@ -73,6 +73,7 @@ const TemplateName = styled.p`
   overflow: hidden;
   white-space: normal;
 `;
+
 const TemplatePrice = styled.p`
   justify-self: end;
   font-weight: 500;

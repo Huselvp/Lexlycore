@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { addUpdateDocumentQuestion as addUpdateDocumentQuestionApi } from "../../services/documentApi";
+import { addUpdateDocumentQuestion as addUpdateDocumentQuestionApi } from "../../../../services/documentApi";
 import {
   displayErrorMessage,
   transformParamToNumber,
-} from "../../utils/helpers";
+} from "../../../../utils/helpers";
 import { useParams } from "react-router-dom";
 
 export const useAddUpdateDocumentQuestion = () => {
@@ -17,7 +17,7 @@ export const useAddUpdateDocumentQuestion = () => {
         values,
       }: {
         isDraft: boolean;
-        values: any[]; // Adjusted type to handle the array of question objects
+        values: any[];
       }) => {
         const processQuestions = (questions, isSubQuestion = false) => {
           return questions.map((question) => {
