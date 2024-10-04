@@ -25,6 +25,11 @@ export const createDocument = async (templateId: number) => {
     getApiConfig()
   );
   const documentId = res.data?.documentId;
+
+  console.log(
+    res,
+    "33333333333333333333333333333333333333333333333333333333333333333"
+  );
   if (!documentId) throw new Error("");
   return { templateId, documentId };
 };

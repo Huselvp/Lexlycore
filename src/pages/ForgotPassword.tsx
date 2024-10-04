@@ -1,19 +1,21 @@
-import { FormEventHandler, useState } from "react"
-import Form from "../ui/AuthForm"
-import { useForgotPassword } from "../features/Authentication/useForgotPassword"
-import SpinnerMini from "../ui/SpinnerMini"
-import styled from "styled-components"
-import Row from "../ui/Row"
-import { Link } from "react-router-dom"
-import { IoArrowBackSharp as ArrowLeftIcon } from "react-icons/io5"
-import toast from "react-hot-toast"
+import { FormEventHandler, useState } from "react";
+import Form from "../ui/AuthForm";
+import { useForgotPassword } from "../features/Authentication/useForgotPassword";
+import SpinnerMini from "../ui/SpinnerMini";
+import styled from "styled-components";
+import Row from "../ui/Row";
+import { Link } from "react-router-dom";
+import { IoArrowBackSharp as ArrowLeftIcon } from "react-icons/io5";
+import toast from "react-hot-toast";
+
+import { getToken } from "../utils/helpers";
 
 const P = styled.p`
   /* padding: 2rem 0; */
   font-weight: 500;
   color: var(--color-grey-500);
   /* text-align: center; */
-`
+`;
 const GoBackToLogin = styled(Link)`
   margin-top: 3rem;
   color: var(--color-stone-650);
@@ -31,25 +33,26 @@ const GoBackToLogin = styled(Link)`
     display: block;
   }
   /* display: block; */
-`
+`;
 
 const ForgotPassword = () => {
-  const [linkWasSent, setLinkWasSent] = useState<boolean>(false)
-  const { isLoading, forgotPassword } = useForgotPassword()
-  const [email, setEmail] = useState("")
+  const [linkWasSent, setLinkWasSent] = useState<boolean>(false);
+  const { isLoading, forgotPassword } = useForgotPassword();
+  const [email, setEmail] = useState("");
+  const token = getToken();
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     forgotPassword(email, {
       onSuccess: () => {
         toast.success(
           `Password resent link was successfully ${
             linkWasSent ? "resent" : "sent"
           }`
-        )
-        setLinkWasSent(true)
-      }
-    })
-  }
+        );
+        setLinkWasSent(true);
+      },
+    });
+  };
 
   return (
     <>
@@ -86,14 +89,14 @@ const ForgotPassword = () => {
           </Form.Button>
         </Row>
         <Row justify="center" direction="row" gap="0" align="center">
-          <GoBackToLogin to="/login">
+          <GoBackToLogin to={token !== "" ? "/login/user" : "/login/guest"}>
             <ArrowLeftIcon />
             <span>Back to log in</span>
           </GoBackToLogin>
         </Row>
       </Form>
     </>
-  )
-}
+  );
+};
 
-export default ForgotPassword
+export default ForgotPassword;

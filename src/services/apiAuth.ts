@@ -33,6 +33,7 @@ export const register = async (data: RegisterData): Promise<void> => {
   if (error_message) throw new Error(error_message);
   setToken(access_token);
 };
+
 export const getMe = async (): Promise<User | null> => {
   try {
     const res = await axios.get(getMeUrl(), getApiConfig());
@@ -43,6 +44,7 @@ export const getMe = async (): Promise<User | null> => {
     return null;
   }
 };
+
 export const forgotPassword = (email: string) =>
   axios.post(forgotPasswordURL, { email }, getApiConfig());
 

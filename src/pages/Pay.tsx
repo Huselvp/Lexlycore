@@ -1,37 +1,40 @@
-import { useEffect } from "react"
-import { useSearchParams } from "react-router-dom"
-import { useChargePayment } from "../features/Payment/useChargePayment"
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useChargePayment } from "../features/Payment/useChargePayment";
 
 const Pay = () => {
-  const [searchParams] = useSearchParams()
-  const { chargePayment } = useChargePayment()
+  const [searchParams] = useSearchParams();
+  const { chargePayment } = useChargePayment();
   useEffect(() => {
-    const script = document.createElement("script")
-    script.src = "https://test.checkout.dibspayment.eu/v1/checkout.js?v=1"
-    script.async = true
-    document.body.appendChild(script)
+    const script = document.createElement("script");
+    script.src = "https://test.checkout.dibspayment.eu/v1/checkout.js?v=1";
+    script.async = true;
+    document.body.appendChild(script);
     script.onload = () => {
       // Dibs script has loaded, now you can use the Dibs.Checkout
-      const checkoutKey = "test-checkout-key-b4efeb14e3114511a84e7be90cc43f1d"
+      const checkoutKey = "test-checkout-key-b4efeb14e3114511a84e7be90cc43f1d";
       const checkoutOptions = {
         checkoutKey,
         paymentId: searchParams.get("p"),
-        containerId: "checkout-container-div"
-      }
+        containerId: "checkout-container-div",
+      };
 
-      const checkout = new window.Dibs.Checkout(checkoutOptions)
+      const checkout = new window.Dibs.Checkout(checkoutOptions);
       checkout.on("payment-completed", function (response) {
-        console.log("Response Success = ", response)
-        chargePayment()
-      })
-    }
+        console.log(
+          "Response Success = 88888888888888888888888888888888",
+          response
+        );
+        chargePayment();
+      });
+    };
     // Cleanup the script when the component unmounts
     return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
+      document.body.removeChild(script);
+    };
+  }, []);
 
-  return <div id="checkout-container-div"></div>
-}
+  return <div id="checkout-container-div"></div>;
+};
 
-export default Pay
+export default Pay;

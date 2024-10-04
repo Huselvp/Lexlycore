@@ -5,6 +5,12 @@ import { useInitiatePayment } from "../../../Payment/useInitiatePayment";
 import React, { useState } from "react";
 import { RxCaretDown, RxCaretUp } from "react-icons/rx";
 
+import { useNavigate } from "react-router-dom";
+
+import { getToken } from "../../../../utils/helpers";
+
+import { useParams } from "react-router-dom";
+
 const SubHeader = styled.p`
   text-align: center;
   margin-top: 0.5rem;
@@ -117,7 +123,44 @@ const GuestDocumentQuestionOverView = ({
   const { isLoading: isLoading2, initiatePayment } = useInitiatePayment();
   const isLoading = isLoading1 || isLoading2;
 
-  const clickHandler = () => {
+  // const clickHandler = () => {
+  //   const values = data.map((item) => {
+  //     return {
+  //       questionId: item.questionId,
+  //       value: item.value,
+  //       type: item.type,
+  //       subquestionsValues:
+  //         item.subQuestions && item.subQuestions.length > 0
+  //           ? item.subQuestions.map((sub) => ({
+  //               subQuestionId: sub.subQuestionId,
+  //               value: sub.subQuestionValue,
+  //               type: sub.type,
+  //             }))
+  //           : [],
+  //     };
+  //   });
+
+  //   addUpdateDocumentQuestion(
+  //     { values, isDraft },
+  //     {
+  //       onSuccess: () => {
+  //         if (localStorage.getItem("access_token") === "") {
+  //           console.log("you can't pay you need to login first");
+  //         } else {
+  //           initiatePayment();
+  //         }
+  //       },
+  //     }
+  //   );
+  // };
+
+  const token = getToken();
+
+  const navigate = useNavigate();
+
+  const param = useParams();
+
+  const guestDocumentSubmitLogic = () => {
     const values = data.map((item) => {
       return {
         questionId: item.questionId,
@@ -134,18 +177,19 @@ const GuestDocumentQuestionOverView = ({
       };
     });
 
-    addUpdateDocumentQuestion(
-      { values, isDraft },
-      {
-        onSuccess: () => {
-          if (localStorage.getItem("access_token") === "") {
-            console.log("you can't pay you need to login first");
-          } else {
-            initiatePayment();
-          }
-        },
-      }
-    );
+    // Convert the object to a JSON string before storing it in localStorage
+    localStorage.setItem("documentValues", JSON.stringify(values));
+
+    localStorage.setItem("templateId", param.templateId);
+
+    navigate("/login/guest");
+  };
+
+  const clickHandler = () => {
+    if (token == "") {
+      console.log(true);
+      guestDocumentSubmitLogic();
+    }
   };
 
   const toggleSubQuestions = (index: number) => {

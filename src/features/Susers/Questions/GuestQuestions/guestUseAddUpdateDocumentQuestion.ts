@@ -6,7 +6,7 @@ import {
 } from "../../../../utils/helpers";
 import { useParams } from "react-router-dom";
 
-export const useAddUpdateDocumentQuestion = () => {
+export const guestUseAddUpdateDocumentQuestion = () => {
   const params = useParams();
   const documentId = transformParamToNumber(params.documentId);
 

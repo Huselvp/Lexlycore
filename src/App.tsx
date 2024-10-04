@@ -46,6 +46,9 @@ import SubQuestionChoices from "./pages/admin/addChoicetoSubQuestionSecondVersio
 
 import GuestDocument from "./pages/guest/GuestDocument";
 
+import GuestLogin from "./features/Susers/Questions/GuestQuestions/GuestLogin";
+import GuestRegister from "./features/Susers/Questions/GuestQuestions/GuestRegister";
+
 function App() {
   return (
     <BrowserRouter>
@@ -145,8 +148,8 @@ function App() {
           </Route>
         </Route>
         {/* U */}
+        <Route path="/pay" element={<Pay />} />
         <Route element={<ProtectedRoute userRole="SUSER" />}>
-          <Route path="/pay" element={<Pay />} />
           <Route
             path="createDocument/:templateId/:documentId"
             element={<CreateDocument />}
@@ -169,8 +172,10 @@ function App() {
         {/* Auth */}
         <Route element={<AuthRoute />}>
           <Route path="/login/user" element={<Login />} />
+          <Route path="/login/guest" element={<GuestLogin />} />
           <Route path="/login/admin" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register/guest" element={<GuestRegister />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/resetPassword/:token" element={<ResetPassword />} />
         </Route>
