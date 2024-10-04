@@ -21,8 +21,8 @@ export const useAddUpdateDocumentQuestion = () => {
       }) => {
         const processQuestions = (questions, isSubQuestion = false) => {
           return questions.map((question) => {
-            // Always use 'questionId' as the key regardless of whether it's a subquestion
-            const idKey = "questionId";
+            // Use 'questionId' for main questions and 'subQuestionId' for subquestions
+            const idKey = isSubQuestion ? "subQuestionId" : "questionId";
             const valueKey = "value";
 
             let processedQuestion = {
@@ -77,14 +77,14 @@ export const useAddUpdateDocumentQuestion = () => {
               processedQuestion.value = question[valueKey];
             }
 
-            // Process subquestionsValues recursively and pass true for isSubQuestion
+            // Process subquestions recursively with subQuestionId
             if (
               Array.isArray(question.subquestionsValues) &&
               question.subquestionsValues.length > 0
             ) {
               processedQuestion.subquestionsValues = processQuestions(
                 question.subquestionsValues,
-                true
+                true // Pass true to indicate these are subquestions
               );
             }
 

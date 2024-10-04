@@ -215,129 +215,13 @@ const DocumentHeader = ({
   const { isLoading, addUpdateDocumentQuestion } =
     useAddUpdateDocumentQuestion();
   const navigate = useNavigate();
-  const params = useParams(); // Move this hook to the component body
-  const documentId = params.documentId;
 
   const clickHandler = () => {
-    const values = overviewData.filter((item) => {
-      if (item.value) return { questionId: item.questionId, value: item.value };
-    });
+    console.log(overviewData);
 
-    const processQuestions = (questions, isSubQuestion = false) => {
-      return questions.map((question) => {
-        const idKey = isSubQuestion ? "subQuestionId" : "questionId";
-        const valueKey = "value";
+    localStorage.setItem("continue-later", JSON.stringify(overviewData));
 
-        let processedQuestion = {
-          [idKey]: question[idKey],
-        };
-
-        if (question.type === "form") {
-          const formValues = Array.isArray(question[valueKey])
-            ? question[valueKey].map(({ blockId, labelId, LabelValue }) => ({
-                blockId,
-                labelId,
-                LabelValue,
-              }))
-            : [];
-          processedQuestion.formValues = formValues;
-        } else if (question.type === "time") {
-          if (
-            Array.isArray(question[valueKey]) &&
-            question[valueKey].length >= 2
-          ) {
-            processedQuestion.firstTimeValue = question[valueKey][0]?.time;
-            processedQuestion.secondTimeValue = question[valueKey][1]?.time;
-          }
-        } else if (question.type === "checkbox") {
-          const checkboxValues = Array.isArray(question[valueKey])
-            ? question[valueKey]
-            : [question[valueKey]];
-          processedQuestion.checkboxValues = checkboxValues;
-        } else if (question.type === "day") {
-          const days = Array.isArray(question[valueKey])
-            ? question[valueKey].map(({ index, day }) => ({
-                index,
-                day,
-              }))
-            : [];
-          processedQuestion.days = days;
-        } else {
-          processedQuestion.value = question[valueKey];
-        }
-
-        if (
-          Array.isArray(question.subQuestions) &&
-          question.subQuestions.length > 0
-        ) {
-          processedQuestion.subQuestions = processQuestions(
-            question.subQuestions,
-            true
-          );
-        }
-
-        return processedQuestion;
-      });
-    };
-
-    const orderMyData = (data) => {
-      return processQuestions(data);
-    };
-
-    const finalData = orderMyData(values);
-
-    const getLastNonEmptyQuestionId = (questions) => {
-      let lastQuestionId = null;
-
-      questions.forEach((question) => {
-        const idKey = "questionId";
-        const valueKey = "value";
-
-        const hasValidValue = (value) => {
-          return value !== null && value !== ""; // Check if value is not null or an empty string
-        };
-
-        // Check if the current question has a valid value
-        if (hasValidValue(question[valueKey])) {
-          lastQuestionId = question[idKey];
-        }
-      });
-
-      // Return the last valid question ID found
-      return lastQuestionId;
-    };
-
-    const lastQuestionId = getLastNonEmptyQuestionId(finalData);
-
-    console.log(
-      lastQuestionId,
-      "66666666666666666666666666666666666666666666666666666666"
-    );
-
-    axios
-      .post(
-        `${API}/suser/save-progress/${documentId}`, // Use the documentId from the hook
-        {
-          documentId: documentId,
-          lastAnsweredQuestionId: lastQuestionId,
-          values: finalData,
-        }, // Data to send in the body
-        getApiConfig()
-      )
-      .then((result) => {
-        console.log(
-          result.data,
-          "----------------------------------------------------------------------------------------"
-        );
-        navigate("/u/documents");
-      });
-
-    // addUpdateDocumentQuestion(
-    //   { isDraft, values },
-    //   {
-    //     onSuccess: () => navigate("/u/documents"),
-    //   }
-    // );
+    navigate("/u/documents");
   };
 
   return (

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../Templates/useTemplate";
 import DocumentQuestion from "./DocumentQuestion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -11,12 +11,8 @@ import DocumentQuestionsOverview from "../../Documents/DocumentQuestionsOverview
 import QuestiontsSlider from "../../../ui/QuestiontsSlider";
 import DocumentHeader from "../../Documents/DocumentHeader";
 import DocumentSubQuestion from "./DocumentSubQuestion";
-import axios from "axios";
 
 import { useParams } from "react-router-dom";
-
-import { API } from "../../../utils/constants";
-import { getApiConfig } from "../../../utils/constants";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -116,31 +112,33 @@ const DocumentQuestions = ({
 
     return questions.map((q, i) => {
       const questionValues =
-        documentQuestionsValues?.find((item) => item.question.id === q.id) ||
-        {};
+        documentQuestionsValues?.find((item) => item.questionId === q.id) || {};
       const subQuestionsValues =
         questionsValuesExist && questionValues
           ? questionValues.subQuestions || []
           : [];
       return {
         questionText: q.questionText,
+        type: q.valueType,
         questionId: q.id,
         value: questionsValuesExist
-          ? documentQuestionsValues.find((item) => item.question.id === q.id)
-              ?.value || ""
+          ? documentQuestionsValues.find((item) => item.questionId === q.id)
+              ?.value
           : "",
         active: questionsValuesExist
-          ? i === documentQuestionsValues.length
+          ? i === documentQuestionsValues.length - 1
           : i == 0,
         subQuestions: q.subQuestions?.map((subQ) => {
           const subQuestionValue = subQuestionsValues.find(
-            (sqv) => sqv.subQuestion.id === subQ.id
+            (sqv) => sqv.subQuestionId === subQ.id
           );
           return {
             subQuestionId: subQ.id,
             subQuestionText: subQ.questionText,
-            subQuestionValue: subQuestionValue ? subQuestionValue.value : "",
-            type: subQ.type,
+            subQuestionValue: subQuestionValue
+              ? subQuestionValue.subQuestionValue
+              : "",
+            type: subQ.valueType,
           };
         }),
       };
@@ -151,30 +149,6 @@ const DocumentQuestions = ({
 
   const params = useParams();
 
-  const documentId = params.documentId;
-
-  const [draftData, setDratfData] = useState([]);
-
-  useEffect(() => {
-    const draftDataHandler = async (id) => {
-      try {
-        axios
-          .get(`${API}/suser/resume-progress/${id}`, getApiConfig())
-          .then((result) => {
-            console.log(
-              result.data,
-              "11111111111111111111111111111111111111111111111111111111111111"
-            );
-            setDratfData(result.data);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    draftDataHandler(documentId);
-  }, [documentId]);
-
   const activeQuestion = overviewData.find((q) => q.active);
 
   const activeQuestionIndex = overviewData.findIndex(
@@ -183,7 +157,6 @@ const DocumentQuestions = ({
 
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
-  // console.log("test active subq", activeSubQuestions);
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
   // console.log("activeQuestion = ", activeQuestion);
@@ -310,7 +283,7 @@ const DocumentQuestions = ({
                               overviewData[index]?.subQuestions[ind]
                                 ?.subQuestionValue as any
                             }
-                            setValue={(value, type: string) =>
+                            setValue={(value: any, type: string) =>
                               handleSetValue(sq.id, value, type)
                             }
                             subOpen={(value) => {
@@ -537,9 +510,9 @@ const DocumentQuestions = ({
 
         <button
           onClick={() => {
-            console.log(isDraft);
             console.log(overviewData);
-            console.log(draftData, "888888888888888888888888888888888888");
+            console.log(questions);
+            console.log(ALLquestions);
           }}
         >
           test
