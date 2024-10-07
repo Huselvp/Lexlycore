@@ -5,7 +5,7 @@ const Pagination = ({ totalItems }: { totalItems: number }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const currentPage = +searchParams.get("page")! || 1
   const totalPages = Math.ceil(totalItems / MaxItemsPerPage)
-  console.log({ totalPages, totalItems, currentPage })
+  
   const next = () => {
     if (currentPage < totalPages) {
       searchParams.set("page", `${currentPage + 1}`)

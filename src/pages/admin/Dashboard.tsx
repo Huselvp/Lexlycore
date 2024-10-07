@@ -1,7 +1,6 @@
 import styled from "styled-components"
 import DashboardHeader from "../../features/Dashboard/DashboardHeader"
 import FeaturesHeader from "../../ui/FeaturesHeader"
-//
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -106,9 +105,7 @@ const Dashboard = () => {
       </FeaturesHeader>
       <Content>
         <DashboardHeader />
-        {/* <Box>
-          <PieChart options={pieOptions} data={pieData} />
-        </Box> */}
+     
         <Box>
           <LineChart options={lineOptions} data={lineData} />
         </Box>

@@ -1,7 +1,7 @@
-import styled from "styled-components"
-import Logo from "./Logo"
-import { HiOutlineMenuAlt2 as BurgerIcon } from "react-icons/hi"
-import { useUser } from "../features/Authentication/useUser"
+import styled from "styled-components";
+import Logo from "./Logo";
+import { HiOutlineMenuAlt2 as BurgerIcon } from "react-icons/hi";
+import { useUser } from "../features/Authentication/useUser";
 
 const Header = styled.header`
   position: relative;
@@ -41,7 +41,7 @@ const Header = styled.header`
       border-radius: 50%;
     }
   }
-`
+`;
 const ImgContainer = styled.div`
   color: var(--color-grey-500);
   display: flex;
@@ -55,7 +55,7 @@ const ImgContainer = styled.div`
     background: none;
     border: none;
   }
-`
+`;
 
 const Burger = styled.button`
   background: none;
@@ -63,16 +63,16 @@ const Burger = styled.button`
   svg {
     font-size: 3rem;
   }
-`
+`;
 
 const ProfileHeader = ({
   setHideSidebarOnMobile,
-  onMobile
+  onMobile,
 }: {
-  setHideSidebarOnMobile: React.Dispatch<React.SetStateAction<boolean>>
-  onMobile: boolean
+  setHideSidebarOnMobile: React.Dispatch<React.SetStateAction<boolean>>;
+  onMobile: boolean;
 }) => {
-  const { user } = useUser()
+  const { user } = useUser();
   return (
     <Header>
       {onMobile ? (
@@ -88,7 +88,6 @@ const ProfileHeader = ({
           <p>
             {user?.firstname || ""} {user?.lastname || ""}
           </p>
-          {/* <p>Mohamed Akarrouch</p> */}
         </div>
       )}
       <div>
@@ -97,7 +96,7 @@ const ProfileHeader = ({
         </ImgContainer>
       </div>
     </Header>
-  )
-}
+  );
+};
 
-export default ProfileHeader
+export default ProfileHeader;

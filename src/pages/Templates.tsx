@@ -1,13 +1,12 @@
-import Header from "../ui/Header"
-import { useTemplates } from "../features/Templates/useTemplates"
-import Spinner from "../ui/Spinner"
-import Footer from "../ui/Footer"
-import TemplatesContent from "../features/Templates/TemplatesContent"
-import ErrorMessage from "../ui/ErrorMessage"
+import Header from "../ui/Header";
+import { useTemplates } from "../features/Templates/useTemplates";
+import Spinner from "../ui/Spinner";
+import Footer from "../ui/Footer";
+import TemplatesContent from "../features/Templates/TemplatesContent";
+import ErrorMessage from "../ui/ErrorMessage";
 
 const Templates = () => {
-  const { isLoading, templates, isError } = useTemplates()
-  console.log({ isLoading, templates })
+  const { isLoading, isError } = useTemplates();
 
   return (
     <>
@@ -21,7 +20,7 @@ const Templates = () => {
       )}
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Templates
+export default Templates;

@@ -31,7 +31,6 @@ import { MdDeleteOutline } from "react-icons/md";
 import { MdDone } from "react-icons/md";
 
 function SubQuestionForm({ subQuestionId }) {
-  // popups controllers
   const [isAddSubQuestionFormNameOpen, setIsAddSubQuestionFormNameOpen] =
     useState(false);
 
@@ -44,8 +43,6 @@ function SubQuestionForm({ subQuestionId }) {
   const [isSeeAlSubQuestionBlocksOpen, setIsSeeAllSubQuestionBlocksOpen] =
     useState(false);
 
-  // SubQuestion data
-
   const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
 
   const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
@@ -53,8 +50,6 @@ function SubQuestionForm({ subQuestionId }) {
   const [subQuestionFormId, setSubQuestionFormId] = useState("");
 
   const [subQuestionBlockId, setSubQuestionBlockId] = useState("");
-
-  // subQuestion controllers
 
   const createSubQuestionFormHandler = async () => {
     try {
@@ -65,13 +60,11 @@ function SubQuestionForm({ subQuestionId }) {
             { title: subQuestionFormTitle },
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setIsAddSubQuestionFormNameOpen(false);
             setIsSeeSubQuestionBlocks(true);
             getSubQuestionFormBlocksHandler(subQuestionFormId);
           });
-      } else {
-        console.log("form title should not be empty");
       }
     } catch (err) {
       console.log(err);
@@ -122,7 +115,7 @@ function SubQuestionForm({ subQuestionId }) {
     try {
       await axios
         .post(`${API}/form/block/${subQuestionFormId}`, {}, getApiConfig())
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -137,7 +130,7 @@ function SubQuestionForm({ subQuestionId }) {
           `${API}/form/block/${subQuestionFormId}/${subQuestionId}`,
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -153,7 +146,7 @@ function SubQuestionForm({ subQuestionId }) {
           {},
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -250,12 +243,12 @@ function SubQuestionForm({ subQuestionId }) {
 
         {isSeeAlSubQuestionBlocksOpen && (
           <div className="form_type">
-            {subQuestionFormBlocks.map((block, blockIndex) => {
+            {subQuestionFormBlocks.map((block) => {
               return (
                 <div className="form-block-user" key={block.id}>
                   <IoIosClose className="form_type_controllers" size={20} />
 
-                  {block.labels.map((label, labelIndex) => {
+                  {block.labels.map((label) => {
                     return (
                       <div key={label.id} className="block-input">
                         <label>{label.name}</label>

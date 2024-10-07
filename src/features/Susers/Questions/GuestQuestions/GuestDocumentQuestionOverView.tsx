@@ -97,7 +97,6 @@ const BtnsContainer = styled.div`
 
 const GuestDocumentQuestionOverView = ({
   data,
-  isDraft,
   onClick,
 }: {
   data: {
@@ -118,41 +117,11 @@ const GuestDocumentQuestionOverView = ({
     data.map(() => false)
   );
 
-  const { isLoading: isLoading1, addUpdateDocumentQuestion } =
+  const { isLoading: isLoading1 } =
     guestUseAddUpdateDocumentQuestion();
-  const { isLoading: isLoading2, initiatePayment } = useInitiatePayment();
+  const { isLoading: isLoading2 } = useInitiatePayment();
   const isLoading = isLoading1 || isLoading2;
 
-  // const clickHandler = () => {
-  //   const values = data.map((item) => {
-  //     return {
-  //       questionId: item.questionId,
-  //       value: item.value,
-  //       type: item.type,
-  //       subquestionsValues:
-  //         item.subQuestions && item.subQuestions.length > 0
-  //           ? item.subQuestions.map((sub) => ({
-  //               subQuestionId: sub.subQuestionId,
-  //               value: sub.subQuestionValue,
-  //               type: sub.type,
-  //             }))
-  //           : [],
-  //     };
-  //   });
-
-  //   addUpdateDocumentQuestion(
-  //     { values, isDraft },
-  //     {
-  //       onSuccess: () => {
-  //         if (localStorage.getItem("access_token") === "") {
-  //           console.log("you can't pay you need to login first");
-  //         } else {
-  //           initiatePayment();
-  //         }
-  //       },
-  //     }
-  //   );
-  // };
 
   const token = getToken();
 
@@ -177,7 +146,7 @@ const GuestDocumentQuestionOverView = ({
       };
     });
 
-    // Convert the object to a JSON string before storing it in localStorage
+   
     localStorage.setItem("documentValues", JSON.stringify(values));
 
     localStorage.setItem("templateId", param.templateId);
@@ -187,7 +156,7 @@ const GuestDocumentQuestionOverView = ({
 
   const clickHandler = () => {
     if (token == "") {
-      console.log(true);
+    
       guestDocumentSubmitLogic();
     }
   };
@@ -200,8 +169,8 @@ const GuestDocumentQuestionOverView = ({
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-      // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+      
+    
       return {
         apartment: "",
         address: "",
@@ -290,7 +259,7 @@ const GuestDocumentQuestionOverView = ({
                   key={i}
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  {/* Process map values outside of JSX */}
+                 
                   {(() => {
                     const mapValues = convertStringToAddressObject(item.value);
                     return (
@@ -459,7 +428,7 @@ const GuestDocumentQuestionOverView = ({
 
                       {sq.type === "map" &&
                         (() => {
-                          // Perform the logic to process map values
+                        
                           const mapValues = convertStringToAddressObject(
                             sq.subQuestionValue
                           );

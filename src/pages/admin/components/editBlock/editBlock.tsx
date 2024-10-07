@@ -83,7 +83,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     try {
       axios
         .post(`${API}/form/block/label/options/${id}`, options, getApiConfig())
-        .then((result) => {
+        .then(() => {
           setIsAddNewInputOpen(false);
           setIsAddOptionsOpen(false);
 
@@ -105,15 +105,13 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const delete_option_from_options = (option) => {
     const result = options.filter((e) => e !== option);
     setOptions(result);
-    console.log("deleted");
   };
 
   const delete_input_handler = async (inputId) => {
     try {
       await axios
         .delete(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
-        .then((result) => {
-          console.log(result?.data);
+        .then(() => {
           getBlockData();
         });
     } catch (err) {
@@ -126,7 +124,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
       await axios
         .get(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
         .then((result) => {
-          console.log(inputId);
           setInputToUpdateData(result?.data);
           setUpdatedOptions(result?.data.options);
           if (result.data.type === "SELECT") {
@@ -140,7 +137,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     }
   };
 
-  const submit_updated_input_data = async (inputId) => {
+  const submit_updated_input_data = async (inputId: any) => {
     try {
       axios
         .put(
@@ -148,7 +145,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           { name: upDatedInputName, type: upDatedInputType, id: inputId },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           if (upDatedInputType === "SELECT") {
             setIsAddOptionsOpen(true);
             setIsEditInputOpen(false);
@@ -174,7 +171,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           { name: upDatedInputName, type: upDatedInputType, id: inputId },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getBlockData();
           setIsAddNewInputOpen(false);
           setIsAddOptionsOpen(false);
@@ -192,7 +189,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     try {
       axios
         .delete(`${API}/form/block/label/option/${id}/${key}`, getApiConfig())
-        .then((result) => {
+        .then(() => {
           get_input_by_id(id);
         });
     } catch (err) {
@@ -209,7 +206,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
             [newOption],
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setOptions([]);
 
             get_input_by_id(id);
@@ -637,38 +634,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           </div>
         </div>
       )}
-
-      {/* {isAddMinMaxValueOpen && (
-        <div>
-          <form>
-            <input
-              type="number"
-              placeholder="Enter min value"
-              onChange={(e) => {
-                setMinValue(e.target.value);
-              }}
-            ></input>
-            <input
-              type="number"
-              placeholder="Enter max value"
-              onChange={(e) => {
-                setMaxValue(e.target.value);
-              }}
-            ></input>
-          </form>
-
-          <div className="controllers">
-            <button
-              type="button"
-              onClick={() => {
-                // add_min_max_value_handler(question.id);
-              }}
-            >
-              <MdDone />
-            </button>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

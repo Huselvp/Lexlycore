@@ -4,7 +4,7 @@ import { getTemplate } from "../../services/templateApi";
 
 export const useTemplate = () => {
   const params = useParams();
-  let templateId = Number(params.templateId) ?? -1;
+  const templateId = Number(params.templateId) ?? -1;
 
   const {
     isPending: isLoading,

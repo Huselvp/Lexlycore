@@ -1,19 +1,19 @@
-import React from 'react';
-import { Formik, Form, Field, FormikHelpers } from 'formik';
-import { Button, Stepper, Step, StepLabel } from '@mui/material';
-import * as Yup from 'yup';
+import React from "react";
+import { Formik, Form, Field, FormikHelpers } from "formik";
+import { Button, Stepper, Step, StepLabel } from "@mui/material";
+import * as Yup from "yup";
 
-const steps = ['Step 1', 'Step 2', 'Step 3'];
+const steps = ["Step 1", "Step 2", "Step 3"];
 
 const validationSchemas = [
   Yup.object({
-    firstName: Yup.string().required('Required'),
+    firstName: Yup.string().required("Required"),
   }),
   Yup.object({
-    lastName: Yup.string().required('Required'),
+    lastName: Yup.string().required("Required"),
   }),
   Yup.object({
-    email: Yup.string().email('Invalid email address').required('Required'),
+    email: Yup.string().email("Invalid email address").required("Required"),
   }),
 ];
 
@@ -49,10 +49,9 @@ const QuestionnaireWizard = () => {
   ) => {
     const errors = await validateForm();
     if (Object.keys(errors).length === 0) {
-        if (isLastStep) {
-            alert(JSON.stringify(values, null, 2));
-            console.log('Form submitted successfully', values);
-          }
+      if (isLastStep) {
+        alert(JSON.stringify(values, null, 2));
+      }
       setActiveStep((prevStep) => prevStep + 1);
       setTouched({});
     } else {
@@ -65,14 +64,13 @@ const QuestionnaireWizard = () => {
   const handleSubmit = (values: any, { setSubmitting }: FormikHelpers<any>) => {
     if (isLastStep) {
       alert(JSON.stringify(values, null, 2));
-      console.log('Form submitted successfully', values);
     }
     setSubmitting(false);
   };
 
   return (
     <Formik
-      initialValues={{ firstName: '', lastName: '', email: '' }}
+      initialValues={{ firstName: "", lastName: "", email: "" }}
       validationSchema={validationSchemas[activeStep]}
       onSubmit={handleSubmit}
     >
@@ -92,10 +90,12 @@ const QuestionnaireWizard = () => {
             </Button>
             <Button
               type="button"
-              onClick={() => handleNext(validateForm, setTouched, setSubmitting)}
+              onClick={() =>
+                handleNext(validateForm, setTouched, setSubmitting)
+              }
               disabled={isSubmitting}
             >
-              {isLastStep ? 'Submit' : 'Next'}
+              {isLastStep ? "Submit" : "Next"}
             </Button>
           </div>
         </Form>

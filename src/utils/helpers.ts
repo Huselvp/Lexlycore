@@ -4,8 +4,6 @@ export const formatCurrency = (value: number) =>
     value
   );
 export const displayErrorMessage = (error: any) => {
-  console.log("********************************");
-  console.log("Error = ", error);
   let errorMessage: string =
     (typeof error?.response?.data === "string" && error?.response?.data) ||
     error?.response?.data?.message ||
@@ -13,8 +11,7 @@ export const displayErrorMessage = (error: any) => {
     "Something went wrong";
   if (errorMessage === "Access Denied")
     errorMessage = "Email or password is incorrect";
-  console.log("Error Message = ", errorMessage);
-  console.log("********************************");
+
   toast.error(errorMessage);
 };
 export const transformParamToNumber = (val: any) => {

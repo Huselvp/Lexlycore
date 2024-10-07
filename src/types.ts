@@ -71,10 +71,6 @@ type Answer = {
   value: string | null;
 };
 
-// type AddUpdateDocumentQuestion = {
-//   documentId: number
-//   questionId: number
-// } & ({ selectedChoiceId: number } | { value: string })
 type AddUpdateDocumentQuestion = {
   isDraft: boolean;
   documentId: number;

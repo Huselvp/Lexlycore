@@ -9,7 +9,7 @@ import Spinner from "../../../ui/Spinner";
 
 const SubQuestionChoice = () => {
   const { isError, isLoading, question } = useSubQuestion();
-  console.log("test question :", question);
+
   if (isLoading) return <Spinner />;
   if (isError || !question?.valueType.startsWith("checkbox"))
     return <div>Page not Found</div>;

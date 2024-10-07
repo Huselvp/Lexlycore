@@ -30,10 +30,7 @@ const AuthRoute = () => {
       <Form.Content>
         <Form.Header>
           <Logo />
-          {/* <Link to="/login">
-          <SuitecaseIcon />
-          <span>Log in as an advisor</span>
-        </Link> */}
+        
         </Form.Header>
         <Outlet />
       </Form.Content>

@@ -1,16 +1,15 @@
-import Button from "../../ui/Button"
-import CategoriesTable from "../../features/Categories/CategoriesTable"
-import FeaturesHeader from "../../ui/FeaturesHeader"
-import Modal from "../../ui/Modal"
-import AddEditCategory from "../../features/Categories/AddEditCategory"
-import { useCategories } from "../../features/Categories/useCategories"
-import Spinner from "../../ui/Spinner"
+import Button from "../../ui/Button";
+import CategoriesTable from "../../features/Categories/CategoriesTable";
+import FeaturesHeader from "../../ui/FeaturesHeader";
+import Modal from "../../ui/Modal";
+import AddEditCategory from "../../features/Categories/AddEditCategory";
+import { useCategories } from "../../features/Categories/useCategories";
+import Spinner from "../../ui/Spinner";
 
 const Categories = () => {
-  const { isLoading, isError } = useCategories()
-  if (isLoading) return <Spinner />
-  if (isError) return <div>Something went wrong</div>
-  console.log("isLoading = ", isLoading)
+  const { isLoading, isError } = useCategories();
+  if (isLoading) return <Spinner />;
+  if (isError) return <div>Something went wrong</div>;
 
   return (
     <Modal>
@@ -27,7 +26,7 @@ const Categories = () => {
       </FeaturesHeader>
       <CategoriesTable />
     </Modal>
-  )
-}
+  );
+};
 
-export default Categories
+export default Categories;

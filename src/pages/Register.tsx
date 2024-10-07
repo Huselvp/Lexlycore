@@ -17,9 +17,9 @@ const Register = () => {
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    // check if email is valid
+    
     if (!isEmail(email)) return toast.error("Email is not valid");
-    // check if passwords match
+  
     if (password !== passwordConfirm)
       return toast.error("Passwords must match");
     register({ firstname, lastname, username, email, password, role: "ADMIN" });

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../../Templates/useTemplate";
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -13,12 +13,7 @@ import DocumentHeader from "../../../Documents/DocumentHeader";
 
 import GuestDocumentQuestion from "./GuestDocumentQuestion";
 import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
-import axios from "axios";
 
-import { useParams } from "react-router-dom";
-
-import { API } from "../../../../utils/constants";
-import { getApiConfig } from "../../../../utils/constants";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -81,13 +76,10 @@ const GuestDocumentQuestions = ({
 }: {
   documentQuestionsValues?: DocumentQuestionsValues[];
 }) => {
-  // FROM THE TEMPLETE HE GETS THE QUESTIONS DATA
   const { template } = useTemplate();
   const ALLquestions = template!.questions;
   const questions = flattenSubQuestions(ALLquestions);
   const [display, setdisplay] = useState(false);
-
-  // this is the form data
 
   const [isFormDataFull, setIsFormDataFull] = useState(false);
   const [isDaysFull, setIsDaysFull] = useState(false);
@@ -96,7 +88,6 @@ const GuestDocumentQuestions = ({
   const [isAllSubQuestionDataFull, setIsAllSubQuestionDataFull] =
     useState(false);
 
-  // this is the state where he saves the data
   const [overviewData, setOverviewData] = useState<
     {
       questionText: string;
@@ -151,31 +142,11 @@ const GuestDocumentQuestions = ({
 
   const isDraft = overviewData.some((q) => !q.value);
 
-  const params = useParams();
 
-  const documentId = params.documentId;
 
-  const [draftData, setDratfData] = useState([]);
 
-  useEffect(() => {
-    const draftDataHandler = async (id) => {
-      try {
-        axios
-          .get(`${API}/suser/resume-progress/${id}`, getApiConfig())
-          .then((result) => {
-            console.log(
-              result.data,
-              "11111111111111111111111111111111111111111111111111111111111111"
-            );
-            setDratfData(result.data);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
 
-    draftDataHandler(documentId);
-  }, [documentId]);
+
 
   const activeQuestion = overviewData.find((q) => q.active);
 
@@ -185,13 +156,10 @@ const GuestDocumentQuestions = ({
 
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
-  // console.log("test active subq", activeSubQuestions);
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
-  // console.log("activeQuestion = ", activeQuestion);
-
   const handleSetValue = (id: number, newValue: any, type: string) => {
-    // here he saves the input data
+
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -234,7 +202,7 @@ const GuestDocumentQuestions = ({
     return questions.map((question) => {
       let flattenedQuestion = { ...question };
 
-      // Recursively process subQuestions
+  
       if (
         flattenedQuestion.subQuestions &&
         flattenedQuestion.subQuestions.length > 0
@@ -243,7 +211,7 @@ const GuestDocumentQuestions = ({
           flattenedQuestion.subQuestions
         );
 
-        // Extract nested subQuestions from all levels
+     
         const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
           (q) => q.subQuestions
         );
@@ -536,16 +504,6 @@ const GuestDocumentQuestions = ({
             />
           )}
         </Content>
-
-        <button
-          onClick={() => {
-            console.log(isDraft);
-            console.log(overviewData);
-            console.log(draftData, "888888888888888888888888888888888888");
-          }}
-        >
-          test
-        </button>
       </Container>
     </>
   );

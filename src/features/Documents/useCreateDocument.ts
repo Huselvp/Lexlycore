@@ -18,8 +18,6 @@ export const useCreateDocument = () => {
       documentId: number;
       templateId: number;
     }) => {
-      // toast.success("Document created successfully")
-      // navigate(`/u/documents/createDocument/${templateId}/${documentId}`)
       navigate(`/createDocument/${templateId}/${documentId}`);
     },
     onError: displayErrorMessage,

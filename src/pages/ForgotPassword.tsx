@@ -56,16 +56,12 @@ const ForgotPassword = () => {
 
   return (
     <>
-      {/* <Logo /> */}
       <Form onSubmit={onFormSubmit}>
         <h3>Forgot Password</h3>
         <Row direction="column" gap="2rem">
           <P>
-            {/* Enter your user account's email address and we will send you a
-            password reset link. */}
             {linkWasSent
-              ? // ? "Password reset link was sent. If it doesn't show up, hit the 'Resend' button to give it another go."
-                "In case it doesn't pop up in your inbox shortly, no worries! You can always hit the 'Resend' button below."
+              ? "In case it doesn't pop up in your inbox shortly, no worries! You can always hit the 'Resend' button below."
               : "Enter your email and you will receive a password reset link."}
           </P>
           <Form.Input

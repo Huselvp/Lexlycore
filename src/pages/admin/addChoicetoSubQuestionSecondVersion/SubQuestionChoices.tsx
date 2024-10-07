@@ -1,9 +1,8 @@
 import AddEditSubChoice from "./AddEditSubChoice";
-//import AddEditChoice from "../../../features/Templates/Questions/Choices/AddEditChoice";
-// import ChoicesTable from "../../../features/Templates/Questions/Choices/ChoicesTable";
+
 import { useSubQuestion } from "./useSubQuestion";
 import SubChoicesTable from "./SubChoicesTable";
-//=====================
+
 import Button from "../../../ui/Button";
 import FeaturesHeader from "../../../ui/FeaturesHeader";
 import GoBackButton from "../../../ui/GoBackButton";
@@ -12,7 +11,7 @@ import Spinner from "../../../ui/Spinner";
 
 const SubQuestionChoices = () => {
   const { isError, isLoading, question } = useSubQuestion();
-  console.log("test question :", question);
+
   if (isLoading) return <Spinner />;
   if (isError || !question?.valueType.startsWith("checkbox"))
     return <div>Page not Found</div>;

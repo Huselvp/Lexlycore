@@ -49,9 +49,7 @@ const CategoriesTable = () => {
               <CategoriesRow key={category.id} category={category} />
             )}
           ></Table.Body>
-          {/* <Table.Footer> */}
-          {/* <Pagination totalItems={categories.length} /> */}
-          {/* </Table.Footer> */}
+         
         </Table>
       </Menus>
     </>

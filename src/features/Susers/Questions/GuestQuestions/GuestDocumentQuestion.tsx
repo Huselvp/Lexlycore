@@ -11,8 +11,6 @@ import { IoMdRemove } from "react-icons/io";
 import { FiUser } from "react-icons/fi";
 import { BsBuildings } from "react-icons/bs";
 
-// import "../../../ui/map/styles.css";
-
 import MMapComponent from "../MMapComponent";
 
 const Checkbox = styled.input`
@@ -174,8 +172,6 @@ const GuestDocumentQuestion = ({
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
-  const [formErrors, setFormErrors] = useState([]);
-  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
 
   // Fetch form blocks and filter data
   useEffect(() => {
@@ -187,10 +183,6 @@ const GuestDocumentQuestion = ({
             getApiConfig()
           );
           setFormBlocks(result?.data.form.blocks);
-          console.log(
-            result?.data.form.blocks,
-            "this is the blogs hdyuhefyuefyufryurf"
-          );
         } catch (err) {
           console.log(err);
         }
@@ -257,15 +249,14 @@ const GuestDocumentQuestion = ({
     return formBlocks.map((block) => {
       if (block.type === "COMPANY" || block.type === "PERSON") {
         const labels = defaultLabels[block.type].map((label) => {
-          // Ensure we generate a unique ID
           while (idsArray.includes(generatedId)) {
             generatedId++;
           }
 
-          const newId = generatedId; // Use the current generatedId
-          generatedId++; // Increment for the next ID
+          const newId = generatedId;
+          generatedId++;
 
-          idsArray.push(newId); // Update the idsArray with the new ID
+          idsArray.push(newId);
 
           return {
             name: label.labelName,
@@ -286,13 +277,6 @@ const GuestDocumentQuestion = ({
   const newBlocksForm = generateFormDataWithUniqueLabels(formBlocks);
 
   const totalInputs = countTotalInputs(newBlocksForm);
-
-  useEffect(() => {
-    const initialFormErrors = formBlocks?.flatMap((block) =>
-      block.labels?.map(() => "")
-    );
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
 
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
@@ -319,7 +303,7 @@ const GuestDocumentQuestion = ({
         }
 
         const allInputsFilled = updatedFormData?.length === totalInputs;
-        setIsAllDataEntered(allInputsFilled);
+
         isTherData(allInputsFilled);
         setValue(updatedFormData, question.valueType);
 
@@ -328,8 +312,6 @@ const GuestDocumentQuestion = ({
     },
     [totalInputs, isTherData, setValue, question.valueType]
   );
-
-  //=========================
 
   const isTheFilterHavAvalue = useCallback(() => {
     return value !== "";
@@ -354,8 +336,6 @@ const GuestDocumentQuestion = ({
     setValue(newValue, question.valueType);
   };
 
-  // ++++++++++++++++++++++++++++++++++++++++++
-
   const isTimesHaveValues = () => {
     return (
       Array.isArray(value) &&
@@ -365,7 +345,6 @@ const GuestDocumentQuestion = ({
     );
   };
 
-  // Initialize state based on a condition
   const [times, setTimes] = useState(() => {
     if (isTimesHaveValues()) {
       return [
@@ -380,16 +359,14 @@ const GuestDocumentQuestion = ({
     }
   });
 
-  // Handle time changes
   const handleTimeChange = (index, event) => {
     const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
-    setValue(newTimes, question.valueType); // Assuming setValue is defined elsewhere
+    setValue(newTimes, question.valueType);
   };
 
-  // Use useEffect without conditional calls
   useEffect(() => {
     if (times[0]?.time !== "" && times[1]?.time !== "") {
       isTherTimes(true);
@@ -399,7 +376,6 @@ const GuestDocumentQuestion = ({
   }, [times, isTherTimes]);
 
   const isSecondTimeDisabled = times[0]?.time === "";
-  // ========================
 
   const isDaysHaveValues = () => {
     return (
@@ -446,8 +422,6 @@ const GuestDocumentQuestion = ({
 
   const isSecondDayDisabled = days[0]?.day === "";
 
-  // ========================
-
   const [countriesList, setCountriesList] = useState([]);
 
   const getCountriesList = async () => {
@@ -456,14 +430,12 @@ const GuestDocumentQuestion = ({
         "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
       );
 
-      // Sort the countries alphabetically
       let sortedCountries = result.data.geonames.sort((a, b) => {
         if (a.countryName < b.countryName) return -1;
         if (a.countryName > b.countryName) return 1;
         return 0;
       });
 
-      // Move 'Danmark' to the first position
       sortedCountries = sortedCountries.filter(
         (country) => country.countryName !== "Danmark"
       );
@@ -479,11 +451,9 @@ const GuestDocumentQuestion = ({
     getCountriesList();
   }, []);
 
-  // ----------- CVR DATA -------------
-
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
-  const [isCVRRight, setIsCVRRight] = useState(false);
+
 
   const getSVRDataHandler = async (cvr) => {
     try {
@@ -500,16 +470,16 @@ const GuestDocumentQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-        console.log(result.data);
-        setIsCVRRight(true);
+
+        
       } else {
         clearFormFields();
-        setIsCVRRight(true);
+       
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
-      setIsCVRRight(true);
+    
     }
   };
 
@@ -521,16 +491,11 @@ const GuestDocumentQuestion = ({
   };
 
   const handleCVRChanges = (cvr, blockId) => {
-    console.log("I am here and working good");
-    console.log(blockId);
-
-    // Ensure the targeted block exists
+    
     let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
     if (!targetedBlock) return;
 
-    console.log(targetedBlock);
-
-    // Map field names to their corresponding variables
+    
     const fieldMappings = {
       Virksomhedsnavn: virksomhedsnavn,
       Adresse: adresse,
@@ -544,26 +509,26 @@ const GuestDocumentQuestion = ({
     setFormData((prevFormData) => {
       let updatedFormData = [...prevFormData];
 
-      // Iterate over fieldMappings to update, add, or remove data
+     
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
-        // Find the labelId from the targetedBlock's labels
+        
         const targetedLabel = targetedBlock.labels.find(
           (label) => label.name === labelName
         );
-        const labelId = targetedLabel ? targetedLabel.id : null; // Safely retrieve labelId
+        const labelId = targetedLabel ? targetedLabel.id : null; 
 
         if (labelId) {
-          // Proceed only if labelId is found
+          
           const existingEntryIndex = updatedFormData.findIndex(
             (entry) => entry.blockId === blockId && entry.labelId === labelId
           );
 
           if (value !== "") {
             if (existingEntryIndex !== -1) {
-              // Update the existing entry
+              
               updatedFormData[existingEntryIndex].LabelValue = value;
             } else {
-              // Add a new entry
+              
               updatedFormData.push({
                 blockId,
                 labelId,
@@ -573,29 +538,29 @@ const GuestDocumentQuestion = ({
             }
           } else {
             if (existingEntryIndex !== -1) {
-              // Remove the entry if the value is an empty string
+              
               updatedFormData.splice(existingEntryIndex, 1);
             }
           }
         }
       });
 
-      // Directly update the form data and state
+      
       setValue(updatedFormData, question.valueType);
 
       return updatedFormData;
     });
   };
 
-  // UseEffect with the updated dependency array
+  
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-      // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+     
+
       return {
         apartment: "",
         address: "",
@@ -850,7 +815,7 @@ const GuestDocumentQuestion = ({
                                 e.target.value,
                                 block.labels[2]?.name
                               );
-                              // getSVRDataHandler(e.target.value);
+                             
                             }}
                           />
                         </div>
@@ -994,44 +959,7 @@ const GuestDocumentQuestion = ({
                           >
                             Land
                           </label>
-                          {/* <select
-                            name="land"
-                            id="land"
-                            style={{
-                              width: "100%",
-                              padding: "0.8rem 1.2rem",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "4px",
-                              backgroundColor: "#fff",
-                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                              paddingRight: "30px",
-                            }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "Danemark"
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[6]?.id,
-                                e.target.value,
-                                block.labels[6]?.name
-                              )
-                            }
-                          >
-                            <option>Land</option>
-                            {countriesList.map((country) => (
-                              <option
-                                key={country.countryName}
-                                value={country.countryName}
-                              >
-                                {country.countryName}
-                              </option>
-                            ))}
-                          </select> */}
+                        
 
                           <select
                             name="land"
@@ -1050,7 +978,7 @@ const GuestDocumentQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "" // Default value is set to an empty string
+                              )?.LabelValue || "" 
                             }
                             onChange={(e) =>
                               handleChange(
@@ -1062,7 +990,7 @@ const GuestDocumentQuestion = ({
                             }
                           >
                             <option value="">Land</option>{" "}
-                            {/* Placeholder option */}
+                           
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}
@@ -1246,12 +1174,7 @@ const GuestDocumentQuestion = ({
                               )?.LabelValue || cvrNumber
                             }
                             onChange={(e) => {
-                              // handleChange(
-                              //   block?.id,
-                              //   block.labels[2]?.id,
-                              //   e.target.value,
-                              //   block.labels[2]?.name
-                              // );
+                             
                               setCvrNumber(e.target.value);
                               getSVRDataHandler(e.target.value);
                               setCVR(e.target.value);

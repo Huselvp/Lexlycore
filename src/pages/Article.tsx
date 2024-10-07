@@ -61,7 +61,7 @@ const Article = () => {
   useScrollToTop()
   if (!isArticleValid(article)) return <Navigate to="/pageNotFound" />
   if (article === "gensidigt-testamente")
-    // mutual-wills
+    
     return (
       <>
         <Header />
@@ -246,7 +246,7 @@ const Article = () => {
       </>
     )
   if (article === "familietestamente")
-    // family-wills
+   
     return (
       <>
         <Header />
@@ -360,7 +360,7 @@ const Article = () => {
       </>
     )
   if (article === "anfordringslån")
-    // Demain-loans
+    
     return (
       <>
         <Header />
@@ -497,7 +497,7 @@ const Article = () => {
       </>
     )
   if (article === "lejekontrakt")
-    // Lease
+  
     return (
       <>
         <Header />

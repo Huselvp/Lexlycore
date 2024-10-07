@@ -40,8 +40,7 @@ const AddEditSubSubQuestion = ({
       "") as string;
     const textArea = (formData.get("textArea") || "") as string;
     const valueType = (formData.get("valueType") || "") as string;
-    // check if texte is a valid html
-    console.log("texte = ", textArea);
+   
     if (onAdd) {
       addSubQuestion({
         questionText,

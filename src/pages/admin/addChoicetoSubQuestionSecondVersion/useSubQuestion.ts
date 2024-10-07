@@ -15,6 +15,6 @@ export const useSubQuestion = () => {
     queryKey: ["question", questionId],
     queryFn: () => getSubQuestion(questionId, subQuestionId),
   });
-  console.log("useSubQuestion", question);
+
   return { isError, isLoading, question };
 };

@@ -1,11 +1,11 @@
-import styled from "styled-components"
-import Button from "../../ui/Button"
-import { useAddCategory } from "./useAddCategory"
-import { FormEventHandler } from "react"
-import Form from "../../ui/AuthForm"
-import Row from "../../ui/Row"
-import { useUpdateCategory } from "./useUpdateCategory"
-import Checkbox from "../../ui/Checkbox"
+import styled from "styled-components";
+import Button from "../../ui/Button";
+import { useAddCategory } from "./useAddCategory";
+import { FormEventHandler } from "react";
+import Form from "../../ui/AuthForm";
+import Row from "../../ui/Row";
+import { useUpdateCategory } from "./useUpdateCategory";
+import Checkbox from "../../ui/Checkbox";
 
 const Container = styled.div`
   /* width: 60rem; */
@@ -16,39 +16,38 @@ const Container = styled.div`
   & label {
     cursor: pointer;
   }
-`
+`;
 
 const AddEditCategory = ({
   onCloseModal,
   onAdd,
-  category
+  category,
 }: {
-  onCloseModal?: () => void
-  onAdd: boolean
-  category?: Category
+  onCloseModal?: () => void;
+  onAdd: boolean;
+  category?: Category;
 }) => {
-  const { isLoading: isLoading1, addCategory } = useAddCategory()
-  const { isLoading: isLoading2, updateCategory } = useUpdateCategory()
+  const { isLoading: isLoading1, addCategory } = useAddCategory();
+  const { isLoading: isLoading2, updateCategory } = useUpdateCategory();
 
-  const isLoading = isLoading1 || isLoading2
+  const isLoading = isLoading1 || isLoading2;
 
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const name: string = (formData.get("subcategory") || "") as string
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const name: string = (formData.get("subcategory") || "") as string;
     const categoryType: "PRIVATE" | "BUSINESS" = formData.get("category") as
       | "PRIVATE"
-      | "BUSINESS"
-    // const categoryType: string = (formData.get("category") || "") as string
-    console.log({ name, categoryType })
-    if (onAdd) addCategory({ name, categoryType }, { onSuccess: onCloseModal })
+      | "BUSINESS";
+
+    if (onAdd) addCategory({ name, categoryType }, { onSuccess: onCloseModal });
 
     if (!onAdd && category)
       updateCategory(
         { ...category, name, categoryType },
         { onSuccess: onCloseModal }
-      )
-  }
+      );
+  };
   return (
     <Container>
       <Row as="form" direction="column" gap="3rem" onSubmit={onSubmit}>
@@ -112,7 +111,7 @@ const AddEditCategory = ({
         </Row>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
-export default AddEditCategory
+export default AddEditCategory;

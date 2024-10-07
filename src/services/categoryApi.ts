@@ -12,7 +12,7 @@ import {
 
 export const getCategories = async (): Promise<Category[]> => {
   const res = await axios.get(getCategoriesUrl, getApiConfig())
-  console.log("Res = ", res)
+  
   if (!res.data) new Error("Something went wrong")
   return res.data
 }
@@ -55,7 +55,7 @@ export const assignUpdateCategory = async ({
     {},
     getApiConfig()
   )
-  console.log("Res = ", res)
+  
   if (!res.data?.data) throw new Error("Something went wrong")
   console.log(res.data?.data)
   return res.data?.data

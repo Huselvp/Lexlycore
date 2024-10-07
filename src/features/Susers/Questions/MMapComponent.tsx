@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { GoogleMap, useLoadScript, Autocomplete } from "@react-google-maps/api";
 
 const libraries = ["places"];
@@ -61,20 +61,6 @@ const MapComponent = ({ getMapData, data, isFull }) => {
       addressDetails.y !== "" ? addressDetails.y : ""
     }`;
   };
-
-  // useEffect(() => {
-  //   if (
-  //     addressDetails.address !== "" &&
-  //     addressDetails.city !== "" &&
-  //     addressDetails.country !== "" &&
-  //     addressDetails.postal_code !== "" &&
-  //     addressDetails.apartment
-  //   ) {
-  //     isFull(true);
-  //   } else {
-  //     isFull(false);
-  //   }
-  // }, [addressDetails]);
 
   useEffect(() => {
     if (getMapData) {

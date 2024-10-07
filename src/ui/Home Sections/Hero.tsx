@@ -71,7 +71,7 @@ const Hero = () => {
           vejledning
         </p>
         <button onClick={() => navigate("/templates")}>
-          {/* <span>Explore templates</span> */}
+    
           <span>Udforsk skabeloner</span>
           <ArrowRightIcon />
         </button>

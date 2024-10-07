@@ -1,15 +1,15 @@
-import styled from "styled-components"
+import styled from "styled-components";
 import {
   IoIosArrowBack as LeftArrow,
-  IoIosArrowForward as RightArrow
-} from "react-icons/io"
-import { useRef } from "react"
+  IoIosArrowForward as RightArrow,
+} from "react-icons/io";
+import { useRef } from "react";
 
 const Container = styled.section`
   h2 {
     /* text-align: center; */
   }
-`
+`;
 
 const StyledSlider = styled.div`
   padding: 2rem 0;
@@ -71,20 +71,20 @@ const StyledSlider = styled.div`
       display: block;
     }
   }
-`
+`;
 
 const Slider = () => {
-  const sliderRef = useRef<HTMLDivElement>(null)
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
-    const scrollAmount = 400 // Adjust as needed
-    const container = sliderRef.current
+    const scrollAmount = 400;
+    const container = sliderRef.current;
 
     if (container) {
-      const scrollValue = direction === "left" ? -scrollAmount : scrollAmount
-      container.scrollBy({ left: scrollValue, behavior: "smooth" })
+      const scrollValue = direction === "left" ? -scrollAmount : scrollAmount;
+      container.scrollBy({ left: scrollValue, behavior: "smooth" });
     }
-  }
+  };
   return (
     <Container>
       <h2>Templates</h2>
@@ -139,7 +139,7 @@ const Slider = () => {
         </button>
       </StyledSlider>
     </Container>
-  )
-}
+  );
+};
 
-export default Slider
+export default Slider;

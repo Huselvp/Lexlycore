@@ -9,11 +9,11 @@ import { AContainer, ARow } from "./AccountForm"
 
 const UpdatePasswordForm = () => {
   const { isLoading, updatePassword } = useUpdatePassword()
-  // States
+  
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  //
+  
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
     if (newPassword !== confirmPassword)

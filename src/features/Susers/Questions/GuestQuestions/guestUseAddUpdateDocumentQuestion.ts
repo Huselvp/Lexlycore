@@ -21,12 +21,11 @@ export const guestUseAddUpdateDocumentQuestion = () => {
       }) => {
         const processQuestions = (questions, isSubQuestion = false) => {
           return questions.map((question) => {
-            // Always use 'questionId' as the key regardless of whether it's a subquestion
             const idKey = "questionId";
             const valueKey = "value";
 
             let processedQuestion = {
-              [idKey]: question[isSubQuestion ? "subQuestionId" : "questionId"], // Dynamically assign the correct ID
+              [idKey]: question[isSubQuestion ? "subQuestionId" : "questionId"],
             };
 
             if (question.type === "form") {
@@ -62,11 +61,9 @@ export const guestUseAddUpdateDocumentQuestion = () => {
                 : [];
               processedQuestion.days = days;
             } else if (question.type === "map") {
-              // Split the map string by commas and trim each part
               const mapString = question[valueKey] || "";
               const mapParts = mapString.split(",").map((part) => part.trim());
 
-              // Create mapValues object with keys as 1, 2, 3, etc.
               const mapValues = mapParts.reduce((acc, value, index) => {
                 acc[index + 1] = value;
                 return acc;
@@ -77,7 +74,6 @@ export const guestUseAddUpdateDocumentQuestion = () => {
               processedQuestion.value = question[valueKey];
             }
 
-            // Process subquestionsValues recursively and pass true for isSubQuestion
             if (
               Array.isArray(question.subquestionsValues) &&
               question.subquestionsValues.length > 0
@@ -96,10 +92,8 @@ export const guestUseAddUpdateDocumentQuestion = () => {
           return processQuestions(data);
         };
 
-        // Process and log data
         const finalData = orderMyData(values);
 
-        // Make the API call
         return addUpdateDocumentQuestionApi({
           isDraft,
           values: finalData,

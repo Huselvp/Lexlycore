@@ -1,7 +1,7 @@
-import styled from "styled-components"
-import { CiSearch as SearchIcon } from "react-icons/ci"
-import { FormEvent } from "react"
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
+import styled from "styled-components";
+import { CiSearch as SearchIcon } from "react-icons/ci";
+import { FormEvent } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const Container = styled.form`
   position: relative;
@@ -36,23 +36,22 @@ const Container = styled.form`
       /* border-color: transparent; */
     }
   }
-`
+`;
 const Searchbar = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [searchParams] = useSearchParams()
-  const search: string = searchParams.get("s") || ""
-  // Hack
-  // ****
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const search: string = searchParams.get("s") || "";
+
   const onSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    console.log(event.currentTarget)
-    const formElement = event.currentTarget
+    event.preventDefault();
+
+    const formElement = event.currentTarget;
     if (formElement instanceof HTMLFormElement) {
-      const search: string = formElement.search.value
-      navigate("/templates?s=" + search)
+      const search: string = formElement.search.value;
+      navigate("/templates?s=" + search);
     }
-  }
+  };
   return (
     <Container onSubmit={onSubmit}>
       <input
@@ -64,7 +63,7 @@ const Searchbar = () => {
       />
       <SearchIcon />
     </Container>
-  )
-}
+  );
+};
 
-export default Searchbar
+export default Searchbar;

@@ -1,26 +1,25 @@
-import { FormEventHandler, useState } from "react"
-import Form from "../ui/AuthForm"
-import SpinnerMini from "../ui/SpinnerMini"
-import Row from "../ui/Row"
-import toast from "react-hot-toast"
-import { useResetPassword } from "../features/Authentication/useResetPassword"
-import InputPassword from "../ui/InputPassword"
+import { FormEventHandler, useState } from "react";
+import Form from "../ui/AuthForm";
+import SpinnerMini from "../ui/SpinnerMini";
+import Row from "../ui/Row";
+import toast from "react-hot-toast";
+import { useResetPassword } from "../features/Authentication/useResetPassword";
+import InputPassword from "../ui/InputPassword";
 
 const ResetPassword = () => {
-  const { isLoading, resetPassword } = useResetPassword()
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const { isLoading, resetPassword } = useResetPassword();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     if (newPassword !== confirmPassword)
-      return toast.error("Passwords must match")
-    resetPassword(newPassword)
-  }
+      return toast.error("Passwords must match");
+    resetPassword(newPassword);
+  };
 
   return (
     <>
-      {/* <Logo /> */}
       <Form onSubmit={onFormSubmit}>
         <h3>Reset Password</h3>
         <Row direction="column" gap="2rem">
@@ -52,7 +51,7 @@ const ResetPassword = () => {
         </Row>
       </Form>
     </>
-  )
-}
+  );
+};
 
-export default ResetPassword
+export default ResetPassword;

@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-// import { addQuestion as addQuestionApi } from "../../../services/questionApi"
 import { displayErrorMessage } from "../../../utils/helpers";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";

@@ -139,7 +139,6 @@ export const updatePersonalDataUrl = () => {
 export const getUsersUrl = `${API}/admin/all_users`;
 // Document
 
-// houda must remove the access token from here to be able to get the data
 export const getDocumentsUrl = () => {
   const token = getToken();
   return `${API}/suser/get_documents/${token}`;
@@ -154,12 +153,8 @@ export const generateDocumentUrl = ({
   templateId: number;
 }) => `${API}/suser/generate-pdf/${documentId}/${templateId}`;
 
-// should be a create document for the gust
 export const createDocumentUrl = (templateId: number) =>
   `${API}/suser/createDocument/${templateId}`;
-
-// export const createDocumentUrl = (templateId: number) =>
-//   `${API}/suser/createDocument/${templateId}`
 
 export const addUpdateDocumentQuestionUrl = `${API}/suser/add-values`;
 

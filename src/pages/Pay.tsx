@@ -11,7 +11,7 @@ const Pay = () => {
     script.async = true;
     document.body.appendChild(script);
     script.onload = () => {
-      // Dibs script has loaded, now you can use the Dibs.Checkout
+    
       const checkoutKey = "test-checkout-key-b4efeb14e3114511a84e7be90cc43f1d";
       const checkoutOptions = {
         checkoutKey,
@@ -20,15 +20,11 @@ const Pay = () => {
       };
 
       const checkout = new window.Dibs.Checkout(checkoutOptions);
-      checkout.on("payment-completed", function (response) {
-        console.log(
-          "Response Success = 88888888888888888888888888888888",
-          response
-        );
+      checkout.on("payment-completed", function () {
         chargePayment();
       });
     };
-    // Cleanup the script when the component unmounts
+    
     return () => {
       document.body.removeChild(script);
     };

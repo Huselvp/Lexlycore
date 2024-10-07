@@ -321,7 +321,6 @@ const Wizard: React.FC = () => {
   return (
     <div className="container">
       <div className="form-container">
-        {/* her is the slider */}
         <div className="wizard-slider">
           {steps.map((step, index) => (
             <div
@@ -358,7 +357,7 @@ const Wizard: React.FC = () => {
             </div>
           ))}
         </div>
-        {/* her is the data displayed */}
+
         <div>
           <div className="wizard_form_container">
             <h2 className="title">{currentStepData.title}</h2>

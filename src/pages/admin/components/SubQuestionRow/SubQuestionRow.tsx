@@ -38,8 +38,6 @@ function SubQuestionRow({
 }) {
   const navigate = useNavigate();
 
-  // popups controllers
-
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
 
   const [isAddSubQuestionFormNameOpen, setIsAddSubQuestionFormNameOpen] =
@@ -57,8 +55,6 @@ function SubQuestionRow({
   const [isSeeAllBlocksInpusOpen, setIsSeeAllBlocksInputOpen] = useState(false);
 
   const [isAddBlockTypeOpen, setIsAddBlockTypeOpen] = useState(false);
-
-  // SubQuestion data
 
   const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
 
@@ -85,8 +81,6 @@ function SubQuestionRow({
             getSubQuestionFormBlocksHandler(subQuestionFormId);
             setSubQuestionFormId(result?.data.id);
           });
-      } else {
-        console.log("form title should not be empty");
       }
     } catch (err) {
       console.log(err);
@@ -145,7 +139,7 @@ function SubQuestionRow({
           },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
           setIsAddBlockTypeOpen(false);
           setIsSeeSubQuestionBlocks(true);
@@ -160,7 +154,7 @@ function SubQuestionRow({
     try {
       await axios
         .delete(`${API}/form/block/${subQuestionFormId}/${id}`, getApiConfig())
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -176,7 +170,7 @@ function SubQuestionRow({
           {},
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -191,7 +185,6 @@ function SubQuestionRow({
         getApiConfig()
       );
       setFormBblocksData(result?.data.form.blocks);
-      console.log(result?.data.form.blocks);
     } catch (err) {
       console.error(err);
     }
@@ -201,8 +194,6 @@ function SubQuestionRow({
     get_form_blocks(subQuestion.id);
   }, [subQuestion.id]);
 
-  // ==============================
-
   const [isAddMaxMinValuesOpen, setIsAddMaxMinValuesOpen] = useState(false);
 
   const [minValue, setMinValue] = useState(0);
@@ -210,7 +201,6 @@ function SubQuestionRow({
 
   const add_min_max_value_handler = async () => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
-      console.error("minValue or maxValue is not defined");
       return;
     }
 
@@ -224,7 +214,7 @@ function SubQuestionRow({
           },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           setIsPopUpOpen(false);
           setIsAddMaxMinValuesOpen(false);
           getFilterInformation(subQuestion?.id, subQuestion?.valueType);
@@ -279,7 +269,7 @@ function SubQuestionRow({
             },
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setIsUpdatedMaxMinValuesOpen(false);
             setIsPopUpOpen(false);
           });
@@ -303,10 +293,6 @@ function SubQuestionRow({
     setIsAddBlockTypeOpen(true);
     setIsSeeSubQuestionBlocks(false);
   };
-
-  // +++++++++++++++++++++++++++
-
-  const [blockPositions, setBlockPositions] = useState([]);
 
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
@@ -344,35 +330,25 @@ function SubQuestionRow({
     );
   };
 
-  useEffect(() => {
-    setBlockPositions(subQuestionFormBlocks?.map((bloc) => bloc.id));
-  }, [subQuestionFormBlocks]);
-
   const moveItem = (fromIndex, toIndex) => {
     const updatedItems = [...subQuestionFormBlocks];
     const [movedItem] = updatedItems.splice(fromIndex, 1);
     updatedItems.splice(toIndex, 0, movedItem);
 
-    setSubQuestionFormBlocks(updatedItems); // Update the state with the new order of items
+    setSubQuestionFormBlocks(updatedItems);
 
-    // Update block positions to match the new order
     const updatedBlockPositions = updatedItems.map((item) => item.id);
-    setBlockPositions(updatedBlockPositions);
 
-    // Submit the new block positions
     submitBlockPositions(updatedBlockPositions);
   };
 
   const submitBlockPositions = async (positions) => {
     try {
       await axios.put(`${API}/form/blocks/reorder`, positions, getApiConfig());
-      console.log("Block positions submitted successfully");
     } catch (error) {
       console.error("Error submitting block positions:", error);
     }
   };
-
-  // =====
 
   const [countriesList, setCountriesList] = useState([]);
 
@@ -396,8 +372,6 @@ function SubQuestionRow({
     getCountriesList();
   }, []);
 
-  // ===============
-
   const colors = [
     "#FF5733",
     "#3357FF",
@@ -412,7 +386,6 @@ function SubQuestionRow({
   ];
 
   useEffect(() => {
-    console.log(depth, "i am the depth");
     localStorage.setItem("depth", depth);
   }, [depth]);
 
@@ -470,43 +443,6 @@ function SubQuestionRow({
 
             {isSeeSubQuestionFormBlocksOpen && (
               <BlocksContainer>
-                {/* {subQuestionFormBlocks?.map((block, index) => {
-                  return (
-                    <Block key={index}>
-                      <div className="block-controlers">
-                        <button>
-                          <FaRegEdit
-                            size={20}
-                            onClick={() => {
-                              setIsEditSubQuestionBlocksOpen(true);
-                              setIsAddSubQuestionFormNameOpen(false);
-                              setIsSeeAllSubQuestionBlocksOpen(false);
-                              setIsSeeSubQuestionBlocks(false);
-                              setSubQuestionBlockId(block.id);
-                            }}
-                          />
-                        </button>
-                        <button>
-                          <HiOutlineDuplicate
-                            size={20}
-                            onClick={() => {
-                              duplicate_subQuestion_block_handler(block.id);
-                            }}
-                          />
-                        </button>
-                        <button>
-                          <MdDeleteOutline
-                            size={20}
-                            onClick={() => {
-                              delete_subQuestion_block_handler(block.id);
-                            }}
-                          />
-                        </button>
-                      </div>
-                    </Block>
-                  );
-                })} */}
-
                 <DndProvider backend={HTML5Backend}>
                   {subQuestionFormBlocks?.map((item, index) => (
                     <DraggableItem
@@ -716,7 +652,7 @@ function SubQuestionRow({
 
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
-                {formBlocksData?.map((block, blockIndex) => {
+                {formBlocksData?.map((block) => {
                   if (block.type === "COMPANY") {
                     return (
                       <div
@@ -967,7 +903,7 @@ function SubQuestionRow({
                         </div>
                       </div>
                     );
-                  } else if (block.type === "PERSON") {
+                  } else if (block?.type === "PERSON") {
                     return (
                       <div
                         className="person"
@@ -1226,7 +1162,7 @@ function SubQuestionRow({
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
-                      {block.labels?.map((label, labelIndex) => {
+                      {block.labels?.map((label) => {
                         if (!label.name) {
                           return null;
                         }
@@ -1291,12 +1227,10 @@ function SubQuestionRow({
 
             {isSeeAlSubQuestionBlocksOpen && (
               <div className="form_type">
-                {subQuestionFormBlocks?.map((block, blockIndex) => {
+                {subQuestionFormBlocks?.map((block) => {
                   return (
                     <div className="form-block-user" key={block.id}>
-                      {/* <IoIosClose className="form_type_controllers" size={20} /> */}
-
-                      {block.labels?.map((label, labelIndex) => {
+                      {block.labels?.map((label) => {
                         return (
                           <div key={label.id} className="block-input">
                             <label>{label.name}</label>
@@ -1424,7 +1358,6 @@ function SubQuestionRow({
       </PopUp>
 
       <Table.Row id={`menus-row--sq--${subQuestion.id}`}>
-        {/* <div></div> */}
         <div className="down-icon" style={{ marginLeft: "15px" }}>
           {subQuestion?.subQuestions?.length > 0 ? (
             <button
@@ -1442,8 +1375,8 @@ function SubQuestionRow({
             marginLeft: "20px",
             color:
               isNested && depth >= 0 && depth < colors.length
-                ? colors[depth - 1] // Apply color only to nested subquestions
-                : "#646464", // Default color for non-nested subquestions
+                ? colors[depth - 1]
+                : "#646464",
           }}
         >
           {subQuestion.questionText}
@@ -1454,14 +1387,14 @@ function SubQuestionRow({
             marginLeft: "35px",
             color:
               isNested && depth >= 0 && depth < colors.length
-                ? colors[depth - 1] // Apply color only to nested subquestions
-                : "#646464", // Default color for non-nested subquestions
+                ? colors[depth - 1]
+                : "#646464",
           }}
         >
           {subQuestion.Description}
         </div>
         <Menus.Toggle id={String(subQuestion.id)} />
-        {/* this is the button who open the subList*/}
+
         <Menus.ListSub id={String(subQuestion.id)}>
           <Menus.Button
             icon={<HiPencil />}
@@ -1522,7 +1455,6 @@ function SubQuestionRow({
                 onClick={() => {
                   setIsAddMaxMinValuesOpen(true);
                   setIsPopUpOpen(true);
-                  console.log("this is working");
                 }}
               >
                 Add min max values
@@ -1533,7 +1465,6 @@ function SubQuestionRow({
                 onClick={() => {
                   setIsUpdatedMaxMinValuesOpen(true);
                   setIsPopUpOpen(true);
-                  console.log("this is working");
                 }}
               >
                 Edit Min Max Values
@@ -1547,7 +1478,6 @@ function SubQuestionRow({
           </Modal.Open>
         </Menus.ListSub>
 
-        {/* {this is the window to confirm the delete} */}
         <Modal.Window
           name={`delete-subquestion-${subQuestion.id}-${questionId}`}
         >

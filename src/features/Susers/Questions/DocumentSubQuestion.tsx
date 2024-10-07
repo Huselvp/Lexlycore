@@ -150,7 +150,7 @@ const DocumentSubQuestion = ({
   value,
   setValue,
   subOpen,
-  subQuestions,
+
   data,
   mainQuestionId,
   isSDataFull,
@@ -166,17 +166,11 @@ const DocumentSubQuestion = ({
     [question!.valueType]
   );
 
-  // get the subquestions data
-
   const getSubQuestionData = useCallback(() => {
-    // Find the sub-question data for the current main question
     const subQuestionData = data?.find((q) => q.questionId === mainQuestionId);
 
-    // Return the sub-questions
     return subQuestionData ? subQuestionData.subQuestions : [];
   }, [data, mainQuestionId]);
-
-  // get the subquestion data
 
   const getSubquestion = () => {
     const subQuestionData = getSubQuestionData()?.find(
@@ -189,8 +183,6 @@ const DocumentSubQuestion = ({
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
-  const [formErrors, setFormErrors] = useState([]);
-  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
 
   // Fetch form blocks and filter data
   useEffect(() => {
@@ -230,8 +222,6 @@ const DocumentSubQuestion = ({
     subOpen(true);
   }, [subOpen]);
 
-  // =============  day ===========
-
   const isDaysHaveValues = () => {
     return (
       Array.isArray(getSubquestion()) &&
@@ -265,8 +255,6 @@ const DocumentSubQuestion = ({
 
   const isSecondDayDisabled = days[0]?.day === "";
 
-  // ============ time ==========
-
   const isTimesHaveValues = () => {
     return (
       Array.isArray(getSubquestion()) &&
@@ -276,7 +264,6 @@ const DocumentSubQuestion = ({
     );
   };
 
-  // Initialize state based on a condition
   const [times, setTimes] = useState(() => {
     if (isTimesHaveValues()) {
       return [
@@ -291,18 +278,15 @@ const DocumentSubQuestion = ({
     }
   });
 
-  // Handle time changes
   const handleTimeChange = (index, event) => {
     const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
-    setValue(newTimes, question.valueType); // Assuming setValue is defined elsewhere
+    setValue(newTimes, question.valueType);
   };
 
   const isSecondTimeDisabled = times[0]?.time === "";
-
-  // ===============  filter =============
 
   const isTheFilterHavAvalue = useCallback(() => {
     return getSubquestion() !== "";
@@ -329,9 +313,7 @@ const DocumentSubQuestion = ({
     setValue(newValue, question.valueType);
   };
 
-  // ================ form ================
-
-  // Fetch form blocks and filter data
+  
   useEffect(() => {
     const getFormBlocks = async () => {
       if (question?.valueType === "form") {
@@ -365,7 +347,7 @@ const DocumentSubQuestion = ({
     getFilterData();
   }, [question.id, question?.valueType]);
 
-  // Initialize form data with props value
+
   useEffect(() => {
     if (getSubquestion()) {
       setFormData(getSubquestion());
@@ -408,15 +390,15 @@ const DocumentSubQuestion = ({
     return formBlocks.map((block) => {
       if (block.type === "COMPANY" || block.type === "PERSON") {
         const labels = defaultLabels[block.type].map((label) => {
-          // Ensure we generate a unique ID
+          
           while (idsArray.includes(generatedId)) {
             generatedId++;
           }
 
-          const newId = generatedId; // Use the current generatedId
-          generatedId++; // Increment for the next ID
+          const newId = generatedId; 
+          generatedId++; 
 
-          idsArray.push(newId); // Update the idsArray with the new ID
+          idsArray.push(newId); 
 
           return {
             name: label.labelName,
@@ -437,14 +419,6 @@ const DocumentSubQuestion = ({
   const newBlocksForm = generateFormDataWithUniqueLabels(formBlocks);
 
   const totalInputs = countTotalInputs(newBlocksForm);
-
-  // Update form errors when form blocks change
-  useEffect(() => {
-    const initialFormErrors = formBlocks?.flatMap((block) =>
-      block?.labels?.map(() => "")
-    );
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
 
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
@@ -470,11 +444,7 @@ const DocumentSubQuestion = ({
           });
         }
 
-        // Update form data and check if all data is entered
-        const allInputsFilled = updatedFormData?.length === totalInputs;
-        setIsAllDataEntered(allInputsFilled);
-
-        setValue(updatedFormData, question.valueType); // Pass updated data to setValue
+        setValue(updatedFormData, question.valueType);
 
         return updatedFormData;
       });
@@ -482,11 +452,10 @@ const DocumentSubQuestion = ({
     [totalInputs, setValue]
   );
 
-  // ----------- CVR DATA -------------
+ 
 
   const [CVR, setCVR] = useState("");
-  const [CVRBlockId, setCVRBlockId] = useState("");
-  const [isCVRRight, setIsCVRRight] = useState(false);
+ 
 
   const getSVRDataHandler = async (cvr) => {
     try {
@@ -503,16 +472,16 @@ const DocumentSubQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-        console.log(result.data);
-        setIsCVRRight(true);
+
+       
       } else {
         clearFormFields();
-        setIsCVRRight(true);
+       
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
-      setIsCVRRight(true);
+    
     }
   };
 
@@ -524,16 +493,11 @@ const DocumentSubQuestion = ({
   };
 
   const handleCVRChanges = (cvr, blockId) => {
-    console.log("I am here and working good");
-    console.log(blockId);
-
-    // Ensure the targeted block exists
+    
     let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
     if (!targetedBlock) return;
 
-    console.log(targetedBlock);
-
-    // Map field names to their corresponding variables
+   
     const fieldMappings = {
       Virksomhedsnavn: virksomhedsnavn,
       Adresse: adresse,
@@ -545,28 +509,28 @@ const DocumentSubQuestion = ({
     };
 
     setFormData((prevFormData) => {
-      let updatedFormData = [...prevFormData];
+      const updatedFormData = [...prevFormData];
 
-      // Iterate over fieldMappings to update, add, or remove data
+      
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
-        // Find the labelId from the targetedBlock's labels
+      
         const targetedLabel = targetedBlock.labels.find(
           (label) => label.name === labelName
         );
-        const labelId = targetedLabel ? targetedLabel.id : null; // Safely retrieve labelId
+        const labelId = targetedLabel ? targetedLabel.id : null; 
 
         if (labelId) {
-          // Proceed only if labelId is found
+         
           const existingEntryIndex = updatedFormData.findIndex(
             (entry) => entry.blockId === blockId && entry.labelId === labelId
           );
 
           if (value !== "") {
             if (existingEntryIndex !== -1) {
-              // Update the existing entry
+             
               updatedFormData[existingEntryIndex].LabelValue = value;
             } else {
-              // Add a new entry
+            
               updatedFormData.push({
                 blockId,
                 labelId,
@@ -576,32 +540,32 @@ const DocumentSubQuestion = ({
             }
           } else {
             if (existingEntryIndex !== -1) {
-              // Remove the entry if the value is an empty string
+             
               updatedFormData.splice(existingEntryIndex, 1);
             }
           }
         }
       });
 
-      // Directly update the form data and state
+      
       setValue(updatedFormData, question.valueType);
 
       return updatedFormData;
     });
   };
 
-  // UseEffect with the updated dependency array
+  
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
 
-  // ===========  checking is all subquestions values is not null =======
+ 
 
   const idAllSubQuestionsValuesIsNotNull = useCallback(() => {
-    // Get sub-question data
+  
     const subQuestionData = getSubQuestionData();
 
-    // Check if all sub-question values are not empty
+    
     const allValuesNotEmpty = subQuestionData?.every(
       (e) => e.subQuestionValue !== ""
     );
@@ -614,7 +578,7 @@ const DocumentSubQuestion = ({
     isSDataFull(isDataFull);
   }, [idAllSubQuestionsValuesIsNotNull, isSDataFull]);
 
-  // =============
+ 
 
   const [countriesList, setCountriesList] = useState([]);
 
@@ -640,8 +604,6 @@ const DocumentSubQuestion = ({
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-      // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
       return {
         apartment: "",
         address: "",
@@ -685,7 +647,7 @@ const DocumentSubQuestion = ({
       <DetailsContainer>
         <button
           onClick={() => setShowDetails((show) => !show)}
-          // disabled={disabled}
+         
         >
           <span>{showDetails ? "Hide " : "Show"} details</span>
           {showDetails ? <HiMiniChevronUp /> : <HiMiniChevronDown />}
@@ -695,7 +657,7 @@ const DocumentSubQuestion = ({
       <InputContainer>
         {question.valueType === "number" && (
           <Input
-            // disabled={disabled}
+           
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -705,7 +667,7 @@ const DocumentSubQuestion = ({
 
         {question.valueType === "input" && (
           <Input
-            // disabled={disabled}
+           
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -715,7 +677,7 @@ const DocumentSubQuestion = ({
 
         {question.valueType === "textarea" && (
           <Textarea
-            // disabled={disabled}
+            
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -837,552 +799,7 @@ const DocumentSubQuestion = ({
           </div>
         )}
 
-        {/* {question.valueType.startsWith("form") && (
-          <div className="form_type">
-            {formBlocks?.map((block) => {
-             
-              if (block.type === "COMPANY") {
-                return (
-                  <div className="company">
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginBottom: "2rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "5rem",
-                          height: "5rem",
-                          backgroundColor: "#9a9278",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50px",
-                        }}
-                      >
-                        <span>
-                          <BsBuildings color="white" />
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
-                        Virksomhed
-                      </p>
-                    </div>
-
-                    <div>
-                      <form>
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="Virksomhedsnavn"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Virksomhedsnavn
-                            </label>
-                            <input
-                              id="Virksomhedsnavn"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Adresse
-                            </label>
-                            <input
-                              id="adresse"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="cpr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              CPR nr
-                            </label>
-                            <input
-                              id="cpr"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "40%",
-                            }}
-                          >
-                            <label
-                              htmlFor="postnr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Postnr
-                            </label>
-                            <input
-                              id="postnr"
-                              type="number"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "55%",
-                            }}
-                          >
-                            <label
-                              htmlFor="by"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              By
-                            </label>
-                            <input
-                              id="by"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Herefter otalt som
-                            </label>
-
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Land
-                            </label>
-                            <select
-                              name="land"
-                              id="land"
-                              style={{
-                                width: "100%",
-                                padding: "0.8rem 1.2rem",
-                                border: "1px solid #d1d5db",
-                                borderRadius: " 4px",
-                                backgroundColor: " #fff",
-                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                paddingRight: "30px",
-                              }}
-                            >
-                              {countriesList.map((country) => {
-                                return (
-                                  <option value={country.countryName}>
-                                    {country.countryName}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                );
-              } else if (block.type === "PERSON") {
-                return (
-                  <div className="person">
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginBottom: "2rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "5rem",
-                          height: "5rem",
-                          backgroundColor: "#9a9278",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50px",
-                        }}
-                      >
-                        <span>
-                          <FiUser color="white" />
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
-                        Person
-                      </p>
-                    </div>
-
-                    <div>
-                      <form>
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Navn
-                            </label>
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Adresse
-                            </label>
-                            <input
-                              id="adresse"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="cpr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              CPR nr
-                            </label>
-                            <input
-                              id="cpr"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "40%",
-                            }}
-                          >
-                            <label
-                              htmlFor="postnr"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Postnr
-                            </label>
-                            <input
-                              id="postnr"
-                              type="number"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "55%",
-                            }}
-                          >
-                            <label
-                              htmlFor="by"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              By
-                            </label>
-                            <input
-                              id="by"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            width: "100%",
-                            gap: "2rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="name"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Herefter otalt som
-                            </label>
-
-                            <input
-                              id="nmae"
-                              type="text"
-                              style={{ width: "100%" }}
-                            ></input>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "start",
-                              width: "100%",
-                            }}
-                          >
-                            <label
-                              htmlFor="adresse"
-                              style={{
-                                marginBottom: "1rem",
-                                fontWeight: "700",
-                              }}
-                            >
-                              Land
-                            </label>
-                            <select
-                              name="land"
-                              id="land"
-                              style={{
-                                width: "100%",
-                                padding: "0.8rem 1.2rem",
-                                border: "1px solid #d1d5db",
-                                borderRadius: " 4px",
-                                backgroundColor: " #fff",
-                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                paddingRight: "30px",
-                              }}
-                            >
-                              {countriesList.map((country) => {
-                                return (
-                                  <option value={country.countryName}>
-                                    {country.countryName}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                );
-              }
-
-              if (!block?.labels || block?.labels.length === 0) {
-                return null; 
-              }
-
-              return (
-                <div className="form-block-user" key={block?.id}>
-                 
-                  {block.labels?.map((label) => {
-                    const existingData = formData?.find(
-                      (data) =>
-                        data?.blockId === block?.id &&
-                        data?.labelId === label?.id
-                    );
-                    const fieldValue = existingData
-                      ? existingData.LabelValue
-                      : "";
-                    const questionText = label.name;
-
-                    const handleInputChange = (e) => {
-                      const { value } = e.target;
-                      handleChange(block?.id, label?.id, value, questionText);
-                    };
-
-                    return (
-                      <div key={label.id} className="block-input">
-                        <label>{label.name}</label>
-                        {label.type === "SELECT" ? (
-                          <select
-                            name={label.name}
-                            value={fieldValue}
-                            onChange={handleInputChange}
-                          >
-                            <option value="">Select an option</option>
-                            {Object.keys(label.options)?.map((key) => (
-                              <option key={key} value={label.options[key]}>
-                                {label.options[key]}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type={label.type}
-                            name={label.name}
-                            value={fieldValue}
-                            placeholder={label.name}
-                            onChange={handleInputChange}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
-        )} */}
+       
 
         {question.valueType.startsWith("form") && (
           <div className="form_type">
@@ -1556,7 +973,7 @@ const DocumentSubQuestion = ({
                                 e.target.value,
                                 block.labels[2]?.name
                               );
-                              // getSVRDataHandler(e.target.value);
+                              
                             }}
                           />
                         </div>
@@ -1700,44 +1117,7 @@ const DocumentSubQuestion = ({
                           >
                             Land
                           </label>
-                          {/* <select
-                            name="land"
-                            id="land"
-                            style={{
-                              width: "100%",
-                              padding: "0.8rem 1.2rem",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "4px",
-                              backgroundColor: "#fff",
-                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                              paddingRight: "30px",
-                            }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "Danemark"
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[6]?.id,
-                                e.target.value,
-                                block.labels[6]?.name
-                              )
-                            }
-                          >
-                            <option>Land</option>
-                            {countriesList.map((country) => (
-                              <option
-                                key={country.countryName}
-                                value={country.countryName}
-                              >
-                                {country.countryName}
-                              </option>
-                            ))}
-                          </select> */}
+                         
 
                           <select
                             name="land"
@@ -1756,7 +1136,7 @@ const DocumentSubQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "" // Default value is set to an empty string
+                              )?.LabelValue || "" 
                             }
                             onChange={(e) =>
                               handleChange(
@@ -1768,7 +1148,7 @@ const DocumentSubQuestion = ({
                             }
                           >
                             <option value="">Land</option>{" "}
-                            {/* Placeholder option */}
+                         
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}
@@ -1952,16 +1332,11 @@ const DocumentSubQuestion = ({
                               )?.LabelValue || cvrNumber
                             }
                             onChange={(e) => {
-                              // handleChange(
-                              //   block?.id,
-                              //   block.labels[2]?.id,
-                              //   e.target.value,
-                              //   block.labels[2]?.name
-                              // );
+                            
                               setCvrNumber(e.target.value);
                               getSVRDataHandler(e.target.value);
                               setCVR(e.target.value);
-                              setCVRBlockId(block?.id);
+                            
                             }}
                           />
                         </div>

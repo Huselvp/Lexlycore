@@ -27,17 +27,9 @@ const AdminLogin = () => {
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     login({ email, password });
-    console.log("email: ", email, "password : ", password);
   };
   return (
     <>
-      {/* <Form.Header> */}
-      {/* <Logo /> */}
-      {/* <Link to="/login">
-          <SuitecaseIcon />
-          <span>Log in as an advisor</span>
-        </Link> */}
-      {/* </Form.Header> */}
       <Form onSubmit={onFormSubmit}>
         <h3>Log in</h3>
         <Form.Rows>

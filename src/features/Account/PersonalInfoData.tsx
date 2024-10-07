@@ -126,15 +126,7 @@ const PersonalInfoData = () => {
   return (
     <Container>
       <form onSubmit={onSubmit}>
-        {/* <FormRow>
-          <div>
-            <img src="/about-3.jpg" />
-            <input type="file" id="picture" />
-            <label htmlFor="picture">
-              <PencilIcon />
-            </label>
-          </div>
-        </FormRow> */}
+        
         <FormRow>
           <Form.Label>Username</Form.Label>
           <Form.Input

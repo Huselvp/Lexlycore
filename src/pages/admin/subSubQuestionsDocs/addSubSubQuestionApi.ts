@@ -36,8 +36,7 @@ export const addSubSubQuestionApi = async ({
     subQuestion,
     getApiConfig()
   );
-  console.log("Res = ", res);
-  console.log("Data = ", res.data);
+
   return res.data;
 };
 
@@ -66,25 +65,6 @@ export const updateSubQuestion = async (
     getApiConfig()
   );
 };
-
-// Description
-// :
-// "test test "
-// description_details
-// :
-// "test test "
-// id
-// :
-// 8
-// questionText
-// :
-// "subquestion 1 "
-// text_area
-// :
-// "<p>test [value]</p>"
-// valueType
-// :
-// "input"
 
 export const getSubQuestion = async (
   idq: number,

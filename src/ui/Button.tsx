@@ -58,8 +58,6 @@ const Button = styled.button<{
   ${(props) => sizes[props.size]}
   ${(props) => variations[props.variation]}
 `
-// const Button = ({ children }: { children: React.ReactNode }) => {
-//   return <StyledButton>{children}</StyledButton>
-// }
+
 
 export default Button

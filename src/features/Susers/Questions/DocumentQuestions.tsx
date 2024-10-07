@@ -12,7 +12,6 @@ import QuestiontsSlider from "../../../ui/QuestiontsSlider";
 import DocumentHeader from "../../Documents/DocumentHeader";
 import DocumentSubQuestion from "./DocumentSubQuestion";
 
-import { useParams } from "react-router-dom";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -75,13 +74,13 @@ const DocumentQuestions = ({
 }: {
   documentQuestionsValues?: DocumentQuestionsValues[];
 }) => {
-  // FROM THE TEMPLETE HE GETS THE QUESTIONS DATA
+  
   const { template } = useTemplate();
   const ALLquestions = template!.questions;
   const questions = flattenSubQuestions(ALLquestions);
   const [display, setdisplay] = useState(false);
 
-  // this is the form data
+ 
 
   const [isFormDataFull, setIsFormDataFull] = useState(false);
   const [isDaysFull, setIsDaysFull] = useState(false);
@@ -90,7 +89,7 @@ const DocumentQuestions = ({
   const [isAllSubQuestionDataFull, setIsAllSubQuestionDataFull] =
     useState(false);
 
-  // this is the state where he saves the data
+  
   const [overviewData, setOverviewData] = useState<
     {
       questionText: string;
@@ -147,7 +146,7 @@ const DocumentQuestions = ({
 
   const isDraft = overviewData.some((q) => !q.value);
 
-  const params = useParams();
+ 
 
   const activeQuestion = overviewData.find((q) => q.active);
 
@@ -159,10 +158,10 @@ const DocumentQuestions = ({
 
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
-  // console.log("activeQuestion = ", activeQuestion);
+ 
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
-    // here he saves the input data
+    
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -203,9 +202,9 @@ const DocumentQuestions = ({
 
   function flattenSubQuestions(questions) {
     return questions.map((question) => {
-      let flattenedQuestion = { ...question };
+      const flattenedQuestion = { ...question };
 
-      // Recursively process subQuestions
+     
       if (
         flattenedQuestion.subQuestions &&
         flattenedQuestion.subQuestions.length > 0
@@ -214,7 +213,7 @@ const DocumentQuestions = ({
           flattenedQuestion.subQuestions
         );
 
-        // Extract nested subQuestions from all levels
+      
         const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
           (q) => q.subQuestions
         );
@@ -369,7 +368,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 0000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -396,7 +395,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next map</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -423,7 +422,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -450,7 +449,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -481,7 +480,7 @@ const DocumentQuestions = ({
                                   isSubOpen(false);
                                 }}
                               >
-                                <span>Next 0000</span>
+                                <span>Next</span>
                                 <ArrowRightIcon />
                               </button>
                             )}
@@ -507,16 +506,6 @@ const DocumentQuestions = ({
             />
           )}
         </Content>
-
-        <button
-          onClick={() => {
-            console.log(overviewData);
-            console.log(questions);
-            console.log(ALLquestions);
-          }}
-        >
-          test
-        </button>
       </Container>
     </>
   );

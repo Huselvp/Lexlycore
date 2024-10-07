@@ -8,10 +8,7 @@ const SubQuesctionCoicesTable = () => {
   const { question } = useSubQuestion();
   const choices = extractChoicesFromString(question!.valueType);
 
-  console.log(
-    choices,
-    "########################################################################################"
-  );
+  
 
   return (
     <Menus>

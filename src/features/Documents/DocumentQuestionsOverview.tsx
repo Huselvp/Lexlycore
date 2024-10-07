@@ -95,13 +95,15 @@ const DocumentQuestionsOverview = ({
   onClick,
 }: {
   data: {
+    type: unknown;
     questionText: string;
     questionId: number;
-    value: any;
+    value: unknown;
     subQuestions?: {
+      type: string;
       subQuestionId: number;
       subQuestionText: string;
-      subQuestionValue: any;
+      subQuestionValue: unknown;
     }[];
     active: boolean;
   }[];
@@ -139,15 +141,13 @@ const DocumentQuestionsOverview = ({
       {
         onSuccess: () => {
           if (localStorage.getItem("access_token") === "") {
-            console.log("you can't pay you need to login first");
+            return;
           } else {
             initiatePayment();
           }
         },
       }
     );
-
-    // Redirect the user to the checkout page
   };
 
   const toggleSubQuestions = (index: number) => {
@@ -158,8 +158,6 @@ const DocumentQuestionsOverview = ({
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-      // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
       return {
         apartment: "",
         address: "",
@@ -243,12 +241,11 @@ const DocumentQuestionsOverview = ({
                 </li>
               )}
 
-              {item.type === "map" && (
+              {item?.type === "map" && (
                 <li
                   key={i}
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  {/* Process map values outside of JSX */}
                   {(() => {
                     const mapValues = convertStringToAddressObject(item.value);
                     return (
@@ -417,7 +414,6 @@ const DocumentQuestionsOverview = ({
 
                       {sq.type === "map" &&
                         (() => {
-                          // Perform the logic to process map values
                           const mapValues = convertStringToAddressObject(
                             sq.subQuestionValue
                           );

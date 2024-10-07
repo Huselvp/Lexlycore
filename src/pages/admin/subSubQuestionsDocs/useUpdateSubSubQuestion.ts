@@ -12,7 +12,6 @@ export const useUpdateSubSubQuestion = () => {
   const queryClient = useQueryClient();
   const params = useParams();
   const questionId = transformParamToNumber(params.questionId);
-  // const subquestionId = transformParamToNumber(params.subquestionId)
   const templateId = transformParamToNumber(params.templateId);
   const { isPending: isLoading, mutate: updateSubQuestion } = useMutation({
     mutationFn: (question: SubQuestion) =>
