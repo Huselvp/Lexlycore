@@ -1,5 +1,6 @@
 package com.iker.Lexly.Controller;
 
+import com.iker.Lexly.DTO.QuestionDTO;
 import com.iker.Lexly.DTO.SubQuestionDTO;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
@@ -10,6 +11,7 @@ import com.iker.Lexly.request.CompanyDetails;
 import com.iker.Lexly.responses.GuestDocumentResponse;
 import com.iker.Lexly.service.CompanySearchService;
 import com.iker.Lexly.service.GuestService;
+import com.iker.Lexly.service.QuestionService;
 import com.iker.Lexly.service.SubQuestionService;
 import com.iker.Lexly.service.form.BlockService;
 import com.iker.Lexly.service.form.FormService;
@@ -30,14 +32,16 @@ public class GuestController {
     private final QuestionRepository questionRepository;
     private final SubQuestionService subQuestionService;
     private final CompanySearchService companySearchService;
+    private final QuestionService questionService;
 
-    public GuestController(FormService formService, BlockService blockService, GuestService guestService, QuestionRepository questionRepository, SubQuestionService subQuestionService, CompanySearchService companySearchService) {
+    public GuestController(FormService formService, BlockService blockService, GuestService guestService, QuestionRepository questionRepository, SubQuestionService subQuestionService, CompanySearchService companySearchService, QuestionService questionService) {
         this.formService = formService;
         this.blockService = blockService;
         this.guestService = guestService;
         this.questionRepository = questionRepository;
         this.subQuestionService = subQuestionService;
         this.companySearchService = companySearchService;
+        this.questionService = questionService;
     }
 
     @GetMapping("/guest_find_questions_by_template/{templateId}")
@@ -56,6 +60,11 @@ public class GuestController {
     public ResponseEntity<SubQuestionDTO> getSubQuestionWithDetails(@PathVariable Long idSubQuestion) {
         SubQuestionDTO subQuestionDTO = subQuestionService.getSubQuestionWithDetails(idSubQuestion);
         return ResponseEntity.ok(subQuestionDTO);
+    }
+    @GetMapping("/question-details/{idQuestion}")
+    public ResponseEntity<QuestionDTO> getQuestionWithFormDetails(@PathVariable Long idQuestion ) {
+        QuestionDTO questionDTO = questionService.getQuestionWithDetails(idQuestion);
+        return ResponseEntity.ok(questionDTO);
     }
 
     @GetMapping("/company-details/{cvr}")
