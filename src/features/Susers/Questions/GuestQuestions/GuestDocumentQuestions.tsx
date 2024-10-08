@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../../Templates/useTemplate";
 
-import {  useState } from "react";
+import { useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -13,7 +13,6 @@ import DocumentHeader from "../../../Documents/DocumentHeader";
 
 import GuestDocumentQuestion from "./GuestDocumentQuestion";
 import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
-
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -93,11 +92,11 @@ const GuestDocumentQuestions = ({
       questionText: string;
       questionId: number;
       type: string;
-      value: any;
+      value: unknown;
       subQuestions?: {
         subQuestionId: number;
         subQuestionText: string;
-        subQuestionValue: any;
+        subQuestionValue: unknown;
         type: string;
       }[];
       active: boolean;
@@ -125,7 +124,7 @@ const GuestDocumentQuestions = ({
         active: questionsValuesExist
           ? i === documentQuestionsValues.length
           : i == 0,
-        subQuestions: q.subQuestions?.map((subQ) => {
+        subQuestions: q.subQuestions?.map((subQ: unknown) => {
           const subQuestionValue = subQuestionsValues.find(
             (sqv) => sqv.subQuestion.id === subQ.id
           );
@@ -142,12 +141,6 @@ const GuestDocumentQuestions = ({
 
   const isDraft = overviewData.some((q) => !q.value);
 
-
-
-
-
-
-
   const activeQuestion = overviewData.find((q) => q.active);
 
   const activeQuestionIndex = overviewData.findIndex(
@@ -159,7 +152,6 @@ const GuestDocumentQuestions = ({
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
-
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -202,7 +194,6 @@ const GuestDocumentQuestions = ({
     return questions.map((question) => {
       let flattenedQuestion = { ...question };
 
-  
       if (
         flattenedQuestion.subQuestions &&
         flattenedQuestion.subQuestions.length > 0
@@ -211,7 +202,6 @@ const GuestDocumentQuestions = ({
           flattenedQuestion.subQuestions
         );
 
-     
         const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
           (q) => q.subQuestions
         );

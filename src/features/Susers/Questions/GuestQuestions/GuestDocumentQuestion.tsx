@@ -13,6 +13,8 @@ import { BsBuildings } from "react-icons/bs";
 
 import MMapComponent from "../MMapComponent";
 
+import { getToken } from "../../../../utils/helpers";
+
 const Checkbox = styled.input`
   /* accent-color: var(--color-stone-300); */
   /* border: none; */
@@ -161,6 +163,12 @@ const GuestDocumentQuestion = ({
 }: {
   question: Question;
   children: ReactNode;
+  value: any;
+  setValue: any;
+  isTherData: any;
+  isTherDays: any;
+  isTherTimes: any;
+  isMapDataFullAdded: any;
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   if (typeof question === "undefined") return null;
@@ -173,15 +181,19 @@ const GuestDocumentQuestion = ({
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
 
+  const token = getToken(); // Get token, if available
+
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
       if (question?.valueType === "form") {
         try {
-          const result = await axios.get(
-            `${API}/suser/question-details/${question.id}`,
-            getApiConfig()
-          );
+          // Check if token exists to determine API endpoint
+          const url = token
+            ? `${API}/suser/question-details/${question.id}` // Authenticated API
+            : `${API}/guest/question-details/${question.id}`; // Guest API
+
+          const result = await axios.get(url, getApiConfig());
           setFormBlocks(result?.data.form.blocks);
         } catch (err) {
           console.log(err);
@@ -192,10 +204,12 @@ const GuestDocumentQuestion = ({
     const getFilterData = async () => {
       if (question?.valueType === "filter") {
         try {
-          const result = await axios.get(
-            `${API}/suser/question-details/${question.id}`,
-            getApiConfig()
-          );
+          // Check if token exists to determine API endpoint
+          const url = token
+            ? `${API}/suser/question-details/${question.id}` // Authenticated API
+            : `${API}/guest/question-details/${question.id}`; // Guest API
+
+          const result = await axios.get(url, getApiConfig());
           setFilterData(result?.data.filter);
         } catch (err) {
           console.log(err);
@@ -205,7 +219,7 @@ const GuestDocumentQuestion = ({
 
     getFormBlocks();
     getFilterData();
-  }, [question.id, question?.valueType]);
+  }, [question.id, question?.valueType, token]);
 
   useEffect(() => {
     if (value) {
@@ -213,8 +227,11 @@ const GuestDocumentQuestion = ({
     }
   }, [value]);
 
-  const countTotalInputs = (blocks) => {
-    return blocks.reduce((total, block) => total + block?.labels.length, 0);
+  const countTotalInputs = (blocks: any) => {
+    return blocks.reduce(
+      (total: any, block: any) => total + block?.labels.length,
+      0
+    );
   };
 
   const defaultLabels = {
@@ -238,17 +255,19 @@ const GuestDocumentQuestion = ({
     ],
   };
 
-  const collectLabelIds = (formBlocks) => {
-    return formBlocks.flatMap((block) => block.labels.map((label) => label.id));
+  const collectLabelIds = (formBlocks: any) => {
+    return formBlocks.flatMap((block: any) =>
+      block.labels.map((label: any) => label.id)
+    );
   };
 
-  const generateFormDataWithUniqueLabels = (formBlocks) => {
+  const generateFormDataWithUniqueLabels = (formBlocks: any) => {
     let generatedId = 0;
-    let idsArray = collectLabelIds(formBlocks);
+    const idsArray = collectLabelIds(formBlocks);
 
-    return formBlocks.map((block) => {
+    return formBlocks.map((block: any) => {
       if (block.type === "COMPANY" || block.type === "PERSON") {
-        const labels = defaultLabels[block.type].map((label) => {
+        const labels = defaultLabels[block.type].map((label: any) => {
           while (idsArray.includes(generatedId)) {
             generatedId++;
           }
@@ -287,7 +306,7 @@ const GuestDocumentQuestion = ({
   const [herefterOtaltSom, setHerefterOtaltSom] = useState("");
 
   const handleChange = useCallback(
-    (blockId, labelId, value, questionText) => {
+    (blockId: any, labelId: any, value: any, questionText: string) => {
       setFormData((prevFormData) => {
         const updatedFormData = prevFormData.filter(
           (item) => !(item?.blockId === blockId && item?.labelId === labelId)
@@ -359,7 +378,7 @@ const GuestDocumentQuestion = ({
     }
   });
 
-  const handleTimeChange = (index, event) => {
+  const handleTimeChange = (index: number, event: any) => {
     const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
@@ -400,7 +419,7 @@ const GuestDocumentQuestion = ({
     }
   });
 
-  const handleSelectChange = (index, event) => {
+  const handleSelectChange = (index: number, event) => {
     const newDays = days.map((day) =>
       day.index === index ? { ...day, day: event.target.value } : day
     );
@@ -430,14 +449,14 @@ const GuestDocumentQuestion = ({
         "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
       );
 
-      let sortedCountries = result.data.geonames.sort((a, b) => {
+      let sortedCountries = result.data.geonames.sort((a: any, b: any) => {
         if (a.countryName < b.countryName) return -1;
         if (a.countryName > b.countryName) return 1;
         return 0;
       });
 
       sortedCountries = sortedCountries.filter(
-        (country) => country.countryName !== "Danmark"
+        (country: string) => country.countryName !== "Danmark"
       );
       sortedCountries.unshift({ countryName: "Danmark" });
 
@@ -454,13 +473,14 @@ const GuestDocumentQuestion = ({
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
 
-
   const getSVRDataHandler = async (cvr) => {
     try {
-      const result = await axios.get(
-        `${API}/suser/company-details/${cvr}`,
-        getApiConfig()
-      );
+      // Check if token exists to determine the correct API endpoint
+      const url = token
+        ? `${API}/suser/company-details/${cvr}` // Authenticated API
+        : `${API}/guest/company-details/${cvr}`; // Guest API
+
+      const result = await axios.get(url, getApiConfig());
 
       if (result.data) {
         setVirksomhedsnavn(result.data.name || "");
@@ -470,16 +490,12 @@ const GuestDocumentQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-
-        
       } else {
         clearFormFields();
-       
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
-    
     }
   };
 
@@ -490,12 +506,12 @@ const GuestDocumentQuestion = ({
     setCity("");
   };
 
-  const handleCVRChanges = (cvr, blockId) => {
-    
-    let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+  const handleCVRChanges = (cvr: unknown, blockId: unknown) => {
+    const targetedBlock = newBlocksForm.find(
+      (block: unknown) => block.id === blockId
+    );
     if (!targetedBlock) return;
 
-    
     const fieldMappings = {
       Virksomhedsnavn: virksomhedsnavn,
       Adresse: adresse,
@@ -507,28 +523,23 @@ const GuestDocumentQuestion = ({
     };
 
     setFormData((prevFormData) => {
-      let updatedFormData = [...prevFormData];
+      const updatedFormData = [...prevFormData];
 
-     
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
-        
         const targetedLabel = targetedBlock.labels.find(
-          (label) => label.name === labelName
+          (label: unknown) => label.name === labelName
         );
-        const labelId = targetedLabel ? targetedLabel.id : null; 
+        const labelId = targetedLabel ? targetedLabel.id : null;
 
         if (labelId) {
-          
           const existingEntryIndex = updatedFormData.findIndex(
             (entry) => entry.blockId === blockId && entry.labelId === labelId
           );
 
           if (value !== "") {
             if (existingEntryIndex !== -1) {
-              
               updatedFormData[existingEntryIndex].LabelValue = value;
             } else {
-              
               updatedFormData.push({
                 blockId,
                 labelId,
@@ -538,29 +549,24 @@ const GuestDocumentQuestion = ({
             }
           } else {
             if (existingEntryIndex !== -1) {
-              
               updatedFormData.splice(existingEntryIndex, 1);
             }
           }
         }
       });
 
-      
       setValue(updatedFormData, question.valueType);
 
       return updatedFormData;
     });
   };
 
-  
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
 
-  const convertStringToAddressObject = (dataString) => {
+  const convertStringToAddressObject = (dataString: unknown) => {
     if (typeof dataString !== "string") {
-     
-
       return {
         apartment: "",
         address: "",
@@ -645,780 +651,778 @@ const GuestDocumentQuestion = ({
 
         {question.valueType.startsWith("form") && (
           <div className="form_type">
-            {generateFormDataWithUniqueLabels(formBlocks)?.map((block) => {
-              if (block.type === "PERSON") {
-                return (
-                  <div
-                    className="company"
-                    style={{
-                      backgroundColor: "rgb(255, 255, 255)",
-                      padding: "2rem",
-                      borderRadius: "10px",
-                      width: "100%",
-                    }}
-                    key={block?.id}
-                  >
+            {generateFormDataWithUniqueLabels(formBlocks)?.map(
+              (block: unknown) => {
+                if (block.type === "PERSON") {
+                  return (
                     <div
+                      className="company"
                       style={{
+                        backgroundColor: "rgb(255, 255, 255)",
+                        padding: "2rem",
+                        borderRadius: "10px",
                         width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginBottom: "2rem",
                       }}
+                      key={block?.id}
                     >
                       <div
                         style={{
-                          width: "5rem",
-                          height: "5rem",
-                          backgroundColor: "#9a9278",
+                          width: "100%",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50px",
-                        }}
-                      >
-                        <span>
-                          <FiUser color="white" />
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
-                        Virksomhed
-                      </p>
-                    </div>
-
-                    <form>
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
+                          gap: "10px",
+                          marginBottom: "2rem",
                         }}
                       >
                         <div
                           style={{
+                            width: "5rem",
+                            height: "5rem",
+                            backgroundColor: "#9a9278",
                             display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "50px",
                           }}
                         >
-                          <label
-                            htmlFor="Virksomhedsnavn"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Navn
-                          </label>
-                          <input
-                            id="Virksomhedsnavn"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[0]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[0]?.id,
-                                e.target.value,
-                                block.labels[0]?.name
-                              )
-                            }
-                          />
+                          <span>
+                            <FiUser color="white" />
+                          </span>
                         </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="adresse"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Adresse
-                          </label>
-                          <input
-                            id="adresse"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[1]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[1]?.id,
-                                e.target.value,
-                                block.labels[1]?.name
-                              )
-                            }
-                          />
-                        </div>
+                        <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                          Virksomhed
+                        </p>
                       </div>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
-                        }}
-                      >
+                      <form>
                         <div
                           style={{
                             display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
                             width: "100%",
+                            gap: "2rem",
                           }}
                         >
-                          <label
-                            htmlFor="cvr"
+                          <div
                             style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            CPR nr
-                          </label>
-                          <input
-                            id="cvr"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[2]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) => {
-                              handleChange(
-                                block?.id,
-                                block.labels[2]?.id,
-                                e.target.value,
-                                block.labels[2]?.name
-                              );
-                             
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "40%",
-                          }}
-                        >
-                          <label
-                            htmlFor="postnr"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Postnr
-                          </label>
-                          <input
-                            id="postnr"
-                            type="number"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[3]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[3]?.id,
-                                e.target.value,
-                                block.labels[3]?.name
-                              )
-                            }
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "55%",
-                          }}
-                        >
-                          <label
-                            htmlFor="by"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            By
-                          </label>
-                          <input
-                            id="by"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[4]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[4]?.id,
-                                e.target.value,
-                                block.labels[4]?.name
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="name"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Herefter otalt som
-                          </label>
-                          <input
-                            id="name"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[5]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[5]?.id,
-                                e.target.value,
-                                block.labels[5]?.name
-                              )
-                            }
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="adresse"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Land
-                          </label>
-                        
-
-                          <select
-                            name="land"
-                            id="land"
-                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
                               width: "100%",
-                              padding: "0.8rem 1.2rem",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "4px",
-                              backgroundColor: "#fff",
-                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                              paddingRight: "30px",
                             }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "" 
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[6]?.id,
-                                e.target.value,
-                                block.labels[6]?.name
-                              )
-                            }
                           >
-                            <option value="">Land</option>{" "}
-                           
-                            {countriesList.map((country) => (
-                              <option
-                                key={country.countryName}
-                                value={country.countryName}
-                              >
-                                {country.countryName}
-                              </option>
-                            ))}
-                          </select>
+                            <label
+                              htmlFor="Virksomhedsnavn"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Navn
+                            </label>
+                            <input
+                              id="Virksomhedsnavn"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[0]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[0]?.id,
+                                  e.target.value,
+                                  block.labels[0]?.name
+                                )
+                              }
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Adresse
+                            </label>
+                            <input
+                              id="adresse"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[1]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[1]?.id,
+                                  e.target.value,
+                                  block.labels[1]?.name
+                                )
+                              }
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </form>
-                  </div>
-                );
-              }
 
-              if (block.type === "COMPANY") {
-                return (
-                  <div
-                    className="company"
-                    style={{
-                      backgroundColor: "rgb(255, 255, 255)",
-                      padding: "2rem",
-                      borderRadius: "10px",
-                      width: "100%",
-                    }}
-                    key={block?.id}
-                  >
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="cvr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              CPR nr
+                            </label>
+                            <input
+                              id="cvr"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[2]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) => {
+                                handleChange(
+                                  block?.id,
+                                  block.labels[2]?.id,
+                                  e.target.value,
+                                  block.labels[2]?.name
+                                );
+                              }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "40%",
+                            }}
+                          >
+                            <label
+                              htmlFor="postnr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Postnr
+                            </label>
+                            <input
+                              id="postnr"
+                              type="number"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[3]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[3]?.id,
+                                  e.target.value,
+                                  block.labels[3]?.name
+                                )
+                              }
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "55%",
+                            }}
+                          >
+                            <label
+                              htmlFor="by"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              By
+                            </label>
+                            <input
+                              id="by"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[4]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[4]?.id,
+                                  e.target.value,
+                                  block.labels[4]?.name
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="name"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Herefter otalt som
+                            </label>
+                            <input
+                              id="name"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[5]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[5]?.id,
+                                  e.target.value,
+                                  block.labels[5]?.name
+                                )
+                              }
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Land
+                            </label>
+
+                            <select
+                              name="land"
+                              id="land"
+                              style={{
+                                width: "100%",
+                                padding: "0.8rem 1.2rem",
+                                border: "1px solid #d1d5db",
+                                borderRadius: "4px",
+                                backgroundColor: "#fff",
+                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                paddingRight: "30px",
+                              }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[6]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[6]?.id,
+                                  e.target.value,
+                                  block.labels[6]?.name
+                                )
+                              }
+                            >
+                              <option value="">Land</option>{" "}
+                              {countriesList.map((country) => (
+                                <option
+                                  key={country.countryName}
+                                  value={country.countryName}
+                                >
+                                  {country.countryName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  );
+                }
+
+                if (block.type === "COMPANY") {
+                  return (
                     <div
+                      className="company"
                       style={{
+                        backgroundColor: "rgb(255, 255, 255)",
+                        padding: "2rem",
+                        borderRadius: "10px",
                         width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginBottom: "2rem",
                       }}
+                      key={block?.id}
                     >
                       <div
                         style={{
-                          width: "5rem",
-                          height: "5rem",
-                          backgroundColor: "#9a9278",
+                          width: "100%",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50px",
-                        }}
-                      >
-                        <span>
-                          <BsBuildings color="white" />
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "15px", fontWeight: "bold" }}>
-                        Virksomhed
-                      </p>
-                    </div>
-
-                    <form>
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
+                          gap: "10px",
+                          marginBottom: "2rem",
                         }}
                       >
                         <div
                           style={{
+                            width: "5rem",
+                            height: "5rem",
+                            backgroundColor: "#9a9278",
                             display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "50px",
                           }}
                         >
-                          <label
-                            htmlFor="Virksomhedsnavn"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Virksomhedsnavn
-                          </label>
-                          <input
-                            id="Virksomhedsnavn"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[0]?.id
-                              )?.LabelValue || virksomhedsnavn
-                            }
-                            onChange={(e) => {
-                              handleChange(
-                                block?.id,
-                                block.labels[0]?.id,
-                                e.target.value,
-                                block.labels[0]?.name
-                              );
-
-                              setVirksomhedsnavn(e.target.value);
-                            }}
-                          />
+                          <span>
+                            <BsBuildings color="white" />
+                          </span>
                         </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="adresse"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Adresse
-                          </label>
-                          <input
-                            id="adresse"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[1]?.id
-                              )?.LabelValue || adresse
-                            }
-                            onChange={(e) => {
-                              handleChange(
-                                block?.id,
-                                block.labels[1]?.id,
-                                e.target.value,
-                                block.labels[1]?.name
-                              );
-
-                              setAdresse(e.target.value);
-                            }}
-                          />
-                        </div>
+                        <p style={{ fontSize: "15px", fontWeight: "bold" }}>
+                          Virksomhed
+                        </p>
                       </div>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
-                        }}
-                      >
+                      <form>
                         <div
                           style={{
                             display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
                             width: "100%",
+                            gap: "2rem",
                           }}
                         >
-                          <label
-                            htmlFor="cvr"
+                          <div
                             style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            CVR nr
-                          </label>
-                          <input
-                            id="cvr"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[2]?.id
-                              )?.LabelValue || cvrNumber
-                            }
-                            onChange={(e) => {
-                             
-                              setCvrNumber(e.target.value);
-                              getSVRDataHandler(e.target.value);
-                              setCVR(e.target.value);
-                              setCVRBlockId(block?.id);
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "40%",
-                          }}
-                        >
-                          <label
-                            htmlFor="postnr"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Postnr
-                          </label>
-                          <input
-                            id="postnr"
-                            type="number"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[3]?.id
-                              )?.LabelValue || postalCode
-                            }
-                            onChange={(e) => {
-                              setPostalCode(e.target.value);
-                              handleChange(
-                                block?.id,
-                                block.labels[3]?.id,
-                                e.target.value,
-                                block.labels[3]?.name
-                              );
-                            }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "55%",
-                          }}
-                        >
-                          <label
-                            htmlFor="by"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            By
-                          </label>
-                          <input
-                            id="by"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[4]?.id
-                              )?.LabelValue || city
-                            }
-                            onChange={(e) => {
-                              handleChange(
-                                block?.id,
-                                block.labels[4]?.id,
-                                e.target.value,
-                                block.labels[4]?.name
-                              );
-
-                              setCity(e.target.value);
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          display: "flex",
-                          width: "100%",
-                          gap: "2rem",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="name"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Herefter otalt som
-                          </label>
-                          <input
-                            id="name"
-                            type="text"
-                            style={{ width: "100%" }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[5]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[5]?.id,
-                                e.target.value,
-                                block.labels[5]?.name
-                              )
-                            }
-                          />
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "start",
-                            width: "100%",
-                          }}
-                        >
-                          <label
-                            htmlFor="adresse"
-                            style={{
-                              marginBottom: "1rem",
-                              fontWeight: "700",
-                            }}
-                          >
-                            Land
-                          </label>
-                          <select
-                            name="land"
-                            id="land"
-                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
                               width: "100%",
-                              padding: "0.8rem 1.2rem",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "4px",
-                              backgroundColor: "#fff",
-                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                              paddingRight: "30px",
                             }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || ""
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[6]?.id,
-                                e.target.value,
-                                block.labels[6]?.name
-                              )
-                            }
                           >
-                            <option value="">Land</option>{" "}
-                            {countriesList.map((country) => (
-                              <option
-                                key={country.countryName}
-                                value={country.countryName}
-                              >
-                                {country.countryName}
-                              </option>
-                            ))}
-                          </select>
+                            <label
+                              htmlFor="Virksomhedsnavn"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Virksomhedsnavn
+                            </label>
+                            <input
+                              id="Virksomhedsnavn"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[0]?.id
+                                )?.LabelValue || virksomhedsnavn
+                              }
+                              onChange={(e) => {
+                                handleChange(
+                                  block?.id,
+                                  block.labels[0]?.id,
+                                  e.target.value,
+                                  block.labels[0]?.name
+                                );
+
+                                setVirksomhedsnavn(e.target.value);
+                              }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Adresse
+                            </label>
+                            <input
+                              id="adresse"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[1]?.id
+                                )?.LabelValue || adresse
+                              }
+                              onChange={(e) => {
+                                handleChange(
+                                  block?.id,
+                                  block.labels[1]?.id,
+                                  e.target.value,
+                                  block.labels[1]?.name
+                                );
+
+                                setAdresse(e.target.value);
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </form>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="cvr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              CVR nr
+                            </label>
+                            <input
+                              id="cvr"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[2]?.id
+                                )?.LabelValue || cvrNumber
+                              }
+                              onChange={(e) => {
+                                setCvrNumber(e.target.value);
+                                getSVRDataHandler(e.target.value);
+                                setCVR(e.target.value);
+                                setCVRBlockId(block?.id);
+                              }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "40%",
+                            }}
+                          >
+                            <label
+                              htmlFor="postnr"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Postnr
+                            </label>
+                            <input
+                              id="postnr"
+                              type="number"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[3]?.id
+                                )?.LabelValue || postalCode
+                              }
+                              onChange={(e) => {
+                                setPostalCode(e.target.value);
+                                handleChange(
+                                  block?.id,
+                                  block.labels[3]?.id,
+                                  e.target.value,
+                                  block.labels[3]?.name
+                                );
+                              }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "55%",
+                            }}
+                          >
+                            <label
+                              htmlFor="by"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              By
+                            </label>
+                            <input
+                              id="by"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[4]?.id
+                                )?.LabelValue || city
+                              }
+                              onChange={(e) => {
+                                handleChange(
+                                  block?.id,
+                                  block.labels[4]?.id,
+                                  e.target.value,
+                                  block.labels[4]?.name
+                                );
+
+                                setCity(e.target.value);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            gap: "2rem",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="name"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Herefter otalt som
+                            </label>
+                            <input
+                              id="name"
+                              type="text"
+                              style={{ width: "100%" }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[5]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[5]?.id,
+                                  e.target.value,
+                                  block.labels[5]?.name
+                                )
+                              }
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "start",
+                              width: "100%",
+                            }}
+                          >
+                            <label
+                              htmlFor="adresse"
+                              style={{
+                                marginBottom: "1rem",
+                                fontWeight: "700",
+                              }}
+                            >
+                              Land
+                            </label>
+                            <select
+                              name="land"
+                              id="land"
+                              style={{
+                                width: "100%",
+                                padding: "0.8rem 1.2rem",
+                                border: "1px solid #d1d5db",
+                                borderRadius: "4px",
+                                backgroundColor: "#fff",
+                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                                paddingRight: "30px",
+                              }}
+                              value={
+                                formData?.find(
+                                  (data) =>
+                                    data?.blockId === block?.id &&
+                                    data?.labelId === block.labels[6]?.id
+                                )?.LabelValue || ""
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  block?.id,
+                                  block.labels[6]?.id,
+                                  e.target.value,
+                                  block.labels[6]?.name
+                                )
+                              }
+                            >
+                              <option value="">Land</option>{" "}
+                              {countriesList.map((country) => (
+                                <option
+                                  key={country.countryName}
+                                  value={country.countryName}
+                                >
+                                  {country.countryName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="form-block-user" key={block?.id}>
+                    {block.labels?.map((label) => {
+                      const existingData = formData?.find(
+                        (data) =>
+                          data?.blockId === block?.id &&
+                          data?.labelId === label?.id
+                      );
+                      const fieldValue = existingData
+                        ? existingData.LabelValue
+                        : "";
+                      const questionText = label.name;
+
+                      const handleInputChange = (e) => {
+                        const { value } = e.target;
+                        handleChange(block?.id, label?.id, value, questionText);
+                      };
+
+                      return (
+                        <div key={label.id} className="block-input">
+                          <label>{label.name}</label>
+                          {label.type === "SELECT" ? (
+                            <select
+                              name={label.name}
+                              value={fieldValue}
+                              onChange={handleInputChange}
+                            >
+                              <option value="">Select an option</option>
+                              {Object.keys(label.options)?.map((key) => (
+                                <option key={key} value={label.options[key]}>
+                                  {label.options[key]}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <input
+                              type={label.type}
+                              name={label.name}
+                              value={fieldValue}
+                              placeholder={label.name}
+                              onChange={handleInputChange}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               }
-
-              return (
-                <div className="form-block-user" key={block?.id}>
-                  {block.labels?.map((label) => {
-                    const existingData = formData?.find(
-                      (data) =>
-                        data?.blockId === block?.id &&
-                        data?.labelId === label?.id
-                    );
-                    const fieldValue = existingData
-                      ? existingData.LabelValue
-                      : "";
-                    const questionText = label.name;
-
-                    const handleInputChange = (e) => {
-                      const { value } = e.target;
-                      handleChange(block?.id, label?.id, value, questionText);
-                    };
-
-                    return (
-                      <div key={label.id} className="block-input">
-                        <label>{label.name}</label>
-                        {label.type === "SELECT" ? (
-                          <select
-                            name={label.name}
-                            value={fieldValue}
-                            onChange={handleInputChange}
-                          >
-                            <option value="">Select an option</option>
-                            {Object.keys(label.options)?.map((key) => (
-                              <option key={key} value={label.options[key]}>
-                                {label.options[key]}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type={label.type}
-                            name={label.name}
-                            value={fieldValue}
-                            placeholder={label.name}
-                            onChange={handleInputChange}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            )}
           </div>
         )}
 
@@ -1526,11 +1530,11 @@ const GuestDocumentQuestion = ({
         {question.valueType.startsWith("map") && (
           <MMapComponent
             key={question.id}
-            getMapData={(value) => {
+            getMapData={(value: unknown) => {
               setValue(value, "map");
             }}
             data={convertStringToAddressObject(value)}
-            isFull={(value) => {
+            isFull={(value: unknown) => {
               isMapDataFullAdded(value);
             }}
           />

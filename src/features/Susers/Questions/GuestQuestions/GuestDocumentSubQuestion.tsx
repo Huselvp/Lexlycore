@@ -9,6 +9,8 @@ import { getApiConfig } from "../../../../utils/constants";
 import { IoMdRemove } from "react-icons/io";
 import axios from "axios";
 
+import { getToken } from "../../../../utils/helpers";
+
 import { FiUser } from "react-icons/fi";
 
 import { BsBuildings } from "react-icons/bs";
@@ -183,14 +185,18 @@ const GuestDocumentSubQuestion = ({
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
 
+  const token = getToken(); // Retrieve the token (if available)
+
   useEffect(() => {
     const getFormBlocks = async () => {
       if (question?.valueType === "form") {
         try {
-          const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
-            getApiConfig()
-          );
+          // Determine the API endpoint based on the presence of the token
+          const url = token
+            ? `${API}/suser/sub-question-details/${question.id}` // Authenticated API
+            : `${API}/guest/sub-question-details/${question.id}`; // Guest API
+
+          const result = await axios.get(url, getApiConfig());
           setFormBlocks(result?.data.form.blocks);
         } catch (err) {
           console.log(err);
@@ -201,10 +207,12 @@ const GuestDocumentSubQuestion = ({
     const getFilterData = async () => {
       if (question?.valueType === "filter") {
         try {
-          const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
-            getApiConfig()
-          );
+          // Determine the API endpoint based on the presence of the token
+          const url = token
+            ? `${API}/suser/sub-question-details/${question.id}` // Authenticated API
+            : `${API}/guest/sub-question-details/${question.id}`; // Guest API
+
+          const result = await axios.get(url, getApiConfig());
           setFilterData(result?.data.filter);
         } catch (err) {
           console.log(err);
@@ -214,7 +222,7 @@ const GuestDocumentSubQuestion = ({
 
     getFormBlocks();
     getFilterData();
-  }, [question.id, question?.valueType]);
+  }, [question.id, question?.valueType, token]);
 
   useEffect(() => {
     subOpen(true);
@@ -438,7 +446,6 @@ const GuestDocumentSubQuestion = ({
             questionText,
           });
         }
-        const allInputsFilled = updatedFormData?.length === totalInputs;
 
         setValue(updatedFormData, question.valueType);
 
@@ -451,12 +458,14 @@ const GuestDocumentSubQuestion = ({
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
 
-  const getSVRDataHandler = async (cvr) => {
+  const getSVRDataHandler = async (cvr: string) => {
     try {
-      const result = await axios.get(
-        `${API}/suser/company-details/${cvr}`,
-        getApiConfig()
-      );
+      // Check if token exists to determine the correct API endpoint
+      const url = token
+        ? `${API}/suser/company-details/${cvr}` // Authenticated API
+        : `${API}/guest/company-details/${cvr}`; // Guest API
+
+      const result = await axios.get(url, getApiConfig());
 
       if (result.data) {
         setVirksomhedsnavn(result.data.name || "");
@@ -512,10 +521,8 @@ const GuestDocumentSubQuestion = ({
 
           if (value !== "") {
             if (existingEntryIndex !== -1) {
-              
               updatedFormData[existingEntryIndex].LabelValue = value;
             } else {
-            
               updatedFormData.push({
                 blockId,
                 labelId,
@@ -525,32 +532,25 @@ const GuestDocumentSubQuestion = ({
             }
           } else {
             if (existingEntryIndex !== -1) {
-             
               updatedFormData.splice(existingEntryIndex, 1);
             }
           }
         }
       });
 
-     
       setValue(updatedFormData, question.valueType);
 
       return updatedFormData;
     });
   };
 
-
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
 
- 
-
   const idAllSubQuestionsValuesIsNotNull = useCallback(() => {
-    
     const subQuestionData = getSubQuestionData();
 
-    
     const allValuesNotEmpty = subQuestionData?.every(
       (e) => e.subQuestionValue !== ""
     );
@@ -563,8 +563,6 @@ const GuestDocumentSubQuestion = ({
     isSDataFull(isDataFull);
   }, [idAllSubQuestionsValuesIsNotNull, isSDataFull]);
 
- 
-
   const [countriesList, setCountriesList] = useState([]);
 
   const getCountriesList = async () => {
@@ -572,11 +570,13 @@ const GuestDocumentSubQuestion = ({
       const result = await axios.get(
         "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
       );
-      const sortedCountries = result.data.geonames.sort((a, b) => {
-        if (a.countryName < b.countryName) return -1;
-        if (a.countryName > b.countryName) return 1;
-        return 0;
-      });
+      const sortedCountries = result.data.geonames.sort(
+        (a: unknown, b: unknown) => {
+          if (a.countryName < b.countryName) return -1;
+          if (a.countryName > b.countryName) return 1;
+          return 0;
+        }
+      );
       setCountriesList(sortedCountries);
     } catch (err) {
       console.log(err);
@@ -589,7 +589,6 @@ const GuestDocumentSubQuestion = ({
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-     
       return {
         apartment: "",
         address: "",
@@ -631,10 +630,7 @@ const GuestDocumentSubQuestion = ({
         <Description>{question?.Description}</Description>
       </div>
       <DetailsContainer>
-        <button
-          onClick={() => setShowDetails((show) => !show)}
-          
-        >
+        <button onClick={() => setShowDetails((show) => !show)}>
           <span>{showDetails ? "Hide " : "Show"} details</span>
           {showDetails ? <HiMiniChevronUp /> : <HiMiniChevronDown />}
         </button>
@@ -643,7 +639,6 @@ const GuestDocumentSubQuestion = ({
       <InputContainer>
         {question.valueType === "number" && (
           <Input
-          
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -653,7 +648,6 @@ const GuestDocumentSubQuestion = ({
 
         {question.valueType === "input" && (
           <Input
-         
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -663,7 +657,6 @@ const GuestDocumentSubQuestion = ({
 
         {question.valueType === "textarea" && (
           <Textarea
-           
             placeholder={question.questionText}
             value={value}
             onChange={(e) => setValue(e.target.value, question.valueType)}
@@ -784,8 +777,6 @@ const GuestDocumentSubQuestion = ({
             />
           </div>
         )}
-
-      
 
         {question.valueType.startsWith("form") && (
           <div className="form_type">
@@ -959,7 +950,6 @@ const GuestDocumentSubQuestion = ({
                                 e.target.value,
                                 block.labels[2]?.name
                               );
-                             
                             }}
                           />
                         </div>
@@ -1103,7 +1093,6 @@ const GuestDocumentSubQuestion = ({
                           >
                             Land
                           </label>
-                         
 
                           <select
                             name="land"
@@ -1122,7 +1111,7 @@ const GuestDocumentSubQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "" 
+                              )?.LabelValue || ""
                             }
                             onChange={(e) =>
                               handleChange(
@@ -1134,7 +1123,6 @@ const GuestDocumentSubQuestion = ({
                             }
                           >
                             <option value="">Land</option>{" "}
-                         
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}
@@ -1318,7 +1306,6 @@ const GuestDocumentSubQuestion = ({
                               )?.LabelValue || cvrNumber
                             }
                             onChange={(e) => {
-                            
                               setCvrNumber(e.target.value);
                               getSVRDataHandler(e.target.value);
                               setCVR(e.target.value);

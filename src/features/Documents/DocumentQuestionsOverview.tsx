@@ -156,7 +156,7 @@ const DocumentQuestionsOverview = ({
     setCaretIconActive(newCaretState);
   };
 
-  const convertStringToAddressObject = (dataString) => {
+  const convertStringToAddressObject = (dataString : unknown) => {
     if (typeof dataString !== "string") {
       return {
         apartment: "",

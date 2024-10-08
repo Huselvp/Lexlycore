@@ -19,12 +19,12 @@ export const useAddUpdateDocumentQuestion = () => {
         isDraft: boolean;
         values: unknown;
       }) => {
-        const processQuestions = (questions, isSubQuestion = false) => {
-          return questions.map((question) => {
+        const processQuestions = (questions : any, isSubQuestion = false) => {
+          return questions.map((question : any) => {
             const idKey = isSubQuestion ? "subQuestionId" : "questionId";
             const valueKey = "value";
 
-            let processedQuestion = {
+            const processedQuestion = {
               [idKey]: question[isSubQuestion ? "subQuestionId" : "questionId"],
             };
 
@@ -62,9 +62,9 @@ export const useAddUpdateDocumentQuestion = () => {
               processedQuestion.days = days;
             } else if (question.type === "map") {
               const mapString = question[valueKey] || "";
-              const mapParts = mapString.split(",").map((part) => part.trim());
+              const mapParts = mapString.split(",").map((part : any) => part.trim());
 
-              const mapValues = mapParts.reduce((acc, value, index) => {
+              const mapValues = mapParts.reduce((acc : any, value : any, index : any) => {
                 acc[index + 1] = value;
                 return acc;
               }, {});
@@ -88,7 +88,7 @@ export const useAddUpdateDocumentQuestion = () => {
           });
         };
 
-        const orderMyData = (data) => {
+        const orderMyData = (data : any) => {
           return processQuestions(data);
         };
 

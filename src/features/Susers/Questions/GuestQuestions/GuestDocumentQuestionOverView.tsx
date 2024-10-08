@@ -100,13 +100,14 @@ const GuestDocumentQuestionOverView = ({
   onClick,
 }: {
   data: {
+    type: string;
     questionText: string;
     questionId: number;
-    value: any;
+    value: unknown;
     subQuestions?: {
       subQuestionId: number;
       subQuestionText: string;
-      subQuestionValue: any;
+      subQuestionValue: unknown;
     }[];
     active: boolean;
   }[];
@@ -167,7 +168,7 @@ const GuestDocumentQuestionOverView = ({
     setCaretIconActive(newCaretState);
   };
 
-  const convertStringToAddressObject = (dataString) => {
+  const convertStringToAddressObject = (dataString : unknown) => {
     if (typeof dataString !== "string") {
       
     

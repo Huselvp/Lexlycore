@@ -1,0 +1,139 @@
+.d {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 10rem;
+}
+
+.a {
+  background: none rgb(56 56 56);
+  border: 0px;
+  margin: 10px;
+  padding: 0px;
+  text-transform: none;
+  appearance: none;
+  position: absolute;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 2px;
+  height: 40px;
+  width: 40px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+  overflow: hidden;
+  top: 150px;
+  right: 0px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.address-info {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  z-index: 1000;
+}
+
+.locationPin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Optionally, set width and height */
+  width: 200px;
+  height: 100px;
+  text-align: center;
+  line-height: 100px; /* Adjust this if height is different */
+  font-size: xx-large;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.inputDiv {
+  /* position: absolute;
+  top: 390px; */
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+  width: -webkit-fill-available;
+}
+
+.anas {
+  position: absolute;
+}
+.anas > div {
+  width: 100%;
+}
+
+.pac-target-input {
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+}
+
+.autocomplete-container input {
+  /* background-color: red; */
+  height: 40px;
+  width: 48vw;
+}
+
+.autocomplete-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* height: 70px;
+  border: 1px solid #ccc; */
+  margin-top: 15px;
+  padding: 0 15px;
+}
+
+/* @media (max-width: 480px) {
+  .autocomplete-container input {
+    width: 200px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .autocomplete-control {
+    width: 20rem;
+  }
+} */
+
+.one {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.one input:first-child {
+  width: 70%;
+}
+
+.one input:nth-child(2) {
+  width: 30%;
+}
+
+.two {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+}
+
+.two input:nth-child(1) {
+  width: 30%;
+}
+
+.two input:nth-child(2) {
+  width: 40%;
+}
+
+.two input:nth-child(3) {
+  width: 30%;
+}
