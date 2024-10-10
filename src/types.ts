@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 type Category = {
   id: number;
   name: string;
   categoryType: "PRIVATE" | "BUSINESS";
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type DocumentUser = {
   id: number;
   createdAt: Date;
@@ -21,6 +23,7 @@ type Template = {
   questions: Question[];
 };
 type Question = {
+  position: string | number;
   id: number;
   questionText: string;
   description: string;
@@ -46,6 +49,7 @@ type LoginData = {
   password: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type User = {
   userId: number;
   firstname: string | null;
@@ -71,10 +75,6 @@ type Answer = {
   value: string | null;
 };
 
-// type AddUpdateDocumentQuestion = {
-//   documentId: number
-//   questionId: number
-// } & ({ selectedChoiceId: number } | { value: string })
 type AddUpdateDocumentQuestion = {
   isDraft: boolean;
   documentId: number;

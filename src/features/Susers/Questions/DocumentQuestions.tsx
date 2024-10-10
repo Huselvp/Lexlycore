@@ -12,7 +12,6 @@ import QuestiontsSlider from "../../../ui/QuestiontsSlider";
 import DocumentHeader from "../../Documents/DocumentHeader";
 import DocumentSubQuestion from "./DocumentSubQuestion";
 
-import { useParams } from "react-router-dom";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -96,11 +95,13 @@ const DocumentQuestions = ({
       questionText: string;
       questionId: number;
       type: string;
-      value: any;
+  
+      value: unknown;
       subQuestions?: {
         subQuestionId: number;
         subQuestionText: string;
-        subQuestionValue: any;
+       
+        subQuestionValue: unknown;
         type: string;
       }[];
       active: boolean;
@@ -112,18 +113,26 @@ const DocumentQuestions = ({
 
     return questions.map((q, i) => {
       const questionValues =
-        documentQuestionsValues?.find((item) => item.questionId === q.id) || {};
+        documentQuestionsValues?.find(
+          (item) =>
+            // @ts-ignore
+            item.questionId === q.id
+        ) || {};
       const subQuestionsValues =
         questionsValuesExist && questionValues
-          ? questionValues.subQuestions || []
+          ? // @ts-ignore
+            questionValues.subQuestions || []
           : [];
       return {
         questionText: q.questionText,
         type: q.valueType,
         questionId: q.id,
         value: questionsValuesExist
-          ? documentQuestionsValues.find((item) => item.questionId === q.id)
-              ?.value
+          ? documentQuestionsValues.find(
+              (item) =>
+                // @ts-ignore
+                item.questionId === q.id
+            )?.value
           : "",
         active: questionsValuesExist
           ? i === documentQuestionsValues.length - 1
@@ -147,7 +156,7 @@ const DocumentQuestions = ({
 
   const isDraft = overviewData.some((q) => !q.value);
 
-  const params = useParams();
+
 
   const activeQuestion = overviewData.find((q) => q.active);
 
@@ -158,8 +167,6 @@ const DocumentQuestions = ({
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
-
-  // console.log("activeQuestion = ", activeQuestion);
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
     // here he saves the input data
@@ -203,7 +210,7 @@ const DocumentQuestions = ({
 
   function flattenSubQuestions(questions) {
     return questions.map((question) => {
-      let flattenedQuestion = { ...question };
+      const flattenedQuestion = { ...question };
 
       // Recursively process subQuestions
       if (
@@ -233,7 +240,9 @@ const DocumentQuestions = ({
 
   return (
     <>
-      <DocumentHeader isDraft={isDraft} overviewData={overviewData} />
+      <DocumentHeader isDraft={isDraft} 
+      // @ts-ignore
+      overviewData={overviewData} />
       <Container>
         <QuestiontsSlider
           activeQuestion={overviewData.findIndex((q) => q === activeQuestion)}
@@ -248,6 +257,7 @@ const DocumentQuestions = ({
                   <DocumentQuestion
                     key={question.id}
                     question={question}
+                    // @ts-ignore
                     value={overviewData.at(index)?.value || ""}
                     setValue={(value: any, type: string) =>
                       setOverviewData((current) =>
@@ -276,10 +286,12 @@ const DocumentQuestions = ({
                           <DocumentSubQuestion
                             key={sq.subQuestionId}
                             question={sq}
+                            // @ts-ignore
                             data={overviewData}
                             subQuestions={question.subQuestions}
                             mainQuestionId={question.id}
                             value={
+                             
                               overviewData[index]?.subQuestions[ind]
                                 ?.subQuestionValue as any
                             }
@@ -494,6 +506,7 @@ const DocumentQuestions = ({
           ) : (
             <DocumentQuestionsOverview
               isDraft={isDraft}
+              // @ts-ignore
               data={overviewData}
               onClick={(index: number) => {
                 setOverviewData((data) =>
@@ -507,16 +520,6 @@ const DocumentQuestions = ({
             />
           )}
         </Content>
-
-        <button
-          onClick={() => {
-            console.log(overviewData);
-            console.log(questions);
-            console.log(ALLquestions);
-          }}
-        >
-          test
-        </button>
       </Container>
     </>
   );

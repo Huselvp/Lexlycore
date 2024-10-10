@@ -36,8 +36,7 @@ export const addSubQuestionApi = async ({
     subQuestion,
     getApiConfig()
   );
-  console.log("Res = ", res);
-  console.log("Data = ", res.data);
+
   return res.data;
 };
 

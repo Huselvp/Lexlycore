@@ -1,25 +1,52 @@
+import { AxiosError } from "axios";
+
+interface ErrorResponseData {
+  message?: string;
+}
+
+interface CustomError extends Error {
+  response?: {
+    data?: string | ErrorResponseData;
+  };
+}
+
 import toast from "react-hot-toast";
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("da-DK", { style: "currency", currency: "DKK" }).format(
     value
   );
-export const displayErrorMessage = (error: any) => {
-  console.log("********************************");
-  console.log("Error = ", error);
-  let errorMessage: string =
-    (typeof error?.response?.data === "string" && error?.response?.data) ||
-    error?.response?.data?.message ||
-    error?.message ||
-    "Something went wrong";
-  if (errorMessage === "Access Denied")
+
+export const displayErrorMessage = (error: AxiosError | CustomError) => {
+  let errorMessage: string = "";
+
+  const isErrorResponseData = (data: unknown): data is ErrorResponseData => {
+    return typeof data === "object" && data !== null && "message" in data;
+  };
+
+  if (typeof error?.response?.data === "string") {
+    errorMessage = error.response.data;
+  } else if (isErrorResponseData(error?.response?.data)) {
+    errorMessage = error.response.data.message || "Something went wrong";
+  } else if (error?.message) {
+    errorMessage = error.message;
+  } else {
+    errorMessage = "Something went wrong";
+  }
+
+  if (errorMessage === "Access Denied") {
     errorMessage = "Email or password is incorrect";
-  console.log("Error Message = ", errorMessage);
-  console.log("********************************");
+  }
+
   toast.error(errorMessage);
 };
-export const transformParamToNumber = (val: any) => {
-  if (isNaN(val)) return -1;
-  return +val;
+
+export const transformParamToNumber = (
+  val: string | number | null | undefined
+): number => {
+  if (val === null || val === undefined || isNaN(Number(val))) {
+    return -1;
+  }
+  return Number(val);
 };
 
 export const extractChoicesFromString = (item: string): Choice[] => {
@@ -37,6 +64,7 @@ export const extractChoicesFromString = (item: string): Choice[] => {
 
 export const getToken = (): string =>
   localStorage.getItem("access_token") || "";
+
 export const setToken = (token: string): void =>
   localStorage.setItem("access_token", token);
 export const removeToken = (): void => localStorage.removeItem("access_token");

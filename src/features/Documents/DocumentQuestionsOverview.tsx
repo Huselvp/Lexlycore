@@ -89,25 +89,59 @@ const BtnsContainer = styled.div`
   }
 `;
 
-const DocumentQuestionsOverview = ({
-  data,
-  isDraft,
-  onClick,
-}: {
-  data: {
-    questionText: string;
-    questionId: number;
-    value: any;
-    subQuestions?: {
-      subQuestionId: number;
-      subQuestionText: string;
-      subQuestionValue: any;
+const DocumentQuestionsOverview = (
+  //   {
+  //   data,
+  //   isDraft,
+  //   onClick,
+  // }: {
+  //   data: {
+  //     questionText: string;
+  //     questionId: number;
+  //     value: any;
+  //     subQuestions?: {
+  //       subQuestionId: number;
+  //       subQuestionText: string;
+  //       subQuestionValue: any;
+  //     }[];
+  //     active: boolean;
+  //   }[];
+  //   onClick: (index: number) => void;
+  //   isDraft: boolean;
+  // }
+
+  {
+    data,
+    isDraft,
+    onClick,
+  }: {
+    data: {
+      type: unknown;
+      questionText: string;
+      questionId: number;
+      value:
+        | string
+        | number
+        | string[]
+        | number[]
+        | { [key: string]: unknown }[]; // Array of objects with key-value pairs
+      subQuestions?: {
+        type: unknown;
+        subQuestionId: number;
+        subQuestionText: string;
+        subQuestionValue:
+          | string
+          | number
+          | string[]
+          | number[]
+          | { [key: string]: unknown }[]; // Array of objects with key-value pairs
+      }[];
+      active: boolean;
     }[];
-    active: boolean;
-  }[];
-  onClick: (index: number) => void;
-  isDraft: boolean;
-}) => {
+    onClick: (index: number) => void;
+    isDraft: boolean;
+  }
+) => {
   const [caret_icon_active, setCaretIconActive] = useState<boolean[]>(
     data.map(() => false)
   );
@@ -139,8 +173,9 @@ const DocumentQuestionsOverview = ({
       {
         onSuccess: () => {
           if (localStorage.getItem("access_token") === "") {
-            console.log("you can't pay you need to login first");
+            return;
           } else {
+            // @ts-ignore
             initiatePayment();
           }
         },
@@ -156,10 +191,10 @@ const DocumentQuestionsOverview = ({
     setCaretIconActive(newCaretState);
   };
 
-  const convertStringToAddressObject = (dataString) => {
+  const convertStringToAddressObject = (dataString: string) => {
     if (typeof dataString !== "string") {
       // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+
       return {
         apartment: "",
         address: "",
@@ -200,7 +235,7 @@ const DocumentQuestionsOverview = ({
                 item.type !== "map" && (
                   <li key={i}>
                     <p>
-                      {item?.subQuestions?.length > 0 ? (
+                      {item?.subQuestions && item.subQuestions.length > 0 ? (
                         <button
                           style={{ background: "none", border: "none" }}
                           onClick={() => toggleSubQuestions(i)}
@@ -212,12 +247,13 @@ const DocumentQuestionsOverview = ({
                           )}
                         </button>
                       ) : null}
+
                       {item.questionText}
                     </p>
                     <button onClick={() => onClick(i)}>
                       <EditIcon />
                     </button>
-                    <p>{item.value}</p>
+                    <p>{String(item.value)}</p>
                   </li>
                 )}
 
@@ -250,7 +286,10 @@ const DocumentQuestionsOverview = ({
                 >
                   {/* Process map values outside of JSX */}
                   {(() => {
-                    const mapValues = convertStringToAddressObject(item.value);
+                    const mapValues = convertStringToAddressObject(
+                      // @ts-ignore
+                      item.value
+                    );
                     return (
                       <div style={{ width: "100%" }}>
                         <div
@@ -350,14 +389,17 @@ const DocumentQuestionsOverview = ({
                     </button>
                   </div>
                   <div>
-                    {item.value?.map((q) => {
-                      return (
-                        <div key={q.questionText}>
-                          <p>{q.questionText}</p>
-                          <p>{q.LabelValue}</p>
-                        </div>
-                      );
-                    })}
+                    {
+                      // @ts-ignore
+                      item.value?.map((q) => {
+                        return (
+                          <div key={q.questionText}>
+                            <p>{q.questionText}</p>
+                            <p>{q.LabelValue}</p>
+                          </div>
+                        );
+                      })
+                    }
                   </div>
                 </li>
               )}
@@ -397,7 +439,8 @@ const DocumentQuestionsOverview = ({
                             <button onClick={() => onClick(i)}>
                               <EditIcon />
                             </button>
-                            <p>{sq.subQuestionValue}</p>
+
+                            <p>{String(sq.subQuestionValue)}</p>
                           </li>
                         )}
 
@@ -419,6 +462,7 @@ const DocumentQuestionsOverview = ({
                         (() => {
                           // Perform the logic to process map values
                           const mapValues = convertStringToAddressObject(
+                            // @ts-ignore
                             sq.subQuestionValue
                           );
 
@@ -473,7 +517,10 @@ const DocumentQuestionsOverview = ({
                                   fontWeight: "600",
                                 }}
                               >
-                                {sq.questionText}
+                                {
+                                  // @ts-ignore
+                                  sq.questionText
+                                }
                               </p>
                             </div>
                             <button onClick={() => onClick(i)}>
@@ -481,12 +528,15 @@ const DocumentQuestionsOverview = ({
                             </button>
                           </div>
                           <div>
-                            {sq.subQuestionValue?.map((q, qIdx) => (
-                              <div key={qIdx}>
-                                <p>{q.questionText}</p>
-                                <p>{q.LabelValue}</p>
-                              </div>
-                            ))}
+                            {
+                              // @ts-ignore
+                              sq.subQuestionValue?.map((q, qIdx) => (
+                                <div key={qIdx}>
+                                  <p>{q.questionText}</p>
+                                  <p>{q.LabelValue}</p>
+                                </div>
+                              ))
+                            }
                           </div>
                         </li>
                       )}

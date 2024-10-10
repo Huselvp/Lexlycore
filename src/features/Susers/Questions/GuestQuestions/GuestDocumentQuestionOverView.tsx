@@ -97,7 +97,7 @@ const BtnsContainer = styled.div`
 
 const GuestDocumentQuestionOverView = ({
   data,
-  isDraft,
+
   onClick,
 }: {
   data: {
@@ -118,41 +118,9 @@ const GuestDocumentQuestionOverView = ({
     data.map(() => false)
   );
 
-  const { isLoading: isLoading1, addUpdateDocumentQuestion } =
-    guestUseAddUpdateDocumentQuestion();
-  const { isLoading: isLoading2, initiatePayment } = useInitiatePayment();
+  const { isLoading: isLoading1 } = guestUseAddUpdateDocumentQuestion();
+  const { isLoading: isLoading2 } = useInitiatePayment();
   const isLoading = isLoading1 || isLoading2;
-
-  // const clickHandler = () => {
-  //   const values = data.map((item) => {
-  //     return {
-  //       questionId: item.questionId,
-  //       value: item.value,
-  //       type: item.type,
-  //       subquestionsValues:
-  //         item.subQuestions && item.subQuestions.length > 0
-  //           ? item.subQuestions.map((sub) => ({
-  //               subQuestionId: sub.subQuestionId,
-  //               value: sub.subQuestionValue,
-  //               type: sub.type,
-  //             }))
-  //           : [],
-  //     };
-  //   });
-
-  //   addUpdateDocumentQuestion(
-  //     { values, isDraft },
-  //     {
-  //       onSuccess: () => {
-  //         if (localStorage.getItem("access_token") === "") {
-  //           console.log("you can't pay you need to login first");
-  //         } else {
-  //           initiatePayment();
-  //         }
-  //       },
-  //     }
-  //   );
-  // };
 
   const token = getToken();
 
@@ -165,12 +133,14 @@ const GuestDocumentQuestionOverView = ({
       return {
         questionId: item.questionId,
         value: item.value,
+        // @ts-ignore
         type: item.type,
         subquestionsValues:
           item.subQuestions && item.subQuestions.length > 0
             ? item.subQuestions.map((sub) => ({
                 subQuestionId: sub.subQuestionId,
                 value: sub.subQuestionValue,
+                // @ts-ignore
                 type: sub.type,
               }))
             : [],
@@ -187,7 +157,6 @@ const GuestDocumentQuestionOverView = ({
 
   const clickHandler = () => {
     if (token == "") {
-      console.log(true);
       guestDocumentSubmitLogic();
     }
   };
@@ -201,7 +170,7 @@ const GuestDocumentQuestionOverView = ({
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
       // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+
       return {
         apartment: "",
         address: "",
@@ -236,263 +205,82 @@ const GuestDocumentQuestionOverView = ({
         <ul>
           {data.map((item, i) => (
             <>
-              {item.type !== "form" &&
-                item.type !== "day" &&
-                item.type !== "time" &&
-                item.type !== "map" && (
-                  <li key={i}>
-                    <p>
-                      {item?.subQuestions?.length > 0 ? (
-                        <button
-                          style={{ background: "none", border: "none" }}
-                          onClick={() => toggleSubQuestions(i)}
-                        >
-                          {!caret_icon_active[i] ? (
-                            <RxCaretDown />
-                          ) : (
-                            <RxCaretUp />
-                          )}
-                        </button>
-                      ) : null}
-                      {item.questionText}
-                    </p>
-                    <button onClick={() => onClick(i)}>
-                      <EditIcon />
-                    </button>
-                    <p>{item.value}</p>
-                  </li>
-                )}
-
-              {item.type === "time" && (
-                <li key={i}>
-                  {item?.subQuestions?.length > 0 ? (
-                    <button
-                      style={{ background: "none", border: "none" }}
-                      onClick={() => toggleSubQuestions(i)}
-                    >
-                      {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
-                    </button>
-                  ) : null}
-                  <p>{item.questionText}</p>
-                  <button onClick={() => onClick(i)}>
-                    <EditIcon />
-                  </button>
-                  <p>
-                    {item.value[0].time}
-                    {"-"}
-                    {item.value[1].time}
-                  </p>
-                </li>
-              )}
-
-              {item.type === "map" && (
-                <li
-                  key={i}
-                  style={{ display: "flex", flexDirection: "column" }}
-                >
-                  {/* Process map values outside of JSX */}
-                  {(() => {
-                    const mapValues = convertStringToAddressObject(item.value);
-                    return (
-                      <div style={{ width: "100%" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            width: "100%",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }}
+              {
+                // @ts-ignore
+                item.type !== "form" &&
+                  // @ts-ignore
+                  item.type !== "day" &&
+                  // @ts-ignore
+                  item.type !== "time" &&
+                  // @ts-ignore
+                  item.type !== "map" && (
+                    <li key={i}>
+                      <p>
+                        {item?.subQuestions?.length > 0 ? (
+                          <button
+                            style={{ background: "none", border: "none" }}
+                            onClick={() => toggleSubQuestions(i)}
                           >
-                            {item?.subQuestions?.length > 0 ? (
-                              <button
-                                style={{ background: "none", border: "none" }}
-                                onClick={() => toggleSubQuestions(i)}
-                              >
-                                {!caret_icon_active[i] ? (
-                                  <RxCaretDown />
-                                ) : (
-                                  <RxCaretUp />
-                                )}
-                              </button>
-                            ) : null}
-                            <p
-                              style={{
-                                color: "var(--color-stone-500)",
-                                fontSize: "1.7rem",
-                                fontWeight: "600",
-                              }}
-                            >
-                              {item.questionText}
-                            </p>
-                          </div>
-                          <button onClick={() => onClick(i)}>
-                            <EditIcon />
+                            {!caret_icon_active[i] ? (
+                              <RxCaretDown />
+                            ) : (
+                              <RxCaretUp />
+                            )}
                           </button>
-                        </div>
-                        <div>
-                          <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </li>
-              )}
-
-              {item.type === "form" && (
-                <li
-                  key={i}
-                  style={{ display: "flex", flexDirection: "column" }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {item?.subQuestions?.length > 0 ? (
-                        <button
-                          style={{ background: "none", border: "none" }}
-                          onClick={() => toggleSubQuestions(i)}
-                        >
-                          {!caret_icon_active[i] ? (
-                            <RxCaretDown />
-                          ) : (
-                            <RxCaretUp />
-                          )}
-                        </button>
-                      ) : null}
-                      <p
-                        style={{
-                          color: "var(--color-stone-500)",
-                          fontSize: "1.7rem",
-                          fontWeight: "600",
-                        }}
-                      >
+                        ) : null}
                         {item.questionText}
                       </p>
-                    </div>
+                      <button onClick={() => onClick(i)}>
+                        <EditIcon />
+                      </button>
+                      <p>{item.value}</p>
+                    </li>
+                  )
+              }
+
+              {
+                // @ts-ignore
+                item.type === "time" && (
+                  <li key={i}>
+                    {item?.subQuestions?.length > 0 ? (
+                      <button
+                        style={{ background: "none", border: "none" }}
+                        onClick={() => toggleSubQuestions(i)}
+                      >
+                        {!caret_icon_active[i] ? (
+                          <RxCaretDown />
+                        ) : (
+                          <RxCaretUp />
+                        )}
+                      </button>
+                    ) : null}
+                    <p>{item.questionText}</p>
                     <button onClick={() => onClick(i)}>
                       <EditIcon />
                     </button>
-                  </div>
-                  <div>
-                    {item.value?.map((q) => {
-                      return (
-                        <div key={q.questionText}>
-                          <p>{q.questionText}</p>
-                          <p>{q.LabelValue}</p>
-                        </div>
+                    <p>
+                      {item.value[0].time}
+                      {"-"}
+                      {item.value[1].time}
+                    </p>
+                  </li>
+                )
+              }
+
+              {
+                // @ts-ignore
+                item.type === "map" && (
+                  <li
+                    key={i}
+                    style={{ display: "flex", flexDirection: "column" }}
+                  >
+                    {/* Process map values outside of JSX */}
+                    {(() => {
+                      const mapValues = convertStringToAddressObject(
+                        item.value
                       );
-                    })}
-                  </div>
-                </li>
-              )}
-
-              {item.type === "day" && (
-                <li key={i}>
-                  {item?.subQuestions?.length > 0 ? (
-                    <button
-                      style={{ background: "none", border: "none" }}
-                      onClick={() => toggleSubQuestions(i)}
-                    >
-                      {!caret_icon_active[i] ? <RxCaretDown /> : <RxCaretUp />}
-                    </button>
-                  ) : null}
-                  <p>{item.questionText}</p>
-                  <button onClick={() => onClick(i)}>
-                    <EditIcon />
-                  </button>
-                  <p>
-                    {item.value[0].day}
-                    {"-"}
-                    {item.value[1].day}
-                  </p>
-                </li>
-              )}
-
-              {caret_icon_active[i] && (
-                <div>
-                  {item?.subQuestions?.map((sq, ind) => (
-                    <React.Fragment key={ind}>
-                      {sq.type !== "day" &&
-                        sq.type !== "time" &&
-                        sq.type !== "form" &&
-                        sq.type !== "map" && (
-                          <li>
-                            <p>{sq.subQuestionText}</p>
-                            <button onClick={() => onClick(i)}>
-                              <EditIcon />
-                            </button>
-                            <p>{sq.subQuestionValue}</p>
-                          </li>
-                        )}
-
-                      {sq.type === "day" && (
-                        <li>
-                          <p>{sq.subQuestionText}</p>
-                          <button onClick={() => onClick(i)}>
-                            <EditIcon />
-                          </button>
-                          <p>
-                            {sq.subQuestionValue[0]?.day}
-                            {"-"}
-                            {sq.subQuestionValue[1]?.day}
-                          </p>
-                        </li>
-                      )}
-
-                      {sq.type === "map" &&
-                        (() => {
-                          // Perform the logic to process map values
-                          const mapValues = convertStringToAddressObject(
-                            sq.subQuestionValue
-                          );
-
-                          return (
-                            <li key={i}>
-                              <p>{sq.subQuestionText}</p>
-                              <button onClick={() => onClick(i)}>
-                                <EditIcon />
-                              </button>
-                              <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
-                            </li>
-                          );
-                        })()}
-
-                      {sq.type === "time" && (
-                        <li>
-                          <p>{sq.subQuestionText}</p>
-                          <button onClick={() => onClick(i)}>
-                            <EditIcon />
-                          </button>
-                          <p>
-                            {sq.subQuestionValue[0]?.time}
-                            {"-"}
-                            {sq.subQuestionValue[1]?.time}
-                          </p>
-                        </li>
-                      )}
-
-                      {sq.type === "form" && (
-                        <li
-                          style={{ display: "flex", flexDirection: "column" }}
-                        >
+                      return (
+                        <div style={{ width: "100%" }}>
                           <div
                             style={{
                               display: "flex",
@@ -508,6 +296,18 @@ const GuestDocumentQuestionOverView = ({
                                 justifyContent: "space-between",
                               }}
                             >
+                              {item?.subQuestions?.length > 0 ? (
+                                <button
+                                  style={{ background: "none", border: "none" }}
+                                  onClick={() => toggleSubQuestions(i)}
+                                >
+                                  {!caret_icon_active[i] ? (
+                                    <RxCaretDown />
+                                  ) : (
+                                    <RxCaretUp />
+                                  )}
+                                </button>
+                              ) : null}
                               <p
                                 style={{
                                   color: "var(--color-stone-500)",
@@ -515,7 +315,7 @@ const GuestDocumentQuestionOverView = ({
                                   fontWeight: "600",
                                 }}
                               >
-                                {sq.questionText}
+                                {item.questionText}
                               </p>
                             </div>
                             <button onClick={() => onClick(i)}>
@@ -523,15 +323,233 @@ const GuestDocumentQuestionOverView = ({
                             </button>
                           </div>
                           <div>
-                            {sq.subQuestionValue?.map((q, qIdx) => (
-                              <div key={qIdx}>
-                                <p>{q.questionText}</p>
-                                <p>{q.LabelValue}</p>
-                              </div>
-                            ))}
+                            <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
                           </div>
-                        </li>
-                      )}
+                        </div>
+                      );
+                    })()}
+                  </li>
+                )
+              }
+
+              {
+                // @ts-ignore
+                item.type === "form" && (
+                  <li
+                    key={i}
+                    style={{ display: "flex", flexDirection: "column" }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        {item?.subQuestions?.length > 0 ? (
+                          <button
+                            style={{ background: "none", border: "none" }}
+                            onClick={() => toggleSubQuestions(i)}
+                          >
+                            {!caret_icon_active[i] ? (
+                              <RxCaretDown />
+                            ) : (
+                              <RxCaretUp />
+                            )}
+                          </button>
+                        ) : null}
+                        <p
+                          style={{
+                            color: "var(--color-stone-500)",
+                            fontSize: "1.7rem",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {item.questionText}
+                        </p>
+                      </div>
+                      <button onClick={() => onClick(i)}>
+                        <EditIcon />
+                      </button>
+                    </div>
+                    <div>
+                      {item.value?.map((q) => {
+                        return (
+                          <div key={q.questionText}>
+                            <p>{q.questionText}</p>
+                            <p>{q.LabelValue}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </li>
+                )
+              }
+
+              {
+                // @ts-ignore
+                item.type === "day" && (
+                  <li key={i}>
+                    {item?.subQuestions?.length > 0 ? (
+                      <button
+                        style={{ background: "none", border: "none" }}
+                        onClick={() => toggleSubQuestions(i)}
+                      >
+                        {!caret_icon_active[i] ? (
+                          <RxCaretDown />
+                        ) : (
+                          <RxCaretUp />
+                        )}
+                      </button>
+                    ) : null}
+                    <p>{item.questionText}</p>
+                    <button onClick={() => onClick(i)}>
+                      <EditIcon />
+                    </button>
+                    <p>
+                      {item.value[0].day}
+                      {"-"}
+                      {item.value[1].day}
+                    </p>
+                  </li>
+                )
+              }
+
+              {caret_icon_active[i] && (
+                <div>
+                  {item?.subQuestions?.map((sq, ind) => (
+                    <React.Fragment key={ind}>
+                      {
+                        // @ts-ignore
+                        sq.type !== "day" &&
+                          // @ts-ignore
+                          sq.type !== "time" &&
+                          // @ts-ignore
+                          sq.type !== "form" &&
+                          // @ts-ignore
+                          sq.type !== "map" && (
+                            <li>
+                              <p>{sq.subQuestionText}</p>
+                              <button onClick={() => onClick(i)}>
+                                <EditIcon />
+                              </button>
+                              <p>{sq.subQuestionValue}</p>
+                            </li>
+                          )
+                      }
+
+                      {
+                        // @ts-ignore
+                        sq.type === "day" && (
+                          <li>
+                            <p>{sq.subQuestionText}</p>
+                            <button onClick={() => onClick(i)}>
+                              <EditIcon />
+                            </button>
+                            <p>
+                              {sq.subQuestionValue[0]?.day}
+                              {"-"}
+                              {sq.subQuestionValue[1]?.day}
+                            </p>
+                          </li>
+                        )
+                      }
+
+                      {
+                        // @ts-ignore
+                        sq.type === "map" &&
+                          (() => {
+                            // Perform the logic to process map values
+                            const mapValues = convertStringToAddressObject(
+                              sq.subQuestionValue
+                            );
+
+                            return (
+                              <li key={i}>
+                                <p>{sq.subQuestionText}</p>
+                                <button onClick={() => onClick(i)}>
+                                  <EditIcon />
+                                </button>
+                                <p>{`${mapValues.apartment}, ${mapValues.address}, ${mapValues.city}, ${mapValues.country}, ${mapValues.postal_code}`}</p>
+                              </li>
+                            );
+                          })()
+                      }
+
+                      {
+                        // @ts-ignore
+                        sq.type === "time" && (
+                          <li>
+                            <p>{sq.subQuestionText}</p>
+                            <button onClick={() => onClick(i)}>
+                              <EditIcon />
+                            </button>
+                            <p>
+                              {sq.subQuestionValue[0]?.time}
+                              {"-"}
+                              {sq.subQuestionValue[1]?.time}
+                            </p>
+                          </li>
+                        )
+                      }
+
+                      {
+                        // @ts-ignore
+                        sq.type === "form" && (
+                          <li
+                            style={{ display: "flex", flexDirection: "column" }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                width: "100%",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <p
+                                  style={{
+                                    color: "var(--color-stone-500)",
+                                    fontSize: "1.7rem",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  {
+                                    // @ts-ignore
+                                    sq.questionText
+                                  }
+                                </p>
+                              </div>
+                              <button onClick={() => onClick(i)}>
+                                <EditIcon />
+                              </button>
+                            </div>
+                            <div>
+                              {sq.subQuestionValue?.map((q, qIdx) => (
+                                <div key={qIdx}>
+                                  <p>{q.questionText}</p>
+                                  <p>{q.LabelValue}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </li>
+                        )
+                      }
                     </React.Fragment>
                   ))}
                 </div>

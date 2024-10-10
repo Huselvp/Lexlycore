@@ -17,7 +17,7 @@ export const useAddUpdateDocumentQuestion = () => {
         values,
       }: {
         isDraft: boolean;
-        values: any[]; // Adjusted type to handle the array of question objects
+        values: any;
       }) => {
         const processQuestions = (questions, isSubQuestion = false) => {
           return questions.map((question) => {
@@ -25,7 +25,7 @@ export const useAddUpdateDocumentQuestion = () => {
             const idKey = isSubQuestion ? "subQuestionId" : "questionId";
             const valueKey = "value";
 
-            let processedQuestion = {
+            const processedQuestion = {
               [idKey]: question[isSubQuestion ? "subQuestionId" : "questionId"], // Dynamically assign the correct ID
             };
 

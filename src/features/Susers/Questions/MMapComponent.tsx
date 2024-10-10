@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { GoogleMap, useLoadScript, Autocomplete } from "@react-google-maps/api";
 
 const libraries = ["places"];
@@ -36,6 +36,7 @@ const searchBoxStyle = {
 const MapComponent = ({ getMapData, data, isFull }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyB8HxTy1ONHp4EbqDUcHgbjZcQQ9aGLvqM",
+    // @ts-ignore
     libraries,
   });
 
@@ -61,20 +62,6 @@ const MapComponent = ({ getMapData, data, isFull }) => {
       addressDetails.y !== "" ? addressDetails.y : ""
     }`;
   };
-
-  // useEffect(() => {
-  //   if (
-  //     addressDetails.address !== "" &&
-  //     addressDetails.city !== "" &&
-  //     addressDetails.country !== "" &&
-  //     addressDetails.postal_code !== "" &&
-  //     addressDetails.apartment
-  //   ) {
-  //     isFull(true);
-  //   } else {
-  //     isFull(false);
-  //   }
-  // }, [addressDetails]);
 
   useEffect(() => {
     if (getMapData) {
@@ -167,8 +154,12 @@ const MapComponent = ({ getMapData, data, isFull }) => {
 
   return (
     <div style={{ marginBottom: "4rem" }}>
-      <div style={mapContainerStyle}>
+      <div
+        // @ts-ignore
+        style={mapContainerStyle}
+      >
         <GoogleMap
+          // @ts-ignore
           mapContainerStyle={mapContainerStyle}
           zoom={12}
           center={center}
@@ -184,6 +175,7 @@ const MapComponent = ({ getMapData, data, isFull }) => {
             <input
               type="text"
               placeholder="Search for a place"
+              // @ts-ignore
               style={searchBoxStyle}
             />
           </Autocomplete>

@@ -1,13 +1,12 @@
-import styled from "styled-components"
-import Form from "../../../ui/AuthForm"
-import Button from "../../../ui/Button"
-import Editor from "../../../ui/Editor"
-import { FormEventHandler } from "react"
-import { useAddQuestion } from "./useAddQuestion"
-import { useUpdateQuestion } from "./useUpdateQuestion"
-import Row from "../../../ui/Row"
-import { questionsAnsewersTypes } from "../../../utils/constants"
-import React, { useState } from "react";
+import styled from "styled-components";
+import Form from "../../../ui/AuthForm";
+import Button from "../../../ui/Button";
+import Editor from "../../../ui/Editor";
+import { FormEventHandler } from "react";
+import { useAddQuestion } from "./useAddQuestion";
+import { useUpdateQuestion } from "./useUpdateQuestion";
+import Row from "../../../ui/Row";
+import { questionsAnsewersTypes } from "../../../utils/constants";
 
 const Container = styled.div`
   border-radius: var(--rounded-lg);
@@ -27,11 +26,11 @@ const AddEditQuestion = ({
   onAdd: boolean;
   question?: Question;
 }) => {
-  const { isLoading: isLoading1, addQuestion } = useAddQuestion()
-  const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion()
-  const isLoading = isLoading1 || isLoading2
-  const isQuestionProvided = typeof question !== "undefined"
-  const [editorContent, setEditorContent] = useState(isQuestionProvided ? question.texte : "");
+  const { isLoading: isLoading1, addQuestion } = useAddQuestion();
+  const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion();
+  const isLoading = isLoading1 || isLoading2;
+  const isQuestionProvided = typeof question !== "undefined";
+
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -41,14 +40,14 @@ const AddEditQuestion = ({
       "") as string;
     const texte = (formData.get("texte") || "") as string;
     const valueType = (formData.get("valueType") || "") as string;
-    // check if texte is a valid html
-    console.log("texte = ", texte);
+
     if (onAdd) {
       addQuestion({
         questionText,
         description,
         descriptionDetails,
         texte,
+        // @ts-ignore
         valueType,
       });
     }
@@ -59,6 +58,7 @@ const AddEditQuestion = ({
         description,
         descriptionDetails,
         texte,
+        // @ts-ignore
         valueType,
       });
   };
@@ -100,9 +100,13 @@ const AddEditQuestion = ({
           </Form.Row>
           <Form.Row>
             <Form.Label>Content</Form.Label>
-            <Editor defaultValue={isQuestionProvided ? question.texte : ""} name="texte" onChange={
-              setEditorContent
-            }/>
+            <Editor
+              defaultValue={isQuestionProvided ? question.texte : ""}
+              name="texte"
+              onChange={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+            />
           </Form.Row>
           <Form.Row>
             <Form.Label>Type</Form.Label>

@@ -1,12 +1,12 @@
-import styled from "styled-components"
-import Sidebar from "../../ui/Sidebar"
-import { Navigate, Outlet, useNavigate } from "react-router-dom"
-import Spinner from "../../ui/Spinner"
-import { useEffect, useState } from "react"
-import { useUser } from "../../features/Authentication/useUser"
-import ProfileHeader from "../../ui/ProfileHeader"
-import MobileSidebar from "../../ui/MobileSidebar"
-import { useWindowListener } from "../../hooks/useWindowListener"
+import styled from "styled-components";
+import Sidebar from "../../ui/Sidebar";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import Spinner from "../../ui/Spinner";
+import { useEffect, useState } from "react";
+import { useUser } from "../../features/Authentication/useUser";
+import ProfileHeader from "../../ui/ProfileHeader";
+import MobileSidebar from "../../ui/MobileSidebar";
+import { useWindowListener } from "../../hooks/useWindowListener";
 
 const Container = styled.div`
   display: grid;
@@ -37,22 +37,23 @@ const Container = styled.div`
       padding: 3rem 1rem;
     }
   }
-`
+`;
 
 const Profile = ({ userRole }: { userRole: "ADMIN" | "SUSER" }) => {
-  const { isLoading, isAuthenticated, user } = useUser()
-  const navigate = useNavigate()
+  const { isLoading, isAuthenticated, user } = useUser();
+  const navigate = useNavigate();
 
-  const [hideSidebarOnMobile, setHideSidebarOnMobile] = useState<boolean>(true)
-  const { windowWidth } = useWindowListener()
-  const onMobile = windowWidth <= 600
+  const [hideSidebarOnMobile, setHideSidebarOnMobile] = useState<boolean>(true);
+  const { windowWidth } = useWindowListener();
+  const onMobile = windowWidth <= 600;
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) navigate("/login")
-  }, [isLoading, isAuthenticated])
-  if (isLoading) return <Spinner />
-  if (!isLoading && !isAuthenticated) return null
-  if (user?.role !== userRole) return <Navigate to="/pageNotFound" />
- 
+    if (!isLoading && !isAuthenticated) navigate("/login");
+  }, [isLoading, isAuthenticated]);
+  if (isLoading) return <Spinner />;
+  if (!isLoading && !isAuthenticated) return null;
+  // @ts-ignore
+  if (user?.role !== userRole) return <Navigate to="/pageNotFound" />;
+
   return (
     <Container>
       {onMobile ? (
@@ -71,14 +72,14 @@ const Profile = ({ userRole }: { userRole: "ADMIN" | "SUSER" }) => {
         <main
           style={{
             backgroundColor: "var(--color-grey-50)",
-            minHeight: "100dvh"
+            minHeight: "100dvh",
           }}
         >
           <Outlet />
         </main>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

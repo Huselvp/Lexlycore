@@ -1,10 +1,10 @@
-import { Outlet, useNavigate } from "react-router-dom"
-import Form from "./AuthForm"
-import Spinner from "./Spinner"
-import { useEffect } from "react"
-import { useUser } from "../features/Authentication/useUser"
-import styled from "styled-components"
-import Logo from "./Logo"
+import { Outlet, useNavigate } from "react-router-dom";
+import Form from "./AuthForm";
+import Spinner from "./Spinner";
+import { useEffect } from "react";
+import { useUser } from "../features/Authentication/useUser";
+import styled from "styled-components";
+import Logo from "./Logo";
 const Container = styled(Form.Container)`
   @media screen and (max-width: 56.25em) {
     grid-template-columns: 1fr;
@@ -12,18 +12,20 @@ const Container = styled(Form.Container)`
       display: none;
     }
   }
-`
+`;
 const AuthRoute = () => {
-  const { isLoading, isAuthenticated, user } = useUser()
-  const navigate = useNavigate()
+  const { isLoading, isAuthenticated, user } = useUser();
+  const navigate = useNavigate();
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      if (user?.role === "ADMIN") navigate("/a")
-      if (user?.role === "SUSER") navigate("/u")
+      // @ts-ignore
+      if (user?.role === "ADMIN") navigate("/a");
+      // @ts-ignore
+      if (user?.role === "SUSER") navigate("/u");
     }
-  }, [isLoading, isAuthenticated])
-  if (isLoading) return <Spinner />
-  if (!isLoading && isAuthenticated) return null
+  }, [isLoading, isAuthenticated]);
+  if (isLoading) return <Spinner />;
+  if (!isLoading && isAuthenticated) return null;
 
   return (
     <Container>
@@ -39,7 +41,7 @@ const AuthRoute = () => {
       </Form.Content>
       <Form.Img src="/auth.jpg" />
     </Container>
-  )
-}
+  );
+};
 
-export default AuthRoute
+export default AuthRoute;

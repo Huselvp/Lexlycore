@@ -2,20 +2,20 @@ import {
   // HiOutlineHome as HomeIcon,
   HiOutlineUsers as UsersIcon,
   HiMiniArrowLeftOnRectangle as LogoutIcon,
-  HiOutlineUserCircle as UserIcon
-} from "react-icons/hi2"
-import { HiOutlineHome as HomeIcon } from "react-icons/hi"
-import { BiCategory as CategoriesIcon } from "react-icons/bi"
-import { CgTemplate as TemplatesIcon } from "react-icons/cg"
-import { IoDocumentOutline as DocumentIcon } from "react-icons/io5"
+  HiOutlineUserCircle as UserIcon,
+} from "react-icons/hi2";
+import { HiOutlineHome as HomeIcon } from "react-icons/hi";
+import { BiCategory as CategoriesIcon } from "react-icons/bi";
+import { CgTemplate as TemplatesIcon } from "react-icons/cg";
+import { IoDocumentOutline as DocumentIcon } from "react-icons/io5";
 // import { HiUsers as UsersIcon } from "react-icons/hi"
 
-import styled, { css } from "styled-components"
-import { NavLink } from "react-router-dom"
-import { useLogout } from "../features/Authentication/useLogout"
-import { useUser } from "../features/Authentication/useUser"
+import styled, { css } from "styled-components";
+import { NavLink } from "react-router-dom";
+import { useLogout } from "../features/Authentication/useLogout";
+import { useUser } from "../features/Authentication/useUser";
 
-const Nav = styled.nav``
+const Nav = styled.nav``;
 const List = styled.ul<{ shorten: string }>`
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@ const List = styled.ul<{ shorten: string }>`
         border-radius: 50%;
       }
     `}
-`
+`;
 // const NavLink = styled(NavLink)`
 //   /* color: var(--color-grey-500);
 //   display: flex;
@@ -78,50 +78,57 @@ const Btn = styled.button`
   border: none;
   background-color: transparent;
   width: 100%;
-`
+`;
 
 const ProfileNav = ({ onShorten }: { onShorten: boolean }) => {
-  const { isLoading, logout } = useLogout()
-  const { user } = useUser()
+  const { isLoading, logout } = useLogout();
+  const { user } = useUser();
+
   return (
     <Nav>
       <List shorten={onShorten ? "true" : "false"}>
-        {user?.role === "ADMIN" && (
-          <>
+        {
+          // @ts-ignore
+          user?.role === "ADMIN" && (
+            <>
+              <li>
+                <NavLink to="/a/dashboard">
+                  <HomeIcon />
+                  {!onShorten && <span>Dashboard</span>}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/a/templates">
+                  <TemplatesIcon />
+                  {!onShorten && <span>Templates</span>}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/a/categories">
+                  <CategoriesIcon />
+                  {!onShorten && <span>Subcategories</span>}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/a/users">
+                  <UsersIcon />
+                  {!onShorten && <span>Users</span>}
+                </NavLink>
+              </li>
+            </>
+          )
+        }
+        {
+          // @ts-ignore
+          user?.role === "SUSER" && (
             <li>
-              <NavLink to="/a/dashboard">
-                <HomeIcon />
-                {!onShorten && <span>Dashboard</span>}
+              <NavLink to="/u/documents">
+                <DocumentIcon />
+                {!onShorten && <span>Documents</span>}
               </NavLink>
             </li>
-            <li>
-              <NavLink to="/a/templates">
-                <TemplatesIcon />
-                {!onShorten && <span>Templates</span>}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/a/categories">
-                <CategoriesIcon />
-                {!onShorten && <span>Subcategories</span>}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/a/users">
-                <UsersIcon />
-                {!onShorten && <span>Users</span>}
-              </NavLink>
-            </li>
-          </>
-        )}
-        {user?.role === "SUSER" && (
-          <li>
-            <NavLink to="/u/documents">
-              <DocumentIcon />
-              {!onShorten && <span>Documents</span>}
-            </NavLink>
-          </li>
-        )}
+          )
+        }
         {/* <li>
           <NavLink to={`/${user?.role === "ADMIN" ? "a" : "u"}/notifications`}>
             <NotificationsIcon />
@@ -129,7 +136,12 @@ const ProfileNav = ({ onShorten }: { onShorten: boolean }) => {
           </NavLink>
         </li> */}
         <li>
-          <NavLink to={`/${user?.role === "ADMIN" ? "a" : "u"}/account`}>
+          <NavLink
+            to={`/${
+              // @ts-ignore
+              user?.role === "ADMIN" ? "a" : "u"
+            }/account`}
+          >
             <UserIcon />
             {!onShorten && <span>Account</span>}
           </NavLink>
@@ -144,10 +156,10 @@ const ProfileNav = ({ onShorten }: { onShorten: boolean }) => {
         </li>
       </List>
     </Nav>
-  )
-}
+  );
+};
 
-export default ProfileNav
+export default ProfileNav;
 // import {
 //   // HiOutlineHome as HomeIcon,
 //   HiOutlineUsers as UsersIcon,

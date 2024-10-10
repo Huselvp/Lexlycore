@@ -10,18 +10,13 @@ import {
 
 export const getTemplates = async (): Promise<Template[]> => {
   const res = await axios.get(getTemplatesURL, getApiConfig());
-  console.log("Res template = ", res);
 
   return res.data;
 };
 
 export const getTemplate = async (id: number): Promise<Template> => {
   const res = await axios.get(getTemplateUrl(id), getApiConfig());
-  console.log(
-    "Res = ",
-    res,
-    "================================================================================================"
-  );
+
   if (!res.data || typeof res.data !== "object") throw new Error("");
   return res.data;
 };

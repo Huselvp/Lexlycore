@@ -1,15 +1,15 @@
-import { useQuery } from "@tanstack/react-query"
-import { getUsers } from "../../services/apiAuth"
+import { useQuery } from "@tanstack/react-query";
+import { getUsers } from "../../services/apiAuth";
 
 export const useUsers = () => {
   const {
     isLoading,
     data: users = [],
-    isError
+    isError,
   } = useQuery({
     queryKey: ["users"],
-    queryFn: getUsers
-  })
-  console.log({ isLoading, users, isError })
-  return { isLoading, users, isError }
-}
+    queryFn: getUsers,
+  });
+
+  return { isLoading, users, isError };
+};

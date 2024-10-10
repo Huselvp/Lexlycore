@@ -1,39 +1,39 @@
-import { FormEventHandler, useEffect, useState } from "react"
-import { useUser } from "../Authentication/useUser"
-import Form from "../../ui/AuthForm"
-import { useUpdateEmail } from "./useUpdateEmail"
-import InputPassword from "../../ui/InputPassword"
-import Row from "../../ui/Row"
-import Button from "../../ui/Button"
-import toast from "react-hot-toast"
-import isEmail from "validator/lib/isEmail"
-import { AContainer, ARow } from "./AccountForm"
+import { FormEventHandler, useEffect, useState } from "react";
+import { useUser } from "../Authentication/useUser";
+import Form from "../../ui/AuthForm";
+import { useUpdateEmail } from "./useUpdateEmail";
+import InputPassword from "../../ui/InputPassword";
+import Row from "../../ui/Row";
+import Button from "../../ui/Button";
+import toast from "react-hot-toast";
+import isEmail from "validator/lib/isEmail";
+import { AContainer, ARow } from "./AccountForm";
 
 const UpdateEmailForm = () => {
-  const { user } = useUser()
-  const { isLoading, updateEmail } = useUpdateEmail()
-  // States
-  const [email, setEmail] = useState(user?.email || "")
-  const [newEmail, setNewEmail] = useState("")
-  const [currentPassword, setCurrentPassword] = useState("")
+  const { user } = useUser();
+  const { isLoading, updateEmail } = useUpdateEmail();
+
+  const [email, setEmail] = useState(user?.email || "");
+  const [newEmail, setNewEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
-    console.log(isEmail(newEmail), newEmail)
-    if (!isEmail(newEmail)) return toast.error("Email is not valid")
+    event.preventDefault();
+
+    if (!isEmail(newEmail)) return toast.error("Email is not valid");
     updateEmail(
       { email: newEmail, currentPassword },
       {
         onSuccess: () => {
-          setNewEmail("")
-          setCurrentPassword("")
-        }
+          setNewEmail("");
+          setCurrentPassword("");
+        },
       }
-    )
-  }
+    );
+  };
   useEffect(() => {
-    setEmail(user?.email || "")
-  }, [user?.email])
-  //
+    setEmail(user?.email || "");
+  }, [user?.email]);
+
   return (
     <AContainer onSubmit={onSubmit}>
       <ARow>
@@ -79,7 +79,7 @@ const UpdateEmailForm = () => {
         </Button>
       </Row>
     </AContainer>
-  )
-}
+  );
+};
 
-export default UpdateEmailForm
+export default UpdateEmailForm;

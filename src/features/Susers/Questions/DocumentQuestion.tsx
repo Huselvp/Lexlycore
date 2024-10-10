@@ -154,11 +154,17 @@ const Textarea = styled(Form.Textarea)`
 const DocumentQuestion = ({
   question,
   children,
+  // @ts-ignore
   value,
+  // @ts-ignore
   setValue,
+  // @ts-ignore
   isTherData,
+  // @ts-ignore
   isTherDays,
+  // @ts-ignore
   isTherTimes,
+  // @ts-ignore
   isMapDataFullAdded,
 }: {
   question: Question;
@@ -174,23 +180,21 @@ const DocumentQuestion = ({
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
-  const [formErrors, setFormErrors] = useState([]);
-  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
+
+  
 
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question?.valueType === "form") {
+      if (
+        // @ts-ignore
+        question?.valueType === "form") {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
             getApiConfig()
           );
           setFormBlocks(result?.data.form.blocks);
-          console.log(
-            result?.data.form.blocks,
-            "this is the blogs hdyuhefyuefyufryurf"
-          );
         } catch (err) {
           console.log(err);
         }
@@ -198,7 +202,9 @@ const DocumentQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question?.valueType === "filter") {
+      if ( 
+        // @ts-ignore
+        question?.valueType === "filter") {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -287,12 +293,7 @@ const DocumentQuestion = ({
 
   const totalInputs = countTotalInputs(newBlocksForm);
 
-  useEffect(() => {
-    const initialFormErrors = formBlocks?.flatMap((block) =>
-      block.labels?.map(() => "")
-    );
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
+
 
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
@@ -319,7 +320,7 @@ const DocumentQuestion = ({
         }
 
         const allInputsFilled = updatedFormData?.length === totalInputs;
-        setIsAllDataEntered(allInputsFilled);
+       
         isTherData(allInputsFilled);
         setValue(updatedFormData, question.valueType);
 
@@ -340,10 +341,14 @@ const DocumentQuestion = ({
       return value;
     } else if (
       filterData &&
+      // @ts-ignore
       filterData?.filterStartInt &&
+      // @ts-ignore
       filterData?.filterEndInt
     ) {
-      return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+      return (
+        // @ts-ignore
+        +filterData?.filterStartInt + filterData?.filterEndInt) / 2;
     }
   });
 
@@ -483,7 +488,6 @@ const DocumentQuestion = ({
 
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
-  const [isCVRRight, setIsCVRRight] = useState(false);
 
   const getSVRDataHandler = async (cvr) => {
     try {
@@ -500,16 +504,11 @@ const DocumentQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-        console.log(result.data);
-        setIsCVRRight(true);
       } else {
         clearFormFields();
-        setIsCVRRight(true);
       }
     } catch (err) {
-      console.log(err);
       clearFormFields();
-      setIsCVRRight(true);
     }
   };
 
@@ -521,14 +520,9 @@ const DocumentQuestion = ({
   };
 
   const handleCVRChanges = (cvr, blockId) => {
-    console.log("I am here and working good");
-    console.log(blockId);
-
     // Ensure the targeted block exists
-    let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+    const targetedBlock = newBlocksForm.find((block) => block.id === blockId);
     if (!targetedBlock) return;
-
-    console.log(targetedBlock);
 
     // Map field names to their corresponding variables
     const fieldMappings = {
@@ -542,7 +536,7 @@ const DocumentQuestion = ({
     };
 
     setFormData((prevFormData) => {
-      let updatedFormData = [...prevFormData];
+      const updatedFormData = [...prevFormData];
 
       // Iterate over fieldMappings to update, add, or remove data
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
@@ -587,7 +581,6 @@ const DocumentQuestion = ({
     });
   };
 
-  // UseEffect with the updated dependency array
   useEffect(() => {
     handleCVRChanges(CVR, CVRBlockId);
   }, [CVR, virksomhedsnavn, adresse, cvrNumber, postalCode, city]);
@@ -595,7 +588,7 @@ const DocumentQuestion = ({
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
       // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+
       return {
         apartment: "",
         address: "",
@@ -994,44 +987,6 @@ const DocumentQuestion = ({
                           >
                             Land
                           </label>
-                          {/* <select
-                            name="land"
-                            id="land"
-                            style={{
-                              width: "100%",
-                              padding: "0.8rem 1.2rem",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "4px",
-                              backgroundColor: "#fff",
-                              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                              paddingRight: "30px",
-                            }}
-                            value={
-                              formData?.find(
-                                (data) =>
-                                  data?.blockId === block?.id &&
-                                  data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "Danemark"
-                            }
-                            onChange={(e) =>
-                              handleChange(
-                                block?.id,
-                                block.labels[6]?.id,
-                                e.target.value,
-                                block.labels[6]?.name
-                              )
-                            }
-                          >
-                            <option>Land</option>
-                            {countriesList.map((country) => (
-                              <option
-                                key={country.countryName}
-                                value={country.countryName}
-                              >
-                                {country.countryName}
-                              </option>
-                            ))}
-                          </select> */}
 
                           <select
                             name="land"
@@ -1246,12 +1201,6 @@ const DocumentQuestion = ({
                               )?.LabelValue || cvrNumber
                             }
                             onChange={(e) => {
-                              // handleChange(
-                              //   block?.id,
-                              //   block.labels[2]?.id,
-                              //   e.target.value,
-                              //   block.labels[2]?.name
-                              // );
                               setCvrNumber(e.target.value);
                               getSVRDataHandler(e.target.value);
                               setCVR(e.target.value);
@@ -1504,12 +1453,19 @@ const DocumentQuestion = ({
             <h3>
               {value !== ""
                 ? value
-                : (+filterData?.filterStartInt + filterData?.filterEndInt) / 2}
+                : // @ts-ignore
+                  (+filterData?.filterStartInt + filterData?.filterEndInt) / 2}
             </h3>
             <input
               type="range"
-              min={filterData?.filterStartInt}
-              max={filterData?.filterEndInt}
+              min={
+                // @ts-ignore
+                filterData?.filterStartInt
+              }
+              max={
+                // @ts-ignore
+                filterData?.filterEndInt
+              }
               value={Fvalue}
               onChange={handleSliderChange}
               style={{

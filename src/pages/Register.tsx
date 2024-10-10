@@ -22,7 +22,15 @@ const Register = () => {
     // check if passwords match
     if (password !== passwordConfirm)
       return toast.error("Passwords must match");
-    register({ firstname, lastname, username, email, password, role: "ADMIN" });
+    register({
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      // @ts-ignore
+      role: "ADMIN",
+    });
   };
 
   return (

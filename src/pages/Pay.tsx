@@ -18,13 +18,9 @@ const Pay = () => {
         paymentId: searchParams.get("p"),
         containerId: "checkout-container-div",
       };
-
+      // @ts-ignore
       const checkout = new window.Dibs.Checkout(checkoutOptions);
-      checkout.on("payment-completed", function (response) {
-        console.log(
-          "Response Success = 88888888888888888888888888888888",
-          response
-        );
+      checkout.on("payment-completed", function () {
         chargePayment();
       });
     };

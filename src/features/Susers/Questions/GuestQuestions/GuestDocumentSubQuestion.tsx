@@ -137,6 +137,7 @@ const InputContainer = styled.div`
     width: 85vw;
   }
 `;
+
 const Input = styled(Form.Input)`
   padding: 0.8rem 1.2rem;
 `;
@@ -147,13 +148,21 @@ const Textarea = styled(Form.Textarea)`
 const GuestDocumentSubQuestion = ({
   question,
   children,
+  // @ts-ignore
   value,
+  // @ts-ignore
   setValue,
+  // @ts-ignore
   subOpen,
+  // @ts-ignore
   subQuestions,
+  // @ts-ignore
   data,
+  // @ts-ignore
   mainQuestionId,
+  // @ts-ignore
   isSDataFull,
+  // @ts-ignore
   isMapDataFullAdded,
 }: {
   question: SubQuestion;
@@ -189,16 +198,17 @@ const GuestDocumentSubQuestion = ({
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
-  const [formErrors, setFormErrors] = useState([]);
-  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
 
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question?.valueType === "form") {
+      if (
+        // @ts-ignore
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
+            `${API}/guest/sub-question-details/${question.id}`,
             getApiConfig()
           );
           setFormBlocks(result?.data.form.blocks);
@@ -209,10 +219,13 @@ const GuestDocumentSubQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question?.valueType === "filter") {
+      if (
+        // @ts-ignore
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
-            `${API}/suser/sub-question-details/${question.id}`,
+            `${API}/guest/sub-question-details/${question.id}`,
             getApiConfig()
           );
           setFilterData(result?.data.filter);
@@ -313,10 +326,15 @@ const GuestDocumentSubQuestion = ({
       return Number(getSubquestion());
     } else if (
       filterData &&
+      // @ts-ignore
       filterData?.filterStartInt !== undefined &&
+      // @ts-ignore
       filterData?.filterEndInt !== undefined
     ) {
-      return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+      return (
+        // @ts-ignore
+        (+filterData?.filterStartInt + filterData?.filterEndInt) / 2
+      );
     } else {
       return 0;
     }
@@ -334,7 +352,10 @@ const GuestDocumentSubQuestion = ({
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question?.valueType === "form") {
+      if (
+        // @ts-ignore
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -348,10 +369,13 @@ const GuestDocumentSubQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question?.valueType === "filter") {
+      if (
+        // @ts-ignore
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
-            `${API}/suser/question-details/${question.id}`,
+            `${API}/guest/question-details/${question.id}`,
             getApiConfig()
           );
           setFilterData(result?.data.filter);
@@ -438,14 +462,6 @@ const GuestDocumentSubQuestion = ({
 
   const totalInputs = countTotalInputs(newBlocksForm);
 
-  // Update form errors when form blocks change
-  useEffect(() => {
-    const initialFormErrors = formBlocks?.flatMap((block) =>
-      block?.labels?.map(() => "")
-    );
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
-
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
   const [cvrNumber, setCvrNumber] = useState("");
@@ -470,10 +486,6 @@ const GuestDocumentSubQuestion = ({
           });
         }
 
-        // Update form data and check if all data is entered
-        const allInputsFilled = updatedFormData?.length === totalInputs;
-        setIsAllDataEntered(allInputsFilled);
-
         setValue(updatedFormData, question.valueType); // Pass updated data to setValue
 
         return updatedFormData;
@@ -486,12 +498,11 @@ const GuestDocumentSubQuestion = ({
 
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
-  const [isCVRRight, setIsCVRRight] = useState(false);
 
   const getSVRDataHandler = async (cvr) => {
     try {
       const result = await axios.get(
-        `${API}/suser/company-details/${cvr}`,
+        `${API}/guest/company-details/${cvr}`,
         getApiConfig()
       );
 
@@ -503,16 +514,12 @@ const GuestDocumentSubQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-        console.log(result.data);
-        setIsCVRRight(true);
       } else {
         clearFormFields();
-        setIsCVRRight(true);
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
-      setIsCVRRight(true);
     }
   };
 
@@ -524,14 +531,9 @@ const GuestDocumentSubQuestion = ({
   };
 
   const handleCVRChanges = (cvr, blockId) => {
-    console.log("I am here and working good");
-    console.log(blockId);
-
     // Ensure the targeted block exists
     let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
     if (!targetedBlock) return;
-
-    console.log(targetedBlock);
 
     // Map field names to their corresponding variables
     const fieldMappings = {
@@ -641,7 +643,7 @@ const GuestDocumentSubQuestion = ({
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
       // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
+
       return {
         apartment: "",
         address: "",
@@ -680,7 +682,12 @@ const GuestDocumentSubQuestion = ({
         >
           {question.questionText}
         </h2>
-        <Description>{question?.Description}</Description>
+        <Description>
+          {
+            // @ts-ignore
+            question?.Description
+          }
+        </Description>
       </div>
       <DetailsContainer>
         <button
@@ -690,7 +697,14 @@ const GuestDocumentSubQuestion = ({
           <span>{showDetails ? "Hide " : "Show"} details</span>
           {showDetails ? <HiMiniChevronUp /> : <HiMiniChevronDown />}
         </button>
-        {showDetails && <Details>{question.description_details}</Details>}
+        {showDetails && (
+          <Details>
+            {
+              // @ts-ignore
+              question.description_details
+            }
+          </Details>
+        )}
       </DetailsContainer>
       <InputContainer>
         {question.valueType === "number" && (
@@ -823,8 +837,14 @@ const GuestDocumentSubQuestion = ({
             <h3>{Fvalue}</h3>
             <input
               type="range"
-              min={filterData?.filterStartInt}
-              max={filterData?.filterEndInt}
+              min={
+                // @ts-ignore
+                filterData?.filterStartInt
+              }
+              max={
+                // @ts-ignore
+                filterData?.filterEndInt
+              }
               value={Fvalue}
               onChange={handleSliderChange}
               style={{

@@ -15,7 +15,7 @@ const EditDocument = () => {
   const { isLoading: isLoading1, template, isError: isError1 } = useTemplate();
   const {
     isLoading: isLoading2,
-    documentQuestionsValues,
+
     isError: isError2,
   } = useDocumentQuestionsValues();
   const isError = isError1 || isError2;
@@ -34,7 +34,7 @@ const EditDocument = () => {
       <DocumentQuestions
         key={8685}
         documentQuestionsValues={JSON.parse(
-          localStorage.getItem("continue-later")
+          (localStorage.getItem("continue-later") as string | null) || "[]"
         )}
       />
     </Container>

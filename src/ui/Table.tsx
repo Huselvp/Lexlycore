@@ -1,9 +1,7 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 import styled from "styled-components";
 import { Link as RouterLink } from "react-router-dom";
 import { Reorder } from "framer-motion";
-import { getApiConfig } from "../utils/constants";
-import axios from "axios";
 
 const StyledTable = styled.div.attrs({ role: "table" })`
   border: 1px solid var(--color-grey-200);

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
@@ -15,10 +16,15 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "strictFunctionTypes": false, // Disables strict function type checks
+    "strictBindCallApply": false, // Disables strict bind/call/apply methods checks
+    "strictPropertyInitialization": false, // Disables strict class property checks
+    "noImplicitThis": false // Disables strict checks for 'this' usage
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -7,7 +7,7 @@ import GoBackButton from "../../ui/GoBackButton";
 import { useTemplate } from "../../features/Templates/useTemplate";
 import Spinner from "../../ui/Spinner";
 import ErrorMessage from "../../ui/ErrorMessage";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { MdOutlineRemoveRedEye } from "react-icons/md";
@@ -32,11 +32,8 @@ const Questions = () => {
 
       // Log the result and handle the PDF generation once data is successfully fetched
       if (result?.data?.questions) {
-        console.log(result.data.questions);
-        console.log(result.data.templateName);
+       
         handleGeneratePdf(result.data.questions, result.data.templateName, i);
-      } else {
-        console.log("No questions found in the response.");
       }
     } catch (err) {
       // Handle errors that might occur during the API call
@@ -281,7 +278,7 @@ const Questions = () => {
           size={30}
           style={{ cursor: "pointer" }}
           onClick={() => {
-            console.log("here is me");
+           
             getTemplateQuestion();
           }}
         />

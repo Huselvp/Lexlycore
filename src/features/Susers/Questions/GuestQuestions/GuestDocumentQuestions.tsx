@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useTemplate } from "../../../Templates/useTemplate";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -13,12 +13,8 @@ import DocumentHeader from "../../../Documents/DocumentHeader";
 
 import GuestDocumentQuestion from "./GuestDocumentQuestion";
 import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
-import axios from "axios";
 
-import { useParams } from "react-router-dom";
 
-import { API } from "../../../../utils/constants";
-import { getApiConfig } from "../../../../utils/constants";
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -102,6 +98,7 @@ const GuestDocumentQuestions = ({
       questionText: string;
       questionId: number;
       type: string;
+      
       value: any;
       subQuestions?: {
         subQuestionId: number;
@@ -122,6 +119,7 @@ const GuestDocumentQuestions = ({
         {};
       const subQuestionsValues =
         questionsValuesExist && questionValues
+        // @ts-ignore
           ? questionValues.subQuestions || []
           : [];
       return {
@@ -151,31 +149,26 @@ const GuestDocumentQuestions = ({
 
   const isDraft = overviewData.some((q) => !q.value);
 
-  const params = useParams();
 
-  const documentId = params.documentId;
 
-  const [draftData, setDratfData] = useState([]);
 
-  useEffect(() => {
-    const draftDataHandler = async (id) => {
-      try {
-        axios
-          .get(`${API}/suser/resume-progress/${id}`, getApiConfig())
-          .then((result) => {
-            console.log(
-              result.data,
-              "11111111111111111111111111111111111111111111111111111111111111"
-            );
-            setDratfData(result.data);
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    };
 
-    draftDataHandler(documentId);
-  }, [documentId]);
+  // useEffect(() => {
+  //   const draftDataHandler = async (id) => {
+  //     try {
+  //       axios
+  //         .get(`${API}/suser/resume-progress/${id}`, getApiConfig())
+  //         .then((result) => {
+
+  //           setDratfData(result.data);
+  //         });
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   draftDataHandler(documentId);
+  // }, [documentId]);
 
   const activeQuestion = overviewData.find((q) => q.active);
 
@@ -185,10 +178,7 @@ const GuestDocumentQuestions = ({
 
   const activeSubQuestions = questions[activeQuestionIndex]?.subQuestions || [];
 
-  // console.log("test active subq", activeSubQuestions);
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
-
-  // console.log("activeQuestion = ", activeQuestion);
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
     // here he saves the input data
@@ -232,7 +222,7 @@ const GuestDocumentQuestions = ({
 
   function flattenSubQuestions(questions) {
     return questions.map((question) => {
-      let flattenedQuestion = { ...question };
+      const flattenedQuestion = { ...question };
 
       // Recursively process subQuestions
       if (
@@ -277,6 +267,7 @@ const GuestDocumentQuestions = ({
                   <GuestDocumentQuestion
                     key={question.id}
                     question={question}
+                    // @ts-ignore
                     value={overviewData.at(index)?.value || ""}
                     setValue={(value: any, type: string) =>
                       setOverviewData((current) =>
@@ -305,6 +296,7 @@ const GuestDocumentQuestions = ({
                           <GuestDocumentSubQuestion
                             key={sq.subQuestionId}
                             question={sq}
+                            // @ts-ignore
                             data={overviewData}
                             subQuestions={question.subQuestions}
                             mainQuestionId={question.id}
@@ -536,16 +528,6 @@ const GuestDocumentQuestions = ({
             />
           )}
         </Content>
-
-        <button
-          onClick={() => {
-            console.log(isDraft);
-            console.log(overviewData);
-            console.log(draftData, "888888888888888888888888888888888888");
-          }}
-        >
-          test
-        </button>
       </Container>
     </>
   );

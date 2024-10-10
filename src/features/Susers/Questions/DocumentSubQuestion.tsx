@@ -144,16 +144,23 @@ const Textarea = styled(Form.Textarea)`
   width: 100%;
   min-height: 12rem;
 `;
+
 const DocumentSubQuestion = ({
   question,
   children,
+  // @ts-ignore
   value,
+  // @ts-ignore
   setValue,
+  // @ts-ignore
   subOpen,
-  subQuestions,
+  // @ts-ignore
   data,
+  // @ts-ignore
   mainQuestionId,
+  // @ts-ignore
   isSDataFull,
+  // @ts-ignore
   isMapDataFullAdded,
 }: {
   question: SubQuestion;
@@ -189,13 +196,14 @@ const DocumentSubQuestion = ({
   const [formBlocks, setFormBlocks] = useState([]);
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
-  const [formErrors, setFormErrors] = useState([]);
-  const [isAllDataEntered, setIsAllDataEntered] = useState(false);
 
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question?.valueType === "form") {
+      if (
+        // @ts-ignore
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/sub-question-details/${question.id}`,
@@ -209,7 +217,10 @@ const DocumentSubQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question?.valueType === "filter") {
+      if (
+        // @ts-ignore
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/sub-question-details/${question.id}`,
@@ -306,17 +317,22 @@ const DocumentSubQuestion = ({
 
   const isTheFilterHavAvalue = useCallback(() => {
     return getSubquestion() !== "";
-  }, [getSubquestion()]);
+  }, []);
 
   const [Fvalue, setFValue] = useState(() => {
     if (isTheFilterHavAvalue()) {
       return Number(getSubquestion());
     } else if (
       filterData &&
+      // @ts-ignore
       filterData?.filterStartInt !== undefined &&
+      // @ts-ignore
       filterData?.filterEndInt !== undefined
     ) {
-      return (+filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+      return (
+        // @ts-ignore
+        (+filterData?.filterStartInt + filterData?.filterEndInt) / 2
+      );
     } else {
       return 0;
     }
@@ -334,7 +350,10 @@ const DocumentSubQuestion = ({
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
-      if (question?.valueType === "form") {
+      if (
+        // @ts-ignore
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -348,7 +367,10 @@ const DocumentSubQuestion = ({
     };
 
     const getFilterData = async () => {
-      if (question?.valueType === "filter") {
+      if (
+        // @ts-ignore
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -403,7 +425,7 @@ const DocumentSubQuestion = ({
 
   const generateFormDataWithUniqueLabels = (formBlocks) => {
     let generatedId = 0;
-    let idsArray = collectLabelIds(formBlocks);
+    const idsArray = collectLabelIds(formBlocks);
 
     return formBlocks.map((block) => {
       if (block.type === "COMPANY" || block.type === "PERSON") {
@@ -438,14 +460,6 @@ const DocumentSubQuestion = ({
 
   const totalInputs = countTotalInputs(newBlocksForm);
 
-  // Update form errors when form blocks change
-  useEffect(() => {
-    const initialFormErrors = formBlocks?.flatMap((block) =>
-      block?.labels?.map(() => "")
-    );
-    setFormErrors(initialFormErrors);
-  }, [formBlocks]);
-
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
   const [cvrNumber, setCvrNumber] = useState("");
@@ -470,10 +484,6 @@ const DocumentSubQuestion = ({
           });
         }
 
-        // Update form data and check if all data is entered
-        const allInputsFilled = updatedFormData?.length === totalInputs;
-        setIsAllDataEntered(allInputsFilled);
-
         setValue(updatedFormData, question.valueType); // Pass updated data to setValue
 
         return updatedFormData;
@@ -486,7 +496,6 @@ const DocumentSubQuestion = ({
 
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
-  const [isCVRRight, setIsCVRRight] = useState(false);
 
   const getSVRDataHandler = async (cvr) => {
     try {
@@ -503,16 +512,12 @@ const DocumentSubQuestion = ({
         setCity(result.data.city || "");
         setCountry("Danmark");
         setHerefterOtaltSom(result.data.hereafterReferredTo || "");
-        console.log(result.data);
-        setIsCVRRight(true);
       } else {
         clearFormFields();
-        setIsCVRRight(true);
       }
     } catch (err) {
       console.log(err);
       clearFormFields();
-      setIsCVRRight(true);
     }
   };
 
@@ -524,14 +529,9 @@ const DocumentSubQuestion = ({
   };
 
   const handleCVRChanges = (cvr, blockId) => {
-    console.log("I am here and working good");
-    console.log(blockId);
-
     // Ensure the targeted block exists
-    let targetedBlock = newBlocksForm.find((block) => block.id === blockId);
+    const targetedBlock = newBlocksForm.find((block) => block.id === blockId);
     if (!targetedBlock) return;
-
-    console.log(targetedBlock);
 
     // Map field names to their corresponding variables
     const fieldMappings = {
@@ -545,7 +545,7 @@ const DocumentSubQuestion = ({
     };
 
     setFormData((prevFormData) => {
-      let updatedFormData = [...prevFormData];
+      const updatedFormData = [...prevFormData];
 
       // Iterate over fieldMappings to update, add, or remove data
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
@@ -640,8 +640,6 @@ const DocumentSubQuestion = ({
 
   const convertStringToAddressObject = (dataString) => {
     if (typeof dataString !== "string") {
-      // If the input is not a string, return an empty object or handle it accordingly
-      console.error("Expected a string but got:", typeof dataString);
       return {
         apartment: "",
         address: "",
@@ -680,7 +678,12 @@ const DocumentSubQuestion = ({
         >
           {question.questionText}
         </h2>
-        <Description>{question?.Description}</Description>
+        <Description>
+          {
+            // @ts-ignore
+            question?.Description
+          }
+        </Description>
       </div>
       <DetailsContainer>
         <button
@@ -690,7 +693,14 @@ const DocumentSubQuestion = ({
           <span>{showDetails ? "Hide " : "Show"} details</span>
           {showDetails ? <HiMiniChevronUp /> : <HiMiniChevronDown />}
         </button>
-        {showDetails && <Details>{question.description_details}</Details>}
+        {showDetails && (
+          <Details>
+            {
+              // @ts-ignore
+              question.description_details
+            }
+          </Details>
+        )}
       </DetailsContainer>
       <InputContainer>
         {question.valueType === "number" && (
@@ -823,8 +833,12 @@ const DocumentSubQuestion = ({
             <h3>{Fvalue}</h3>
             <input
               type="range"
-              min={filterData?.filterStartInt}
-              max={filterData?.filterEndInt}
+              min={
+                 // @ts-ignore
+                filterData?.filterStartInt}
+              max={
+                 // @ts-ignore
+                filterData?.filterEndInt}
               value={Fvalue}
               onChange={handleSliderChange}
               style={{

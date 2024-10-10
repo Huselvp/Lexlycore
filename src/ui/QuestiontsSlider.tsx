@@ -1,16 +1,16 @@
-import styled, { css } from "styled-components"
-import { FaCheck } from "react-icons/fa"
-import { useMemo } from "react"
+import styled, { css } from "styled-components";
+import { FaCheck } from "react-icons/fa";
+import { useMemo } from "react";
 
 const Container = styled.div`
   margin: 0 auto;
-`
+`;
 const List = styled.ul`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 2rem 1rem;
-`
+`;
 const Li = styled.li<{ active: "true" | "false" }>`
   font-weight: 700;
   font-size: 1.5rem;
@@ -27,35 +27,43 @@ const Li = styled.li<{ active: "true" | "false" }>`
     css`
       background-color: var(--color-stone-200);
     `}
-`
+`;
 const QuestiontsSlider = ({
   length,
-  activeQuestion
+  activeQuestion,
 }: {
-  length: number
-  activeQuestion: number
+  length: number;
+  activeQuestion: number;
 }) => {
-  const data = useMemo(() => Array.from({ length }, (v, i) => i), [length])
+  const data = useMemo(() => Array.from({ length }, (i) => i), [length]);
   return (
     <Container>
       <List>
         {activeQuestion === -1
           ? data.map((item) => (
+              // @ts-ignore
               <Li active={"true"} key={item}>
                 <FaCheck />
               </Li>
             ))
-          : data.map((item) => (
+          : data.map((item, index) => (
+              // <Li
+              //   active={item === activeQuestion ? "true" : "false"}
+              //   key={item}
+              // >
+              //   {item < activeQuestion ? <FaCheck /> : item + 1}
+              // </Li>
+
               <Li
                 active={item === activeQuestion ? "true" : "false"}
-                key={item}
+                key={index}
               >
-                {item < activeQuestion ? <FaCheck /> : item + 1}
+                {Number(item) < activeQuestion ? <FaCheck /> : Number(item) + 1}
               </Li>
             ))}
       </List>
     </Container>
-  )
-}
+  );
+};
 
-export default QuestiontsSlider
+export default QuestiontsSlider;

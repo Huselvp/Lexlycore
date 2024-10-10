@@ -49,7 +49,7 @@ const AssignUpdateCategory = ({
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const category = (Number(formData.get("category")) || 0) as number
-    console.log("category = ", category, templateId)
+  
     assignUpdateTemplateCategory(
       { onAssign, categoryId: category, templateId },
       {

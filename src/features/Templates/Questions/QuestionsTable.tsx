@@ -1,43 +1,43 @@
-import { Reorder } from "framer-motion";
 import Menus from "../../../ui/Menus";
 import Table from "../../../ui/Table";
 import { useTemplate } from "../useTemplate";
 import QuestionsRow from "./QuestionsRow";
 import { useEffect, useState } from "react";
-import { API, QuestionReorder, getApiConfig } from "../../../utils/constants";
+import { API, getApiConfig } from "../../../utils/constants";
 import axios from "axios";
 
 const QuestionsTable = () => {
   const { template } = useTemplate();
-  const questions = template!.questions.sort((a,b)=>a.position - b.position)
-  console.log("questions before reorder", questions);
+  const questions = template!.questions.sort((a, b) => 
+    // @ts-ignore
+    a.position - b.position);
+
   const [questionOrderTest, setQuestionOrderTest] = useState(questions);
-  const questionIds = questionOrderTest.map((q)=>q.id);
-  // console.log("question ids test ",questionIds)
+  const questionIds = questionOrderTest.map((q) => q.id);
 
   const handleReorder = (newOrder) => {
-    // console.log("New order:", newOrder);
     setQuestionOrderTest(newOrder);
-  };  
-  // console.log("questions after reorder", questionOrderTest);
+  };
 
   useEffect(() => {
-    const reorderQuestions = async (questionids : number[]) => {
-        try {
-            const response = await axios.put(`${API}/admin/question/reorder`, questionids, getApiConfig())
-            console.log("ordered question from the reponse :",response.data); 
-        } catch (error) {
-            console.error('Error reordering questions:', error);
-        }
+    const reorderQuestions = async (questionids: number[]) => {
+      try {
+        await axios.put(
+          `${API}/admin/question/reorder`,
+          questionids,
+          getApiConfig()
+        );
+      } catch (error) {
+        console.error("Error reordering questions:", error);
+      }
     };
 
     reorderQuestions(questionIds);
-}, [questionOrderTest , questionIds]); 
+  }, [questionOrderTest, questionIds]);
 
-
-useEffect(()=>{
-setQuestionOrderTest(questions)
-},[questions])
+  useEffect(() => {
+    setQuestionOrderTest(questions);
+  }, [questions]);
 
   return (
     <Menus>
@@ -48,14 +48,13 @@ setQuestionOrderTest(questions)
           <div>Description</div>
           <div></div>
         </Table.Header>
-          <Table.OrderedBody
-            data={questionOrderTest}
-            render={(question) => {
-              // console.log("the question reponse", question);
-              return <QuestionsRow key={question.id} question={question} />;
-            }}
-            onReorder={handleReorder}
-          />
+        <Table.OrderedBody
+          data={questionOrderTest}
+          render={(question) => {
+            return <QuestionsRow key={question.id} question={question} />;
+          }}
+          onReorder={handleReorder}
+        />
       </Table>
     </Menus>
   );

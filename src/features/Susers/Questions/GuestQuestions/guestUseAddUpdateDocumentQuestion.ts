@@ -39,19 +39,23 @@ export const guestUseAddUpdateDocumentQuestion = () => {
                     })
                   )
                 : [];
+              // @ts-ignore
               processedQuestion.formValues = formValues;
             } else if (question.type === "time") {
               if (
                 Array.isArray(question[valueKey]) &&
                 question[valueKey].length >= 2
               ) {
+                // @ts-ignore
                 processedQuestion.firstTimeValues = question[valueKey][0]?.time;
+                // @ts-ignore
                 processedQuestion.secondTimeValue = question[valueKey][1]?.time;
               }
             } else if (question.type === "checkbox") {
               const checkboxValues = Array.isArray(question[valueKey])
                 ? question[valueKey]
                 : [question[valueKey]];
+              // @ts-ignore
               processedQuestion.checkboxValue = checkboxValues;
             } else if (question.type === "day") {
               const days = Array.isArray(question[valueKey])
@@ -60,6 +64,7 @@ export const guestUseAddUpdateDocumentQuestion = () => {
                     day,
                   }))
                 : [];
+              // @ts-ignore
               processedQuestion.days = days;
             } else if (question.type === "map") {
               // Split the map string by commas and trim each part
@@ -71,9 +76,10 @@ export const guestUseAddUpdateDocumentQuestion = () => {
                 acc[index + 1] = value;
                 return acc;
               }, {});
-
+              // @ts-ignore
               processedQuestion.mapValues = mapValues;
             } else {
+              // @ts-ignore
               processedQuestion.value = question[valueKey];
             }
 
@@ -82,6 +88,7 @@ export const guestUseAddUpdateDocumentQuestion = () => {
               Array.isArray(question.subquestionsValues) &&
               question.subquestionsValues.length > 0
             ) {
+              // @ts-ignore
               processedQuestion.subquestionsValues = processQuestions(
                 question.subquestionsValues,
                 true

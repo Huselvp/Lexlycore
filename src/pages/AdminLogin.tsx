@@ -27,7 +27,6 @@ const AdminLogin = () => {
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     login({ email, password });
-    console.log("email: ", email, "password : ", password);
   };
   return (
     <>

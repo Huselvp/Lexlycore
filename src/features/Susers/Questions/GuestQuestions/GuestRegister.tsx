@@ -1,141 +1,3 @@
-// import { FormEventHandler, useState } from "react";
-// import { useRegister } from "../../../../features/Authentication/useRegister";
-// import isEmail from "validator/lib/isEmail";
-// import Form from "../../../../ui/AuthForm";
-// import { Link } from "react-router-dom";
-// import SpinnerMini from "../../../../ui/SpinnerMini";
-// import toast from "react-hot-toast";
-// import InputPassword from "../../../../ui/InputPassword";
-// import { API } from "../../../../utils/constants";
-// import { getApiConfig } from "../../../../utils/constants";
-// import axios from "axios";
-
-// const GuestRegister = () => {
-//   const { isLoading, register } = useRegister();
-//   const [firstname, setfirstname] = useState("");
-//   const [lastname, setlastname] = useState("");
-//   const [username, setusername] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [password, setpassword] = useState("");
-//   const [passwordConfirm, setpasswordConfirm] = useState("");
-
-//   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-//     event.preventDefault();
-//     // check if email is valid
-//     if (!isEmail(email)) return toast.error("Email is not valid");
-//     // check if passwords match
-//     if (password !== passwordConfirm)
-//       return toast.error("Passwords must match");
-//     // register({ firstname, lastname, username, email, password, role: "SUSER" });
-
-//     axios
-//       .post(
-//         `${API}/auth/register`,
-//         { firstname, lastname, username, email, password, role: "SUSER" },
-//         getApiConfig()
-//       )
-//       .then((result) => {
-//         console.log(result.data);
-//       });
-//   };
-
-//   return (
-//     <>
-//       <Form onSubmit={onFormSubmit}>
-//         <h3>Create your account</h3>
-//         <Form.Rows>
-//           <Form.DoubleRow>
-//             <Form.Row>
-//               <Form.Label htmlFor="firstname">First name</Form.Label>
-//               <Form.Input
-//                 disabled={isLoading}
-//                 value={firstname}
-//                 onChange={(e) => setfirstname(e.target.value)}
-//                 id="firstname"
-//                 type="text"
-//                 required
-//                 minLength={3}
-//               />
-//             </Form.Row>
-//             <Form.Row>
-//               <Form.Label htmlFor="lastname">Last name</Form.Label>
-//               <Form.Input
-//                 disabled={isLoading}
-//                 value={lastname}
-//                 onChange={(e) => setlastname(e.target.value)}
-//                 id="lastname"
-//                 type="text"
-//                 required
-//                 minLength={3}
-//               />
-//             </Form.Row>
-//           </Form.DoubleRow>
-//           <Form.Row>
-//             <Form.Label htmlFor="username">Username</Form.Label>
-//             <Form.Input
-//               disabled={isLoading}
-//               value={username}
-//               onChange={(e) => setusername(e.target.value)}
-//               id="username"
-//               type="string"
-//               required
-//             />
-//           </Form.Row>
-//           <Form.Row>
-//             <Form.Label htmlFor="email">Email</Form.Label>
-//             <Form.Input
-//               disabled={isLoading}
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               id="email"
-//               type="email"
-//               required
-//             />
-//           </Form.Row>
-//           <Form.DoubleRow>
-//             <Form.Row>
-//               <Form.Label htmlFor="password">Password</Form.Label>
-//               <InputPassword
-//                 value={password}
-//                 setValue={setpassword}
-//                 name="password"
-//                 id="password"
-//                 disabled={isLoading}
-//                 includeMinLength={true}
-//               />
-//             </Form.Row>
-//             <Form.Row>
-//               <Form.Label htmlFor="confirmpassword">
-//                 Confirm Password
-//               </Form.Label>
-//               <InputPassword
-//                 value={passwordConfirm}
-//                 setValue={setpasswordConfirm}
-//                 name="conxfirmpassword"
-//                 id="confirmpassword"
-//                 disabled={isLoading}
-//                 includeMinLength={true}
-//               />
-//             </Form.Row>
-//           </Form.DoubleRow>
-
-//           <Form.Row>
-//             <Form.Button disabled={isLoading}>
-//               {isLoading ? <SpinnerMini /> : "Register"}
-//             </Form.Button>
-//           </Form.Row>
-//           <Form.Row addborder={true}>
-//             <p>Have an account ?</p>
-//             <Link to="/login/guest">Sign in</Link>
-//           </Form.Row>
-//         </Form.Rows>
-//       </Form>
-//     </>
-//   );
-// };
-
-// export default GuestRegister;
-
 import { FormEventHandler, useState } from "react";
 import { useRegister } from "../../../../features/Authentication/useRegister";
 import isEmail from "validator/lib/isEmail";
@@ -147,10 +9,10 @@ import InputPassword from "../../../../ui/InputPassword";
 import { API } from "../../../../utils/constants";
 import { getApiConfig } from "../../../../utils/constants";
 import axios from "axios";
-import { removeToken, setToken } from "../../../../utils/helpers";
+import {  setToken } from "../../../../utils/helpers";
 
 const GuestRegister = () => {
-  const { isLoading, register } = useRegister();
+  const { isLoading } = useRegister();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [username, setUsername] = useState("");
@@ -173,11 +35,9 @@ const GuestRegister = () => {
         initiatePaymentUrl(data.templateId),
         getApiConfig()
       );
-      console.log("Response: ", response);
 
       // Extract paymentId from response
       const paymentId = JSON.parse(response.data.data).paymentId;
-      console.log("paymentId = ", paymentId);
 
       // Return the processed payment data
       return {
@@ -225,8 +85,6 @@ const GuestRegister = () => {
         getApiConfig()
       );
 
-      console.log("Registration successful:", registerRes.data);
-
       // Handle access_token and store it (similar to login)
       const accessToken = registerRes.data.access_token; // Adjust this line based on the API response structure
       localStorage.setItem("access_token", accessToken); // Store the token in localStorage
@@ -244,7 +102,6 @@ const GuestRegister = () => {
       );
 
       const documentId = createDocRes.data.documentId; // Get the documentId
-      console.log(documentId);
 
       const storedValues = JSON.parse(
         localStorage.getItem("documentValues") || "[]"
@@ -325,13 +182,11 @@ const GuestRegister = () => {
       const finalData = processQuestions(storedValues);
 
       // Send the processed values to the server
-      const addValuesRes = await axios.post(
+       await axios.post(
         `${API}/suser/add-values`,
         { isDraft: false, values: finalData, documentId },
         getApiConfig()
       );
-
-      console.log("Data saved successfully:", addValuesRes.data);
 
       // Now that documentId is available, start the payment process
       await startPaymentProcess(parseInt(templateId), documentId);
@@ -343,8 +198,6 @@ const GuestRegister = () => {
       toast.error("Registration failed, please try again.");
     } finally {
       // setLoading(false); // Reset loading state
-
-      console.log(78);
     }
   };
 

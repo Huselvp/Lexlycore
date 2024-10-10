@@ -6,8 +6,6 @@ import { useCreateDocument } from "../../features/Documents/useCreateDocument";
 import { useUser } from "../../features/Authentication/useUser";
 import { useNavigate } from "react-router-dom";
 
-import { getToken } from "../../utils/helpers";
-
 const Container = styled.div`
   /* padding-right: 2rem; */
   padding: 3rem 2rem 0 0;
@@ -97,7 +95,6 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
   const { isLoading, createDocument } = useCreateDocument();
   const { isAuthenticated, user } = useUser();
   const navigate = useNavigate();
-  const token = getToken();
 
   const clickHandler = () => {
     if (!isAuthenticated) {
@@ -105,6 +102,7 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
       return; // Stop further execution if not authenticated
     }
 
+    // @ts-ignore
     if (user && user.role === "ADMIN") {
       return; // Stop further execution if the user is an admin
     }
@@ -120,6 +118,7 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
           <p>Pris</p>
           <p>{formatCurrency(template.cost)}</p>
           <button
+            // @ts-ignore
             disabled={isAuthenticated && user!.role === "ADMIN"}
             onClick={clickHandler}
           >

@@ -1,9 +1,9 @@
-import { NavLink } from "react-router-dom"
-import styled from "styled-components"
-import { useLogout } from "../features/Authentication/useLogout"
-import { HiOutlineX as CloseMenuIcon } from "react-icons/hi"
-import { createPortal } from "react-dom"
-import { useUser } from "../features/Authentication/useUser"
+import { NavLink } from "react-router-dom";
+import styled from "styled-components";
+import { useLogout } from "../features/Authentication/useLogout";
+import { HiOutlineX as CloseMenuIcon } from "react-icons/hi";
+import { createPortal } from "react-dom";
+import { useUser } from "../features/Authentication/useUser";
 
 const Container = styled.div<{ hide: "true" | "false" }>`
   position: fixed;
@@ -55,7 +55,7 @@ const Container = styled.div<{ hide: "true" | "false" }>`
       }
     }
   }
-`
+`;
 const Btn = styled.button`
   display: block;
   border: none;
@@ -64,7 +64,7 @@ const Btn = styled.button`
   border: 1px solid var(--color-stone-500);
   box-shadow: var(--shadow);
   border-radius: var(--rounded);
-`
+`;
 const CloseBtn = styled.button`
   background: none;
   border: none;
@@ -73,7 +73,7 @@ const CloseBtn = styled.button`
     color: var(--color-stone-500);
     font-size: 3rem;
   }
-`
+`;
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -84,21 +84,21 @@ const Overlay = styled.div`
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   z-index: 10000;
-`
+`;
 
 const MobileSidebar = ({
   hideSidebarOnMobile,
-  setHideSidebarOnMobile
+  setHideSidebarOnMobile,
 }: {
-  hideSidebarOnMobile: boolean
-  setHideSidebarOnMobile: React.Dispatch<React.SetStateAction<boolean>>
+  hideSidebarOnMobile: boolean;
+  setHideSidebarOnMobile: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { logout } = useLogout()
-  const { user } = useUser()
+  const { logout } = useLogout();
+  const { user } = useUser();
   const hideSidebar = () => {
-    setHideSidebarOnMobile(true)
-  }
-  if (hideSidebarOnMobile) return null
+    setHideSidebarOnMobile(true);
+  };
+  if (hideSidebarOnMobile) return null;
   return createPortal(
     <>
       <Overlay onClick={() => setHideSidebarOnMobile(true)} />
@@ -108,41 +108,52 @@ const MobileSidebar = ({
         </CloseBtn>
         <nav>
           <ul>
-            {user?.role === "ADMIN" && (
-              <>
-                <li onClick={hideSidebar}>
-                  <NavLink to="/a">
-                    <span>Dashboard</span>
-                  </NavLink>
-                </li>
-                <li onClick={hideSidebar}>
-                  <NavLink to="/a/templates">
-                    <span>Templates</span>
-                  </NavLink>
-                </li>
-                <li onClick={hideSidebar}>
-                  <NavLink to="/a/categories">
-                    <span>Subcategories</span>
-                  </NavLink>
-                </li>
-                <li onClick={hideSidebar}>
-                  <NavLink to="/a/users">
-                    <span>Users</span>
-                  </NavLink>
-                </li>
-              </>
-            )}
-            {user?.role === "SUSER" && (
-              <>
-                <li>
-                  <NavLink to="/u">
-                    <span>Documents</span>
-                  </NavLink>
-                </li>
-              </>
-            )}
+            {
+              // @ts-ignore
+              user?.role === "ADMIN" && (
+                <>
+                  <li onClick={hideSidebar}>
+                    <NavLink to="/a">
+                      <span>Dashboard</span>
+                    </NavLink>
+                  </li>
+                  <li onClick={hideSidebar}>
+                    <NavLink to="/a/templates">
+                      <span>Templates</span>
+                    </NavLink>
+                  </li>
+                  <li onClick={hideSidebar}>
+                    <NavLink to="/a/categories">
+                      <span>Subcategories</span>
+                    </NavLink>
+                  </li>
+                  <li onClick={hideSidebar}>
+                    <NavLink to="/a/users">
+                      <span>Users</span>
+                    </NavLink>
+                  </li>
+                </>
+              )
+            }
+            {
+              // @ts-ignore
+              user?.role === "SUSER" && (
+                <>
+                  <li>
+                    <NavLink to="/u">
+                      <span>Documents</span>
+                    </NavLink>
+                  </li>
+                </>
+              )
+            }
             <li onClick={hideSidebar}>
-              <NavLink to={`/${user?.role === "ADMIN" ? "a" : "u"}/account`}>
+              <NavLink
+                to={`/${
+                  // @ts-ignore
+                  user?.role === "ADMIN" ? "a" : "u"
+                }/account`}
+              >
                 <span>Account</span>
               </NavLink>
             </li>
@@ -157,7 +168,7 @@ const MobileSidebar = ({
     </>,
 
     document.getElementById("root")!
-  )
-}
+  );
+};
 
-export default MobileSidebar
+export default MobileSidebar;

@@ -1,10 +1,10 @@
-import Form from "../ui/AuthForm"
-import { Link, useNavigate } from "react-router-dom"
-import { FormEventHandler, useState } from "react"
-import { useLogin } from "../features/Authentication/useLogin"
-import SpinnerMini from "../ui/SpinnerMini"
-import styled from "styled-components"
-import InputPassword from "../ui/InputPassword"
+import Form from "../ui/AuthForm";
+import { Link, useNavigate } from "react-router-dom";
+import { FormEventHandler, useState } from "react";
+import { useLogin } from "../features/Authentication/useLogin";
+import SpinnerMini from "../ui/SpinnerMini";
+import styled from "styled-components";
+import InputPassword from "../ui/InputPassword";
 
 const P = styled.p`
   cursor: pointer;
@@ -15,20 +15,19 @@ const P = styled.p`
     color: var(--color-stone-550);
   }
   /* text-align: center; */
-`
+`;
 
 const Login = () => {
-  const navigate = useNavigate()
-  const { isLoading, login } = useLogin()
+  const navigate = useNavigate();
+  const { isLoading, login } = useLogin();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault()
-    login({ email, password })
-    console.log("email: " , email , "password : ", password  )
-  }
+    event.preventDefault();
+    login({ email, password });
+  };
   return (
     <>
       {/* <Form.Header> */}
@@ -80,7 +79,7 @@ const Login = () => {
         </Form.Rows>
       </Form>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

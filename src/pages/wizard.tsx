@@ -4,7 +4,7 @@ import "../styles/wizard.css";
 
 const Wizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [responses, setResponses] = useState({});
+  // const [responses, setResponses] = useState({});
 
   const steps = [
     {
@@ -126,17 +126,17 @@ const Wizard: React.FC = () => {
     setCurrentStep(index);
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setResponses((prevResponses) => ({ ...prevResponses, [name]: value }));
-  };
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setResponses((prevResponses) => ({ ...prevResponses, [name]: value }));
+  // };
 
-  const handleDropdownChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value } = event.target;
-    setResponses((prevResponses) => ({ ...prevResponses, [name]: value }));
-  };
+  // const handleDropdownChange = (
+  //   event: React.ChangeEvent<HTMLSelectElement>
+  // ) => {
+  //   const { name, value } = event.target;
+  //   // setResponses((prevResponses) => ({ ...prevResponses, [name]: value }));
+  // };
 
   const renderFields = (fields: any[]) => {
     return fields.map((field, index) => {
@@ -150,7 +150,7 @@ const Wizard: React.FC = () => {
                 placeholder={`Enter your ${field.label}`}
                 type="text"
                 name={field.label}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
               />
             </div>
           );
@@ -158,7 +158,7 @@ const Wizard: React.FC = () => {
           return (
             <div key={index} className="dropdown_container">
               <label>{field.label}:</label>
-              <select name={field.label} onChange={handleDropdownChange}>
+              <select name={field.label}>
                 {field.options &&
                   field.options.map((option: string, index: number) => (
                     <option key={index} value={option}>
@@ -175,7 +175,8 @@ const Wizard: React.FC = () => {
               <textarea
                 placeholder={`Enter your ${field.label}`}
                 name={field.label}
-                onChange={handleInputChange}
+                // @ts-ignore
+                // onChange={handleInputChange}
               ></textarea>
             </div>
           );
@@ -186,7 +187,7 @@ const Wizard: React.FC = () => {
               <input
                 type="date"
                 name={field.label}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
               />
             </div>
           );
@@ -202,7 +203,7 @@ const Wizard: React.FC = () => {
                       id={option}
                       name={field.label}
                       value={option}
-                      onChange={handleInputChange}
+                      // onChange={handleInputChange}
                     />
                     <label htmlFor={option}>{option}</label>
                   </div>
@@ -217,96 +218,7 @@ const Wizard: React.FC = () => {
                 type="file"
                 name={field.label}
                 accept={field.accepted_types?.join(", ")}
-                onChange={handleInputChange}
-              />
-            </div>
-          );
-        default:
-          return null;
-      }
-    });
-  };
-
-  const renderSubquestions = (subquestions: any[]) => {
-    return subquestions.map((subquestion, index) => {
-      switch (subquestion.type) {
-        case "text_input":
-          return (
-            <div key={index} className="text_input_container">
-              <label>{subquestion.label}:</label>
-              <input
-                className="text_input"
-                placeholder={`Enter your ${subquestion.label}`}
-                type="text"
-                name={subquestion.label}
-                onChange={handleInputChange}
-              />
-            </div>
-          );
-        case "dropdown":
-          return (
-            <div key={index} className="dropdown_container">
-              <label>{subquestion.label}:</label>
-              <select name={subquestion.label} onChange={handleDropdownChange}>
-                {subquestion.options &&
-                  subquestion.options.map((option: string, index: number) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          );
-        case "textarea":
-          return (
-            <div key={index} className="textarea_container">
-              <label>{subquestion.label}:</label>
-              <textarea
-                placeholder={`Enter your ${subquestion.label}`}
-                name={subquestion.label}
-                onChange={handleInputChange}
-              ></textarea>
-            </div>
-          );
-        case "date_picker":
-          return (
-            <div key={index} className="date_picker_container">
-              <label>{subquestion.label}:</label>
-              <input
-                type="date"
-                name={subquestion.label}
-                onChange={handleInputChange}
-              />
-            </div>
-          );
-        case "radio_buttons":
-          return (
-            <div key={index} className="radio_container">
-              <label className="radio_title">{subquestion.label}:</label>
-              {subquestion.options &&
-                subquestion.options.map((option: string, index: number) => (
-                  <div key={index} className="radio">
-                    <input
-                      type="radio"
-                      id={option}
-                      name={subquestion.label}
-                      value={option}
-                      onChange={handleInputChange}
-                    />
-                    <label htmlFor={option}>{option}</label>
-                  </div>
-                ))}
-            </div>
-          );
-        case "file_upload":
-          return (
-            <div key={index} className="file_upload">
-              <label>{subquestion.label}:</label>
-              <input
-                type="file"
-                name={subquestion.label}
-                accept={subquestion.accepted_types?.join(", ")}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
               />
             </div>
           );
@@ -365,7 +277,10 @@ const Wizard: React.FC = () => {
             {currentStepData.subtitle && (
               <p className="sub_title">{currentStepData.subtitle}</p>
             )}
-            {renderFields(currentStepData.fields)}
+            {
+              // @ts-ignore
+              renderFields(currentStepData.fields)
+            }
 
             <div className="btns_container">
               {currentStep > 0 && (

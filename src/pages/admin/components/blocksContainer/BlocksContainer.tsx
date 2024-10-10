@@ -1,4 +1,3 @@
-import React from "react";
 import "./blocksContainer.css";
 
 function BlocksContainer({ children }) {

@@ -37,7 +37,6 @@ export const register = async (data: RegisterData): Promise<void> => {
 export const getMe = async (): Promise<User | null> => {
   try {
     const res = await axios.get(getMeUrl(), getApiConfig());
-    console.log("Res = ", res);
     if (!res.data) throw new Error("");
     return res.data;
   } catch {

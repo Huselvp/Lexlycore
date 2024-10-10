@@ -39,13 +39,13 @@ const AddEditSubQuestion = ({
       "") as string;
     const textArea = (formData.get("textArea") || "") as string;
     const valueType = (formData.get("valueType") || "") as string;
-    // check if texte is a valid html
-    console.log("texte = ", textArea);
+
     if (onAdd) {
       addSubQuestion({
         questionText,
         description,
         descriptionDetails,
+        // @ts-ignore
         valueType,
         textArea,
       });
@@ -55,7 +55,9 @@ const AddEditSubQuestion = ({
         ...question,
         questionText,
         description,
+        // @ts-ignore
         descriptionDetails,
+        // @ts-ignore
         valueType,
         textArea,
       });
@@ -80,7 +82,10 @@ const AddEditSubQuestion = ({
           <Form.Row>
             <Form.Label htmlFor="description">Description</Form.Label>
             <Form.Textarea
-              defaultValue={isQuestionProvided ? question.Description : ""}
+              defaultValue={
+                // @ts-ignore
+                isQuestionProvided ? question.Description : ""
+              }
               name="description"
               disabled={isLoading}
               id="description"
@@ -90,6 +95,7 @@ const AddEditSubQuestion = ({
             <Form.Label htmlFor="details">Details</Form.Label>
             <Form.Textarea
               defaultValue={
+                // @ts-ignore
                 isQuestionProvided ? question.description_details : ""
               }
               name="descriptionDetails"
@@ -100,7 +106,9 @@ const AddEditSubQuestion = ({
           <Form.Row>
             <Form.Label>Content</Form.Label>
             <Editor
-              defaultValue={isQuestionProvided ? question.text_area : ""}
+              defaultValue={
+                // @ts-ignore
+                isQuestionProvided ? question.text_area : ""}
               name="textArea"
             />
           </Form.Row>

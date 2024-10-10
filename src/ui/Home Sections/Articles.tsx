@@ -1,7 +1,7 @@
-import styled from "styled-components"
-import { HiOutlineArrowNarrowRight as ArrowRightIcon } from "react-icons/hi"
-import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import styled from "styled-components";
+import { HiOutlineArrowNarrowRight as ArrowRightIcon } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
+// import { useState } from "react";
 
 const Content = styled.div`
   display: grid;
@@ -15,7 +15,7 @@ const Content = styled.div`
   @media screen and (max-width: 25em) {
     grid-template-columns: 1fr;
   }
-`
+`;
 const Article = styled.div<{ img: string }>`
   & section {
     z-index: 1000000;
@@ -94,7 +94,7 @@ const Article = styled.div<{ img: string }>`
       color: var(--color-grey-50);
     }
   }
-`
+`;
 const Container = styled.div`
   background-color: var(--white);
   padding: 6rem 2rem;
@@ -104,15 +104,15 @@ const Container = styled.div`
     text-align: center;
     margin-bottom: 5rem;
   }
-`
+`;
 
 const Articles = ({
-  data
+  data,
 }: {
-  data: { img: string; title: string; link: string; description: string }[]
+  data: { img: string; title: string; link: string; description: string }[];
 }) => {
-  const navigate = useNavigate()
-  const [hoveredArticle, setHoveredArticle] = useState<null | string>(null)
+  const navigate = useNavigate();
+  // const [hoveredArticle, setHoveredArticle] = useState<null | string>(null)
 
   return (
     <Container>
@@ -121,8 +121,8 @@ const Articles = ({
         {data.map((article) => (
           <Article
             img={article.img}
-            onMouseEnter={() => setHoveredArticle(article.title)}
-            onMouseLeave={() => setHoveredArticle(null)}
+            // onMouseEnter={() => setHoveredArticle(article.title)}
+            // onMouseLeave={() => setHoveredArticle(null)}
           >
             <section>
               <button onClick={() => navigate(`/article/${article.link}`)}>
@@ -138,7 +138,7 @@ const Articles = ({
         ))}
       </Content>
     </Container>
-  )
-}
+  );
+};
 
-export default Articles
+export default Articles;

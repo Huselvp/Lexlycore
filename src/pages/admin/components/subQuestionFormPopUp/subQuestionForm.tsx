@@ -65,13 +65,11 @@ function SubQuestionForm({ subQuestionId }) {
             { title: subQuestionFormTitle },
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setIsAddSubQuestionFormNameOpen(false);
             setIsSeeSubQuestionBlocks(true);
             getSubQuestionFormBlocksHandler(subQuestionFormId);
           });
-      } else {
-        console.log("form title should not be empty");
       }
     } catch (err) {
       console.log(err);
@@ -122,7 +120,7 @@ function SubQuestionForm({ subQuestionId }) {
     try {
       await axios
         .post(`${API}/form/block/${subQuestionFormId}`, {}, getApiConfig())
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -130,14 +128,14 @@ function SubQuestionForm({ subQuestionId }) {
     }
   };
 
-  const delete_subQuestion_block_handler = async (id) => {
+  const delete_subQuestion_block_handler = async () => {
     try {
       await axios
         .delete(
           `${API}/form/block/${subQuestionFormId}/${subQuestionId}`,
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -153,7 +151,7 @@ function SubQuestionForm({ subQuestionId }) {
           {},
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -223,7 +221,7 @@ function SubQuestionForm({ subQuestionId }) {
                     <MdDeleteOutline
                       size={20}
                       onClick={() => {
-                        delete_subQuestion_block_handler(block.id);
+                        delete_subQuestion_block_handler();
                       }}
                     />
                   </button>
@@ -231,6 +229,7 @@ function SubQuestionForm({ subQuestionId }) {
               </Block>
             ))}
             <AddNewBlock
+              // @ts-ignore
               onCreateNewBlock={create_subQuestion_new_block_handler}
             />
           </BlocksContainer>
@@ -250,12 +249,12 @@ function SubQuestionForm({ subQuestionId }) {
 
         {isSeeAlSubQuestionBlocksOpen && (
           <div className="form_type">
-            {subQuestionFormBlocks.map((block, blockIndex) => {
+            {subQuestionFormBlocks.map((block) => {
               return (
                 <div className="form-block-user" key={block.id}>
                   <IoIosClose className="form_type_controllers" size={20} />
 
-                  {block.labels.map((label, labelIndex) => {
+                  {block.labels.map((label) => {
                     return (
                       <div key={label.id} className="block-input">
                         <label>{label.name}</label>

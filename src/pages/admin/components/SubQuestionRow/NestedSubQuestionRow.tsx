@@ -85,8 +85,6 @@ function NestedSubQuestionRow({
             getSubQuestionFormBlocksHandler(subQuestionFormId);
             setSubQuestionFormId(result?.data.id);
           });
-      } else {
-        console.log("form title should not be empty");
       }
     } catch (err) {
       console.log(err);
@@ -145,7 +143,7 @@ function NestedSubQuestionRow({
           },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
           setIsAddBlockTypeOpen(false);
           setIsSeeSubQuestionBlocks(true);
@@ -160,7 +158,7 @@ function NestedSubQuestionRow({
     try {
       await axios
         .delete(`${API}/form/block/${subQuestionFormId}/${id}`, getApiConfig())
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -176,7 +174,7 @@ function NestedSubQuestionRow({
           {},
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getSubQuestionFormBlocksHandler(subQuestionFormId);
         });
     } catch (err) {
@@ -191,7 +189,6 @@ function NestedSubQuestionRow({
         getApiConfig()
       );
       setFormBblocksData(result?.data.form.blocks);
-      console.log(result?.data.form.blocks);
     } catch (err) {
       console.error(err);
     }
@@ -205,12 +202,11 @@ function NestedSubQuestionRow({
 
   const [isAddMaxMinValuesOpen, setIsAddMaxMinValuesOpen] = useState(false);
 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(0);
+  const [minValue, setMinValue] = useState<number>(0);
+  const [maxValue, setMaxValue] = useState<number>(0);
 
   const add_min_max_value_handler = async () => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
-      console.error("minValue or maxValue is not defined");
       return;
     }
 
@@ -224,7 +220,7 @@ function NestedSubQuestionRow({
           },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           setIsPopUpOpen(false);
           setIsAddMaxMinValuesOpen(false);
           getFilterInformation(subQuestion?.id, subQuestion?.valueType);
@@ -260,10 +256,10 @@ function NestedSubQuestionRow({
   const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
     useState(false);
 
-  const [updatedMinValue, setUpdatedMinValue] = useState(0);
-  const [updatedMaxValue, setUpdatedMaxValue] = useState(0);
+  const [updatedMinValue, setUpdatedMinValue] = useState<number>(0);
+  const [updatedMaxValue, setUpdatedMaxValue] = useState<number>(0);
 
-  const updateMinMaxValuesHandler = async (id) => {
+  const updateMinMaxValuesHandler = async () => {
     try {
       if (
         updatedMaxValue !== 0 &&
@@ -272,14 +268,16 @@ function NestedSubQuestionRow({
       ) {
         await axios
           .put(
-            `${API}/filter/update/${filterData.id}`,
+            `${API}/filter/update/${
+            // @ts-ignore
+            filterData.id}`,
             {
               filterStart: `${updatedMinValue}`,
               filterEnd: `${updatedMaxValue}`,
             },
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setIsUpdatedMaxMinValuesOpen(false);
             setIsPopUpOpen(false);
           });
@@ -306,8 +304,6 @@ function NestedSubQuestionRow({
 
   // +++++++++++++++++++++++++++
 
-  const [blockPositions, setBlockPositions] = useState([]);
-
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
 
@@ -315,11 +311,13 @@ function NestedSubQuestionRow({
       accept: "BLOCK",
       hover: (draggedItem) => {
         if (!ref.current) return;
+        // @ts-ignore
         const dragIndex = draggedItem.index;
         const hoverIndex = index;
         if (dragIndex === hoverIndex) return;
 
         moveItem(dragIndex, hoverIndex);
+        // @ts-ignore
         draggedItem.index = hoverIndex;
       },
     });
@@ -344,10 +342,6 @@ function NestedSubQuestionRow({
     );
   };
 
-  useEffect(() => {
-    setBlockPositions(subQuestionFormBlocks?.map((bloc) => bloc.id));
-  }, [subQuestionFormBlocks]);
-
   const moveItem = (fromIndex, toIndex) => {
     const updatedItems = [...subQuestionFormBlocks];
     const [movedItem] = updatedItems.splice(fromIndex, 1);
@@ -357,7 +351,6 @@ function NestedSubQuestionRow({
 
     // Update block positions to match the new order
     const updatedBlockPositions = updatedItems.map((item) => item.id);
-    setBlockPositions(updatedBlockPositions);
 
     // Submit the new block positions
     submitBlockPositions(updatedBlockPositions);
@@ -366,7 +359,6 @@ function NestedSubQuestionRow({
   const submitBlockPositions = async (positions) => {
     try {
       await axios.put(`${API}/form/blocks/reorder`, positions, getApiConfig());
-      console.log("Block positions submitted successfully");
     } catch (error) {
       console.error("Error submitting block positions:", error);
     }
@@ -545,7 +537,9 @@ function NestedSubQuestionRow({
                       </div>
                     </DraggableItem>
                   ))}
-                  <style jsx>{`
+                  <style 
+                  // @ts-ignore
+                  jsx>{`
                     .item {
                       background-color: #fffdf0;
                       border-radius: 10px;
@@ -711,7 +705,7 @@ function NestedSubQuestionRow({
 
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
-                {formBlocksData?.map((block, blockIndex) => {
+                {formBlocksData?.map((block) => {
                   if (block.type === "COMPANY") {
                     return (
                       <div
@@ -1221,7 +1215,7 @@ function NestedSubQuestionRow({
                   return (
                     <div className="form-block-user" key={block.id}>
                       <IoIosClose className="form_type_controllers" size={20} />
-                      {block.labels?.map((label, labelIndex) => {
+                      {block.labels?.map((label) => {
                         if (!label.name) {
                           return null;
                         }
@@ -1286,12 +1280,12 @@ function NestedSubQuestionRow({
 
             {isSeeAlSubQuestionBlocksOpen && (
               <div className="form_type">
-                {subQuestionFormBlocks?.map((block, blockIndex) => {
+                {subQuestionFormBlocks?.map((block) => {
                   return (
                     <div className="form-block-user" key={block.id}>
                       {/* <IoIosClose className="form_type_controllers" size={20} /> */}
 
-                      {block.labels?.map((label, labelIndex) => {
+                      {block.labels?.map((label) => {
                         return (
                           <div key={label.id} className="block-input">
                             <label>{label.name}</label>
@@ -1326,14 +1320,14 @@ function NestedSubQuestionRow({
                     type="number"
                     placeholder="Enter min value"
                     onChange={(e) => {
-                      setMinValue(e.target.value);
+                      setMinValue(Number(e.target.value));
                     }}
                   ></input>
                   <input
                     type="number"
                     placeholder="Enter max value"
                     onChange={(e) => {
-                      setMaxValue(e.target.value);
+                      setMaxValue(Number(e.target.value));
                     }}
                   ></input>
                 </form>
@@ -1349,7 +1343,7 @@ function NestedSubQuestionRow({
                   <button
                     type="button"
                     onClick={() => {
-                      add_min_max_value_handler(subQuestion.id);
+                      add_min_max_value_handler();
                     }}
                   >
                     <MdDone />
@@ -1374,14 +1368,14 @@ function NestedSubQuestionRow({
                     type="number"
                     placeholder="Enter min value"
                     onChange={(e) => {
-                      setUpdatedMinValue(e.target.value);
+                      setUpdatedMinValue(Number(e.target.value));
                     }}
                   ></input>
                   <input
                     type="number"
                     placeholder="Enter max value"
                     onChange={(e) => {
-                      setUpdatedMaxValue(e.target.value);
+                      setUpdatedMaxValue(Number(e.target.value));
                     }}
                   ></input>
                 </form>
@@ -1397,7 +1391,7 @@ function NestedSubQuestionRow({
                   <button
                     type="button"
                     onClick={() => {
-                      updateMinMaxValuesHandler(subQuestion.id);
+                      updateMinMaxValuesHandler();
                     }}
                   >
                     <MdDone />
@@ -1517,7 +1511,6 @@ function NestedSubQuestionRow({
                 onClick={() => {
                   setIsAddMaxMinValuesOpen(true);
                   setIsPopUpOpen(true);
-                  console.log("this is working");
                 }}
               >
                 Add min max values
@@ -1528,7 +1521,6 @@ function NestedSubQuestionRow({
                 onClick={() => {
                   setIsUpdatedMaxMinValuesOpen(true);
                   setIsPopUpOpen(true);
-                  console.log("this is working");
                 }}
               >
                 Edit Min Max Values

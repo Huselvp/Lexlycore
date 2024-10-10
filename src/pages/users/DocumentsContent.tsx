@@ -9,7 +9,7 @@ import { useState } from "react";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
 import ConfirmDeleteDocument from "../../features/Documents/ConfirmDeleteDocument";
-import { useGenerateDocument } from "../../features/Documents/useGenerateDocument";
+// import { useGenerateDocument } from "../../features/Documents/useGenerateDocument";
 import { useInitiatePayment } from "../../features/Payment/useInitiatePayment";
 import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
@@ -92,8 +92,8 @@ const NoData = styled.p``;
 
 const DocumentsContent = () => {
   const navigate = useNavigate();
-  const { isLoading: isGeneratingDocument, generateDocument } =
-    useGenerateDocument();
+  // const { isLoading: isGeneratingDocument, generateDocument } =
+  //   useGenerateDocument();
   const { documents } = useDocuments();
   const { isLoading: isInitiatingPayment, initiatePayment } =
     useInitiatePayment();
@@ -103,104 +103,11 @@ const DocumentsContent = () => {
 
   // =============
 
-  const [documentQuestions, setDocumentQuestions] = useState([]);
-
-  // const getPDF = async (id, title) => {
-  //   try {
-  //     await axios
-  //       .get(`${API}/suser/values/${id}`, getApiConfig())
-  //       .then((result) => {
-  //         setDocumentQuestions(result.data);
-  //         console.log(result.data);
-  //         // Update state
-  //         handleGeneratePdf(result.data, title, i); // Pass the result directly to the function
-  //       });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-
-  // // Function to extract both texte and value from questions
-  // function extractTextes(questions) {
-  //   const texteArray = [];
-
-  //   questions.forEach((item) => {
-  //     if (item.question && item.question.texte) {
-  //       // Replace the placeholder [value] with the actual value
-  //       const updatedText = item.question.texte.replaceAll(
-  //         "[value]",
-  //         item.value
-  //       );
-
-  //       // Append the updated text to the array
-  //       texteArray.push(updatedText);
-  //     }
-  //   });
-
-  //   return texteArray;
-  // }
-
-  // // Component to extract and return raw HTML content from documentQuestions
-  // const DocumentQuestionsDisplay = ({ documentQuestions }) => {
-  //   const textes = extractTextes(documentQuestions);
-
-  //   // Add margin-bottom: 2rem to each extracted HTML block
-  //   return textes
-  //     .map(
-  //       (texte) => `<div style="margin-bottom: 1rem;">${texte}</div>` // Add margin-bottom here
-  //     )
-  //     .join(""); // Return the combined HTML content as string
-  // };
-
-  // // Function to convert HTML content to PDF
-  // const convertToPdf = (title, logo, contentHtml) => {
-  //   // Define the header HTML, using a specific font family, smaller font size, and margin
-  //   const header = `
-  //     <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
-  //       <h2 style="font-size: 16px;">${title}</h2>
-  //       <img src="${logo}" width="100" height="100" alt="Logo" />
-  //     </div>`;
-
-  //   // Apply the same font family and size to the entire content, adding margin between parent tags
-  //   const content = `
-  //     <div style="font-family: Arial, sans-serif; font-size: 12px;">
-  //       ${header}
-  //       ${contentHtml} <!-- The contentHtml already has the margin applied in each div -->
-  //     </div>`;
-
-  //   const options = {
-  //     filename: "my-document.pdf",
-  //     margin: 1,
-  //     image: { type: "jpeg", quality: 0.98 },
-  //     html2canvas: { scale: 2, useCORS: true },
-  //     jsPDF: {
-  //       unit: "in",
-  //       format: "letter",
-  //       orientation: "portrait",
-  //     },
-  //   };
-
-  //   // Generate the PDF with the header and content included
-  //   html2pdf().set(options).from(content).save();
-  // };
-
-  // const handleGeneratePdf = (documentQuestions, title, logo) => {
-  //   // Generate HTML content from DocumentQuestionsDisplay
-  //   const contentHtml = DocumentQuestionsDisplay({ documentQuestions });
-
-  //   // Pass it to the convertToPdf function
-  //   convertToPdf(title, logo, contentHtml);
-  // };
-
-  // ==============
-
   const getPDF = async (id, title) => {
     try {
       await axios
         .get(`${API}/suser/values/${id}`, getApiConfig())
         .then((result) => {
-          setDocumentQuestions(result.data);
-          console.log(result.data);
           // Update state
           handleGeneratePdf(result.data, title, i); // Pass the result directly to the function
         });
@@ -364,7 +271,6 @@ const DocumentsContent = () => {
                           icon={<HiMiniDocumentArrowDown />}
                           onClick={() => {
                             getPDF(document.id, document.template.templateName);
-                            console.log();
                           }}
                         >
                           Download

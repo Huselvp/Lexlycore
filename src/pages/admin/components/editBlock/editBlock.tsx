@@ -23,10 +23,12 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const [isEditOptionsOpen, setIsEditOptionsOpen] = useState(false);
 
   const [upDatedInputName, setUpdatedInputName] = useState(
+    // @ts-ignore
     inputToUpdateData.name
   );
 
   const [upDatedInputType, setUpdatedInputType] = useState(
+    // @ts-ignore
     inputToUpdateData.type
   );
 
@@ -52,6 +54,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
 
   const add_new_input_handler = async () => {
     try {
+      // @ts-ignore
       if (setNewInputName !== "") {
         await axios
           .post(
@@ -83,7 +86,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     try {
       axios
         .post(`${API}/form/block/label/options/${id}`, options, getApiConfig())
-        .then((result) => {
+        .then(() => {
           setIsAddNewInputOpen(false);
           setIsAddOptionsOpen(false);
 
@@ -105,15 +108,13 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
   const delete_option_from_options = (option) => {
     const result = options.filter((e) => e !== option);
     setOptions(result);
-    console.log("deleted");
   };
 
   const delete_input_handler = async (inputId) => {
     try {
       await axios
         .delete(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
-        .then((result) => {
-          console.log(result?.data);
+        .then(() => {
           getBlockData();
         });
     } catch (err) {
@@ -126,7 +127,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
       await axios
         .get(`${API}/form/block/label/${id}/${inputId}`, getApiConfig())
         .then((result) => {
-          console.log(inputId);
           setInputToUpdateData(result?.data);
           setUpdatedOptions(result?.data.options);
           if (result.data.type === "SELECT") {
@@ -148,7 +148,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           { name: upDatedInputName, type: upDatedInputType, id: inputId },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           if (upDatedInputType === "SELECT") {
             setIsAddOptionsOpen(true);
             setIsEditInputOpen(false);
@@ -174,7 +174,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           { name: upDatedInputName, type: upDatedInputType, id: inputId },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           getBlockData();
           setIsAddNewInputOpen(false);
           setIsAddOptionsOpen(false);
@@ -192,7 +192,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     try {
       axios
         .delete(`${API}/form/block/label/option/${id}/${key}`, getApiConfig())
-        .then((result) => {
+        .then(() => {
           get_input_by_id(id);
         });
     } catch (err) {
@@ -209,7 +209,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
             [newOption],
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setOptions([]);
 
             get_input_by_id(id);
@@ -277,12 +277,16 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
                           <select>
                             {Object.entries(input.options)?.map(
                               ([key, value]) => (
-                                <option key={key} value={value}>
-                                  {value}
+                                <option key={key} value={String(value)}>
+                                  {" "}
+                                  {/* Ensure value is treated as a string */}
+                                  {String(value)}{" "}
+                                  {/* Ensure value is displayed as a string */}
                                 </option>
                               )
                             )}
                           </select>
+
                           <CiEdit
                             size={30}
                             className="icon"
@@ -518,7 +522,10 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
             <button
               type="button"
               onClick={() => {
-                submit_updated_input_data(inputToUpdateData.id);
+                submit_updated_input_data(
+                  // @ts-ignore
+                  inputToUpdateData.id
+                );
               }}
             >
               <IoIosAdd />
@@ -590,12 +597,36 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
 
             <div>
               <label>Options</label>
-              <div>
+              {/* <div>
                 {updatedOptions &&
                   Object.keys(updatedOptions).length !== 0 &&
                   Object.entries(updatedOptions).map(([key, value]) => (
                     <div key={key} value={value} className="edit-option">
                       {value}
+                      <MdDeleteOutline
+                        className="icon"
+                        onClick={() => {
+                          delete_option_handler(
+                            localStorage.getItem("selectedInputId"),
+                            key
+                          );
+                        }}
+                      />
+                    </div>
+                  ))}
+              </div> */}
+
+              <div>
+                {updatedOptions &&
+                  Object.keys(updatedOptions).length !== 0 &&
+                  Object.entries(updatedOptions).map(([key, value]) => (
+                    <div key={key} className="edit-option">
+                      {typeof value === "string" ||
+                      typeof value === "number" ? (
+                        value
+                      ) : (
+                        <span>Invalid value</span> // Handle unexpected types
+                      )}
                       <MdDeleteOutline
                         className="icon"
                         onClick={() => {
@@ -637,38 +668,6 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
           </div>
         </div>
       )}
-
-      {/* {isAddMinMaxValueOpen && (
-        <div>
-          <form>
-            <input
-              type="number"
-              placeholder="Enter min value"
-              onChange={(e) => {
-                setMinValue(e.target.value);
-              }}
-            ></input>
-            <input
-              type="number"
-              placeholder="Enter max value"
-              onChange={(e) => {
-                setMaxValue(e.target.value);
-              }}
-            ></input>
-          </form>
-
-          <div className="controllers">
-            <button
-              type="button"
-              onClick={() => {
-                // add_min_max_value_handler(question.id);
-              }}
-            >
-              <MdDone />
-            </button>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

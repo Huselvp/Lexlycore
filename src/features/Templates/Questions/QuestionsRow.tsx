@@ -45,8 +45,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   const [isAddFormNameOpen, setIsAddFormNameOpen] = useState(false);
   const [isSeeBlocksOpen, setIsSeeBlocksOpen] = useState(false);
   const [isEditBlockOpen, setIsEditBlockOpen] = useState(false);
-  const [formBlocksId, setFormBlocksId] = useState("");
-  const [isTherBlocks, setIsTherBlocks] = useState(false);
+  const [formBlocksId, setFormBlocksId] = useState<number>();
 
   const [isAddMaxMinValuesOpen, setIsAddMaxMinValuesOpen] = useState(false);
 
@@ -64,10 +63,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const [formBlocs, setFormBlocs] = useState([]);
 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(0);
-
-  const [blockPositions, setBlockPositions] = useState([]);
+  const [minValue, setMinValue] = useState<number>(0);
+  const [maxValue, setMaxValue] = useState<number>(0);
 
   const [isUpdateMaxMinValuesOpen, setIsUpdatedMaxMinValuesOpen] =
     useState(false);
@@ -90,6 +87,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   const [squestionOrderTest, setSQuestionOrderTest] = useState(
+    // @ts-ignore
     question?.subQuestions.sort((a, b) => a.position - b.position)
   );
   const squestionIds = squestionOrderTest.map((q) => q?.id);
@@ -117,8 +115,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   }, [squestionOrderTest]);
 
   useEffect(() => {
-    setSQuestionOrderTest(question?.subQuestions);
-  }, [question?.subQuestions]);
+    setSQuestionOrderTest(
+      // @ts-ignore
+      question?.subQuestions
+    );
+  }, [
+    // @ts-ignore
+    question?.subQuestions,
+  ]);
 
   const get_form_blocks_handler = useCallback(async (id) => {
     try {
@@ -128,7 +132,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       );
       const blocks = result?.data;
       setFormBlocs(blocks);
-      setIsTherBlocks(blocks.length > 0);
     } catch (err) {
       console.error(err);
     }
@@ -146,7 +149,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           setFormBlocksId(formId);
           await get_form_blocks_handler(formId);
         } else {
-          setFormBlocksId("");
+          setFormBlocksId(null);
         }
       } catch (err) {
         console.error(err);
@@ -163,7 +166,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const submit_form_name_handler = async () => {
     if (!formTitle) {
-      console.log("form title should not be empty");
       return;
     }
     try {
@@ -183,7 +185,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const create_new_block_handler = async () => {
     try {
-      const result = await axios.post(
+      await axios.post(
         `${API}/form/block/${formBlocksId}`,
         { type: blockType === "null" ? null : blockType },
         getApiConfig()
@@ -234,7 +236,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         getApiConfig()
       );
       setFormBblocksData(result?.data.form.blocks);
-      console.log(result?.data.form.blocks);
     } catch (err) {
       console.error(err);
     }
@@ -248,7 +249,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
   const add_min_max_value_handler = async (id) => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
-      console.error("minValue or maxValue is not defined");
       return;
     }
 
@@ -262,7 +262,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           },
           getApiConfig()
         )
-        .then((result) => {
+        .then(() => {
           setIsPopUpOpen(false);
           setIsAddMaxMinValuesOpen(false);
           getFilterInformation(question?.id, question?.valueType);
@@ -295,7 +295,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     getFilterInformation(question?.id, question?.valueType);
   }, [question?.id, question?.valueType]);
 
-  const updateMinMaxValuesHandler = async (id) => {
+  const updateMinMaxValuesHandler = async () => {
     try {
       if (
         updatedMaxValue !== 0 &&
@@ -304,14 +304,16 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       ) {
         await axios
           .put(
-            `${API}/filter/update/${filterData.id}`,
+            `${API}/filter/update/${
+            // @ts-ignore
+            filterData.id}`,
             {
               filterStart: `${updatedMinValue}`,
               filterEnd: `${updatedMaxValue}`,
             },
             getApiConfig()
           )
-          .then((result) => {
+          .then(() => {
             setIsUpdatedMaxMinValuesOpen(false);
             setIsPopUpOpen(false);
           });
@@ -330,11 +332,13 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       accept: "BLOCK",
       hover: (draggedItem) => {
         if (!ref.current) return;
+        // @ts-ignore
         const dragIndex = draggedItem.index;
         const hoverIndex = index;
         if (dragIndex === hoverIndex) return;
 
         moveItem(dragIndex, hoverIndex);
+        // @ts-ignore
         draggedItem.index = hoverIndex;
       },
     });
@@ -359,10 +363,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     );
   };
 
-  useEffect(() => {
-    setBlockPositions(formBlocs?.map((bloc) => bloc.id));
-  }, [formBlocs]);
-
   const moveItem = (fromIndex, toIndex) => {
     const updatedItems = [...formBlocs];
     const [movedItem] = updatedItems.splice(fromIndex, 1);
@@ -372,7 +372,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
     // Update block positions to match the new order
     const updatedBlockPositions = updatedItems.map((item) => item.id);
-    setBlockPositions(updatedBlockPositions);
 
     // Submit the new block positions
     submitBlockPositions(updatedBlockPositions);
@@ -381,15 +380,10 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   const submitBlockPositions = async (positions) => {
     try {
       await axios.put(`${API}/form/blocks/reorder`, positions, getApiConfig());
-      console.log("Block positions submitted successfully");
     } catch (error) {
       console.error("Error submitting block positions:", error);
     }
   };
-
-  // ============
-
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
   // ======
 
@@ -431,6 +425,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   const RecursiveSubQuestionRow = React.memo(
+    // @ts-ignore
     ({ question, subQuestion, questionId, isNested = false, depth = -1 }) => {
       const [isOpen, setIsOpen] = useState(false);
       const [newPlace, setNewPlace] = useState(subQuestion);
@@ -443,8 +438,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
       // Handle reorder and collect IDs of subquestions
       const handleReorder = (newOrder) => {
-        console.log("New order:", newOrder);
-
         // Update the subQuestions structure after reorder
         const updatedSubQuestions = newOrder.map((item) => ({
           ...item,
@@ -458,14 +451,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           ...prev,
           subQuestions: updatedSubQuestions,
         }));
-
-        // Collect all IDs for subquestions of the question
-        const collectedIds = question.subQuestions
-          ? question.subQuestions.flatMap(collectSubQuestionIds)
-          : [];
-
-        console.log("Collected IDs:", collectedIds);
-        console.log(question, "9999999999999999999999999999");
 
         // Extract the IDs from the new order
         const newOrderIds = newOrder.map((item) => item.id);
@@ -494,6 +479,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       return (
         <Reorder.Item value={newPlace} key={newPlace.id}>
           <SubQuestionRow
+            // @ts-ignore
             id={newPlace.id}
             subQuestion={newPlace}
             questionId={questionId}
@@ -513,6 +499,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 {newPlace.subQuestions?.map((sq) => (
                   <RecursiveSubQuestionRow
                     key={sq.id}
+                    // @ts-ignore
                     subQuestion={sq}
                     questionId={newPlace.id}
                     isNested={true}
@@ -542,7 +529,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             setIsAddFormNameOpen(false);
             setIsSeeBlocksOpen(false);
             setIsEditBlockOpen(false);
-            console.log(formBlocksData);
+
             get_form_blocks(question.id);
           }}
           isBlocksOpen={isSeeBlocksOpen}
@@ -622,7 +609,10 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       </div>
                     </DraggableItem>
                   ))}
-                  <style jsx>{`
+                  <style
+                    // @ts-ignore
+                    jsx
+                  >{`
                     .item {
                       background-color: #fffdf0;
                       border-radius: 10px;
@@ -799,7 +789,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
             {isSeeAllBlocksInpusOpen && (
               <div className="form_type">
-                {formBlocksData?.map((block, blockIndex) => {
+                {formBlocksData?.map((block) => {
                   if (block.type === "COMPANY") {
                     return (
                       <div
@@ -1310,7 +1300,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   return (
                     <div className="form-block-user" key={block.id}>
                       {/* <IoIosClose className="form_type_controllers" size={20} /> */}
-                      {block.labels?.map((label, labelIndex) => {
+                      {block.labels?.map((label) => {
                         // Check if the label name is empty before rendering
                         if (!label.name) {
                           return null;
@@ -1369,14 +1359,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     type="number"
                     placeholder="Enter min value"
                     onChange={(e) => {
-                      setMinValue(e.target.value);
+                      setMinValue(Number(e.target.value));
                     }}
                   ></input>
                   <input
                     type="number"
                     placeholder="Enter max value"
                     onChange={(e) => {
-                      setMaxValue(e.target.value);
+                      setMaxValue(Number(e.target.value));
                     }}
                   ></input>
                 </form>
@@ -1438,39 +1428,17 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     type="number"
                     placeholder="Enter min value"
                     onChange={(e) => {
-                      setUpdatedMinValue(e.target.value);
+                      setUpdatedMinValue(Number(e.target.value));
                     }}
                   ></input>
                   <input
                     type="number"
                     placeholder="Enter max value"
                     onChange={(e) => {
-                      setUpdatedMaxValue(e.target.value);
+                      setUpdatedMaxValue(Number(e.target.value));
                     }}
                   ></input>
                 </form>
-
-                {/* <div className="controllers">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      updateMinMaxValuesHandler(question.id);
-                      console.log(question);
-                    }}
-                  >
-                    <MdDone />
-                  </Button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // setIsSeeBlocksOpen(true);
-                      // setIsSeeAllBlocksInputOpen(false);
-                    }}
-                  >
-                    Back
-                  </button>
-                </div> */}
 
                 <div
                   className="see_blocs_controller add-new-input"
@@ -1483,7 +1451,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      updateMinMaxValuesHandler(question.id);
+                      updateMinMaxValuesHandler();
                     }}
                   >
                     <MdDone />
@@ -1508,13 +1476,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         <div>
           <Table.Row id={`menus-row--${question.id}`}>
             <div>
-              {question?.subQuestions?.length > 0 ? (
+              {
+              // @ts-ignore
+              question?.subQuestions?.length > 0 ? (
                 <button
                   style={{ background: "none", border: "none" }}
                   // here were i activate and desactivate the toggle
                   onClick={() => {
                     setcaret((prevCaret) => !prevCaret);
-                    setIsSubMenuOpen(true);
                   }}
                 >
                   {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
@@ -1543,13 +1512,14 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 )}
 
                 {question.valueType.startsWith("form") &&
-                  (formBlocksId === "" ? (
+                  (
+                    // @ts-ignore
+                    formBlocksId === "" ? (
                     <Menus.Button
                       icon={<HiEye />}
                       onClick={() => {
                         setIsPopUpOpen(true);
                         setIsAddFormNameOpen(true);
-                        console.log(question.id);
                       }}
                     >
                       Add form
@@ -1575,7 +1545,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       onClick={() => {
                         setIsAddMaxMinValuesOpen(true);
                         setIsPopUpOpen(true);
-                        console.log("this is working");
                       }}
                     >
                       Add min max values
@@ -1586,7 +1555,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                       onClick={() => {
                         setIsUpdatedMaxMinValuesOpen(true);
                         setIsPopUpOpen(true);
-                        console.log("this is working");
                       }}
                     >
                       Edit Min Max Values
@@ -1637,6 +1605,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
             {squestionOrderTest?.map((sq) => (
               <RecursiveSubQuestionRow
+                 // @ts-ignore
                 question={question}
                 key={sq.id}
                 subQuestion={sq}

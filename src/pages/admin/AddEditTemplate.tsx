@@ -26,7 +26,7 @@ const AddEditTemplate = ({
   onAdd: boolean
   template?: Template
 }) => {
-  console.log("Template = ", template)
+
   const navigate = useNavigate()
   const { isLoading: isLoading1, addTemplate } = useAddTemplate()
   const { isLoading: isLoading2, updateTemplate } = useUpdateTemplate()

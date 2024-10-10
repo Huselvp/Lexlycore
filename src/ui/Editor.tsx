@@ -1,37 +1,4 @@
-// import SunEditor from "suneditor-react"
-// import "suneditor/dist/css/suneditor.min.css" // Import Sun Editor's CSS File
-// const customOptions = {
-//   buttonList: [
-//     ["undo", "redo"],
-//     ["font", "fontSize", "formatBlock"],
-//     ["bold", "underline", "italic", "strike", "subscript", "superscript"],
-//     ["fontColor", "hiliteColor", "textStyle"],
-//     ["removeFormat"],
-//     ["outdent", "indent"],
-//     // ["align", "horizontalRule", "list", "table"],
-//     ["align", "horizontalRule", "list"],
-//     ["link"],
-//     // ["link", "image", "video"],
-//     // ["fullScreen", "showBlocks", "codeView"]
-//     ["fullScreen", "showBlocks"]
-//   ],
-//   height: "auto"
-// }
-// const Editor = ({ defaultValue , name="texte" }: { defaultValue: string , name : string }) => {
-//   return (
-//     <SunEditor
-//       setDefaultStyle="font-family: Poppins, sans-serif; font-size: 1.6rem;"
-//       setOptions={customOptions}
-//       defaultValue={defaultValue}
-//       // onChange={setContent}
-//       name={name}
-//     />
-//   )
-// }
-
-// export default Editor
-
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
 export default function EditorText({
@@ -40,8 +7,8 @@ export default function EditorText({
   onChange,
 }: {
   defaultValue: string;
-  name: string;
-  onChange: (content: string) => void;
+  name?: string;
+  onChange?: (content: string) => void; // Make onChange optional
 }) {
   const editorRef = useRef(null);
   const textareaRef = useRef(null);
@@ -50,17 +17,13 @@ export default function EditorText({
     <>
       <Editor
         apiKey="6kqstarlut29zlefi8jivx3mi7frl7vp0zzaebl3s2rx9nq9"
-        onInit={(evt, editor) => (editorRef.current = editor)}
+        onInit={(editor) => (editorRef.current = editor)}
         initialValue={defaultValue}
-        onEditorChange={(content, editor) => {
-          console.log("content", content);
-
+        onEditorChange={(content) => {
           // Update the hidden textarea value
           if (textareaRef.current) {
             textareaRef.current.value = content;
           }
-
-          console.log("textareaRef.current.value", textareaRef.current.value);
 
           // Call the onChange callback with the updated content
           onChange(content);
