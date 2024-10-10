@@ -181,14 +181,12 @@ const DocumentQuestion = ({
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
 
-  
-
-  // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
       if (
         // @ts-ignore
-        question?.valueType === "form") {
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -202,9 +200,10 @@ const DocumentQuestion = ({
     };
 
     const getFilterData = async () => {
-      if ( 
+      if (
         // @ts-ignore
-        question?.valueType === "filter") {
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -263,15 +262,14 @@ const DocumentQuestion = ({
     return formBlocks.map((block) => {
       if (block.type === "COMPANY" || block.type === "PERSON") {
         const labels = defaultLabels[block.type].map((label) => {
-          // Ensure we generate a unique ID
           while (idsArray.includes(generatedId)) {
             generatedId++;
           }
 
-          const newId = generatedId; // Use the current generatedId
-          generatedId++; // Increment for the next ID
+          const newId = generatedId;
+          generatedId++;
 
-          idsArray.push(newId); // Update the idsArray with the new ID
+          idsArray.push(newId);
 
           return {
             name: label.labelName,
@@ -292,8 +290,6 @@ const DocumentQuestion = ({
   const newBlocksForm = generateFormDataWithUniqueLabels(formBlocks);
 
   const totalInputs = countTotalInputs(newBlocksForm);
-
-
 
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
@@ -320,7 +316,7 @@ const DocumentQuestion = ({
         }
 
         const allInputsFilled = updatedFormData?.length === totalInputs;
-       
+
         isTherData(allInputsFilled);
         setValue(updatedFormData, question.valueType);
 
@@ -329,8 +325,6 @@ const DocumentQuestion = ({
     },
     [totalInputs, isTherData, setValue, question.valueType]
   );
-
-  //=========================
 
   const isTheFilterHavAvalue = useCallback(() => {
     return value !== "";
@@ -348,7 +342,9 @@ const DocumentQuestion = ({
     ) {
       return (
         // @ts-ignore
-        +filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+        (+filterData?.filterStartInt + filterData?.filterEndInt) /
+        2
+      );
     }
   });
 
@@ -359,8 +355,6 @@ const DocumentQuestion = ({
     setValue(newValue, question.valueType);
   };
 
-  // ++++++++++++++++++++++++++++++++++++++++++
-
   const isTimesHaveValues = () => {
     return (
       Array.isArray(value) &&
@@ -370,7 +364,6 @@ const DocumentQuestion = ({
     );
   };
 
-  // Initialize state based on a condition
   const [times, setTimes] = useState(() => {
     if (isTimesHaveValues()) {
       return [
@@ -385,16 +378,14 @@ const DocumentQuestion = ({
     }
   });
 
-  // Handle time changes
   const handleTimeChange = (index, event) => {
     const newTimes = times?.map((time) =>
       time.index === index ? { ...time, time: event.target.value } : time
     );
     setTimes(newTimes);
-    setValue(newTimes, question.valueType); // Assuming setValue is defined elsewhere
+    setValue(newTimes, question.valueType);
   };
 
-  // Use useEffect without conditional calls
   useEffect(() => {
     if (times[0]?.time !== "" && times[1]?.time !== "") {
       isTherTimes(true);
@@ -404,7 +395,6 @@ const DocumentQuestion = ({
   }, [times, isTherTimes]);
 
   const isSecondTimeDisabled = times[0]?.time === "";
-  // ========================
 
   const isDaysHaveValues = () => {
     return (
@@ -451,8 +441,6 @@ const DocumentQuestion = ({
 
   const isSecondDayDisabled = days[0]?.day === "";
 
-  // ========================
-
   const [countriesList, setCountriesList] = useState([]);
 
   const getCountriesList = async () => {
@@ -461,14 +449,12 @@ const DocumentQuestion = ({
         "http://api.geonames.org/countryInfoJSON?username=anasiker&lang=da"
       );
 
-      // Sort the countries alphabetically
       let sortedCountries = result.data.geonames.sort((a, b) => {
         if (a.countryName < b.countryName) return -1;
         if (a.countryName > b.countryName) return 1;
         return 0;
       });
 
-      // Move 'Danmark' to the first position
       sortedCountries = sortedCountries.filter(
         (country) => country.countryName !== "Danmark"
       );
@@ -483,8 +469,6 @@ const DocumentQuestion = ({
   useEffect(() => {
     getCountriesList();
   }, []);
-
-  // ----------- CVR DATA -------------
 
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
@@ -537,27 +521,23 @@ const DocumentQuestion = ({
 
     setFormData((prevFormData) => {
       const updatedFormData = [...prevFormData];
+      const updatedFormData = [...prevFormData];
 
-      // Iterate over fieldMappings to update, add, or remove data
       Object.entries(fieldMappings).forEach(([labelName, value]) => {
-        // Find the labelId from the targetedBlock's labels
         const targetedLabel = targetedBlock.labels.find(
           (label) => label.name === labelName
         );
-        const labelId = targetedLabel ? targetedLabel.id : null; // Safely retrieve labelId
+        const labelId = targetedLabel ? targetedLabel.id : null;
 
         if (labelId) {
-          // Proceed only if labelId is found
           const existingEntryIndex = updatedFormData.findIndex(
             (entry) => entry.blockId === blockId && entry.labelId === labelId
           );
 
           if (value !== "") {
             if (existingEntryIndex !== -1) {
-              // Update the existing entry
               updatedFormData[existingEntryIndex].LabelValue = value;
             } else {
-              // Add a new entry
               updatedFormData.push({
                 blockId,
                 labelId,
@@ -567,14 +547,12 @@ const DocumentQuestion = ({
             }
           } else {
             if (existingEntryIndex !== -1) {
-              // Remove the entry if the value is an empty string
               updatedFormData.splice(existingEntryIndex, 1);
             }
           }
         }
       });
 
-      // Directly update the form data and state
       setValue(updatedFormData, question.valueType);
 
       return updatedFormData;
@@ -843,7 +821,6 @@ const DocumentQuestion = ({
                                 e.target.value,
                                 block.labels[2]?.name
                               );
-                              // getSVRDataHandler(e.target.value);
                             }}
                           />
                         </div>
@@ -1005,7 +982,7 @@ const DocumentQuestion = ({
                                 (data) =>
                                   data?.blockId === block?.id &&
                                   data?.labelId === block.labels[6]?.id
-                              )?.LabelValue || "" // Default value is set to an empty string
+                              )?.LabelValue || ""
                             }
                             onChange={(e) =>
                               handleChange(
@@ -1017,7 +994,6 @@ const DocumentQuestion = ({
                             }
                           >
                             <option value="">Land</option>{" "}
-                            {/* Placeholder option */}
                             {countriesList.map((country) => (
                               <option
                                 key={country.countryName}

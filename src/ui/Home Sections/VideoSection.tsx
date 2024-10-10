@@ -1,10 +1,10 @@
-import styled from "styled-components"
+import styled from "styled-components";
 const videoData = [
   "Besvar og udfyld spørgsmålene i vores formular ved brug af vores dokumentgenerator.",
   "Udkast gemmes og kan redigeres i vores system.",
   "Modtag dokumentet på mail eller download direkte via vores system.",
-  "Underskriv via. digital signatur eller udskriv til fysisk underskrift."
-]
+  "Underskriv via. digital signatur eller udskriv til fysisk underskrift.",
+];
 const Container = styled.div`
   padding: 6rem 2rem;
   display: grid;
@@ -74,13 +74,12 @@ const Container = styled.div`
       }
     }
   }
-`
+`;
 const VideoSection = () => {
   return (
     <Container>
       <div>
         <div>
-          {/* <video width="100%" height="100%" autoPlay loop muted> */}
           <video width="100%" height="100%" muted controls autoPlay>
             <source src="/docura-v1.mp4" />
           </video>
@@ -98,7 +97,7 @@ const VideoSection = () => {
         </ul>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default VideoSection
+export default VideoSection;

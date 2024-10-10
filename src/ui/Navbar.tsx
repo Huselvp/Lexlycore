@@ -215,16 +215,7 @@ const Navbar = () => {
               Kontakt os
             </Link>
           </li>
-          {/* {windowWidth < 900 && (
-            <>
-              <li>
-                <Link to="/contact">Privat</Link>
-              </li>
-              <li>
-                <Link to="/contact">Erhverv</Link>
-              </li>
-            </>
-          )} */}
+          
         </ul>
         {windowWidth < 700 && (
           <LoginBtn

@@ -101,13 +101,14 @@ const GuestDocumentQuestionOverView = ({
   onClick,
 }: {
   data: {
+    type: string;
     questionText: string;
     questionId: number;
-    value: any;
+    value: unknown;
     subQuestions?: {
       subQuestionId: number;
       subQuestionText: string;
-      subQuestionValue: any;
+      subQuestionValue: unknown;
     }[];
     active: boolean;
   }[];
@@ -147,7 +148,6 @@ const GuestDocumentQuestionOverView = ({
       };
     });
 
-    // Convert the object to a JSON string before storing it in localStorage
     localStorage.setItem("documentValues", JSON.stringify(values));
 
     localStorage.setItem("templateId", param.templateId);
@@ -167,7 +167,7 @@ const GuestDocumentQuestionOverView = ({
     setCaretIconActive(newCaretState);
   };
 
-  const convertStringToAddressObject = (dataString) => {
+  const convertStringToAddressObject = (dataString: unknown) => {
     if (typeof dataString !== "string") {
       // If the input is not a string, return an empty object or handle it accordingly
 

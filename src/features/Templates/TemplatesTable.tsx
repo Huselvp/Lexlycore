@@ -1,22 +1,22 @@
-import styled from "styled-components"
-import { useWindowListener } from "../../hooks/useWindowListener"
-import Form from "../../ui/AuthForm"
-import Menus from "../../ui/Menus"
-import Table from "../../ui/Table"
-import TemplatesRow from "./TemplatesRow"
-import { useTemplates } from "./useTemplates"
-import { useState } from "react"
+import styled from "styled-components";
+import { useWindowListener } from "../../hooks/useWindowListener";
+import Form from "../../ui/AuthForm";
+import Menus from "../../ui/Menus";
+import Table from "../../ui/Table";
+import TemplatesRow from "./TemplatesRow";
+import { useTemplates } from "./useTemplates";
+import { useState } from "react";
 
 const Select = styled(Form.Select)`
   padding: 0.5rem 1.2rem;
-`
+`;
 
 const TemplatesTable = () => {
-  const { templates } = useTemplates()
-  const { windowWidth } = useWindowListener()
+  const { templates } = useTemplates();
+  const { windowWidth } = useWindowListener();
   const [filteredBy, setFilteredBy] = useState<"all" | "private" | "business">(
     "all"
-  )
+  );
   const data: Template[] =
     filteredBy === "private"
       ? templates.filter(
@@ -26,11 +26,11 @@ const TemplatesTable = () => {
       ? templates.filter(
           (temp) => temp?.subcategory?.categoryType === "BUSINESS"
         )
-      : templates
+      : templates;
   const columns =
     windowWidth >= 600
       ? "1.5rem 1fr .7fr .7fr .5fr 3rem"
-      : "1.5rem 1fr .25fr 3rem"
+      : "1.5rem 1fr .25fr 3rem";
   return (
     <>
       <div style={{ marginBottom: "2rem" }}>
@@ -46,7 +46,6 @@ const TemplatesTable = () => {
         </Select>
       </div>
       <Menus>
-        {/* <Table columns="1.5rem 1fr .7fr .7fr .5fr 3rem"> */}
         <Table columns={columns}>
           <Table.Header>
             <div>#</div>
@@ -72,7 +71,7 @@ const TemplatesTable = () => {
         </Table>
       </Menus>
     </>
-  )
-}
+  );
+};
 
-export default TemplatesTable
+export default TemplatesTable;

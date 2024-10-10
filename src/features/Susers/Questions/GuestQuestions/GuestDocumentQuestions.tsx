@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useTemplate } from "../../../Templates/useTemplate";
 
 import { useState } from "react";
+import { useState } from "react";
 import {
   HiArrowSmRight as ArrowRightIcon,
   HiArrowSmLeft as ArrowLeftIcon,
@@ -13,8 +14,6 @@ import DocumentHeader from "../../../Documents/DocumentHeader";
 
 import GuestDocumentQuestion from "./GuestDocumentQuestion";
 import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
-
-
 
 const BtnsContainer = styled.div`
   display: flex;
@@ -77,13 +76,10 @@ const GuestDocumentQuestions = ({
 }: {
   documentQuestionsValues?: DocumentQuestionsValues[];
 }) => {
-  // FROM THE TEMPLETE HE GETS THE QUESTIONS DATA
   const { template } = useTemplate();
   const ALLquestions = template!.questions;
   const questions = flattenSubQuestions(ALLquestions);
   const [display, setdisplay] = useState(false);
-
-  // this is the form data
 
   const [isFormDataFull, setIsFormDataFull] = useState(false);
   const [isDaysFull, setIsDaysFull] = useState(false);
@@ -92,18 +88,17 @@ const GuestDocumentQuestions = ({
   const [isAllSubQuestionDataFull, setIsAllSubQuestionDataFull] =
     useState(false);
 
-  // this is the state where he saves the data
   const [overviewData, setOverviewData] = useState<
     {
       questionText: string;
       questionId: number;
       type: string;
-      
+
       value: any;
       subQuestions?: {
         subQuestionId: number;
         subQuestionText: string;
-        subQuestionValue: any;
+        subQuestionValue: unknown;
         type: string;
       }[];
       active: boolean;
@@ -119,8 +114,8 @@ const GuestDocumentQuestions = ({
         {};
       const subQuestionsValues =
         questionsValuesExist && questionValues
-        // @ts-ignore
-          ? questionValues.subQuestions || []
+          ? // @ts-ignore
+            questionValues.subQuestions || []
           : [];
       return {
         questionText: q.questionText,
@@ -132,7 +127,7 @@ const GuestDocumentQuestions = ({
         active: questionsValuesExist
           ? i === documentQuestionsValues.length
           : i == 0,
-        subQuestions: q.subQuestions?.map((subQ) => {
+        subQuestions: q.subQuestions?.map((subQ: unknown) => {
           const subQuestionValue = subQuestionsValues.find(
             (sqv) => sqv.subQuestion.id === subQ.id
           );
@@ -148,10 +143,6 @@ const GuestDocumentQuestions = ({
   });
 
   const isDraft = overviewData.some((q) => !q.value);
-
-
-
-
 
   // useEffect(() => {
   //   const draftDataHandler = async (id) => {
@@ -181,7 +172,6 @@ const GuestDocumentQuestions = ({
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
-    // here he saves the input data
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -224,7 +214,6 @@ const GuestDocumentQuestions = ({
     return questions.map((question) => {
       const flattenedQuestion = { ...question };
 
-      // Recursively process subQuestions
       if (
         flattenedQuestion.subQuestions &&
         flattenedQuestion.subQuestions.length > 0
@@ -233,7 +222,6 @@ const GuestDocumentQuestions = ({
           flattenedQuestion.subQuestions
         );
 
-        // Extract nested subQuestions from all levels
         const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
           (q) => q.subQuestions
         );

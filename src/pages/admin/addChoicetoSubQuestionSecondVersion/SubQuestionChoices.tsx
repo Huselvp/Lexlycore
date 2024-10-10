@@ -1,9 +1,8 @@
 import AddEditSubChoice from "./AddEditSubChoice";
-//import AddEditChoice from "../../../features/Templates/Questions/Choices/AddEditChoice";
-// import ChoicesTable from "../../../features/Templates/Questions/Choices/ChoicesTable";
+
 import { useSubQuestion } from "./useSubQuestion";
 import SubChoicesTable from "./SubChoicesTable";
-//=====================
+
 import Button from "../../../ui/Button";
 import FeaturesHeader from "../../../ui/FeaturesHeader";
 import GoBackButton from "../../../ui/GoBackButton";

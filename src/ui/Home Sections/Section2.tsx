@@ -1,49 +1,49 @@
-import styled from "styled-components"
-import { FcApproval } from "react-icons/fc"
+import styled from "styled-components";
+import { FcApproval } from "react-icons/fc";
 
 const data = [
   {
     img: "",
-    title: "Ubegrænset adgang – døgnet rundt"
+    title: "Ubegrænset adgang – døgnet rundt",
   },
   {
     img: "",
-    title: "Begrænset tidsforbrug"
+    title: "Begrænset tidsforbrug",
   },
   {
     img: "",
-    title: "Til en brøkdel af prisen ift. en advokat"
+    title: "Til en brøkdel af prisen ift. en advokat",
   },
   {
     img: "",
-    title: "Optimér dine processer"
+    title: "Optimér dine processer",
   },
   {
     img: "",
-    title: "Ajourført og kvalitetssikret"
+    title: "Ajourført og kvalitetssikret",
   },
   {
     img: "",
     title:
-      "Underskriv med digital signatur eller udskriv til fysisk underskrift"
+      "Underskriv med digital signatur eller udskriv til fysisk underskrift",
   },
   {
     img: "",
-    title: "Integration til CVR"
+    title: "Integration til CVR",
   },
   {
     img: "",
-    title: "Dokumentopbevaring i vores system"
+    title: "Dokumentopbevaring i vores system",
   },
   {
     img: "",
-    title: "Undgå manuelle fejl"
+    title: "Undgå manuelle fejl",
   },
   {
     img: "",
-    title: "Adgang til kundesupport gennem chat, mail og telefon. "
-  }
-]
+    title: "Adgang til kundesupport gennem chat, mail og telefon. ",
+  },
+];
 const Container = styled.div`
   background-color: var(--color-grey-50);
   /* background-color: var(--white); */
@@ -82,7 +82,7 @@ const Container = styled.div`
       }
     }
   }
-`
+`;
 const Section2 = () => {
   return (
     <Container>
@@ -92,7 +92,6 @@ const Section2 = () => {
           {data.map((item) => (
             <li>
               <span>
-                {/* <FcCheckmark /> */}
                 <FcApproval />
               </span>
               <p>{item.title}</p>
@@ -101,7 +100,7 @@ const Section2 = () => {
         </ul>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default Section2
+export default Section2;

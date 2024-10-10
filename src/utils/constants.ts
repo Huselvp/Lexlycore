@@ -139,7 +139,6 @@ export const updatePersonalDataUrl = () => {
 export const getUsersUrl = `${API}/admin/all_users`;
 // Document
 
-
 export const getDocumentsUrl = () => {
   const token = getToken();
   return `${API}/suser/get_documents/${token}`;
@@ -154,11 +153,8 @@ export const generateDocumentUrl = ({
   templateId: number;
 }) => `${API}/suser/generate-pdf/${documentId}/${templateId}`;
 
-
 export const createDocumentUrl = (templateId: number) =>
   `${API}/suser/createDocument/${templateId}`;
-
-
 
 export const addUpdateDocumentQuestionUrl = `${API}/suser/add-values`;
 

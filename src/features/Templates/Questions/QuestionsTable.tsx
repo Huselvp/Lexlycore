@@ -4,6 +4,7 @@ import { useTemplate } from "../useTemplate";
 import QuestionsRow from "./QuestionsRow";
 import { useEffect, useState } from "react";
 import { API, getApiConfig } from "../../../utils/constants";
+import { API, getApiConfig } from "../../../utils/constants";
 import axios from "axios";
 
 const QuestionsTable = () => {
@@ -14,9 +15,11 @@ const QuestionsTable = () => {
 
   const [questionOrderTest, setQuestionOrderTest] = useState(questions);
   const questionIds = questionOrderTest.map((q) => q.id);
+  const questionIds = questionOrderTest.map((q) => q.id);
 
   const handleReorder = (newOrder) => {
     setQuestionOrderTest(newOrder);
+  };
   };
 
   useEffect(() => {
@@ -33,6 +36,11 @@ const QuestionsTable = () => {
     };
 
     reorderQuestions(questionIds);
+  }, [questionOrderTest, questionIds]);
+
+  useEffect(() => {
+    setQuestionOrderTest(questions);
+  }, [questions]);
   }, [questionOrderTest, questionIds]);
 
   useEffect(() => {

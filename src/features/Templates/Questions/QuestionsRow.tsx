@@ -245,8 +245,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     get_form_blocks(question.id);
   }, [question.id]);
 
-  // ++++++++++++++++++++
-
   const add_min_max_value_handler = async (id) => {
     if (minValue == null || (maxValue == null && minValue < maxValue)) {
       return;
@@ -305,8 +303,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         await axios
           .put(
             `${API}/filter/update/${
-            // @ts-ignore
-            filterData.id}`,
+              // @ts-ignore
+              filterData.id
+            }`,
             {
               filterStart: `${updatedMinValue}`,
               filterEnd: `${updatedMaxValue}`,
@@ -322,8 +321,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       console.log(err);
     }
   };
-
-  // ====================
 
   const DraggableItem = ({ item, index, moveItem, children }) => {
     const ref = useRef(null);
@@ -368,9 +365,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     const [movedItem] = updatedItems.splice(fromIndex, 1);
     updatedItems.splice(toIndex, 0, movedItem);
 
-    setFormBlocs(updatedItems); // Update the state with the new order of items
+    setFormBlocs(updatedItems);
 
-    // Update block positions to match the new order
     const updatedBlockPositions = updatedItems.map((item) => item.id);
 
     // Submit the new block positions
@@ -384,8 +380,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
       console.error("Error submitting block positions:", error);
     }
   };
-
-  // ======
 
   const [countriesList, setCountriesList] = useState([]);
 
@@ -409,9 +403,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
     getCountriesList();
   }, []);
 
-  // ============
-
-  // Function to collect all subquestion and nested subquestion IDs
   const collectSubQuestionIds = (subQuestion) => {
     let ids = [subQuestion.id];
 
@@ -436,7 +427,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
 
       const newDepth = depth + 1;
 
-      // Handle reorder and collect IDs of subquestions
       const handleReorder = (newOrder) => {
         // Update the subQuestions structure after reorder
         const updatedSubQuestions = newOrder.map((item) => ({
@@ -446,16 +436,13 @@ const QuestionsRow = ({ question }: { question: Question }) => {
             : [],
         }));
 
-        // Update state with the new subQuestions structure
         setNewPlace((prev) => ({
           ...prev,
           subQuestions: updatedSubQuestions,
         }));
 
-        // Extract the IDs from the new order
         const newOrderIds = newOrder.map((item) => item.id);
 
-        // Function to reorder the subquestions based on their IDs
         const reorderQuestions = async (squestionids) => {
           try {
             await axios
@@ -472,7 +459,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           }
         };
 
-        // Call reorderQuestions with the array of reordered subquestion IDs
         reorderQuestions(newOrderIds);
       };
 
@@ -1292,7 +1278,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     );
                   }
 
-                  // Check if the block has data (e.g., labels) before rendering
                   if (!block.labels || block.labels.length === 0) {
                     return null;
                   }
@@ -1370,27 +1355,6 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                     }}
                   ></input>
                 </form>
-
-                {/* <div className="controllers">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      add_min_max_value_handler(question.id);
-                    }}
-                  >
-                    <MdDone />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // setIsSeeBlocksOpen(true);
-                      // setIsSeeAllBlocksInputOpen(false);
-                    }}
-                  >
-                    Back
-                  </button>
-                </div> */}
 
                 <div
                   className="see_blocs_controller add-new-input"
@@ -1477,18 +1441,18 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           <Table.Row id={`menus-row--${question.id}`}>
             <div>
               {
-              // @ts-ignore
-              question?.subQuestions?.length > 0 ? (
-                <button
-                  style={{ background: "none", border: "none" }}
-                  // here were i activate and desactivate the toggle
-                  onClick={() => {
-                    setcaret((prevCaret) => !prevCaret);
-                  }}
-                >
-                  {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
-                </button>
-              ) : null}
+                // @ts-ignore
+                question?.subQuestions?.length > 0 ? (
+                  <button
+                    style={{ background: "none", border: "none" }}
+                    onClick={() => {
+                      setcaret((prevCaret) => !prevCaret);
+                    }}
+                  >
+                    {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
+                  </button>
+                ) : null
+              }
             </div>
 
             <div className="hideOverflow questions">
@@ -1512,9 +1476,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 )}
 
                 {question.valueType.startsWith("form") &&
-                  (
-                    // @ts-ignore
-                    formBlocksId === "" ? (
+                  // @ts-ignore
+                  (formBlocksId === "" ? (
                     <Menus.Button
                       icon={<HiEye />}
                       onClick={() => {
@@ -1587,25 +1550,11 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           </Table.Row>
         </div>
 
-        {/* {caret_icon_active ? (
-          <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
-            {squestionOrderTest?.map((sq, i) => {
-              return (
-                <Reorder.Item value={sq} key={sq.id}>
-                  <SubQuestionRow subQuestion={sq} questionId={question.id} />
-                </Reorder.Item>
-              );
-            })}
-          </Reorder.Group>
-        ) : (
-          <div></div>
-        )} */}
-
         {caret_icon_active ? (
           <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
             {squestionOrderTest?.map((sq) => (
               <RecursiveSubQuestionRow
-                 // @ts-ignore
+                // @ts-ignore
                 question={question}
                 key={sq.id}
                 subQuestion={sq}

@@ -40,7 +40,7 @@ const AddEditTemplate = ({
     const templateDescription = (formData.get("templateDescription") ||
       "") as string
     const cost = (formData.get("cost") || 0) as string
-    // Content that will be added when adding and updating
+   
     const content = (formData.get("texte") || "") as string
     if (onAdd)
       addTemplate(

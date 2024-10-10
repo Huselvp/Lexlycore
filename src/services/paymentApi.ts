@@ -16,7 +16,7 @@ export const intiatePayment = async (
   return {
     templateId: data.templateId,
     documentId: data.documentId,
-    // paymentId: response.data.data.paymentId
+
     paymentId: JSON.parse(response.data.data).paymentId,
   };
 };

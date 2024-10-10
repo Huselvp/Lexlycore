@@ -1,21 +1,21 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 const firstData = [
   {
     title: "Besvar spørgsmålene og udfyld formularen",
-    img: "https://www.legaldesk.dk/css/img_new/TOP_1.svg"
+    img: "https://www.legaldesk.dk/css/img_new/TOP_1.svg",
   },
   {
     title:
       "Modtag straks dit dokument i PDF-format på mail eller download direkte",
-    img: "https://www.legaldesk.dk/css/img_new/TOP_2.svg"
+    img: "https://www.legaldesk.dk/css/img_new/TOP_2.svg",
   },
   {
     title:
       "Underskriv digitalt med MitID eller udskriv dokument til underskrift.",
-    img: "https://www.legaldesk.dk/css/img_new/TOP_3.svg"
-  }
-]
+    img: "https://www.legaldesk.dk/css/img_new/TOP_3.svg",
+  },
+];
 
 const Container = styled.section`
   /* background-color: var(--color-grey-100); */
@@ -39,7 +39,7 @@ const Container = styled.section`
       border-radius: var(--rounded-xl);
     }
   }
-`
+`;
 const List = styled.ul`
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -77,14 +77,12 @@ const List = styled.ul`
     grid-row: 3/-1;
     grid-column: 3/12;
   }
-`
+`;
 const About = () => {
   return (
     <Container>
-      {/* Section 1 */}
       <h2>Modtag dit juridiske dokument inden for 15 minutter!</h2>
       <div>
-        {/* <img src="/about-1.jpg" /> */}
         <img src="https://youcan.shop/images/new_portal_design/home/navigate-illustration-3.webp" />
         <List>
           <li>
@@ -99,15 +97,10 @@ const About = () => {
             <span>03.</span>
             <p>{firstData[2].title}</p>
           </li>
-          {/* {firstData.map((item,i) => (
-            <li style={{gridColumn :  }}>
-              <p>{item.title}</p>
-            </li>
-          ))} */}
         </List>
       </div>
     </Container>
-  )
-}
+  );
+};
 
-export default About
+export default About;

@@ -1,7 +1,7 @@
-import styled from "styled-components"
-import { IoIosArrowRoundForward as Arrow } from "react-icons/io"
-import { Link } from "react-router-dom"
-import { useWindowListener } from "../hooks/useWindowListener"
+import styled from "styled-components";
+import { IoIosArrowRoundForward as Arrow } from "react-icons/io";
+import { Link } from "react-router-dom";
+import { useWindowListener } from "../hooks/useWindowListener";
 
 const Container = styled.div`
   font-size: 1.4rem;
@@ -42,26 +42,25 @@ const Container = styled.div`
       display: block;
     }
   }
-`
+`;
 
 const Banner = () => {
-  const { windowWidth } = useWindowListener()
-  if (windowWidth <= 400) return null
+  const { windowWidth } = useWindowListener();
+  if (windowWidth <= 400) return null;
   return (
     <Container>
       <p>
         <span>Docura {new Date().getFullYear()}</span>
         <span>&#x2022;</span>
-        {/* <span>Join And have Many Free Features</span> */}
+
         <span>Deltag og få mange gratis funktioner</span>
       </p>
       <Link to="/register">
-        {/* <span>Register now</span> */}
         <span>Registrer nu</span>
         <Arrow />
       </Link>
     </Container>
-  )
-}
+  );
+};
 
-export default Banner
+export default Banner;

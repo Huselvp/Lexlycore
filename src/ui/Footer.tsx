@@ -56,11 +56,7 @@ const StyledFooter = styled.footer`
     }
   }
 `
-// const Title = styled.div`
-//   font-size: 3rem;
-//   font-weight: 800;
-//   line-height: 0.9;
-// `
+
 const LogoContainer = styled.div`
   & a {
     display: inline-block;
@@ -74,16 +70,9 @@ const Footer = () => {
       <nav>
         <LogoContainer>
           <Logo />
-          {/* <Title>Docura</Title> */}
+       
         </LogoContainer>
-        {/* <ul>
-          <li>
-            Office Address : Frederikskaj 4, 1st floor 2450 Copenhagen SW CVR:
-            40300635
-          </li>
-          <li>Email: info@docura.dk</li>
-          <li>Tel: 53 70 05 15</li>
-        </ul> */}
+       
       </nav>
       <nav>
         <div>Information</div>
@@ -120,92 +109,3 @@ const Footer = () => {
 }
 
 export default Footer
-// import styled from "styled-components"
-// import Logo from "./Logo"
-// import {
-//   FaInstagram as InstagramIcon,
-//   FaFacebook as FacebookIcon,
-//   FaTwitter as TwitterIcon
-// } from "react-icons/fa"
-// import { Link } from "react-router-dom"
-
-// const StyledFooter = styled.footer`
-//   /* border-top: 1px solid var(--color-stone-300); */
-//   background-color: var(--color-stone-850);
-//   color: var(--color-stone-200);
-//   /* color: var(--color-stone-600); */
-//   display: flex;
-//   align-items: center;
-//   flex-direction: column;
-//   gap: 2rem;
-//   justify-content: center;
-//   padding: 3rem 2rem;
-//   ul {
-//     display: flex;
-//     gap: 2rem;
-//   }
-//   svg {
-//     font-size: 2rem;
-//   }
-//   p {
-//     /* margin-top: 1rem; */
-//     font-size: 1.3rem;
-//     span {
-//       font-weight: 600;
-//     }
-//   }
-//   a {
-//     font-weight: 500;
-//     font-size: 1.5rem;
-//   }
-// `
-// const Title = styled.div`
-//   font-size: 3rem;
-//   font-weight: 800;
-// `
-// const Footer = () => {
-//   return (
-//     <StyledFooter>
-//       {/* <Logo /> */}
-//       <Title>Docura</Title>
-//       <nav>
-//         <ul>
-//           <li>
-//             <Link to="/">Home</Link>
-//           </li>
-//           <li>
-//             <Link to="/about">About</Link>
-//           </li>
-//           <li>
-//             <Link to="/privacy">Privacy</Link>
-//           </li>
-//           <li>
-//             <Link to="/terms&conditions">Terms & Conditions</Link>
-//           </li>
-//         </ul>
-//       </nav>
-//       <ul>
-//         <li>
-//           <a href="#">
-//             <FacebookIcon />
-//           </a>
-//         </li>
-//         <li>
-//           <a href="#">
-//             <TwitterIcon />
-//           </a>
-//         </li>
-//         <li>
-//           <a href="#">
-//             <InstagramIcon />
-//           </a>
-//         </li>
-//       </ul>
-//       <p>
-//         &copy; {new Date().getFullYear()} By <span>Iker</span>
-//       </p>
-//     </StyledFooter>
-//   )
-// }
-
-// export default Footer

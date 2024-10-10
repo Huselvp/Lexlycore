@@ -74,13 +74,13 @@ const DocumentQuestions = ({
 }: {
   documentQuestionsValues?: DocumentQuestionsValues[];
 }) => {
-  // FROM THE TEMPLETE HE GETS THE QUESTIONS DATA
+  
   const { template } = useTemplate();
   const ALLquestions = template!.questions;
   const questions = flattenSubQuestions(ALLquestions);
   const [display, setdisplay] = useState(false);
 
-  // this is the form data
+ 
 
   const [isFormDataFull, setIsFormDataFull] = useState(false);
   const [isDaysFull, setIsDaysFull] = useState(false);
@@ -89,7 +89,7 @@ const DocumentQuestions = ({
   const [isAllSubQuestionDataFull, setIsAllSubQuestionDataFull] =
     useState(false);
 
-  // this is the state where he saves the data
+  
   const [overviewData, setOverviewData] = useState<
     {
       questionText: string;
@@ -169,7 +169,7 @@ const DocumentQuestions = ({
   const doesActiveQuestionHaveValue = activeQuestion?.value !== "";
 
   const handleSetValue = (id: number, newValue: any, type: string) => {
-    // here he saves the input data
+    
     setOverviewData((current) =>
       current.map((q) => ({
         ...q,
@@ -221,7 +221,7 @@ const DocumentQuestions = ({
           flattenedQuestion.subQuestions
         );
 
-        // Extract nested subQuestions from all levels
+      
         const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
           (q) => q.subQuestions
         );
@@ -381,7 +381,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 0000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -408,7 +408,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next map</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -435,7 +435,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -462,7 +462,7 @@ const DocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next 000</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}
@@ -493,7 +493,7 @@ const DocumentQuestions = ({
                                   isSubOpen(false);
                                 }}
                               >
-                                <span>Next 0000</span>
+                                <span>Next</span>
                                 <ArrowRightIcon />
                               </button>
                             )}

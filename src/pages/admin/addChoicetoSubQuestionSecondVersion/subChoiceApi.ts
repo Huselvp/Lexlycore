@@ -9,12 +9,12 @@ import {
 export const addEditChoice = ({
   onAdd,
 
-  subquestionId, // Added subquestionId
+  subquestionId,
   choice,
 }: {
   onAdd: boolean;
   questionId: number;
-  subquestionId: number; // Added subquestionId
+  subquestionId: number;
   choice: Choice;
 }): Promise<void> => {
   if (!choice.choice.trim()) throw new Error("Choice is required");
@@ -23,18 +23,18 @@ export const addEditChoice = ({
 
   return axios[`${onAdd ? "post" : "put"}`](
     onAdd
-      ? addSubChoiceUrl(subquestionId) // Updated to use subquestionId
-      : updateSubChoiceUrl({ subquestionId, choiceId: choice.id }), // Updated to use subquestionId
+      ? addSubChoiceUrl(subquestionId)
+      : updateSubChoiceUrl({ subquestionId, choiceId: choice.id }),
     choice,
     getApiConfig()
   );
 };
 
 export const deleteChoice = ({
-  subquestionId, // Added subquestionId
+  subquestionId,
   choiceId,
 }: {
-  subquestionId: number; // Added subquestionId
+  subquestionId: number;
   choiceId: number;
 }) =>
-  axios.delete(deleteSubChoiceUrl({ subquestionId, choiceId }), getApiConfig()); // Updated to use subquestionId
+  axios.delete(deleteSubChoiceUrl({ subquestionId, choiceId }), getApiConfig());

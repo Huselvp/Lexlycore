@@ -140,7 +140,7 @@ function EditBlock({ id, onSeeBlocksOpen, isBlocksOpen }) {
     }
   };
 
-  const submit_updated_input_data = async (inputId) => {
+  const submit_updated_input_data = async (inputId: any) => {
     try {
       axios
         .put(

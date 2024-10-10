@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom"
-import styled from "styled-components"
+import { NavLink } from "react-router-dom";
+import styled from "styled-components";
 
 const Container = styled.div`
   padding: 1.5rem;
@@ -7,7 +7,7 @@ const Container = styled.div`
   border-bottom: 3px solid var(--color-grey-100);
   display: flex;
   gap: 2rem;
-`
+`;
 
 const Link = styled(NavLink)`
   &:focus {
@@ -29,7 +29,7 @@ const Link = styled(NavLink)`
       background-color: currentColor;
     }
   }
-`
+`;
 
 const AccountBanner = () => {
   return (
@@ -37,7 +37,7 @@ const AccountBanner = () => {
       <Link to="personal-info">Personal info</Link>
       <Link to="login-info">Login info</Link>
     </Container>
-  )
-}
+  );
+};
 
-export default AccountBanner
+export default AccountBanner;

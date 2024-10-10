@@ -140,6 +140,7 @@ ChartJS.register(
   Legend,
   PieController
 );
+);
 
 const Container = styled.div`
   margin-top: 5rem;
@@ -154,6 +155,7 @@ const options = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
+      position: "top" as const,
       position: "top" as const,
     },
     title: {

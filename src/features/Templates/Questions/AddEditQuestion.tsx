@@ -7,6 +7,7 @@ import { useAddQuestion } from "./useAddQuestion";
 import { useUpdateQuestion } from "./useUpdateQuestion";
 import Row from "../../../ui/Row";
 import { questionsAnsewersTypes } from "../../../utils/constants";
+import React, { useState } from "react";
 
 const Container = styled.div`
   border-radius: var(--rounded-lg);
@@ -30,7 +31,9 @@ const AddEditQuestion = ({
   const { isLoading: isLoading2, updateQuestion } = useUpdateQuestion();
   const isLoading = isLoading1 || isLoading2;
   const isQuestionProvided = typeof question !== "undefined";
-
+  const [editorContent, setEditorContent] = useState(
+    isQuestionProvided ? question.texte : ""
+  );
   const onSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -103,9 +106,7 @@ const AddEditQuestion = ({
             <Editor
               defaultValue={isQuestionProvided ? question.texte : ""}
               name="texte"
-              onChange={function (): void {
-                throw new Error("Function not implemented.");
-              }}
+              onChange={setEditorContent}
             />
           </Form.Row>
           <Form.Row>

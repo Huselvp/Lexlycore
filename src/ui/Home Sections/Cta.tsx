@@ -72,16 +72,13 @@ const Cta = () => {
     <Container>
       <Content>
         <div>
-          {/* <p>Transform Ideas into Documents in Minutes!</p> */}
+         
           <p>Forvandl ideer til dokumenter på få minutter!</p>
           <p>
             Lav ubesværet professionelle dokumenter på få øjeblikke. Vælg en
             skabelon, svar på et par spørgsmål, og se dine ideer komme til live.
           </p>
-          {/* <p>
-            Effortlessly craft professional documents in moments. Choose a
-            template, answer a few questions, and watch your ideas come to life.
-          </p> */}
+        
         </div>
         <Btn onClick={() => navigate("/templates")}>
           <span>Kom igang</span>

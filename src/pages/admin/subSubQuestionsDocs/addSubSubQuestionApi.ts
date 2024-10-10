@@ -66,25 +66,6 @@ export const updateSubQuestion = async (
   );
 };
 
-// Description
-// :
-// "test test "
-// description_details
-// :
-// "test test "
-// id
-// :
-// 8
-// questionText
-// :
-// "subquestion 1 "
-// text_area
-// :
-// "<p>test [value]</p>"
-// valueType
-// :
-// "input"
-
 export const getSubQuestion = async (
   idq: number,
   idsq: number

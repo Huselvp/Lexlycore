@@ -26,13 +26,11 @@ const GuestLogin = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Loading state for the form
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Function to generate the payment URL
   const initiatePaymentUrl = (templateId: number): string =>
     `${API}/suser/initiate-payment/${templateId}`;
 
-  // Function to initiate payment
   const initiatePayment = async (data: {
     templateId: number;
     documentId: number;
@@ -43,10 +41,8 @@ const GuestLogin = () => {
         getApiConfig()
       );
 
-      // Extract paymentId from response
       const paymentId = JSON.parse(response.data.data).paymentId;
 
-      // Return the processed payment data
       return {
         templateId: data.templateId,
         documentId: data.documentId,
@@ -58,16 +54,13 @@ const GuestLogin = () => {
     }
   };
 
-  // Function to handle the initiation of payment
   const startPaymentProcess = async (
     templateId: number,
     documentId: number
   ) => {
     try {
-      // Initiate payment using templateId and documentId
       const paymentData = await initiatePayment({ templateId, documentId });
 
-      // Navigate to the payment page with the returned data
       navigate(
         `/pay?p=${paymentData.paymentId}&d=${paymentData.documentId}&t=${paymentData.templateId}`
       );
@@ -78,10 +71,9 @@ const GuestLogin = () => {
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    setIsLoading(true); // Set loading state
+    setIsLoading(true);
 
     try {
-      // First, make the login API call
       const loginRes = await axios.post(
         `${API}/auth/login`,
         {
@@ -97,11 +89,10 @@ const GuestLogin = () => {
         throw new Error(error_message);
       }
 
-      setToken(access_token); // Save the token
+      setToken(access_token);
 
       const templateId = localStorage.getItem("templateId");
 
-      // After login, create the document
       const createDocRes = await axios.post(
         `${API}/suser/createDocument/${templateId}`,
         {},
@@ -114,7 +105,6 @@ const GuestLogin = () => {
         localStorage.getItem("documentValues") || "[]"
       );
 
-      // Helper function to process questions
       const processQuestions = (questions, isSubQuestion = false) => {
         return questions.map((question) => {
           const idKey = isSubQuestion ? "subQuestionId" : "questionId";
@@ -204,7 +194,7 @@ const GuestLogin = () => {
     } catch (error: any) {
       console.error("Error occurred:", error.message || error);
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 

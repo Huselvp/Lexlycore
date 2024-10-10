@@ -9,9 +9,10 @@ import InputPassword from "../../../../ui/InputPassword";
 import { API } from "../../../../utils/constants";
 import { getApiConfig } from "../../../../utils/constants";
 import axios from "axios";
-import {  setToken } from "../../../../utils/helpers";
+import { setToken } from "../../../../utils/helpers";
 
 const GuestRegister = () => {
+  const { isLoading } = useRegister();
   const { isLoading } = useRegister();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -19,13 +20,11 @@ const GuestRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const navigate = useNavigate(); // For navigation after registration
+  const navigate = useNavigate();
 
-  // Function to generate the payment URL
   const initiatePaymentUrl = (templateId: number): string =>
     `${API}/suser/initiate-payment/${templateId}`;
 
-  // Function to initiate payment
   const initiatePayment = async (data: {
     templateId: number;
     documentId: number;
@@ -36,10 +35,8 @@ const GuestRegister = () => {
         getApiConfig()
       );
 
-      // Extract paymentId from response
       const paymentId = JSON.parse(response.data.data).paymentId;
 
-      // Return the processed payment data
       return {
         templateId: data.templateId,
         documentId: data.documentId,
@@ -51,16 +48,13 @@ const GuestRegister = () => {
     }
   };
 
-  // Function to handle the initiation of payment
   const startPaymentProcess = async (
     templateId: number,
     documentId: number
   ) => {
     try {
-      // Initiate payment using templateId and documentId
       const paymentData = await initiatePayment({ templateId, documentId });
 
-      // Navigate to the payment page with the returned data
       window.location.href = `/pay?p=${paymentData.paymentId}&d=${paymentData.documentId}&t=${paymentData.templateId}`;
     } catch (error) {
       console.error("Failed to initiate payment:", error);
@@ -69,16 +63,13 @@ const GuestRegister = () => {
 
   const onFormSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    // check if email is valid
+
     if (!isEmail(email)) return toast.error("Email is not valid");
-    // check if passwords match
+
     if (password !== passwordConfirm)
       return toast.error("Passwords must match");
 
-    // setLoading(true); // Set loading state
-
     try {
-      // Register the user
       const registerRes = await axios.post(
         `${API}/auth/register`,
         { firstname, lastname, username, email, password, role: "SUSER" },
@@ -94,7 +85,6 @@ const GuestRegister = () => {
 
       const templateId = localStorage.getItem("templateId");
 
-      // Create the document after registration
       const createDocRes = await axios.post(
         `${API}/suser/createDocument/${templateId}`,
         {},
@@ -107,7 +97,6 @@ const GuestRegister = () => {
         localStorage.getItem("documentValues") || "[]"
       );
 
-      // Helper function to process questions
       const processQuestions = (questions, isSubQuestion = false) => {
         return questions.map((question) => {
           const idKey = isSubQuestion ? "subQuestionId" : "questionId";
@@ -182,7 +171,7 @@ const GuestRegister = () => {
       const finalData = processQuestions(storedValues);
 
       // Send the processed values to the server
-       await axios.post(
+      await axios.post(
         `${API}/suser/add-values`,
         { isDraft: false, values: finalData, documentId },
         getApiConfig()
@@ -191,8 +180,7 @@ const GuestRegister = () => {
       // Now that documentId is available, start the payment process
       await startPaymentProcess(parseInt(templateId), documentId);
 
-      // Redirect user after successful registration (optional)
-      navigate("/dashboard"); // or wherever you want to redirect the user
+      navigate("/dashboard");
     } catch (error: any) {
       console.error("Error occurred:", error.message || error);
       toast.error("Registration failed, please try again.");

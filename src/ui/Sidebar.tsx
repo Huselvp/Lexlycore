@@ -1,8 +1,14 @@
 import styled, { css } from "styled-components";
 import Logo from "./Logo";
 import ProfileNav from "./ProfileNav";
+import styled, { css } from "styled-components";
+import Logo from "./Logo";
+import ProfileNav from "./ProfileNav";
 import {
   HiChevronDoubleLeft as LeftArrow,
+  HiChevronDoubleRight as RightArrow,
+} from "react-icons/hi";
+import { useEffect, useState } from "react";
   HiChevronDoubleRight as RightArrow,
 } from "react-icons/hi";
 import { useEffect, useState } from "react";
@@ -111,7 +117,7 @@ const Sidebar = () => {
         )}
       </Header>
       <ProfileNav onShorten={shortenSidebar} />
-      {/* <ProfileNavMobile /> */}
+      
     </Aside>
   );
 };

@@ -19,9 +19,8 @@ export const useAddUpdateDocumentQuestion = () => {
         isDraft: boolean;
         values: any;
       }) => {
-        const processQuestions = (questions, isSubQuestion = false) => {
-          return questions.map((question) => {
-            // Use 'questionId' for main questions and 'subQuestionId' for subquestions
+        const processQuestions = (questions: any, isSubQuestion = false) => {
+          return questions.map((question: any) => {
             const idKey = isSubQuestion ? "subQuestionId" : "questionId";
             const valueKey = "value";
 
@@ -62,29 +61,31 @@ export const useAddUpdateDocumentQuestion = () => {
                 : [];
               processedQuestion.days = days;
             } else if (question.type === "map") {
-              // Split the map string by commas and trim each part
               const mapString = question[valueKey] || "";
-              const mapParts = mapString.split(",").map((part) => part.trim());
+              const mapParts = mapString
+                .split(",")
+                .map((part: any) => part.trim());
 
-              // Create mapValues object with keys as 1, 2, 3, etc.
-              const mapValues = mapParts.reduce((acc, value, index) => {
-                acc[index + 1] = value;
-                return acc;
-              }, {});
+              const mapValues = mapParts.reduce(
+                (acc: any, value: any, index: any) => {
+                  acc[index + 1] = value;
+                  return acc;
+                },
+                {}
+              );
 
               processedQuestion.mapValues = mapValues;
             } else {
               processedQuestion.value = question[valueKey];
             }
 
-            // Process subquestions recursively with subQuestionId
             if (
               Array.isArray(question.subquestionsValues) &&
               question.subquestionsValues.length > 0
             ) {
               processedQuestion.subquestionsValues = processQuestions(
                 question.subquestionsValues,
-                true // Pass true to indicate these are subquestions
+                true
               );
             }
 
@@ -92,14 +93,12 @@ export const useAddUpdateDocumentQuestion = () => {
           });
         };
 
-        const orderMyData = (data) => {
+        const orderMyData = (data: any) => {
           return processQuestions(data);
         };
 
-        // Process and log data
         const finalData = orderMyData(values);
 
-        // Make the API call
         return addUpdateDocumentQuestionApi({
           isDraft,
           values: finalData,

@@ -1,5 +1,4 @@
 import {
-  // HiOutlineHome as HomeIcon,
   HiOutlineUsers as UsersIcon,
   HiMiniArrowLeftOnRectangle as LogoutIcon,
   HiOutlineUserCircle as UserIcon,
@@ -14,7 +13,12 @@ import styled, { css } from "styled-components";
 import { NavLink } from "react-router-dom";
 import { useLogout } from "../features/Authentication/useLogout";
 import { useUser } from "../features/Authentication/useUser";
+import styled, { css } from "styled-components";
+import { NavLink } from "react-router-dom";
+import { useLogout } from "../features/Authentication/useLogout";
+import { useUser } from "../features/Authentication/useUser";
 
+const Nav = styled.nav``;
 const Nav = styled.nav``;
 const List = styled.ul<{ shorten: string }>`
   display: flex;

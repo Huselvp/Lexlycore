@@ -155,25 +155,7 @@ const Select = styled.select`
   background-color: var(--color-grey-0);
   box-shadow: var(--shadow-sm);
 `
-// const Select = ({
-//   data,
-//   onChangeHandler,
-//   disabled
-// }: {
-//   data: { label: string; value: string }[]
-//   onChangeHandler: (e: ChangeEvent<HTMLSelectElement>) => void
-//   disabled: boolean
-// }) => {
-//   return (
-//     <StyledSelect onChange={onChangeHandler}>
-//       {data.map((item) => (
-//         <option key={item.value} value={item.value}>
-//           {item.label}
-//         </option>
-//       ))}
-//     </StyledSelect>
-//   )
-// }
+
 const Error = styled.p`
   color: var(--color-red-700);
   font-weight: 500;

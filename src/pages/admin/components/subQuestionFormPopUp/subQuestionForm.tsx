@@ -31,7 +31,6 @@ import { MdDeleteOutline } from "react-icons/md";
 import { MdDone } from "react-icons/md";
 
 function SubQuestionForm({ subQuestionId }) {
-  // popups controllers
   const [isAddSubQuestionFormNameOpen, setIsAddSubQuestionFormNameOpen] =
     useState(false);
 
@@ -44,8 +43,6 @@ function SubQuestionForm({ subQuestionId }) {
   const [isSeeAlSubQuestionBlocksOpen, setIsSeeAllSubQuestionBlocksOpen] =
     useState(false);
 
-  // SubQuestion data
-
   const [subQuestionFormTitle, setSubQuestionFormTitle] = useState("");
 
   const [subQuestionFormBlocks, setSubQuestionFormBlocks] = useState([]);
@@ -53,8 +50,6 @@ function SubQuestionForm({ subQuestionId }) {
   const [subQuestionFormId, setSubQuestionFormId] = useState("");
 
   const [subQuestionBlockId, setSubQuestionBlockId] = useState("");
-
-  // subQuestion controllers
 
   const createSubQuestionFormHandler = async () => {
     try {

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
 export default function EditorText({
@@ -18,6 +19,7 @@ export default function EditorText({
       <Editor
         apiKey="6kqstarlut29zlefi8jivx3mi7frl7vp0zzaebl3s2rx9nq9"
         onInit={(editor) => (editorRef.current = editor)}
+        onInit={(editor) => (editorRef.current = editor)}
         initialValue={defaultValue}
         onEditorChange={(content) => {
           // Update the hidden textarea value
@@ -30,7 +32,7 @@ export default function EditorText({
         }}
         init={{
           height: 600,
-          //   menubar: false,
+
           plugins:
             "linkchecker autolink charmap emoticons link lists searchreplace table wordcount",
           toolbar:

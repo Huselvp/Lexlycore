@@ -99,7 +99,7 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
   const clickHandler = () => {
     if (!isAuthenticated) {
       navigate(`/guest-document/${template.id}`);
-      return; // Stop further execution if not authenticated
+      return;
     }
 
     // @ts-ignore
@@ -107,7 +107,6 @@ const TemplatePriceCard = ({ template }: { template: Template }) => {
       return; // Stop further execution if the user is an admin
     }
 
-    // If authenticated and not an admin, call createDocument
     createDocument(template.id);
   };
 

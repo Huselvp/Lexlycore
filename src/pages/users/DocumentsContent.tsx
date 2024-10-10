@@ -116,15 +116,12 @@ const DocumentsContent = () => {
     }
   };
 
-  // Function to extract both texte and value from questions, including nested subquestions
   function extractTextes(questions) {
     const texteArray = [];
 
-    // Recursive function to traverse questions and nested subquestions
     function traverseQuestions(questions) {
       questions.forEach((item) => {
         if (item.question) {
-          // If 'texte' exists, replace [value] with the actual value
           if (item.question.texte) {
             const updatedText = item.question.texte.replaceAll(
               "[value]",
@@ -133,7 +130,6 @@ const DocumentsContent = () => {
             texteArray.push(updatedText);
           }
 
-          // If 'text_area' exists, replace [value] with the actual value
           if (item.question.text_area) {
             const updatedText = item.question.text_area.replaceAll(
               "[value]",
@@ -143,41 +139,30 @@ const DocumentsContent = () => {
           }
         }
 
-        // If there are nested subquestions, recurse into them
         if (item.subquestions && item.subquestions.length > 0) {
           traverseQuestions(item.subquestions);
         }
       });
     }
 
-    // Start traversing the main questions
     traverseQuestions(questions);
 
     return texteArray;
   }
 
-  // Component to extract and return raw HTML content from documentQuestions
   const DocumentQuestionsDisplay = ({ documentQuestions }) => {
     const textes = extractTextes(documentQuestions);
 
-    // Apply margin-bottom: 1rem to each extracted HTML block
-    return textes
-      .map(
-        (texte) => `<div>${texte}</div>` // Wrap each texte inside a div
-      )
-      .join(""); // Return the combined HTML content as string
+    return textes.map((texte) => `<div>${texte}</div>`).join("");
   };
 
-  // Function to convert HTML content to PDF
   const convertToPdf = (title, logo, contentHtml) => {
-    // Define the header HTML, using a specific font family, smaller font size, and margin
     const header = `
       <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
         <h2 style="font-size: 16px;">${title}</h2>
         <img src="${logo}" width="100" height="100" alt="Logo" />
       </div>`;
 
-    // Apply the same font family and size to the entire content, adding margin between parent tags
     const content = `
       <div style="font-family: Arial, sans-serif; font-size: 12px;">
         ${header}
@@ -194,18 +179,15 @@ const DocumentsContent = () => {
         format: "letter",
         orientation: "portrait",
       },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // Enable page breaks for long content
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    // Generate the PDF with the header and content included
     html2pdf().set(options).from(content).save();
   };
 
   const handleGeneratePdf = (documentQuestions, title, logo) => {
-    // Generate HTML content from DocumentQuestionsDisplay
     const contentHtml = DocumentQuestionsDisplay({ documentQuestions });
 
-    // Pass it to the convertToPdf function
     convertToPdf(title, logo, contentHtml);
   };
 
@@ -255,18 +237,6 @@ const DocumentsContent = () => {
                         </Menus.Button>
                       )}
                       {!document.draft && document.paymentStatus && (
-                        // <Menus.Button
-                        //   icon={<HiMiniDocumentArrowDown />}
-                        //   onClick={() =>
-                        //     generateDocument({
-                        //       documentId: document.id,
-                        //       templateId: document.template.id,
-                        //       templateName: document.template.templateName,
-                        //     })
-                        //   }
-                        // >
-                        //   {isGeneratingDocument ? "Loading..." : "Download"}
-                        // </Menus.Button>
                         <Menus.Button
                           icon={<HiMiniDocumentArrowDown />}
                           onClick={() => {

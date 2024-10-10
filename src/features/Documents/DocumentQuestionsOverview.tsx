@@ -181,8 +181,6 @@ const DocumentQuestionsOverview = (
         },
       }
     );
-
-    // Redirect the user to the checkout page
   };
 
   const toggleSubQuestions = (index: number) => {
@@ -279,12 +277,11 @@ const DocumentQuestionsOverview = (
                 </li>
               )}
 
-              {item.type === "map" && (
+              {item?.type === "map" && (
                 <li
                   key={i}
                   style={{ display: "flex", flexDirection: "column" }}
                 >
-                  {/* Process map values outside of JSX */}
                   {(() => {
                     const mapValues = convertStringToAddressObject(
                       // @ts-ignore
@@ -460,7 +457,6 @@ const DocumentQuestionsOverview = (
 
                       {sq.type === "map" &&
                         (() => {
-                          // Perform the logic to process map values
                           const mapValues = convertStringToAddressObject(
                             // @ts-ignore
                             sq.subQuestionValue

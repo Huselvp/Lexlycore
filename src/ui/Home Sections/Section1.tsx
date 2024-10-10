@@ -98,8 +98,7 @@ const Section1 = ({
       <ul>
         {data.map((item) => (
           <li>
-            {/* <span>{item.icon}</span> */}
-            {/* <img src="/secure.svg" /> */}
+         
             <img src={`/${item.icon}`} />
             <h3>{item.title}</h3>
             <p>{item.description}</p>
