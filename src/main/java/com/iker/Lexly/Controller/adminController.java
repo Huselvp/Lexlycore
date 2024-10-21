@@ -48,14 +48,12 @@ public class adminController {
     private final SubQuestionService subQuestionService;
     private final UserTransformer userTransformer;
     private final SubcategoryService subcategoryService;
-
     private final UserRepository userRepository;
     private  final PasswordEncoder passwordEncoder;
     private final QuestionTransformer questionTransformer;
     private final QuestionRepository questionRepository;
     private final TemplateRepository templateRepository;
     private final SubCategoryTransformer subcategoryTransformer;
-
 
     @Autowired
     private final TemplateService templateService;

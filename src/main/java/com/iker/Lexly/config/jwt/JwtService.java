@@ -13,7 +13,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private  static final String SECRET_KEY= "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
-    private static final long EXPIRATION_TIME= 5 * 60 * 60;
+    private static final long EXPIRATION_TIME= 5 * 60 * 60 * 1000;
     private static final long INACTIVITY_TIMEOUT = 5 * 60 * 1000;
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -50,10 +50,11 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // This will now use the correct expiration time in ms
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
+
 
     public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

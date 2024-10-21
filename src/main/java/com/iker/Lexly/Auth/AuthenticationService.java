@@ -1,8 +1,6 @@
 package com.iker.Lexly.Auth;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.iker.Lexly.Entity.User;
-
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
