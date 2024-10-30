@@ -228,7 +228,7 @@ const GuestLogin = () => {
           <Form.Row>
             <Form.LabelContainer>
               <Form.Label htmlFor="password">Password</Form.Label>
-              <P onClick={() => navigate("/forgotPassword")}>
+              <P onClick={() => navigate("/forgotPassword/guest")}>
                 Forgot Password?
               </P>
             </Form.LabelContainer>

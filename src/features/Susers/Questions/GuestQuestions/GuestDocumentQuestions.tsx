@@ -14,8 +14,6 @@ import DocumentHeader from "../../../Documents/DocumentHeader";
 import GuestDocumentQuestion from "./GuestDocumentQuestion";
 import GuestDocumentSubQuestion from "./GuestDocumentSubQuestion";
 
-
-
 const BtnsContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -98,7 +96,7 @@ const GuestDocumentQuestions = ({
       questionText: string;
       questionId: number;
       type: string;
-      
+
       value: any;
       subQuestions?: {
         subQuestionId: number;
@@ -119,8 +117,8 @@ const GuestDocumentQuestions = ({
         {};
       const subQuestionsValues =
         questionsValuesExist && questionValues
-        // @ts-ignore
-          ? questionValues.subQuestions || []
+          ? // @ts-ignore
+            questionValues.subQuestions || []
           : [];
       return {
         questionText: q.questionText,
@@ -148,10 +146,6 @@ const GuestDocumentQuestions = ({
   });
 
   const isDraft = overviewData.some((q) => !q.value);
-
-
-
-
 
   // useEffect(() => {
   //   const draftDataHandler = async (id) => {
@@ -220,34 +214,66 @@ const GuestDocumentQuestions = ({
     setIsAllSubQuestionDataFull(value);
   };
 
+  // function flattenSubQuestions(questions) {
+  //   return questions.map((question) => {
+  //     const flattenedQuestion = { ...question };
+
+  //     // Recursively process subQuestions
+  //     if (
+  //       flattenedQuestion.subQuestions &&
+  //       flattenedQuestion.subQuestions.length > 0
+  //     ) {
+  //       flattenedQuestion.subQuestions = flattenSubQuestions(
+  //         flattenedQuestion.subQuestions
+  //       );
+
+  //       // Extract nested subQuestions from all levels
+  //       const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
+  //         (q) => q.subQuestions
+  //       );
+  //       flattenedQuestion.subQuestions = [
+  //         ...flattenedQuestion.subQuestions.map((q) => ({
+  //           ...q,
+  //           subQuestions: [],
+  //         })),
+  //         ...nestedSubQuestions,
+  //       ];
+  //     }
+
+  //     return flattenedQuestion;
+  //   });
+  // }
+
   function flattenSubQuestions(questions) {
-    return questions.map((question) => {
-      const flattenedQuestion = { ...question };
+    return questions
+      .sort((a, b) => a.position - b.position) // Sort top-level questions by position
+      .map((question) => {
+        const flattenedQuestion = { ...question };
 
-      // Recursively process subQuestions
-      if (
-        flattenedQuestion.subQuestions &&
-        flattenedQuestion.subQuestions.length > 0
-      ) {
-        flattenedQuestion.subQuestions = flattenSubQuestions(
-          flattenedQuestion.subQuestions
-        );
+        // Recursively process subQuestions
+        if (
+          flattenedQuestion.subQuestions &&
+          flattenedQuestion.subQuestions.length > 0
+        ) {
+          flattenedQuestion.subQuestions = flattenSubQuestions(
+            flattenedQuestion.subQuestions
+          );
 
-        // Extract nested subQuestions from all levels
-        const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
-          (q) => q.subQuestions
-        );
-        flattenedQuestion.subQuestions = [
-          ...flattenedQuestion.subQuestions.map((q) => ({
-            ...q,
-            subQuestions: [],
-          })),
-          ...nestedSubQuestions,
-        ];
-      }
+          // Extract nested subQuestions from all levels
+          const nestedSubQuestions = flattenedQuestion.subQuestions.flatMap(
+            (q) => q.subQuestions
+          );
+          flattenedQuestion.subQuestions = [
+            ...flattenedQuestion.subQuestions.map((q) => ({
+              ...q,
+              subQuestions: [],
+            })),
+            ...nestedSubQuestions,
+          ];
+        }
 
-      return flattenedQuestion;
-    });
+        return flattenedQuestion;
+      });
   }
 
   return (
@@ -258,6 +284,17 @@ const GuestDocumentQuestions = ({
           activeQuestion={overviewData.findIndex((q) => q === activeQuestion)}
           length={questions.length}
         />
+
+        {/* <button
+          onClick={() => {
+            console.log(
+              overviewData.findIndex((q) => q === activeQuestion),
+              questions.length
+            );
+          }}
+        >
+          get active question
+        </button> */}
         <Content>
           {activeQuestion ? (
             questions
@@ -417,7 +454,7 @@ const GuestDocumentQuestions = ({
                                 isSubOpen(false);
                               }}
                             >
-                              <span>Next map</span>
+                              <span>Next</span>
                               <ArrowRightIcon />
                             </button>
                           )}

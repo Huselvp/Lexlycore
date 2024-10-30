@@ -47,7 +47,7 @@ const Profile = ({ userRole }: { userRole: "ADMIN" | "SUSER" }) => {
   const { windowWidth } = useWindowListener();
   const onMobile = windowWidth <= 600;
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) navigate("/login");
+    if (!isLoading && !isAuthenticated) navigate("/login/user");
   }, [isLoading, isAuthenticated]);
   if (isLoading) return <Spinner />;
   if (!isLoading && !isAuthenticated) return null;

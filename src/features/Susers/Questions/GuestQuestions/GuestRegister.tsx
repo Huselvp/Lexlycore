@@ -9,7 +9,7 @@ import InputPassword from "../../../../ui/InputPassword";
 import { API } from "../../../../utils/constants";
 import { getApiConfig } from "../../../../utils/constants";
 import axios from "axios";
-import {  setToken } from "../../../../utils/helpers";
+import { setToken } from "../../../../utils/helpers";
 
 const GuestRegister = () => {
   const { isLoading } = useRegister();
@@ -182,7 +182,7 @@ const GuestRegister = () => {
       const finalData = processQuestions(storedValues);
 
       // Send the processed values to the server
-       await axios.post(
+      await axios.post(
         `${API}/suser/add-values`,
         { isDraft: false, values: finalData, documentId },
         getApiConfig()
@@ -288,7 +288,7 @@ const GuestRegister = () => {
           </Form.Row>
           <Form.Row addborder={true}>
             <p>Have an account ?</p>
-            <Link to="/auth/login">Log in here</Link>
+            <Link to="/login/guest">Log in here</Link>
           </Form.Row>
         </Form.Rows>
       </Form>

@@ -35,7 +35,7 @@ const GoBackToLogin = styled(Link)`
   /* display: block; */
 `;
 
-const ForgotPassword = () => {
+const ForgotPasswordGuest = () => {
   const [linkWasSent, setLinkWasSent] = useState<boolean>(false);
   const { isLoading, forgotPassword } = useForgotPassword();
   const [email, setEmail] = useState("");
@@ -89,7 +89,7 @@ const ForgotPassword = () => {
           </Form.Button>
         </Row>
         <Row justify="center" direction="row" gap="0" align="center">
-          <GoBackToLogin to={"/login/user"}>
+          <GoBackToLogin to={"/login/guest"}>
             <ArrowLeftIcon />
             <span>Back to log in</span>
           </GoBackToLogin>
@@ -99,4 +99,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordGuest;

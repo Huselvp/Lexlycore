@@ -15,6 +15,7 @@ import AuthRoute from "./ui/AuthRoute";
 import PersonalInfoData from "./features/Account/PersonalInfoData";
 import LoginSecurityData from "./features/Account/LoginSecurityData";
 import ForgotPassword from "./pages/ForgotPassword";
+import ForgotPasswordGuest from "./pages/ForgotPasswordGuest";
 import ResetPassword from "./pages/ResetPassword";
 import PageNotFound from "./pages/PageNotFound";
 import Home from "./pages/Home";
@@ -177,6 +178,11 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/register/guest" element={<GuestRegister />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route
+            path="/forgotPassword/guest"
+            element={<ForgotPasswordGuest />}
+          />
+
           <Route path="/resetPassword/:token" element={<ResetPassword />} />
         </Route>
         {/*  */}

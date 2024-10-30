@@ -169,20 +169,110 @@ const DocumentsContent = () => {
   };
 
   // Function to convert HTML content to PDF
+  // const convertToPdf = (title, logo, contentHtml) => {
+  //   // Define the header HTML, using a specific font family, smaller font size, and margin
+  //   const header = `
+  //     <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
+  //       <h2 style="font-size: 16px;">${title}</h2>
+  //       <img src="${logo}" width="100" height="100" alt="Logo" />
+  //     </div>`;
+
+  //   // Apply the same font family and size to the entire content, adding margin between parent tags
+  //   const content = `
+  //     <div style="font-family: Arial, sans-serif; font-size: 12px;">
+  //       ${header}
+  //       <div style="margin-bottom: 1rem;">${contentHtml}</div>
+  //     </div>`;
+
+  //   const options = {
+  //     filename: "my-document.pdf",
+  //     margin: 1,
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2, useCORS: true },
+  //     jsPDF: {
+  //       unit: "in",
+  //       format: "letter",
+  //       orientation: "portrait",
+  //     },
+  //     pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // Enable page breaks for long content
+  //   };
+
+  //   // Generate the PDF with the header and content included
+  //   html2pdf().set(options).from(content).save();
+  // };
+
+  // const convertToPdf = (title, logo, contentHtml) => {
+  //   // Define the header HTML
+  //   const header = `
+  //     <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
+  //       <h2 style="font-size: 16px;">${title}</h2>
+  //       <img src="${logo}" width="100" height="100" alt="Logo" />
+  //     </div>`;
+
+  //   // Define the footer HTML with dynamic page numbers using a placeholder
+  //   const footer = `
+  //     <div style="position: fixed; bottom: 0; width: 100%; text-align: center; font-family: Arial, sans-serif; font-size: 10px; color: #666;">
+  //       Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+  //     </div>`;
+
+  //   // Wrap content in a div with specific styling for PDF generation
+  //   const content = `
+  //     <div style="font-family: Arial, sans-serif; font-size: 12px;">
+  //       ${header}
+  //       <div style="margin-bottom: 1rem;">${contentHtml}</div>
+  //       ${footer}
+  //     </div>`;
+
+  //   // Options with page break handling
+  //   const options = {
+  //     filename: "my-document.pdf",
+  //     margin: [0.5, 0.5, 1, 0.5], // Adjust bottom margin for footer
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2, useCORS: true },
+  //     jsPDF: {
+  //       unit: "in",
+  //       format: "letter",
+  //       orientation: "portrait",
+  //     },
+  //     pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+  //   };
+
+  //   // Generate the PDF with the header, content, and footer included
+  //   html2pdf()
+  //     .set(options)
+  //     .from(content)
+  //     .toPdf()
+  //     .get("pdf")
+  //     .then((pdf) => {
+  //       // Set total page count
+  //       const totalPages = pdf.internal.getNumberOfPages();
+  //       for (let i = 1; i <= totalPages; i++) {
+  //         pdf.setPage(i);
+  //         pdf.text(
+  //           `Page ${i} of ${totalPages}`,
+  //           pdf.internal.pageSize.width / 2,
+  //           pdf.internal.pageSize.height - 0.5, // Adjust footer position
+  //           { align: "center" }
+  //         );
+  //       }
+  //     })
+  //     .save();
+  // };
+
   const convertToPdf = (title, logo, contentHtml) => {
     // Define the header HTML, using a specific font family, smaller font size, and margin
     const header = `
-      <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
-        <h2 style="font-size: 16px;">${title}</h2>
-        <img src="${logo}" width="100" height="100" alt="Logo" />
-      </div>`;
+    <div style="display:flex; align-items:center; justify-content:space-between; font-family: Arial, sans-serif; font-size: 12px; margin-bottom: 1rem;">
+      <h2 style="font-size: 20px; font-weight:bold;">${title}</h2>
+      <img src="${logo}" width="100" height="100" alt="Logo" />
+    </div>`;
 
     // Apply the same font family and size to the entire content, adding margin between parent tags
     const content = `
-      <div style="font-family: Arial, sans-serif; font-size: 12px;">
-        ${header}
-        <div style="margin-bottom: 1rem;">${contentHtml}</div>
-      </div>`;
+    <div style="font-family: Arial, sans-serif; font-size: 12px;">
+      ${header}
+      ${contentHtml} <!-- The contentHtml already has the margin applied in each div -->
+    </div>`;
 
     const options = {
       filename: "my-document.pdf",
@@ -194,11 +284,31 @@ const DocumentsContent = () => {
         format: "letter",
         orientation: "portrait",
       },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // Enable page breaks for long content
+      pagebreak: { mode: ["css", "legacy"] }, // Enables page breaks
     };
 
-    // Generate the PDF with the header and content included
-    html2pdf().set(options).from(content).save();
+    // Generate the PDF with the header and content included, and add page numbers
+    html2pdf()
+      .set(options)
+      .from(content)
+      .toPdf()
+      .get("pdf")
+      .then(function (pdf) {
+        const totalPages = pdf.internal.getNumberOfPages();
+
+        // Add page numbers to each page
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(10);
+          pdf.text(
+            `Page ${i} of ${totalPages}`,
+            pdf.internal.pageSize.getWidth() / 2,
+            pdf.internal.pageSize.getHeight() - 0.5,
+            { align: "center" }
+          );
+        }
+      })
+      .save();
   };
 
   const handleGeneratePdf = (documentQuestions, title, logo) => {

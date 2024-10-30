@@ -35,7 +35,7 @@ const QuestiontsSlider = ({
   length: number;
   activeQuestion: number;
 }) => {
-  const data = useMemo(() => Array.from({ length }, (i) => i), [length]);
+  const data = useMemo(() => Array.from({ length }, (_, i) => i + 1), [length]);
   return (
     <Container>
       <List>
@@ -58,7 +58,11 @@ const QuestiontsSlider = ({
                 active={item === activeQuestion ? "true" : "false"}
                 key={index}
               >
-                {Number(item) < activeQuestion ? <FaCheck /> : Number(item) + 1}
+                {Number(item - 1) < activeQuestion ? (
+                  <FaCheck />
+                ) : (
+                  Number(item - 1) + 1
+                )}
               </Li>
             ))}
       </List>

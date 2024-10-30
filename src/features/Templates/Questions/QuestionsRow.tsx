@@ -184,12 +184,15 @@ const QuestionsRow = ({ question }: { question: Question }) => {
   };
 
   const create_new_block_handler = async () => {
+    console.log(formBlocksId, "##############################");
+
     try {
       await axios.post(
         `${API}/form/block/${formBlocksId}`,
         { type: blockType === "null" ? null : blockType },
         getApiConfig()
       );
+
       get_form_blocks_handler(formBlocksId);
       setIsAddBlockTypeOpen(false);
       setIsSeeBlocksOpen(true);
@@ -305,8 +308,9 @@ const QuestionsRow = ({ question }: { question: Question }) => {
         await axios
           .put(
             `${API}/filter/update/${
-            // @ts-ignore
-            filterData.id}`,
+              // @ts-ignore
+              filterData.id
+            }`,
             {
               filterStart: `${updatedMinValue}`,
               filterEnd: `${updatedMaxValue}`,
@@ -1477,18 +1481,19 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           <Table.Row id={`menus-row--${question.id}`}>
             <div>
               {
-              // @ts-ignore
-              question?.subQuestions?.length > 0 ? (
-                <button
-                  style={{ background: "none", border: "none" }}
-                  // here were i activate and desactivate the toggle
-                  onClick={() => {
-                    setcaret((prevCaret) => !prevCaret);
-                  }}
-                >
-                  {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
-                </button>
-              ) : null}
+                // @ts-ignore
+                question?.subQuestions?.length > 0 ? (
+                  <button
+                    style={{ background: "none", border: "none" }}
+                    // here were i activate and desactivate the toggle
+                    onClick={() => {
+                      setcaret((prevCaret) => !prevCaret);
+                    }}
+                  >
+                    {!caret_icon_active ? <RxCaretDown /> : <RxCaretUp />}
+                  </button>
+                ) : null
+              }
             </div>
 
             <div className="hideOverflow questions">
@@ -1512,9 +1517,8 @@ const QuestionsRow = ({ question }: { question: Question }) => {
                 )}
 
                 {question.valueType.startsWith("form") &&
-                  (
-                    // @ts-ignore
-                    formBlocksId === "" ? (
+                  // @ts-ignore
+                  (formBlocksId === "" || formBlocksId == undefined ? (
                     <Menus.Button
                       icon={<HiEye />}
                       onClick={() => {
@@ -1605,7 +1609,7 @@ const QuestionsRow = ({ question }: { question: Question }) => {
           <Reorder.Group onReorder={handleReorder} values={squestionOrderTest}>
             {squestionOrderTest?.map((sq) => (
               <RecursiveSubQuestionRow
-                 // @ts-ignore
+                // @ts-ignore
                 question={question}
                 key={sq.id}
                 subQuestion={sq}

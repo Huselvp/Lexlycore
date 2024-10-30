@@ -35,7 +35,7 @@ const ProtectedRoute = ({ userRole }: ProtectedRouteProps) => {
   const { isLoading, isAuthenticated, user } = useUser();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) navigate("/login");
+    if (!isLoading && !isAuthenticated) navigate("/login/user");
   }, [isLoading, isAuthenticated, navigate]);
 
   if (isLoading) return <Spinner />;

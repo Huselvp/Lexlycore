@@ -58,6 +58,7 @@ const Checkbox = styled.input`
     border: 1px solid var(--color-stone-500);
   }
 `;
+
 const Choices = styled.div`
   display: flex;
   flex-direction: column;
@@ -89,6 +90,7 @@ const Description = styled.div`
   color: var(--color-grey-500);
   font-size: 1.3rem;
 `;
+
 const DetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -110,6 +112,7 @@ const DetailsContainer = styled.div`
     box-shadow: var(--shadow);
   }
 `;
+
 const Details = styled(Description)`
   align-self: center;
   display: inline-block;
@@ -121,6 +124,7 @@ const Details = styled(Description)`
   font-size: 1.3rem;
   font-weight: 500;
 `;
+
 const InputContainer = styled.div`
   width: 50vw;
   align-self: center;
@@ -137,9 +141,11 @@ const InputContainer = styled.div`
     width: 85vw;
   }
 `;
+
 const Input = styled(Form.Input)`
   padding: 0.8rem 1.2rem;
 `;
+
 const Textarea = styled(Form.Textarea)`
   width: 100%;
   min-height: 12rem;
@@ -553,6 +559,7 @@ const DocumentSubQuestion = ({
         const targetedLabel = targetedBlock.labels.find(
           (label) => label.name === labelName
         );
+
         const labelId = targetedLabel ? targetedLabel.id : null; // Safely retrieve labelId
 
         if (labelId) {
@@ -834,11 +841,13 @@ const DocumentSubQuestion = ({
             <input
               type="range"
               min={
-                 // @ts-ignore
-                filterData?.filterStartInt}
+                // @ts-ignore
+                filterData?.filterStartInt
+              }
               max={
-                 // @ts-ignore
-                filterData?.filterEndInt}
+                // @ts-ignore
+                filterData?.filterEndInt
+              }
               value={Fvalue}
               onChange={handleSliderChange}
               style={{

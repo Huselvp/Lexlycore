@@ -3,6 +3,7 @@ import Logo from "../../ui/Logo";
 import { FaSave as SaveIcon } from "react-icons/fa";
 import { useAddUpdateDocumentQuestion } from "./useAddUpdateDocumentQuestion";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../utils/helpers";
 
 const Header = styled.div`
   background-color: var(--white);
@@ -44,8 +45,12 @@ const DocumentHeader = ({
   const { isLoading } = useAddUpdateDocumentQuestion();
   const navigate = useNavigate();
 
+  const token = getToken();
+
   const clickHandler = () => {
     localStorage.setItem("continue-later", JSON.stringify(overviewData));
+
+    console.log(overviewData, "############");
 
     navigate("/u/documents");
   };
@@ -53,10 +58,14 @@ const DocumentHeader = ({
   return (
     <Header>
       <Logo />
-      <button disabled={isLoading} onClick={clickHandler}>
-        <span>{isLoading ? "Loading..." : "Continue later"}</span>
-        <SaveIcon />
-      </button>
+      {token !== "" ? (
+        <button disabled={isLoading} onClick={clickHandler}>
+          <span>{isLoading ? "Loading..." : "Continue later"}</span>
+          <SaveIcon />
+        </button>
+      ) : (
+        ""
+      )}
     </Header>
   );
 };

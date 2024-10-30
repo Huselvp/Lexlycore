@@ -181,14 +181,13 @@ const DocumentQuestion = ({
   const [formData, setFormData] = useState([]);
   const [filterData, setFilterData] = useState({});
 
-  
-
   // Fetch form blocks and filter data
   useEffect(() => {
     const getFormBlocks = async () => {
       if (
         // @ts-ignore
-        question?.valueType === "form") {
+        question?.valueType === "form"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -202,9 +201,10 @@ const DocumentQuestion = ({
     };
 
     const getFilterData = async () => {
-      if ( 
+      if (
         // @ts-ignore
-        question?.valueType === "filter") {
+        question?.valueType === "filter"
+      ) {
         try {
           const result = await axios.get(
             `${API}/suser/question-details/${question.id}`,
@@ -293,8 +293,6 @@ const DocumentQuestion = ({
 
   const totalInputs = countTotalInputs(newBlocksForm);
 
-
-
   const [virksomhedsnavn, setVirksomhedsnavn] = useState("");
   const [adresse, setAdresse] = useState("");
   const [cvrNumber, setCvrNumber] = useState("");
@@ -320,7 +318,7 @@ const DocumentQuestion = ({
         }
 
         const allInputsFilled = updatedFormData?.length === totalInputs;
-       
+
         isTherData(allInputsFilled);
         setValue(updatedFormData, question.valueType);
 
@@ -348,7 +346,9 @@ const DocumentQuestion = ({
     ) {
       return (
         // @ts-ignore
-        +filterData?.filterStartInt + filterData?.filterEndInt) / 2;
+        (+filterData?.filterStartInt + filterData?.filterEndInt) /
+        2
+      );
     }
   });
 
@@ -489,26 +489,55 @@ const DocumentQuestion = ({
   const [CVR, setCVR] = useState("");
   const [CVRBlockId, setCVRBlockId] = useState("");
 
+  // const getSVRDataHandler = async (cvr) => {
+  //   try {
+  //     const result = await axios.get(
+  //       `${API}/suser/company-details/${cvr}`,
+  //       getApiConfig()
+  //     );
+
+  //     if (result.data) {
+  //       setVirksomhedsnavn(result.data.name || "");
+  //       setAdresse(result.data.address || "");
+  //       setCvrNumber(result.data.cvrNumber || "");
+  //       setPostalCode(result.data.postalCode || "");
+  //       setCity(result.data.city || "");
+  //       setCountry("Danmark");
+  //       setHerefterOtaltSom(result.data.hereafterReferredTo || "");
+  //     } else {
+  //       clearFormFields();
+  //     }
+  //   } catch (err) {
+  //     clearFormFields();
+  //   }
+  // };
+
   const getSVRDataHandler = async (cvr) => {
     try {
-      const result = await axios.get(
-        `${API}/suser/company-details/${cvr}`,
-        getApiConfig()
-      );
+      // Ensure that CVR is valid and the valueType is 'form'
+      if (question?.valueType === "form" && cvr && cvr !== "") {
+        const result = await axios.get(
+          `${API}/suser/company-details/${cvr}`,
+          getApiConfig()
+        );
 
-      if (result.data) {
-        setVirksomhedsnavn(result.data.name || "");
-        setAdresse(result.data.address || "");
-        setCvrNumber(result.data.cvrNumber || "");
-        setPostalCode(result.data.postalCode || "");
-        setCity(result.data.city || "");
-        setCountry("Danmark");
-        setHerefterOtaltSom(result.data.hereafterReferredTo || "");
+        // Check if result.data exists before updating state
+        if (result?.data) {
+          setVirksomhedsnavn(result.data.name || "");
+          setAdresse(result.data.address || "");
+          setCvrNumber(result.data.cvrNumber || "");
+          setPostalCode(result.data.postalCode || "");
+          setCity(result.data.city || "");
+          setCountry("Danmark");
+          setHerefterOtaltSom(result.data.hereafterReferredTo || "");
+        } else {
+          clearFormFields();
+        }
       } else {
-        clearFormFields();
+        clearFormFields(); // Clear fields if CVR is invalid
       }
     } catch (err) {
-      clearFormFields();
+      clearFormFields(); // Handle any errors by clearing the form fields
     }
   };
 

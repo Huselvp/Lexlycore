@@ -15,6 +15,11 @@ export const getDocments = async (): Promise<DocumentUser[]> => {
   const res = await axios.get(getDocumentsUrl(), getApiConfig());
   // return res.data
   // const documents = await axios.get(getDocumentsUrl(), getApiConfig())
+
+  console.log(
+    res.data,
+    "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+  );
   return res.data;
 };
 
@@ -38,6 +43,8 @@ export const addUpdateDocumentQuestion = async (
     data,
     getApiConfig()
   );
+
+  console.log(res.data);
 
   if (!res.data.success) throw new Error("Something went wrong");
 };

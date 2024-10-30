@@ -99,6 +99,15 @@ export const useAddUpdateDocumentQuestion = () => {
         // Process and log data
         const finalData = orderMyData(values);
 
+        console.log(
+          {
+            isDraft,
+            values: finalData,
+            documentId,
+          },
+          "######################################################"
+        );
+
         // Make the API call
         return addUpdateDocumentQuestionApi({
           isDraft,
