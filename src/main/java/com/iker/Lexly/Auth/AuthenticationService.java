@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.iker.Lexly.Entity.User;
 
+import com.iker.Lexly.Entity.enums.Role;
 import com.iker.Lexly.config.jwt.JwtService;
 import com.iker.Lexly.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -45,6 +46,12 @@ public class AuthenticationService {
     private String secretKey;
     @Value("${my-custom-cookie-name}")
     private String cookieName;
+    @Value("${admin.email}")
+    private String adminEmail;
+    @Value("${admin.password}")
+    private String adminPassword;
+
+
     public AuthenticationResponse register(RegisterRequest request, HttpServletResponse response) {
         String username = request.getFirstname() + " " + request.getLastname();
         try {
@@ -58,15 +65,25 @@ public class AuthenticationService {
                         .errorMessage("Email already in use")
                         .build();
             }
+
+            // Determine role
+            Role role = Role.SUSER; // Default role
+            if (request.getEmail().equals(adminEmail) && request.getPassword().equals(adminPassword)) {
+                role = Role.ADMIN;
+            }
+
+            // Build and save user
             var user = User.builder()
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
                     .email(request.getEmail())
                     .username(username)
                     .password(passwordEncoder.encode(request.getPassword()))
-                    .role(request.getRole())
+                    .role(role)
                     .build();
             var savedUser = userRepository.save(user);
+
+            // Generate token and set cookie
             var jwtToken = jwtService.generateToken(savedUser);
             Cookie cookie = new Cookie(cookieName, jwtToken);
             cookie.setMaxAge(1800);
@@ -88,8 +105,6 @@ public class AuthenticationService {
             }
         }
     }
-
-
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletResponse response) {
         try {
             authenticationManager.authenticate(

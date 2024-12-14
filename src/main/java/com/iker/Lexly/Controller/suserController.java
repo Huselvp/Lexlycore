@@ -18,7 +18,6 @@ import com.iker.Lexly.responses.ApiResponseDocuments;
 import com.iker.Lexly.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,9 +27,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/suser")
 @PreAuthorize("hasRole('ROLE_SUSER')")
@@ -78,26 +74,6 @@ public class suserController {
         this.companySearchService = companySearchService;
         this.documentSubQuestionValueService = documentSubQuestionValueService;
     }
-//    @PreAuthorize("permitAll()")
-//    @PostMapping("/login")
-//    public ResponseEntity<AuthenticationResponse> authenticate(
-//            @RequestBody AuthenticationRequest request,
-//            HttpServletResponse response
-//    ) {
-//        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
-//        return ResponseEntity.ok(authenticationResponse);
-//    }
-//    @PreAuthorize("permitAll()")
-//    @PostMapping("/register")
-//    public ResponseEntity<AuthenticationResponse> register(
-//            @RequestBody RegisterRequest request,
-//            HttpServletResponse response
-//    ) {
-//        request.setRole(Role.SUSER);
-//        AuthenticationResponse authenticationResponse = service.register(request, response);
-//        return ResponseEntity.ok(authenticationResponse);
-//    }
-
     @GetMapping("/get_documents/{token}")
     public ResponseEntity<List<Documents>> getDocumentsByToken(@PathVariable String token) {
         List<Documents> documents = documentsService.getDocumentsByUserId(token);
@@ -161,18 +137,6 @@ public class suserController {
     public ResponseEntity<CompanyDetails> getCompanyDetails(@PathVariable String cvr) {
         return companySearchService.getCompanyDetails(cvr);
     }
-//
-//    @PostMapping("/addValues")
-//    public ApiResponse addValues(@RequestBody AddValuesRequest request) {
-//        ApiResponse response = documentQuestionValueService.addValues(request);
-//
-//
-//
-//        return response;
-//    }
-
-
-
     @GetMapping("/values/{documentId}")
     public ResponseEntity<List<DocumentQuestionValue>> getValuesForDocument(@PathVariable Long documentId) {
         List<DocumentQuestionValue> values =documentsService.getValuesByDocumentId(documentId);

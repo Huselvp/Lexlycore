@@ -9,8 +9,6 @@ import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
 import com.iker.Lexly.Entity.Question;
 import com.iker.Lexly.Entity.SubQuestion;
-import com.iker.Lexly.DTO.QuestionDTO;
-import com.iker.Lexly.Entity.Template;
 import com.iker.Lexly.Transformer.BlockTransformer;
 import com.iker.Lexly.Transformer.FormTransformer;
 import com.iker.Lexly.Transformer.LabelTransformer;
@@ -28,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

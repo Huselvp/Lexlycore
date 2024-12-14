@@ -1,11 +1,9 @@
 package com.iker.Lexly.Controller;
-import com.iker.Lexly.DTO.DocumentQuestionValueDTO;
 import com.iker.Lexly.Entity.Form.Block;
 import com.iker.Lexly.Entity.Form.Form;
 import com.iker.Lexly.Entity.Form.Label;
 import com.iker.Lexly.repository.form.FormRepository;
 import com.iker.Lexly.request.AddValuesRequest;
-import com.iker.Lexly.request.FormValues;
 import com.iker.Lexly.request.UserInputs;
 import com.iker.Lexly.request.UserInputsSubQuestion;
 import com.iker.Lexly.responses.ApiResponse;
