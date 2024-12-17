@@ -81,7 +81,7 @@ const GuestRegister = () => {
       // Register the user
       const registerRes = await axios.post(
         `${API}/auth/register`,
-        { firstname, lastname, username, email, password, role: "SUSER" },
+        { firstname, lastname, username, email, password },
         getApiConfig()
       );
 

@@ -28,8 +28,6 @@ const Register = () => {
       username,
       email,
       password,
-      // @ts-ignore
-      role: "ADMIN",
     });
   };
 

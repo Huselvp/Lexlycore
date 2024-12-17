@@ -1,4 +1,8 @@
-import styled from "styled-components"
+import styled from "styled-components";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { getApiConfig } from "../../utils/constants";
+import { API } from "../../utils/constants";
 
 const Boxes = styled.div`
   display: grid;
@@ -6,7 +10,7 @@ const Boxes = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   /* align-content: space-between; */
   gap: 1rem 2rem;
-`
+`;
 const Box = styled.div`
   background-color: var(--white);
   padding: 2rem 1rem;
@@ -25,28 +29,71 @@ const Box = styled.div`
     font-size: 2.5rem;
     font-weight: 700;
   }
-`
+`;
 const DashboardHeader = () => {
+  useEffect(() => {
+    const getTotalTemplates = async () => {
+      try {
+        const response = await axios.get(
+          `${API}/public/all_templates`,
+          getApiConfig()
+        );
+
+        setTotalTemplates(response.data?.length || 0);
+
+        console.log(response.data, "templates");
+      } catch (err) {
+        console.error("Error fetching total templates:", err);
+      }
+    };
+
+    const getTotalUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${API}/admin/all_users`,
+          getApiConfig()
+        );
+
+        setTotalUsers(response.data?.length || 0);
+
+        console.log(response.data, "@@@@@@@@@@@@@@@@@");
+      } catch (err) {
+        console.error("Error fetching total users:", err);
+      }
+    };
+
+    getTotalTemplates();
+    getTotalUsers();
+  }, []);
+
+  const getPaidTemplatesHandler = () => {};
+
+  const coutTemplatesTotalRevenue = () => {};
+
+  const [totalTemplates, setTotalTemplates] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+
   return (
     <Boxes>
       <Box>
         <span>Total Templates</span>
-        <span>1435</span>
+        <span>{totalTemplates}</span>
       </Box>
       <Box>
         <span>Total Users</span>
-        <span>67,322</span>
+        <span>{totalUsers}</span>
       </Box>
       <Box>
         <span>Total Sales</span>
-        <span>32,444</span>
+        <span>{totalSales}</span>
       </Box>
       <Box>
         <span>Total Revenue</span>
         <span>$10.823,43</span>
       </Box>
     </Boxes>
-  )
-}
+  );
+};
 
-export default DashboardHeader
+export default DashboardHeader;

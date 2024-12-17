@@ -23,7 +23,6 @@ const P = styled.p`
 
 const GuestLogin = () => {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false); // Loading state for the form
@@ -42,7 +41,6 @@ const GuestLogin = () => {
         initiatePaymentUrl(data.templateId),
         getApiConfig()
       );
-
       // Extract paymentId from response
       const paymentId = JSON.parse(response.data.data).paymentId;
 
